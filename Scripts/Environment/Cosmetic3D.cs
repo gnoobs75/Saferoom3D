@@ -2443,48 +2443,220 @@ public partial class Cosmetic3D : StaticBody3D
         float s = PropScale;
 
         // Barrel on its side, broken
-        // Base cylinder section (lying down)
-        int segments = 8;
+        int segments = 12; // More segments for smoother barrel
         float radius = 0.35f * s;
-        float height = 0.5f * s;
+        float height = 0.55f * s;
+        float barrelY = radius * 0.3f; // Slight offset so it rests on floor
 
-        // Create partial barrel (broken, so only 2/3 of it)
+        // === MAIN BARREL BODY - partial staves ===
+        // Create partial barrel (broken, with missing staves)
+        int[] missingStaves = { 2, 3, 10 }; // Staves that are broken off
         for (int i = 0; i < segments; i++)
         {
+            // Check if this stave is missing
+            bool isMissing = false;
+            foreach (int m in missingStaves)
+            {
+                if (i == m) { isMissing = true; break; }
+            }
+            if (isMissing) continue;
+
             float angle1 = i * Mathf.Tau / segments;
             float angle2 = (i + 1) * Mathf.Tau / segments;
-            // Skip some segments for broken look
-            if (i == 2 || i == 3) continue;
 
-            float y1 = Mathf.Cos(angle1) * radius;
+            float y1 = Mathf.Cos(angle1) * radius + barrelY;
             float z1 = Mathf.Sin(angle1) * radius;
-            float y2 = Mathf.Cos(angle2) * radius;
+            float y2 = Mathf.Cos(angle2) * radius + barrelY;
             float z2 = Mathf.Sin(angle2) * radius;
 
-            // Side panel
-            surfaceTool.AddVertex(new Vector3(-height/2, y1, z1));
-            surfaceTool.AddVertex(new Vector3(height/2, y1, z1));
-            surfaceTool.AddVertex(new Vector3(height/2, y2, z2));
+            // Stave width variation (individual plank look)
+            float staveInset = 0.005f * s;
+            float innerY1 = Mathf.Cos(angle1) * (radius - staveInset) + barrelY;
+            float innerZ1 = Mathf.Sin(angle1) * (radius - staveInset);
+            float innerY2 = Mathf.Cos(angle2) * (radius - staveInset) + barrelY;
+            float innerZ2 = Mathf.Sin(angle2) * (radius - staveInset);
 
-            surfaceTool.AddVertex(new Vector3(-height/2, y1, z1));
-            surfaceTool.AddVertex(new Vector3(height/2, y2, z2));
-            surfaceTool.AddVertex(new Vector3(-height/2, y2, z2));
+            // Outer surface of stave
+            surfaceTool.AddVertex(new Vector3(-height / 2, y1, z1));
+            surfaceTool.AddVertex(new Vector3(height / 2, y1, z1));
+            surfaceTool.AddVertex(new Vector3(height / 2, y2, z2));
+
+            surfaceTool.AddVertex(new Vector3(-height / 2, y1, z1));
+            surfaceTool.AddVertex(new Vector3(height / 2, y2, z2));
+            surfaceTool.AddVertex(new Vector3(-height / 2, y2, z2));
+
+            // Inner surface visible (gives thickness to staves)
+            surfaceTool.AddVertex(new Vector3(-height / 2 + 0.02f * s, innerY1, innerZ1));
+            surfaceTool.AddVertex(new Vector3(height / 2 - 0.02f * s, innerY2, innerZ2));
+            surfaceTool.AddVertex(new Vector3(height / 2 - 0.02f * s, innerY1, innerZ1));
+
+            surfaceTool.AddVertex(new Vector3(-height / 2 + 0.02f * s, innerY1, innerZ1));
+            surfaceTool.AddVertex(new Vector3(-height / 2 + 0.02f * s, innerY2, innerZ2));
+            surfaceTool.AddVertex(new Vector3(height / 2 - 0.02f * s, innerY2, innerZ2));
         }
 
-        // Liquid pool beneath
-        for (int i = 0; i < 6; i++)
+        // === SPLINTERED STAVE ENDS - jagged broken edges ===
+        for (int i = 0; i < 3; i++)
         {
-            float angle1 = i * Mathf.Tau / 6;
-            float angle2 = (i + 1) * Mathf.Tau / 6;
-            float r = 0.3f * s;
-            surfaceTool.AddVertex(new Vector3(0.2f * s, 0.01f, 0));
-            surfaceTool.AddVertex(new Vector3(0.2f * s + Mathf.Cos(angle1) * r, 0.01f, Mathf.Sin(angle1) * r));
-            surfaceTool.AddVertex(new Vector3(0.2f * s + Mathf.Cos(angle2) * r, 0.01f, Mathf.Sin(angle2) * r));
+            float splinterAngle = missingStaves[i % 3] * Mathf.Tau / segments + rng.RandfRange(-0.1f, 0.1f);
+            float splinterY = Mathf.Cos(splinterAngle) * radius + barrelY;
+            float splinterZ = Mathf.Sin(splinterAngle) * radius;
+
+            // Jagged splinter pointing outward
+            for (int j = 0; j < 3; j++)
+            {
+                float splinterX = -height / 2 + rng.RandfRange(0.1f, 0.4f) * height;
+                float splinterLen = rng.RandfRange(0.04f, 0.1f) * s;
+                float splinterWidth = rng.RandfRange(0.01f, 0.025f) * s;
+                float outDir = rng.RandfRange(0.3f, 0.8f);
+
+                // Splinter as elongated triangle pointing outward
+                surfaceTool.AddVertex(new Vector3(splinterX - splinterWidth, splinterY, splinterZ));
+                surfaceTool.AddVertex(new Vector3(splinterX + splinterWidth, splinterY, splinterZ));
+                surfaceTool.AddVertex(new Vector3(splinterX, splinterY + splinterLen * outDir, splinterZ + splinterLen * (1 - outDir)));
+            }
+        }
+
+        // === METAL BANDS - two bands with damage ===
+        float bandWidth = 0.04f * s;
+        float bandThickness = 0.015f * s;
+        float[] bandPositions = { -height * 0.35f, height * 0.35f };
+
+        foreach (float bandX in bandPositions)
+        {
+            // Band segments (wrapping around barrel)
+            int bandSegs = 10;
+            for (int i = 0; i < bandSegs; i++)
+            {
+                float angle1 = i * Mathf.Tau / bandSegs;
+                float angle2 = (i + 1) * Mathf.Tau / bandSegs;
+
+                // Skip segment for damage
+                if (i == 2 && bandX > 0) continue; // Broken band on one side
+
+                float y1 = Mathf.Cos(angle1) * (radius + bandThickness) + barrelY;
+                float z1 = Mathf.Sin(angle1) * (radius + bandThickness);
+                float y2 = Mathf.Cos(angle2) * (radius + bandThickness) + barrelY;
+                float z2 = Mathf.Sin(angle2) * (radius + bandThickness);
+
+                // Band segment
+                surfaceTool.AddVertex(new Vector3(bandX - bandWidth / 2, y1, z1));
+                surfaceTool.AddVertex(new Vector3(bandX + bandWidth / 2, y1, z1));
+                surfaceTool.AddVertex(new Vector3(bandX + bandWidth / 2, y2, z2));
+
+                surfaceTool.AddVertex(new Vector3(bandX - bandWidth / 2, y1, z1));
+                surfaceTool.AddVertex(new Vector3(bandX + bandWidth / 2, y2, z2));
+                surfaceTool.AddVertex(new Vector3(bandX - bandWidth / 2, y2, z2));
+            }
+
+            // Loose/bent band end (hanging down)
+            if (bandX > 0)
+            {
+                float bentAngle = 2 * Mathf.Tau / bandSegs;
+                float bentY = Mathf.Cos(bentAngle) * (radius + bandThickness) + barrelY - 0.05f * s;
+                float bentZ = Mathf.Sin(bentAngle) * (radius + bandThickness) + 0.08f * s;
+                surfaceTool.AddVertex(new Vector3(bandX - bandWidth / 2, bentY, bentZ));
+                surfaceTool.AddVertex(new Vector3(bandX + bandWidth / 2, bentY, bentZ));
+                surfaceTool.AddVertex(new Vector3(bandX, bentY - 0.06f * s, bentZ + 0.03f * s));
+            }
+        }
+
+        // === METAL BAND RIVETS/NAILS ===
+        int rivetCount = 6;
+        for (int i = 0; i < rivetCount; i++)
+        {
+            float rivetAngle = i * Mathf.Tau / rivetCount;
+            // Skip rivets on missing staves
+            if (i == 1 || i == 2) continue;
+
+            float rivetY = Mathf.Cos(rivetAngle) * (radius + bandThickness + 0.005f * s) + barrelY;
+            float rivetZ = Mathf.Sin(rivetAngle) * (radius + bandThickness + 0.005f * s);
+
+            // Rivet on each band
+            foreach (float bandX in bandPositions)
+            {
+                float rivetR = 0.012f * s;
+                for (int j = 0; j < 4; j++)
+                {
+                    float ra1 = j * Mathf.Tau / 4;
+                    float ra2 = (j + 1) * Mathf.Tau / 4;
+                    surfaceTool.AddVertex(new Vector3(bandX, rivetY, rivetZ));
+                    surfaceTool.AddVertex(new Vector3(bandX + rivetR * 0.5f, rivetY + Mathf.Cos(ra1) * rivetR, rivetZ + Mathf.Sin(ra1) * rivetR));
+                    surfaceTool.AddVertex(new Vector3(bandX + rivetR * 0.5f, rivetY + Mathf.Cos(ra2) * rivetR, rivetZ + Mathf.Sin(ra2) * rivetR));
+                }
+            }
+        }
+
+        // === SEPARATED STAVES - fallen pieces nearby ===
+        int looseStaveCount = rng.RandiRange(1, 2);
+        for (int i = 0; i < looseStaveCount; i++)
+        {
+            float staveX = rng.RandfRange(0.3f, 0.5f) * s * (rng.Randf() > 0.5f ? 1 : -1);
+            float staveZ = rng.RandfRange(0.25f, 0.4f) * s * (rng.Randf() > 0.5f ? 1 : -1);
+            float staveLen = rng.RandfRange(0.35f, 0.5f) * height;
+            float staveWidth = 0.06f * s;
+            float staveAngle = rng.Randf() * Mathf.Tau;
+
+            // Curved stave lying on ground
+            float dx = Mathf.Cos(staveAngle) * staveLen / 2;
+            float dz = Mathf.Sin(staveAngle) * staveLen / 2;
+
+            // Simple flat representation of curved stave
+            surfaceTool.AddVertex(new Vector3(staveX - dx, 0.02f * s, staveZ - dz - staveWidth / 2));
+            surfaceTool.AddVertex(new Vector3(staveX + dx, 0.02f * s, staveZ + dz - staveWidth / 2));
+            surfaceTool.AddVertex(new Vector3(staveX + dx, 0.025f * s, staveZ + dz + staveWidth / 2));
+
+            surfaceTool.AddVertex(new Vector3(staveX - dx, 0.02f * s, staveZ - dz - staveWidth / 2));
+            surfaceTool.AddVertex(new Vector3(staveX + dx, 0.025f * s, staveZ + dz + staveWidth / 2));
+            surfaceTool.AddVertex(new Vector3(staveX - dx, 0.025f * s, staveZ - dz + staveWidth / 2));
+        }
+
+        // === SPILLED LIQUID POOL ===
+        int poolSegs = 8;
+        float poolCenterX = height * 0.3f;
+        for (int i = 0; i < poolSegs; i++)
+        {
+            float angle1 = i * Mathf.Tau / poolSegs;
+            float angle2 = (i + 1) * Mathf.Tau / poolSegs;
+            float r1 = (0.22f + rng.Randf() * 0.12f) * s;
+            float r2 = (0.22f + rng.Randf() * 0.12f) * s;
+            surfaceTool.AddVertex(new Vector3(poolCenterX, 0.008f, 0));
+            surfaceTool.AddVertex(new Vector3(poolCenterX + Mathf.Cos(angle1) * r1, 0.005f, Mathf.Sin(angle1) * r1));
+            surfaceTool.AddVertex(new Vector3(poolCenterX + Mathf.Cos(angle2) * r2, 0.005f, Mathf.Sin(angle2) * r2));
+        }
+
+        // Liquid trail from barrel opening
+        float trailLen = 0.15f * s;
+        surfaceTool.AddVertex(new Vector3(height / 2, 0.01f, -0.04f * s));
+        surfaceTool.AddVertex(new Vector3(height / 2, 0.01f, 0.04f * s));
+        surfaceTool.AddVertex(new Vector3(height / 2 + trailLen, 0.005f, 0));
+
+        // === WOOD GRAIN DETAIL on staves ===
+        int grainCount = rng.RandiRange(4, 6);
+        for (int g = 0; g < grainCount; g++)
+        {
+            float grainAngle = rng.Randf() * Mathf.Tau;
+            // Avoid missing staves
+            bool onMissing = false;
+            foreach (int m in missingStaves)
+            {
+                float mAngle = m * Mathf.Tau / segments;
+                if (Mathf.Abs(grainAngle - mAngle) < 0.3f) { onMissing = true; break; }
+            }
+            if (onMissing) continue;
+
+            float grainY = Mathf.Cos(grainAngle) * (radius + 0.005f * s) + barrelY;
+            float grainZ = Mathf.Sin(grainAngle) * (radius + 0.005f * s);
+            float grainX = rng.RandfRange(-height * 0.4f, height * 0.4f);
+            float grainLen = rng.RandfRange(0.06f, 0.12f) * s;
+
+            // Grain line as thin box
+            AddBoxToSurfaceTool(surfaceTool, new Vector3(grainX, grainY, grainZ), new Vector3(grainLen, 0.003f * s, 0.006f * s));
         }
 
         surfaceTool.GenerateNormals();
         var mesh = surfaceTool.Commit();
-        var material = ProceduralMesh3D.CreateWoodMaterial(new Color(0.5f, 0.35f, 0.2f));
+        var material = ProceduralMesh3D.CreateWoodMaterial(new Color(0.45f, 0.32f, 0.18f));
         mesh.SurfaceSetMaterial(0, material);
         return mesh;
     }
@@ -2495,50 +2667,222 @@ public partial class Cosmetic3D : StaticBody3D
         surfaceTool.Begin(Mesh.PrimitiveType.Triangles);
         float s = PropScale;
 
-        // Main altar slab with beveled edges
-        AddBoxToSurfaceTool(surfaceTool, new Vector3(0, 0.25f * s, 0), new Vector3(1.2f * s, 0.5f * s, 0.7f * s));
+        float altarTop = 0.5f * s;
+        float altarHeight = 0.5f * s;
 
-        // Base pedestal (wider at bottom)
-        AddBoxToSurfaceTool(surfaceTool, new Vector3(0, 0.02f * s, 0), new Vector3(1.3f * s, 0.04f * s, 0.8f * s));
+        // === MAIN ALTAR SLAB with beveled edges ===
+        AddBoxToSurfaceTool(surfaceTool, new Vector3(0, 0.25f * s, 0), new Vector3(1.2f * s, altarHeight, 0.7f * s));
 
-        // Ritual circle groove
+        // Beveled edge detail (chamfered corners)
+        float bevelSize = 0.04f * s;
+        // Front bevel
+        AddBoxToSurfaceTool(surfaceTool, new Vector3(0, altarTop - 0.01f * s, 0.35f * s), new Vector3(1.1f * s, 0.02f * s, bevelSize));
+        // Back bevel
+        AddBoxToSurfaceTool(surfaceTool, new Vector3(0, altarTop - 0.01f * s, -0.35f * s), new Vector3(1.1f * s, 0.02f * s, bevelSize));
+        // Side bevels
+        AddBoxToSurfaceTool(surfaceTool, new Vector3(0.6f * s, altarTop - 0.01f * s, 0), new Vector3(bevelSize, 0.02f * s, 0.65f * s));
+        AddBoxToSurfaceTool(surfaceTool, new Vector3(-0.6f * s, altarTop - 0.01f * s, 0), new Vector3(bevelSize, 0.02f * s, 0.65f * s));
+
+        // === TIERED BASE PEDESTAL ===
+        AddBoxToSurfaceTool(surfaceTool, new Vector3(0, 0.03f * s, 0), new Vector3(1.35f * s, 0.06f * s, 0.85f * s));
+        AddBoxToSurfaceTool(surfaceTool, new Vector3(0, 0.08f * s, 0), new Vector3(1.28f * s, 0.04f * s, 0.78f * s));
+
+        // === CARVED RUNE PATTERNS - complex magical symbols ===
+        float runeY = altarTop + 0.005f * s;
+
+        // Outer ritual circle
+        int circleSegs = 16;
+        float outerR = 0.38f * s;
+        for (int i = 0; i < circleSegs; i++)
+        {
+            float angle = i * Mathf.Tau / circleSegs;
+            float x = Mathf.Cos(angle) * outerR;
+            float z = Mathf.Sin(angle) * outerR;
+            AddBoxToSurfaceTool(surfaceTool, new Vector3(x, runeY, z), new Vector3(0.05f * s, 0.008f * s, 0.018f * s));
+        }
+
+        // Inner circle
+        float innerR = 0.25f * s;
         for (int i = 0; i < 12; i++)
         {
-            float angle = i * Mathf.Tau / 12f;
-            float circleR = 0.35f * s;
-            float x = Mathf.Cos(angle) * circleR;
-            float z = Mathf.Sin(angle) * circleR;
-            AddBoxToSurfaceTool(surfaceTool, new Vector3(x, 0.505f * s, z), new Vector3(0.05f * s, 0.01f * s, 0.02f * s));
+            float angle = i * Mathf.Tau / 12;
+            float x = Mathf.Cos(angle) * innerR;
+            float z = Mathf.Sin(angle) * innerR;
+            AddBoxToSurfaceTool(surfaceTool, new Vector3(x, runeY, z), new Vector3(0.04f * s, 0.008f * s, 0.015f * s));
         }
 
-        // Rune grooves (cross pattern)
-        AddBoxToSurfaceTool(surfaceTool, new Vector3(0, 0.505f * s, 0), new Vector3(0.9f * s, 0.01f * s, 0.025f * s));
-        AddBoxToSurfaceTool(surfaceTool, new Vector3(0, 0.505f * s, 0), new Vector3(0.025f * s, 0.01f * s, 0.55f * s));
+        // Pentagram-like star pattern
+        for (int i = 0; i < 5; i++)
+        {
+            float angle1 = i * Mathf.Tau / 5;
+            float angle2 = ((i + 2) % 5) * Mathf.Tau / 5;
+            float x1 = Mathf.Cos(angle1) * outerR * 0.85f;
+            float z1 = Mathf.Sin(angle1) * outerR * 0.85f;
+            float x2 = Mathf.Cos(angle2) * outerR * 0.85f;
+            float z2 = Mathf.Sin(angle2) * outerR * 0.85f;
 
-        // Corner candle holders
+            // Line from point to point
+            float midX = (x1 + x2) / 2;
+            float midZ = (z1 + z2) / 2;
+            float lineLen = Mathf.Sqrt((x2 - x1) * (x2 - x1) + (z2 - z1) * (z2 - z1));
+            float lineAngle = Mathf.Atan2(z2 - z1, x2 - x1);
+
+            // Create line segment as rotated box
+            float dx = Mathf.Cos(lineAngle);
+            float dz = Mathf.Sin(lineAngle);
+            AddBoxToSurfaceTool(surfaceTool, new Vector3(midX, runeY + 0.001f * s, midZ), new Vector3(lineLen, 0.006f * s, 0.012f * s));
+        }
+
+        // Diagonal rune lines
+        AddBoxToSurfaceTool(surfaceTool, new Vector3(0, runeY, 0), new Vector3(0.95f * s, 0.008f * s, 0.02f * s));
+        AddBoxToSurfaceTool(surfaceTool, new Vector3(0, runeY, 0), new Vector3(0.02f * s, 0.008f * s, 0.58f * s));
+
+        // Small rune glyphs at cardinal points
+        float[] glyphX = { 0.4f * s, -0.4f * s, 0, 0 };
+        float[] glyphZ = { 0, 0, 0.22f * s, -0.22f * s };
+        for (int g = 0; g < 4; g++)
+        {
+            // Triangle rune
+            float gx = glyphX[g];
+            float gz = glyphZ[g];
+            float gr = 0.025f * s;
+            surfaceTool.AddVertex(new Vector3(gx, runeY + 0.002f * s, gz - gr));
+            surfaceTool.AddVertex(new Vector3(gx + gr, runeY + 0.002f * s, gz + gr));
+            surfaceTool.AddVertex(new Vector3(gx - gr, runeY + 0.002f * s, gz + gr));
+        }
+
+        // === BLOOD CHANNELS - grooves for ritual drainage ===
+        float channelY = altarTop + 0.003f * s;
+        float channelWidth = 0.018f * s;
+
+        // Main channel running down center length
+        AddBoxToSurfaceTool(surfaceTool, new Vector3(0, channelY, 0.1f * s), new Vector3(channelWidth, 0.01f * s, 0.45f * s));
+
+        // Branch channels from center
+        AddBoxToSurfaceTool(surfaceTool, new Vector3(0.15f * s, channelY, 0.2f * s), new Vector3(0.25f * s, 0.01f * s, channelWidth));
+        AddBoxToSurfaceTool(surfaceTool, new Vector3(-0.18f * s, channelY, 0.15f * s), new Vector3(0.3f * s, 0.01f * s, channelWidth));
+
+        // Channel leading to edge (drainage spout)
+        AddBoxToSurfaceTool(surfaceTool, new Vector3(0.45f * s, channelY, 0.2f * s), new Vector3(0.18f * s, 0.01f * s, channelWidth));
+        // Spout notch at edge
+        AddBoxToSurfaceTool(surfaceTool, new Vector3(0.58f * s, altarTop - 0.02f * s, 0.2f * s), new Vector3(0.04f * s, 0.04f * s, 0.03f * s));
+
+        // === CANDLE HOLDERS with detail ===
         float[] cornerX = { -0.5f * s, 0.5f * s, -0.5f * s, 0.5f * s };
-        float[] cornerZ = { -0.3f * s, -0.3f * s, 0.3f * s, 0.3f * s };
+        float[] cornerZ = { -0.28f * s, -0.28f * s, 0.28f * s, 0.28f * s };
         for (int i = 0; i < 4; i++)
         {
-            // Holder base
-            AddBoxToSurfaceTool(surfaceTool, new Vector3(cornerX[i], 0.52f * s, cornerZ[i]), new Vector3(0.06f * s, 0.02f * s, 0.06f * s));
-            // Candle
-            AddBoxToSurfaceTool(surfaceTool, new Vector3(cornerX[i], 0.58f * s, cornerZ[i]), new Vector3(0.025f * s, 0.1f * s, 0.025f * s));
+            float cx = cornerX[i];
+            float cz = cornerZ[i];
+
+            // Holder base (wider)
+            AddBoxToSurfaceTool(surfaceTool, new Vector3(cx, altarTop + 0.015f * s, cz), new Vector3(0.07f * s, 0.03f * s, 0.07f * s));
+
+            // Holder lip (ring)
+            for (int r = 0; r < 6; r++)
+            {
+                float ringAngle = r * Mathf.Tau / 6;
+                float ringX = Mathf.Cos(ringAngle) * 0.032f * s;
+                float ringZ = Mathf.Sin(ringAngle) * 0.032f * s;
+                AddBoxToSurfaceTool(surfaceTool, new Vector3(cx + ringX, altarTop + 0.035f * s, cz + ringZ), new Vector3(0.012f * s, 0.01f * s, 0.012f * s));
+            }
+
+            // Candle (tapered cylinder approximation)
+            float candleH = rng.RandfRange(0.08f, 0.12f) * s;
+            AddBoxToSurfaceTool(surfaceTool, new Vector3(cx, altarTop + 0.04f * s + candleH / 2, cz), new Vector3(0.022f * s, candleH, 0.022f * s));
+
+            // Wax drips
+            int dripCount = rng.RandiRange(1, 3);
+            for (int d = 0; d < dripCount; d++)
+            {
+                float dripAngle = rng.Randf() * Mathf.Tau;
+                float dripDist = 0.015f * s;
+                float dripX = cx + Mathf.Cos(dripAngle) * dripDist;
+                float dripZ = cz + Mathf.Sin(dripAngle) * dripDist;
+                float dripLen = rng.RandfRange(0.02f, 0.05f) * s;
+                AddBoxToSurfaceTool(surfaceTool, new Vector3(dripX, altarTop + 0.05f * s + dripLen / 2, dripZ), new Vector3(0.008f * s, dripLen, 0.008f * s));
+            }
         }
 
-        // Blood stains (asymmetric for realism)
-        AddBoxToSurfaceTool(surfaceTool, new Vector3(0.08f * s, 0.505f * s, 0.05f * s), new Vector3(0.18f * s, 0.01f * s, 0.15f * s));
-        AddBoxToSurfaceTool(surfaceTool, new Vector3(-0.12f * s, 0.505f * s, -0.08f * s), new Vector3(0.1f * s, 0.01f * s, 0.08f * s));
+        // === BLOOD STAINS - more organic shapes ===
+        int stainCount = rng.RandiRange(3, 5);
+        for (int st = 0; st < stainCount; st++)
+        {
+            float stainX = rng.RandfRange(-0.35f, 0.35f) * s;
+            float stainZ = rng.RandfRange(-0.2f, 0.25f) * s;
+            float stainR = rng.RandfRange(0.04f, 0.1f) * s;
 
-        // Offering bowl in center
-        AddSphereToSurfaceTool(surfaceTool, new Vector3(0, 0.54f * s, 0), 0.08f * s);
+            // Irregular stain shape
+            int stainSegs = 6;
+            for (int ss = 0; ss < stainSegs; ss++)
+            {
+                float sAngle1 = ss * Mathf.Tau / stainSegs;
+                float sAngle2 = (ss + 1) * Mathf.Tau / stainSegs;
+                float sr1 = stainR * (0.7f + rng.Randf() * 0.5f);
+                float sr2 = stainR * (0.7f + rng.Randf() * 0.5f);
+
+                surfaceTool.AddVertex(new Vector3(stainX, runeY + 0.003f * s, stainZ));
+                surfaceTool.AddVertex(new Vector3(stainX + Mathf.Cos(sAngle1) * sr1, runeY + 0.002f * s, stainZ + Mathf.Sin(sAngle1) * sr1));
+                surfaceTool.AddVertex(new Vector3(stainX + Mathf.Cos(sAngle2) * sr2, runeY + 0.002f * s, stainZ + Mathf.Sin(sAngle2) * sr2));
+            }
+        }
+
+        // === OFFERING BOWL with blood inside ===
+        float bowlX = 0.05f * s;
+        float bowlZ = -0.05f * s;
+        float bowlR = 0.09f * s;
+        float bowlH = 0.04f * s;
+
+        // Bowl outer rim
+        for (int b = 0; b < 8; b++)
+        {
+            float bAngle1 = b * Mathf.Tau / 8;
+            float bAngle2 = (b + 1) * Mathf.Tau / 8;
+            // Outer wall
+            surfaceTool.AddVertex(new Vector3(bowlX + Mathf.Cos(bAngle1) * bowlR, altarTop + 0.005f * s, bowlZ + Mathf.Sin(bAngle1) * bowlR));
+            surfaceTool.AddVertex(new Vector3(bowlX + Mathf.Cos(bAngle1) * bowlR, altarTop + bowlH, bowlZ + Mathf.Sin(bAngle1) * bowlR));
+            surfaceTool.AddVertex(new Vector3(bowlX + Mathf.Cos(bAngle2) * bowlR, altarTop + bowlH, bowlZ + Mathf.Sin(bAngle2) * bowlR));
+
+            surfaceTool.AddVertex(new Vector3(bowlX + Mathf.Cos(bAngle1) * bowlR, altarTop + 0.005f * s, bowlZ + Mathf.Sin(bAngle1) * bowlR));
+            surfaceTool.AddVertex(new Vector3(bowlX + Mathf.Cos(bAngle2) * bowlR, altarTop + bowlH, bowlZ + Mathf.Sin(bAngle2) * bowlR));
+            surfaceTool.AddVertex(new Vector3(bowlX + Mathf.Cos(bAngle2) * bowlR, altarTop + 0.005f * s, bowlZ + Mathf.Sin(bAngle2) * bowlR));
+        }
+
+        // Blood filling bowl (flat disc at top)
+        float bloodInnerR = bowlR * 0.85f;
+        for (int b = 0; b < 8; b++)
+        {
+            float bAngle1 = b * Mathf.Tau / 8;
+            float bAngle2 = (b + 1) * Mathf.Tau / 8;
+            surfaceTool.AddVertex(new Vector3(bowlX, altarTop + bowlH - 0.01f * s, bowlZ));
+            surfaceTool.AddVertex(new Vector3(bowlX + Mathf.Cos(bAngle1) * bloodInnerR, altarTop + bowlH - 0.01f * s, bowlZ + Mathf.Sin(bAngle1) * bloodInnerR));
+            surfaceTool.AddVertex(new Vector3(bowlX + Mathf.Cos(bAngle2) * bloodInnerR, altarTop + bowlH - 0.01f * s, bowlZ + Mathf.Sin(bAngle2) * bloodInnerR));
+        }
+
+        // === RITUAL DAGGER (optional) ===
+        if (rng.Randf() > 0.3f)
+        {
+            float daggerX = -0.25f * s;
+            float daggerZ = 0.1f * s;
+            float daggerAngle = rng.RandfRange(-0.3f, 0.3f);
+
+            // Blade
+            float bladeLen = 0.12f * s;
+            float dx = Mathf.Cos(daggerAngle) * bladeLen / 2;
+            float dz = Mathf.Sin(daggerAngle) * bladeLen / 2;
+            AddBoxToSurfaceTool(surfaceTool, new Vector3(daggerX, altarTop + 0.01f * s, daggerZ), new Vector3(bladeLen, 0.008f * s, 0.02f * s));
+
+            // Handle
+            float handleLen = 0.06f * s;
+            AddBoxToSurfaceTool(surfaceTool, new Vector3(daggerX - dx - Mathf.Cos(daggerAngle) * handleLen / 2, altarTop + 0.012f * s, daggerZ - dz - Mathf.Sin(daggerAngle) * handleLen / 2), new Vector3(handleLen, 0.015f * s, 0.025f * s));
+        }
 
         surfaceTool.GenerateNormals();
         var mesh = surfaceTool.Commit();
         var material = new StandardMaterial3D
         {
-            AlbedoColor = new Color(0.3f, 0.28f, 0.26f),
-            Roughness = 0.85f
+            AlbedoColor = new Color(0.28f, 0.26f, 0.24f), // Darker aged stone
+            Roughness = 0.88f
         };
         mesh.SurfaceSetMaterial(0, material);
         return mesh;
@@ -2587,27 +2931,126 @@ public partial class Cosmetic3D : StaticBody3D
         surfaceTool.Begin(Mesh.PrimitiveType.Triangles);
         float s = PropScale;
 
-        // Irregular blood pool
-        int segments = 8;
+        // === MAIN IRREGULAR BLOOD POOL with darker center gradient ===
+        int segments = 12; // More segments for smoother pool
         Vector3 center = Vector3.Zero;
+
+        // Outer pool ring (lighter, more translucent edges)
         for (int i = 0; i < segments; i++)
         {
             float angle1 = i * Mathf.Tau / segments;
             float angle2 = (i + 1) * Mathf.Tau / segments;
-            float r1 = (0.2f + rng.Randf() * 0.15f) * s;
-            float r2 = (0.2f + rng.Randf() * 0.15f) * s;
-            surfaceTool.AddVertex(center);
+            float r1 = (0.25f + rng.Randf() * 0.12f) * s;
+            float r2 = (0.25f + rng.Randf() * 0.12f) * s;
+            float midR1 = r1 * 0.5f;
+            float midR2 = r2 * 0.5f;
+
+            // Outer ring triangles (thinner blood at edges)
+            surfaceTool.AddVertex(new Vector3(Mathf.Cos(angle1) * midR1, 0.001f, Mathf.Sin(angle1) * midR1));
             surfaceTool.AddVertex(new Vector3(Mathf.Cos(angle1) * r1, 0, Mathf.Sin(angle1) * r1));
             surfaceTool.AddVertex(new Vector3(Mathf.Cos(angle2) * r2, 0, Mathf.Sin(angle2) * r2));
+
+            surfaceTool.AddVertex(new Vector3(Mathf.Cos(angle1) * midR1, 0.001f, Mathf.Sin(angle1) * midR1));
+            surfaceTool.AddVertex(new Vector3(Mathf.Cos(angle2) * r2, 0, Mathf.Sin(angle2) * r2));
+            surfaceTool.AddVertex(new Vector3(Mathf.Cos(angle2) * midR2, 0.001f, Mathf.Sin(angle2) * midR2));
+
+            // Inner pool (darker, thicker blood in center)
+            surfaceTool.AddVertex(center + new Vector3(0, 0.003f, 0)); // Slightly raised center
+            surfaceTool.AddVertex(new Vector3(Mathf.Cos(angle1) * midR1, 0.001f, Mathf.Sin(angle1) * midR1));
+            surfaceTool.AddVertex(new Vector3(Mathf.Cos(angle2) * midR2, 0.001f, Mathf.Sin(angle2) * midR2));
+        }
+
+        // === SPLATTER PATTERN - blood droplets radiating outward ===
+        int splatCount = rng.RandiRange(5, 8);
+        for (int i = 0; i < splatCount; i++)
+        {
+            float angle = rng.Randf() * Mathf.Tau;
+            float dist = rng.RandfRange(0.28f, 0.45f) * s;
+            float dropX = Mathf.Cos(angle) * dist;
+            float dropZ = Mathf.Sin(angle) * dist;
+            float dropSize = rng.RandfRange(0.02f, 0.05f) * s;
+
+            // Main splatter drop (elongated toward center - directionality)
+            int dropSegs = 6;
+            for (int d = 0; d < dropSegs; d++)
+            {
+                float dAngle1 = d * Mathf.Tau / dropSegs;
+                float dAngle2 = (d + 1) * Mathf.Tau / dropSegs;
+                // Elongate toward center
+                float elongX = -Mathf.Cos(angle) * 0.3f;
+                float elongZ = -Mathf.Sin(angle) * 0.3f;
+                surfaceTool.AddVertex(new Vector3(dropX, 0.001f, dropZ));
+                surfaceTool.AddVertex(new Vector3(dropX + Mathf.Cos(dAngle1) * dropSize * (1 + elongX), 0, dropZ + Mathf.Sin(dAngle1) * dropSize * (1 + elongZ)));
+                surfaceTool.AddVertex(new Vector3(dropX + Mathf.Cos(dAngle2) * dropSize * (1 + elongX), 0, dropZ + Mathf.Sin(dAngle2) * dropSize * (1 + elongZ)));
+            }
+
+            // Trailing droplets (smaller drops leading to main splatter)
+            int trailCount = rng.RandiRange(1, 3);
+            for (int t = 0; t < trailCount; t++)
+            {
+                float trailDist = dist - (t + 1) * 0.06f * s;
+                float trailX = Mathf.Cos(angle) * trailDist + rng.RandfRange(-0.02f, 0.02f) * s;
+                float trailZ = Mathf.Sin(angle) * trailDist + rng.RandfRange(-0.02f, 0.02f) * s;
+                float trailSize = dropSize * 0.4f;
+
+                for (int d = 0; d < 4; d++)
+                {
+                    float dAngle1 = d * Mathf.Tau / 4;
+                    float dAngle2 = (d + 1) * Mathf.Tau / 4;
+                    surfaceTool.AddVertex(new Vector3(trailX, 0.001f, trailZ));
+                    surfaceTool.AddVertex(new Vector3(trailX + Mathf.Cos(dAngle1) * trailSize, 0, trailZ + Mathf.Sin(dAngle1) * trailSize));
+                    surfaceTool.AddVertex(new Vector3(trailX + Mathf.Cos(dAngle2) * trailSize, 0, trailZ + Mathf.Sin(dAngle2) * trailSize));
+                }
+            }
+        }
+
+        // === VISCOSITY TEXTURE - slight ripples/wrinkles in coagulating blood ===
+        int rippleCount = rng.RandiRange(3, 5);
+        for (int i = 0; i < rippleCount; i++)
+        {
+            float angle = rng.Randf() * Mathf.Tau;
+            float dist = rng.RandfRange(0.05f, 0.18f) * s;
+            float rippleX = Mathf.Cos(angle) * dist;
+            float rippleZ = Mathf.Sin(angle) * dist;
+            float rippleLen = rng.RandfRange(0.04f, 0.08f) * s;
+            float rippleWidth = 0.008f * s;
+            float rippleAngle = rng.Randf() * Mathf.Tau;
+
+            // Ripple as thin raised line
+            float dx = Mathf.Cos(rippleAngle) * rippleLen;
+            float dz = Mathf.Sin(rippleAngle) * rippleLen;
+            float nx = -Mathf.Sin(rippleAngle) * rippleWidth;
+            float nz = Mathf.Cos(rippleAngle) * rippleWidth;
+
+            surfaceTool.AddVertex(new Vector3(rippleX - dx + nx, 0.004f, rippleZ - dz + nz));
+            surfaceTool.AddVertex(new Vector3(rippleX + dx + nx, 0.004f, rippleZ + dz + nz));
+            surfaceTool.AddVertex(new Vector3(rippleX + dx - nx, 0.004f, rippleZ + dz - nz));
+
+            surfaceTool.AddVertex(new Vector3(rippleX - dx + nx, 0.004f, rippleZ - dz + nz));
+            surfaceTool.AddVertex(new Vector3(rippleX + dx - nx, 0.004f, rippleZ + dz - nz));
+            surfaceTool.AddVertex(new Vector3(rippleX - dx - nx, 0.004f, rippleZ - dz - nz));
+        }
+
+        // === DARKER CENTER - coagulated blood clot ===
+        float clotRadius = 0.06f * s;
+        for (int i = 0; i < 6; i++)
+        {
+            float angle1 = i * Mathf.Tau / 6;
+            float angle2 = (i + 1) * Mathf.Tau / 6;
+            float offsetX = rng.RandfRange(-0.03f, 0.03f) * s;
+            float offsetZ = rng.RandfRange(-0.03f, 0.03f) * s;
+            surfaceTool.AddVertex(new Vector3(offsetX, 0.005f, offsetZ));
+            surfaceTool.AddVertex(new Vector3(offsetX + Mathf.Cos(angle1) * clotRadius, 0.004f, offsetZ + Mathf.Sin(angle1) * clotRadius));
+            surfaceTool.AddVertex(new Vector3(offsetX + Mathf.Cos(angle2) * clotRadius, 0.004f, offsetZ + Mathf.Sin(angle2) * clotRadius));
         }
 
         surfaceTool.GenerateNormals();
         var mesh = surfaceTool.Commit();
         var material = new StandardMaterial3D
         {
-            AlbedoColor = new Color(0.4f, 0.05f, 0.05f),
-            Roughness = 0.3f,
-            Metallic = 0.2f
+            AlbedoColor = new Color(0.35f, 0.03f, 0.03f), // Darker blood
+            Roughness = 0.25f, // Glossy wet blood
+            Metallic = 0.25f
         };
         mesh.SurfaceSetMaterial(0, material);
         return mesh;
@@ -2775,40 +3218,168 @@ public partial class Cosmetic3D : StaticBody3D
         surfaceTool.Begin(Mesh.PrimitiveType.Triangles);
         float s = PropScale;
 
-        // Glass shards scattered
-        for (int i = 0; i < 6; i++)
+        // === BROKEN BOTTLE BASE - remaining flask bottom ===
+        float baseRadius = 0.04f * s;
+        float baseHeight = 0.03f * s;
+        int baseSegs = 8;
+        for (int i = 0; i < baseSegs; i++)
         {
-            float angle = rng.Randf() * Mathf.Tau;
-            float dist = rng.RandfRange(0.05f, 0.15f) * s;
-            float x = Mathf.Cos(angle) * dist;
-            float z = Mathf.Sin(angle) * dist;
-            // Shard as small triangle
-            Vector3 base1 = new Vector3(x, 0.01f, z);
-            Vector3 base2 = new Vector3(x + 0.03f * s, 0.01f, z + 0.02f * s);
-            Vector3 top = new Vector3(x + 0.01f * s, 0.04f * s, z + 0.01f * s);
-            surfaceTool.AddVertex(base1); surfaceTool.AddVertex(base2); surfaceTool.AddVertex(top);
+            float angle1 = i * Mathf.Tau / baseSegs;
+            float angle2 = (i + 1) * Mathf.Tau / baseSegs;
+            // Bottom disc
+            surfaceTool.AddVertex(new Vector3(0, 0.005f, 0));
+            surfaceTool.AddVertex(new Vector3(Mathf.Cos(angle1) * baseRadius, 0.005f, Mathf.Sin(angle1) * baseRadius));
+            surfaceTool.AddVertex(new Vector3(Mathf.Cos(angle2) * baseRadius, 0.005f, Mathf.Sin(angle2) * baseRadius));
+            // Jagged broken rim (random heights)
+            float h1 = baseHeight + rng.RandfRange(0, 0.02f) * s;
+            float h2 = baseHeight + rng.RandfRange(0, 0.02f) * s;
+            // Side wall
+            surfaceTool.AddVertex(new Vector3(Mathf.Cos(angle1) * baseRadius, 0.005f, Mathf.Sin(angle1) * baseRadius));
+            surfaceTool.AddVertex(new Vector3(Mathf.Cos(angle1) * baseRadius * 0.9f, h1, Mathf.Sin(angle1) * baseRadius * 0.9f));
+            surfaceTool.AddVertex(new Vector3(Mathf.Cos(angle2) * baseRadius * 0.9f, h2, Mathf.Sin(angle2) * baseRadius * 0.9f));
+            surfaceTool.AddVertex(new Vector3(Mathf.Cos(angle1) * baseRadius, 0.005f, Mathf.Sin(angle1) * baseRadius));
+            surfaceTool.AddVertex(new Vector3(Mathf.Cos(angle2) * baseRadius * 0.9f, h2, Mathf.Sin(angle2) * baseRadius * 0.9f));
+            surfaceTool.AddVertex(new Vector3(Mathf.Cos(angle2) * baseRadius, 0.005f, Mathf.Sin(angle2) * baseRadius));
         }
 
-        // Glowing residue pool
+        // === LARGE GLASS SHARDS - scattered around ===
+        int largeShardCount = rng.RandiRange(4, 6);
+        for (int i = 0; i < largeShardCount; i++)
+        {
+            float angle = rng.Randf() * Mathf.Tau;
+            float dist = rng.RandfRange(0.06f, 0.18f) * s;
+            float x = Mathf.Cos(angle) * dist;
+            float z = Mathf.Sin(angle) * dist;
+            float shardAngle = rng.Randf() * Mathf.Tau;
+            float shardLen = rng.RandfRange(0.03f, 0.06f) * s;
+            float shardHeight = rng.RandfRange(0.02f, 0.045f) * s;
+            float shardWidth = rng.RandfRange(0.01f, 0.02f) * s;
+
+            // Curved shard (triangular prism)
+            float dx = Mathf.Cos(shardAngle) * shardLen;
+            float dz = Mathf.Sin(shardAngle) * shardLen;
+            float nx = -Mathf.Sin(shardAngle) * shardWidth;
+            float nz = Mathf.Cos(shardAngle) * shardWidth;
+
+            // Top face
+            surfaceTool.AddVertex(new Vector3(x - dx, 0.01f, z - dz));
+            surfaceTool.AddVertex(new Vector3(x + dx, 0.01f, z + dz));
+            surfaceTool.AddVertex(new Vector3(x, shardHeight, z));
+
+            // Side faces
+            surfaceTool.AddVertex(new Vector3(x - dx, 0.01f, z - dz));
+            surfaceTool.AddVertex(new Vector3(x + nx, 0.01f, z + nz));
+            surfaceTool.AddVertex(new Vector3(x, shardHeight, z));
+
+            surfaceTool.AddVertex(new Vector3(x + dx, 0.01f, z + dz));
+            surfaceTool.AddVertex(new Vector3(x - nx, 0.01f, z - nz));
+            surfaceTool.AddVertex(new Vector3(x, shardHeight, z));
+        }
+
+        // === SMALL GLASS FRAGMENTS - tiny pieces ===
+        int smallShardCount = rng.RandiRange(8, 12);
+        for (int i = 0; i < smallShardCount; i++)
+        {
+            float angle = rng.Randf() * Mathf.Tau;
+            float dist = rng.RandfRange(0.04f, 0.22f) * s;
+            float x = Mathf.Cos(angle) * dist;
+            float z = Mathf.Sin(angle) * dist;
+            float fragSize = rng.RandfRange(0.008f, 0.018f) * s;
+
+            // Tiny triangle shard
+            surfaceTool.AddVertex(new Vector3(x, 0.008f, z));
+            surfaceTool.AddVertex(new Vector3(x + fragSize, 0.008f, z + fragSize * 0.5f));
+            surfaceTool.AddVertex(new Vector3(x + fragSize * 0.3f, rng.RandfRange(0.01f, 0.025f) * s, z + fragSize * 0.7f));
+        }
+
+        // === LIQUID RESIDUE POOL - larger irregular shape ===
+        int poolSegs = 10;
+        for (int i = 0; i < poolSegs; i++)
+        {
+            float angle1 = i * Mathf.Tau / poolSegs;
+            float angle2 = (i + 1) * Mathf.Tau / poolSegs;
+            float r1 = (0.12f + rng.Randf() * 0.06f) * s;
+            float r2 = (0.12f + rng.Randf() * 0.06f) * s;
+            surfaceTool.AddVertex(new Vector3(0, 0.003f, 0));
+            surfaceTool.AddVertex(new Vector3(Mathf.Cos(angle1) * r1, 0.002f, Mathf.Sin(angle1) * r1));
+            surfaceTool.AddVertex(new Vector3(Mathf.Cos(angle2) * r2, 0.002f, Mathf.Sin(angle2) * r2));
+        }
+
+        // === LIQUID STREAMS - running away from pool ===
+        int streamCount = rng.RandiRange(2, 4);
+        for (int i = 0; i < streamCount; i++)
+        {
+            float streamAngle = rng.Randf() * Mathf.Tau;
+            float streamLen = rng.RandfRange(0.08f, 0.15f) * s;
+            float streamWidth = rng.RandfRange(0.012f, 0.022f) * s;
+            float startDist = 0.1f * s;
+
+            float sx = Mathf.Cos(streamAngle) * startDist;
+            float sz = Mathf.Sin(streamAngle) * startDist;
+            float ex = Mathf.Cos(streamAngle) * (startDist + streamLen);
+            float ez = Mathf.Sin(streamAngle) * (startDist + streamLen);
+            float nx = -Mathf.Sin(streamAngle) * streamWidth;
+            float nz = Mathf.Cos(streamAngle) * streamWidth;
+
+            // Stream quad (tapers to end)
+            surfaceTool.AddVertex(new Vector3(sx + nx, 0.002f, sz + nz));
+            surfaceTool.AddVertex(new Vector3(sx - nx, 0.002f, sz - nz));
+            surfaceTool.AddVertex(new Vector3(ex, 0.001f, ez)); // Tapered end
+
+            surfaceTool.AddVertex(new Vector3(sx + nx, 0.002f, sz + nz));
+            surfaceTool.AddVertex(new Vector3(ex, 0.001f, ez));
+            surfaceTool.AddVertex(new Vector3(sx - nx, 0.002f, sz - nz));
+        }
+
+        // === VAPOR WISPS - rising from the pool ===
+        int vaporCount = rng.RandiRange(3, 5);
+        for (int i = 0; i < vaporCount; i++)
+        {
+            float vx = rng.RandfRange(-0.06f, 0.06f) * s;
+            float vz = rng.RandfRange(-0.06f, 0.06f) * s;
+            float vaporHeight = rng.RandfRange(0.04f, 0.08f) * s;
+            float vaporWidth = rng.RandfRange(0.015f, 0.025f) * s;
+
+            // Wisp as thin vertical triangle
+            surfaceTool.AddVertex(new Vector3(vx - vaporWidth, 0.01f, vz));
+            surfaceTool.AddVertex(new Vector3(vx + vaporWidth, 0.01f, vz));
+            surfaceTool.AddVertex(new Vector3(vx + rng.RandfRange(-0.01f, 0.01f) * s, vaporHeight, vz + rng.RandfRange(-0.01f, 0.01f) * s));
+
+            // Second wisp face (perpendicular)
+            surfaceTool.AddVertex(new Vector3(vx, 0.01f, vz - vaporWidth));
+            surfaceTool.AddVertex(new Vector3(vx, 0.01f, vz + vaporWidth));
+            surfaceTool.AddVertex(new Vector3(vx + rng.RandfRange(-0.01f, 0.01f) * s, vaporHeight * 0.9f, vz));
+        }
+
+        // === CORK/STOPPER - thrown aside ===
+        float corkX = rng.RandfRange(0.1f, 0.18f) * s * (rng.Randf() > 0.5f ? 1 : -1);
+        float corkZ = rng.RandfRange(0.1f, 0.18f) * s * (rng.Randf() > 0.5f ? 1 : -1);
+        float corkR = 0.018f * s;
+        float corkH = 0.025f * s;
         for (int i = 0; i < 6; i++)
         {
             float angle1 = i * Mathf.Tau / 6;
             float angle2 = (i + 1) * Mathf.Tau / 6;
-            float r = 0.1f * s;
-            surfaceTool.AddVertex(Vector3.Zero);
-            surfaceTool.AddVertex(new Vector3(Mathf.Cos(angle1) * r, 0.005f, Mathf.Sin(angle1) * r));
-            surfaceTool.AddVertex(new Vector3(Mathf.Cos(angle2) * r, 0.005f, Mathf.Sin(angle2) * r));
+            // Cork lying on side
+            surfaceTool.AddVertex(new Vector3(corkX, 0.01f, corkZ));
+            surfaceTool.AddVertex(new Vector3(corkX + Mathf.Cos(angle1) * corkR, 0.01f + Mathf.Sin(angle1) * corkR, corkZ));
+            surfaceTool.AddVertex(new Vector3(corkX + Mathf.Cos(angle2) * corkR, 0.01f + Mathf.Sin(angle2) * corkR, corkZ));
+            // Extend length
+            surfaceTool.AddVertex(new Vector3(corkX + Mathf.Cos(angle1) * corkR, 0.01f + Mathf.Sin(angle1) * corkR, corkZ));
+            surfaceTool.AddVertex(new Vector3(corkX + Mathf.Cos(angle1) * corkR, 0.01f + Mathf.Sin(angle1) * corkR, corkZ + corkH));
+            surfaceTool.AddVertex(new Vector3(corkX + Mathf.Cos(angle2) * corkR, 0.01f + Mathf.Sin(angle2) * corkR, corkZ + corkH));
         }
 
         surfaceTool.GenerateNormals();
         var mesh = surfaceTool.Commit();
         var material = new StandardMaterial3D
         {
-            AlbedoColor = new Color(0.2f, 0.8f, 0.3f, 0.7f),
+            AlbedoColor = new Color(0.2f, 0.85f, 0.35f, 0.75f),
             Transparency = BaseMaterial3D.TransparencyEnum.Alpha,
             EmissionEnabled = true,
-            Emission = new Color(0.1f, 0.9f, 0.2f),
-            EmissionEnergyMultiplier = 1f
+            Emission = new Color(0.15f, 0.95f, 0.25f),
+            EmissionEnergyMultiplier = 1.2f,
+            Roughness = 0.15f // Glossy glass/liquid
         };
         mesh.SurfaceSetMaterial(0, material);
         return mesh;
@@ -2820,18 +3391,216 @@ public partial class Cosmetic3D : StaticBody3D
         surfaceTool.Begin(Mesh.PrimitiveType.Triangles);
         float s = PropScale;
 
-        // Main scroll body (partially unrolled)
-        AddBoxToSurfaceTool(surfaceTool, new Vector3(0, 0.01f * s, 0), new Vector3(0.4f * s, 0.01f * s, 0.3f * s));
-        // Rolled ends
-        AddSphereToSurfaceTool(surfaceTool, new Vector3(-0.18f * s, 0.025f * s, 0), 0.03f * s);
-        AddSphereToSurfaceTool(surfaceTool, new Vector3(0.18f * s, 0.025f * s, 0), 0.03f * s);
+        // === MAIN SCROLL BODY - partially unrolled parchment ===
+        float scrollWidth = 0.4f * s;
+        float scrollDepth = 0.32f * s;
+        float scrollY = 0.008f * s;
+
+        // Main parchment with slight wave/curl
+        int waveSegs = 6;
+        for (int i = 0; i < waveSegs; i++)
+        {
+            float z1 = -scrollDepth / 2 + i * scrollDepth / waveSegs;
+            float z2 = -scrollDepth / 2 + (i + 1) * scrollDepth / waveSegs;
+            float y1 = scrollY + Mathf.Sin(i * 0.8f) * 0.003f * s; // Slight wave
+            float y2 = scrollY + Mathf.Sin((i + 1) * 0.8f) * 0.003f * s;
+
+            // Quad for each wave segment
+            surfaceTool.AddVertex(new Vector3(-scrollWidth / 2, y1, z1));
+            surfaceTool.AddVertex(new Vector3(scrollWidth / 2, y1, z1));
+            surfaceTool.AddVertex(new Vector3(scrollWidth / 2, y2, z2));
+
+            surfaceTool.AddVertex(new Vector3(-scrollWidth / 2, y1, z1));
+            surfaceTool.AddVertex(new Vector3(scrollWidth / 2, y2, z2));
+            surfaceTool.AddVertex(new Vector3(-scrollWidth / 2, y2, z2));
+        }
+
+        // === ROLLED ENDS with decorative caps ===
+        float rollRadius = 0.025f * s;
+        float rollY = 0.022f * s;
+
+        // Left roll (slightly raised)
+        for (int i = 0; i < 8; i++)
+        {
+            float angle1 = i * Mathf.Tau / 8;
+            float angle2 = (i + 1) * Mathf.Tau / 8;
+            // Roll cylinder
+            surfaceTool.AddVertex(new Vector3(-scrollWidth / 2 - 0.01f * s, rollY + Mathf.Sin(angle1) * rollRadius, Mathf.Cos(angle1) * rollRadius));
+            surfaceTool.AddVertex(new Vector3(-scrollWidth / 2 + 0.02f * s, rollY + Mathf.Sin(angle1) * rollRadius, Mathf.Cos(angle1) * rollRadius));
+            surfaceTool.AddVertex(new Vector3(-scrollWidth / 2 + 0.02f * s, rollY + Mathf.Sin(angle2) * rollRadius, Mathf.Cos(angle2) * rollRadius));
+
+            surfaceTool.AddVertex(new Vector3(-scrollWidth / 2 - 0.01f * s, rollY + Mathf.Sin(angle1) * rollRadius, Mathf.Cos(angle1) * rollRadius));
+            surfaceTool.AddVertex(new Vector3(-scrollWidth / 2 + 0.02f * s, rollY + Mathf.Sin(angle2) * rollRadius, Mathf.Cos(angle2) * rollRadius));
+            surfaceTool.AddVertex(new Vector3(-scrollWidth / 2 - 0.01f * s, rollY + Mathf.Sin(angle2) * rollRadius, Mathf.Cos(angle2) * rollRadius));
+        }
+
+        // Right roll
+        for (int i = 0; i < 8; i++)
+        {
+            float angle1 = i * Mathf.Tau / 8;
+            float angle2 = (i + 1) * Mathf.Tau / 8;
+            surfaceTool.AddVertex(new Vector3(scrollWidth / 2 - 0.02f * s, rollY + Mathf.Sin(angle1) * rollRadius, Mathf.Cos(angle1) * rollRadius));
+            surfaceTool.AddVertex(new Vector3(scrollWidth / 2 + 0.01f * s, rollY + Mathf.Sin(angle1) * rollRadius, Mathf.Cos(angle1) * rollRadius));
+            surfaceTool.AddVertex(new Vector3(scrollWidth / 2 + 0.01f * s, rollY + Mathf.Sin(angle2) * rollRadius, Mathf.Cos(angle2) * rollRadius));
+
+            surfaceTool.AddVertex(new Vector3(scrollWidth / 2 - 0.02f * s, rollY + Mathf.Sin(angle1) * rollRadius, Mathf.Cos(angle1) * rollRadius));
+            surfaceTool.AddVertex(new Vector3(scrollWidth / 2 + 0.01f * s, rollY + Mathf.Sin(angle2) * rollRadius, Mathf.Cos(angle2) * rollRadius));
+            surfaceTool.AddVertex(new Vector3(scrollWidth / 2 - 0.02f * s, rollY + Mathf.Sin(angle2) * rollRadius, Mathf.Cos(angle2) * rollRadius));
+        }
+
+        // Decorative wooden/bone end caps
+        AddSphereToSurfaceTool(surfaceTool, new Vector3(-scrollWidth / 2 - 0.015f * s, rollY, 0), 0.018f * s);
+        AddSphereToSurfaceTool(surfaceTool, new Vector3(scrollWidth / 2 + 0.015f * s, rollY, 0), 0.018f * s);
+
+        // === VISIBLE TEXT/RUNES on scroll surface ===
+        // Horizontal text lines
+        int lineCount = rng.RandiRange(5, 7);
+        float lineSpacing = scrollDepth * 0.8f / lineCount;
+        for (int line = 0; line < lineCount; line++)
+        {
+            float lineZ = -scrollDepth * 0.35f + line * lineSpacing;
+            float lineY = scrollY + 0.002f * s;
+
+            // Multiple "words" per line
+            int wordCount = rng.RandiRange(3, 5);
+            float wordStart = -scrollWidth * 0.35f;
+            for (int w = 0; w < wordCount; w++)
+            {
+                float wordLen = rng.RandfRange(0.03f, 0.06f) * s;
+                float wordX = wordStart + w * (scrollWidth * 0.65f / wordCount) + rng.RandfRange(-0.01f, 0.01f) * s;
+
+                // Word as thin rectangle
+                AddBoxToSurfaceTool(surfaceTool, new Vector3(wordX, lineY, lineZ), new Vector3(wordLen, 0.001f * s, 0.008f * s));
+            }
+        }
+
+        // === DECORATIVE RUNE SYMBOLS - mystical glyphs ===
+        // Large central rune
+        float runeY = scrollY + 0.003f * s;
+        // Rune circle
+        float runeRadius = 0.035f * s;
+        for (int i = 0; i < 6; i++)
+        {
+            float angle1 = i * Mathf.Tau / 6;
+            float angle2 = (i + 1) * Mathf.Tau / 6;
+            surfaceTool.AddVertex(new Vector3(0, runeY, 0));
+            surfaceTool.AddVertex(new Vector3(Mathf.Cos(angle1) * runeRadius, runeY, Mathf.Sin(angle1) * runeRadius));
+            surfaceTool.AddVertex(new Vector3(Mathf.Cos(angle2) * runeRadius, runeY, Mathf.Sin(angle2) * runeRadius));
+        }
+        // Rune lines (star pattern inside)
+        for (int i = 0; i < 3; i++)
+        {
+            float angle = i * Mathf.Tau / 3;
+            float dx = Mathf.Cos(angle) * runeRadius * 0.8f;
+            float dz = Mathf.Sin(angle) * runeRadius * 0.8f;
+            AddBoxToSurfaceTool(surfaceTool, new Vector3(0, runeY + 0.001f * s, 0), new Vector3(0.004f * s, 0.001f * s, runeRadius * 1.5f));
+        }
+
+        // Corner runes (smaller)
+        float[] cornerX = { -scrollWidth * 0.35f, scrollWidth * 0.35f, -scrollWidth * 0.35f, scrollWidth * 0.35f };
+        float[] cornerZ = { -scrollDepth * 0.35f, -scrollDepth * 0.35f, scrollDepth * 0.35f, scrollDepth * 0.35f };
+        for (int c = 0; c < 4; c++)
+        {
+            // Small rune triangle
+            float cx = cornerX[c];
+            float cz = cornerZ[c];
+            float sr = 0.015f * s;
+            surfaceTool.AddVertex(new Vector3(cx, runeY, cz - sr));
+            surfaceTool.AddVertex(new Vector3(cx + sr, runeY, cz + sr));
+            surfaceTool.AddVertex(new Vector3(cx - sr, runeY, cz + sr));
+        }
+
+        // === WAX SEAL - on one edge ===
+        float sealX = scrollWidth * 0.25f;
+        float sealZ = scrollDepth * 0.38f;
+        float sealRadius = 0.028f * s;
+
+        // Seal base (slightly raised disc)
+        for (int i = 0; i < 8; i++)
+        {
+            float angle1 = i * Mathf.Tau / 8;
+            float angle2 = (i + 1) * Mathf.Tau / 8;
+            surfaceTool.AddVertex(new Vector3(sealX, scrollY + 0.005f * s, sealZ));
+            surfaceTool.AddVertex(new Vector3(sealX + Mathf.Cos(angle1) * sealRadius, scrollY + 0.004f * s, sealZ + Mathf.Sin(angle1) * sealRadius));
+            surfaceTool.AddVertex(new Vector3(sealX + Mathf.Cos(angle2) * sealRadius, scrollY + 0.004f * s, sealZ + Mathf.Sin(angle2) * sealRadius));
+        }
+
+        // Seal drip marks (irregular edges)
+        for (int i = 0; i < 4; i++)
+        {
+            float dripAngle = rng.Randf() * Mathf.Tau;
+            float dripLen = rng.RandfRange(0.01f, 0.02f) * s;
+            float dx = Mathf.Cos(dripAngle) * (sealRadius + dripLen / 2);
+            float dz = Mathf.Sin(dripAngle) * (sealRadius + dripLen / 2);
+            AddBoxToSurfaceTool(surfaceTool, new Vector3(sealX + dx, scrollY + 0.003f * s, sealZ + dz), new Vector3(0.006f * s, 0.002f * s, dripLen));
+        }
+
+        // Seal imprint (simple cross)
+        AddBoxToSurfaceTool(surfaceTool, new Vector3(sealX, scrollY + 0.006f * s, sealZ), new Vector3(sealRadius * 1.2f, 0.001f * s, 0.005f * s));
+        AddBoxToSurfaceTool(surfaceTool, new Vector3(sealX, scrollY + 0.006f * s, sealZ), new Vector3(0.005f * s, 0.001f * s, sealRadius * 1.2f));
+
+        // === TORN/AGED EDGES - irregular border ===
+        int tornCount = rng.RandiRange(3, 5);
+        for (int i = 0; i < tornCount; i++)
+        {
+            // Torn notches on edges
+            float edgeSide = rng.Randf(); // 0-0.5 = left/right, 0.5-1 = top/bottom
+            float tornX, tornZ;
+            if (edgeSide < 0.25f)
+            {
+                tornX = -scrollWidth / 2 + rng.RandfRange(0.01f, 0.04f) * s;
+                tornZ = rng.RandfRange(-scrollDepth * 0.4f, scrollDepth * 0.4f);
+            }
+            else if (edgeSide < 0.5f)
+            {
+                tornX = scrollWidth / 2 - rng.RandfRange(0.01f, 0.04f) * s;
+                tornZ = rng.RandfRange(-scrollDepth * 0.4f, scrollDepth * 0.4f);
+            }
+            else if (edgeSide < 0.75f)
+            {
+                tornX = rng.RandfRange(-scrollWidth * 0.4f, scrollWidth * 0.4f);
+                tornZ = -scrollDepth / 2 + rng.RandfRange(0.01f, 0.03f) * s;
+            }
+            else
+            {
+                tornX = rng.RandfRange(-scrollWidth * 0.4f, scrollWidth * 0.4f);
+                tornZ = scrollDepth / 2 - rng.RandfRange(0.01f, 0.03f) * s;
+            }
+
+            // Small triangular tear
+            float tearSize = rng.RandfRange(0.01f, 0.025f) * s;
+            float tearAngle = rng.Randf() * Mathf.Tau;
+            surfaceTool.AddVertex(new Vector3(tornX, scrollY + 0.001f * s, tornZ));
+            surfaceTool.AddVertex(new Vector3(tornX + Mathf.Cos(tearAngle) * tearSize, scrollY, tornZ + Mathf.Sin(tearAngle) * tearSize));
+            surfaceTool.AddVertex(new Vector3(tornX + Mathf.Cos(tearAngle + 1.2f) * tearSize * 0.7f, scrollY, tornZ + Mathf.Sin(tearAngle + 1.2f) * tearSize * 0.7f));
+        }
+
+        // === STAIN MARKS - age spots ===
+        int stainCount = rng.RandiRange(2, 4);
+        for (int i = 0; i < stainCount; i++)
+        {
+            float stainX = rng.RandfRange(-scrollWidth * 0.35f, scrollWidth * 0.35f);
+            float stainZ = rng.RandfRange(-scrollDepth * 0.35f, scrollDepth * 0.35f);
+            float stainRadius = rng.RandfRange(0.015f, 0.03f) * s;
+
+            for (int j = 0; j < 5; j++)
+            {
+                float angle1 = j * Mathf.Tau / 5;
+                float angle2 = (j + 1) * Mathf.Tau / 5;
+                float r1 = stainRadius * (0.8f + rng.Randf() * 0.4f);
+                float r2 = stainRadius * (0.8f + rng.Randf() * 0.4f);
+                surfaceTool.AddVertex(new Vector3(stainX, scrollY + 0.001f * s, stainZ));
+                surfaceTool.AddVertex(new Vector3(stainX + Mathf.Cos(angle1) * r1, scrollY + 0.001f * s, stainZ + Mathf.Sin(angle1) * r1));
+                surfaceTool.AddVertex(new Vector3(stainX + Mathf.Cos(angle2) * r2, scrollY + 0.001f * s, stainZ + Mathf.Sin(angle2) * r2));
+            }
+        }
 
         surfaceTool.GenerateNormals();
         var mesh = surfaceTool.Commit();
         var material = new StandardMaterial3D
         {
-            AlbedoColor = new Color(0.85f, 0.8f, 0.65f), // Aged parchment
-            Roughness = 0.9f
+            AlbedoColor = new Color(0.82f, 0.76f, 0.6f), // Aged yellowed parchment
+            Roughness = 0.92f
         };
         mesh.SurfaceSetMaterial(0, material);
         return mesh;
@@ -3642,37 +4411,201 @@ public partial class Cosmetic3D : StaticBody3D
         surfaceTool.Begin(Mesh.PrimitiveType.Triangles);
         float s = PropScale;
 
-        // Shield lying flat (round shield)
-        int segments = 10;
-        float radius = 0.3f * s;
-        Vector3 center = new Vector3(0, 0.02f * s, 0);
+        // === MAIN SHIELD BODY - round shield with slight warp/damage ===
+        int segments = 14; // More segments for better shape
+        float radius = 0.32f * s;
+        float shieldY = 0.015f * s;
+
+        // Slight tilt to show it's lying damaged
+        float tiltX = rng.RandfRange(-0.05f, 0.05f);
+        float tiltZ = rng.RandfRange(-0.03f, 0.03f);
+
+        // Main shield face with bent/warped sections
         for (int i = 0; i < segments; i++)
         {
             float angle1 = i * Mathf.Tau / segments;
             float angle2 = (i + 1) * Mathf.Tau / segments;
-            surfaceTool.AddVertex(center);
-            surfaceTool.AddVertex(center + new Vector3(Mathf.Cos(angle1) * radius, 0, Mathf.Sin(angle1) * radius));
-            surfaceTool.AddVertex(center + new Vector3(Mathf.Cos(angle2) * radius, 0, Mathf.Sin(angle2) * radius));
+
+            // Warp some edges to show damage
+            float warp1 = (i == 3 || i == 4) ? -0.015f * s : 0;
+            float warp2 = (i == 4 || i == 5) ? -0.012f * s : 0;
+            float edgeWarp1 = (i == 8 || i == 9) ? 0.02f * s : 0;
+            float edgeWarp2 = (i == 9 || i == 10) ? 0.018f * s : 0;
+
+            float y1 = shieldY + warp1 + Mathf.Cos(angle1) * tiltX + Mathf.Sin(angle1) * tiltZ;
+            float y2 = shieldY + warp2 + Mathf.Cos(angle2) * tiltX + Mathf.Sin(angle2) * tiltZ;
+            float edgeY1 = shieldY + edgeWarp1 + Mathf.Cos(angle1) * tiltX * 2 + Mathf.Sin(angle1) * tiltZ * 2;
+            float edgeY2 = shieldY + edgeWarp2 + Mathf.Cos(angle2) * tiltX * 2 + Mathf.Sin(angle2) * tiltZ * 2;
+
+            // Inner section (near center)
+            float innerR = radius * 0.4f;
+            surfaceTool.AddVertex(new Vector3(0, shieldY + 0.005f * s, 0));
+            surfaceTool.AddVertex(new Vector3(Mathf.Cos(angle1) * innerR, y1, Mathf.Sin(angle1) * innerR));
+            surfaceTool.AddVertex(new Vector3(Mathf.Cos(angle2) * innerR, y2, Mathf.Sin(angle2) * innerR));
+
+            // Outer section (with bent edges)
+            surfaceTool.AddVertex(new Vector3(Mathf.Cos(angle1) * innerR, y1, Mathf.Sin(angle1) * innerR));
+            surfaceTool.AddVertex(new Vector3(Mathf.Cos(angle1) * radius, edgeY1, Mathf.Sin(angle1) * radius));
+            surfaceTool.AddVertex(new Vector3(Mathf.Cos(angle2) * radius, edgeY2, Mathf.Sin(angle2) * radius));
+
+            surfaceTool.AddVertex(new Vector3(Mathf.Cos(angle1) * innerR, y1, Mathf.Sin(angle1) * innerR));
+            surfaceTool.AddVertex(new Vector3(Mathf.Cos(angle2) * radius, edgeY2, Mathf.Sin(angle2) * radius));
+            surfaceTool.AddVertex(new Vector3(Mathf.Cos(angle2) * innerR, y2, Mathf.Sin(angle2) * innerR));
         }
 
-        // Boss (center bump)
-        AddSphereToSurfaceTool(surfaceTool, new Vector3(0, 0.05f * s, 0), 0.08f * s);
+        // === SHIELD BOSS (center) with damage ===
+        float bossY = 0.04f * s;
+        float bossR = 0.07f * s;
+        for (int i = 0; i < 8; i++)
+        {
+            float angle1 = i * Mathf.Tau / 8;
+            float angle2 = (i + 1) * Mathf.Tau / 8;
+            // Boss dome
+            surfaceTool.AddVertex(new Vector3(0, bossY + 0.025f * s, 0));
+            surfaceTool.AddVertex(new Vector3(Mathf.Cos(angle1) * bossR, bossY, Mathf.Sin(angle1) * bossR));
+            surfaceTool.AddVertex(new Vector3(Mathf.Cos(angle2) * bossR, bossY, Mathf.Sin(angle2) * bossR));
+        }
+        // Boss rim
+        for (int i = 0; i < 8; i++)
+        {
+            float angle = i * Mathf.Tau / 8;
+            AddBoxToSurfaceTool(surfaceTool, new Vector3(Mathf.Cos(angle) * bossR * 1.1f, bossY - 0.005f * s, Mathf.Sin(angle) * bossR * 1.1f), new Vector3(0.02f * s, 0.015f * s, 0.02f * s));
+        }
 
-        // Metal rim
+        // === DENTS AND BATTLE DAMAGE ===
+        int dentCount = rng.RandiRange(3, 5);
+        for (int d = 0; d < dentCount; d++)
+        {
+            float dentAngle = rng.Randf() * Mathf.Tau;
+            float dentDist = rng.RandfRange(0.08f, 0.22f) * s;
+            float dentX = Mathf.Cos(dentAngle) * dentDist;
+            float dentZ = Mathf.Sin(dentAngle) * dentDist;
+            float dentSize = rng.RandfRange(0.02f, 0.04f) * s;
+            float dentDepth = rng.RandfRange(0.005f, 0.012f) * s;
+
+            // Dent as recessed disc (inverted dome)
+            for (int dd = 0; dd < 5; dd++)
+            {
+                float da1 = dd * Mathf.Tau / 5;
+                float da2 = (dd + 1) * Mathf.Tau / 5;
+                surfaceTool.AddVertex(new Vector3(dentX, shieldY - dentDepth, dentZ));
+                surfaceTool.AddVertex(new Vector3(dentX + Mathf.Cos(da1) * dentSize, shieldY + 0.002f * s, dentZ + Mathf.Sin(da1) * dentSize));
+                surfaceTool.AddVertex(new Vector3(dentX + Mathf.Cos(da2) * dentSize, shieldY + 0.002f * s, dentZ + Mathf.Sin(da2) * dentSize));
+            }
+        }
+
+        // === METAL RIM with damage ===
+        float rimY = 0.02f * s;
+        float rimWidth = 0.025f * s;
         for (int i = 0; i < segments; i++)
         {
             float angle = i * Mathf.Tau / segments;
-            float x = Mathf.Cos(angle) * (radius - 0.02f * s);
-            float z = Mathf.Sin(angle) * (radius - 0.02f * s);
-            AddBoxToSurfaceTool(surfaceTool, new Vector3(x, 0.025f * s, z), new Vector3(0.04f * s, 0.02f * s, 0.04f * s));
+
+            // Skip some segments for broken rim
+            if (i == 5) continue; // Gap in rim
+
+            float x = Mathf.Cos(angle) * (radius - rimWidth / 2);
+            float z = Mathf.Sin(angle) * (radius - rimWidth / 2);
+
+            // Bent rim segments
+            float bendY = (i == 4 || i == 6) ? -0.008f * s : 0;
+            float bendOut = (i == 9) ? 0.01f * s : 0;
+
+            AddBoxToSurfaceTool(surfaceTool, new Vector3(x + Mathf.Cos(angle) * bendOut, rimY + bendY, z + Mathf.Sin(angle) * bendOut), new Vector3(0.035f * s, 0.018f * s, 0.035f * s));
+        }
+
+        // Rivets on rim
+        int rivetCount = 8;
+        for (int r = 0; r < rivetCount; r++)
+        {
+            float rivetAngle = r * Mathf.Tau / rivetCount + 0.15f;
+            float rivetX = Mathf.Cos(rivetAngle) * (radius - rimWidth);
+            float rivetZ = Mathf.Sin(rivetAngle) * (radius - rimWidth);
+
+            // Skip rivets near damage
+            if (r == 2 || r == 3) continue;
+
+            AddSphereToSurfaceTool(surfaceTool, new Vector3(rivetX, rimY + 0.01f * s, rivetZ), 0.008f * s);
+        }
+
+        // === FADED HERALDRY - simple cross/chevron design ===
+        float heraldY = shieldY + 0.003f * s;
+
+        // Main vertical stripe (faded by using thin raised lines)
+        AddBoxToSurfaceTool(surfaceTool, new Vector3(0, heraldY, 0), new Vector3(0.04f * s, 0.004f * s, radius * 0.7f));
+
+        // Horizontal stripe (cross pattern)
+        AddBoxToSurfaceTool(surfaceTool, new Vector3(0, heraldY, 0), new Vector3(radius * 0.5f, 0.004f * s, 0.035f * s));
+
+        // Chevron points (v-shape near bottom)
+        float chevronZ = 0.1f * s;
+        float chevronLen = 0.08f * s;
+        AddBoxToSurfaceTool(surfaceTool, new Vector3(-0.04f * s, heraldY, chevronZ), new Vector3(chevronLen, 0.003f * s, 0.02f * s));
+        AddBoxToSurfaceTool(surfaceTool, new Vector3(0.04f * s, heraldY, chevronZ), new Vector3(chevronLen, 0.003f * s, 0.02f * s));
+
+        // Faded corner emblems (simple squares representing worn-off design)
+        float[] emblemX = { -0.12f * s, 0.12f * s };
+        float[] emblemZ = { -0.12f * s, 0.12f * s };
+        for (int e = 0; e < 2; e++)
+        {
+            AddBoxToSurfaceTool(surfaceTool, new Vector3(emblemX[e], heraldY, emblemZ[e]), new Vector3(0.035f * s, 0.003f * s, 0.035f * s));
+        }
+
+        // === SCRATCHES AND WEAR ===
+        int scratchCount = rng.RandiRange(4, 7);
+        for (int sc = 0; sc < scratchCount; sc++)
+        {
+            float scratchAngle = rng.Randf() * Mathf.Tau;
+            float scratchDist = rng.RandfRange(0.05f, 0.25f) * s;
+            float scratchX = Mathf.Cos(scratchAngle) * scratchDist;
+            float scratchZ = Mathf.Sin(scratchAngle) * scratchDist;
+            float scratchLen = rng.RandfRange(0.03f, 0.08f) * s;
+            float scratchDir = rng.Randf() * Mathf.Tau;
+
+            float dx = Mathf.Cos(scratchDir) * scratchLen / 2;
+            float dz = Mathf.Sin(scratchDir) * scratchLen / 2;
+
+            // Scratch as thin groove
+            surfaceTool.AddVertex(new Vector3(scratchX - dx, shieldY + 0.004f * s, scratchZ - dz));
+            surfaceTool.AddVertex(new Vector3(scratchX + dx, shieldY + 0.004f * s, scratchZ + dz));
+            surfaceTool.AddVertex(new Vector3(scratchX, shieldY + 0.002f * s, scratchZ));
+        }
+
+        // === LEATHER STRAP REMNANTS (broken arm straps) ===
+        float strapX = -0.08f * s;
+        float strapZ = 0;
+        float strapLen = 0.1f * s;
+        // One intact strap
+        AddBoxToSurfaceTool(surfaceTool, new Vector3(strapX, shieldY + 0.015f * s, strapZ), new Vector3(0.025f * s, 0.012f * s, strapLen));
+        // Broken strap end dangling
+        AddBoxToSurfaceTool(surfaceTool, new Vector3(0.06f * s, shieldY + 0.008f * s, 0.03f * s), new Vector3(0.02f * s, 0.008f * s, 0.04f * s));
+
+        // === DIRT AND STAINS ===
+        int stainCount = rng.RandiRange(2, 4);
+        for (int st = 0; st < stainCount; st++)
+        {
+            float stainAngle = rng.Randf() * Mathf.Tau;
+            float stainDist = rng.RandfRange(0.04f, 0.2f) * s;
+            float stainX = Mathf.Cos(stainAngle) * stainDist;
+            float stainZ = Mathf.Sin(stainAngle) * stainDist;
+            float stainR = rng.RandfRange(0.015f, 0.04f) * s;
+
+            for (int ss = 0; ss < 4; ss++)
+            {
+                float sa1 = ss * Mathf.Tau / 4;
+                float sa2 = (ss + 1) * Mathf.Tau / 4;
+                surfaceTool.AddVertex(new Vector3(stainX, shieldY + 0.002f * s, stainZ));
+                surfaceTool.AddVertex(new Vector3(stainX + Mathf.Cos(sa1) * stainR, shieldY + 0.001f * s, stainZ + Mathf.Sin(sa1) * stainR));
+                surfaceTool.AddVertex(new Vector3(stainX + Mathf.Cos(sa2) * stainR, shieldY + 0.001f * s, stainZ + Mathf.Sin(sa2) * stainR));
+            }
         }
 
         surfaceTool.GenerateNormals();
         var mesh = surfaceTool.Commit();
         var material = new StandardMaterial3D
         {
-            AlbedoColor = new Color(0.5f, 0.4f, 0.3f), // Worn wood
-            Roughness = 0.8f
+            AlbedoColor = new Color(0.42f, 0.35f, 0.28f), // Weathered wood/leather
+            Roughness = 0.85f
         };
         mesh.SurfaceSetMaterial(0, material);
         return mesh;
