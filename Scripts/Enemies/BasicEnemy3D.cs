@@ -5,6 +5,7 @@ using SafeRoom3D.Player;
 using SafeRoom3D.Abilities;
 using SafeRoom3D.Abilities.Effects;
 using SafeRoom3D.UI;
+using SafeRoom3D.Broadcaster;
 
 namespace SafeRoom3D.Enemies;
 
@@ -2346,6 +2347,9 @@ public partial class BasicEnemy3D : CharacterBody3D
 
             // Register kill for achievements
             HUD3D.Instance?.RegisterKill(MonsterType, false);
+
+            // Notify AI broadcaster of kill
+            AIBroadcaster.Instance?.OnMonsterKilled(MonsterType);
         }
 
         // Wait for death animation to complete before spawning corpse

@@ -2,6 +2,7 @@ using Godot;
 using SafeRoom3D.Core;
 using SafeRoom3D.Player;
 using SafeRoom3D.UI;
+using SafeRoom3D.Broadcaster;
 
 namespace SafeRoom3D.Enemies;
 
@@ -791,6 +792,8 @@ public partial class BossEnemy3D : CharacterBody3D
                 if (previousState == State.Idle)
                 {
                     PlayMonsterSound("aggro");
+                    // Notify AI broadcaster of boss encounter
+                    AIBroadcaster.Instance?.OnBossEncounter(BossName);
                 }
                 // Bosses run when in aggro state
                 PlayAnimation(AnimationType.Run);
@@ -961,6 +964,9 @@ public partial class BossEnemy3D : CharacterBody3D
         EmitSignal(SignalName.Died, this);
 
         GD.Print($"[BossEnemy3D] {BossName} has been defeated!");
+
+        // Notify AI broadcaster of boss defeat
+        AIBroadcaster.Instance?.OnBossDefeated(BossName);
 
         // Award XP to player
         if (FPSController.Instance != null && ExperienceReward > 0)

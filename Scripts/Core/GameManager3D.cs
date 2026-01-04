@@ -5,6 +5,7 @@ using SafeRoom3D.Abilities;
 using SafeRoom3D.Items;
 using SafeRoom3D.Pet;
 using SafeRoom3D.Environment;
+using SafeRoom3D.Broadcaster;
 
 namespace SafeRoom3D.Core;
 
@@ -279,6 +280,11 @@ public partial class GameManager3D : Node
         floorSelector.Name = "FloorSelector";
         hudLayer.AddChild(floorSelector);
 
+        // Create AI Broadcaster (snarky commentary system)
+        var broadcaster = new AIBroadcaster();
+        broadcaster.Name = "AIBroadcaster";
+        hudLayer.AddChild(broadcaster);
+
         GD.Print("[GameManager3D] UI created");
     }
 
@@ -393,7 +399,7 @@ public partial class GameManager3D : Node
             if (_hitStopTimeRemaining <= 0)
             {
                 _isHitStopped = false;
-                Engine.TimeScale = 1.0;
+                GameConfig.ResumeToNormalSpeed();
             }
             return;
         }
@@ -561,8 +567,8 @@ public partial class GameManager3D : Node
             _player.ResetHealth();
         }
 
-        // Reset time scale
-        Engine.TimeScale = 1.0;
+        // Reset time scale to configured game speed
+        GameConfig.ResumeToNormalSpeed();
         _isHitStopped = false;
 
         // Capture mouse
@@ -662,6 +668,6 @@ public partial class GameManager3D : Node
     public override void _ExitTree()
     {
         Instance = null;
-        Engine.TimeScale = 1.0; // Reset time scale
+        Engine.TimeScale = 1.0; // Reset to default on exit (not game speed)
     }
 }

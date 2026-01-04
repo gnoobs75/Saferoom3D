@@ -4,6 +4,7 @@ using SafeRoom3D.Combat;
 using SafeRoom3D.Abilities;
 using SafeRoom3D.Items;
 using SafeRoom3D.UI;
+using SafeRoom3D.Broadcaster;
 
 namespace SafeRoom3D.Player;
 
@@ -960,8 +961,8 @@ public partial class FPSController : CharacterBody3D
         bool floorSelectorOpen = FloorSelector3D.Instance?.IsOpen == true;
         if (Engine.TimeScale < 0.01 && !isTargeting && !floorSelectorOpen)
         {
-            GD.Print("[FPSController] Health check: TimeScale stuck at 0 - resetting to 1.0");
-            Engine.TimeScale = 1.0;
+            GD.Print("[FPSController] Health check: TimeScale stuck at 0 - resetting to game speed");
+            GameConfig.ResumeToNormalSpeed();
         }
     }
 
@@ -1428,6 +1429,10 @@ public partial class FPSController : CharacterBody3D
 
         GD.Print($"[FPSController] Took {finalDamage} damage from {source} (raw: {rawDamage}). Health: {CurrentHealth}/{MaxHealth}");
 
+        // Notify AI broadcaster of damage
+        float healthPercent = (float)CurrentHealth / MaxHealth;
+        AIBroadcaster.Instance?.OnPlayerDamaged(healthPercent);
+
         if (CurrentHealth <= 0)
         {
             Die();
@@ -1564,6 +1569,9 @@ public partial class FPSController : CharacterBody3D
     {
         GD.Print("[FPSController] Player died!");
 
+        // Notify AI broadcaster of death
+        AIBroadcaster.Instance?.OnPlayerDeath();
+
         // Cancel any active ability targeting
         if (Abilities.AbilityManager3D.Instance?.IsTargeting == true)
         {
@@ -1573,8 +1581,8 @@ public partial class FPSController : CharacterBody3D
         // Reset all input state to prevent stuck inputs after death
         ResetInputState();
 
-        // Ensure time is running
-        Engine.TimeScale = 1.0;
+        // Ensure time is running at configured game speed
+        GameConfig.ResumeToNormalSpeed();
 
         SoundManager3D.Instance?.PlayPlayerDeathSound();
 
