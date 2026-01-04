@@ -88,6 +88,12 @@ powershell -Command "Start-Process 'C:\Godot\Godot_v4.3-stable_mono_win64.exe' -
 
 **Repository:** https://github.com/gnoobs75/Saferoom3D
 
+### Commit Policy
+**IMPORTANT:** After a successful build and user approval, Claude MUST ask:
+> "Build succeeded and changes are working. Should I commit these changes to Git?"
+
+Only commit after the user confirms. Never auto-commit without explicit approval.
+
 ### When to Commit
 - **After each completed feature** - Once user approves and build succeeds
 - **After bug fixes** - When a fix is verified working
