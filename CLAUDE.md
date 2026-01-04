@@ -139,6 +139,12 @@ For detailed information on monsters, abilities, weapons, cosmetics, and porting
 - `.claude/reference/cosmetics.md` - 40+ prop types
 - `.claude/reference/porting-status.md` - What's done / to-do
 
+## Skills
+
+Custom skills for specialized capabilities (auto-loaded in Claude Code sessions):
+- `.claude/skills/godot-3d-dev.md` - Godot 4.3 C# development workflow
+- `.claude/skills/procedural-3d-artist.md` - Procedural 3D mesh creation for monsters & props
+
 ---
 
 ## Known Issues
