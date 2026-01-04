@@ -360,12 +360,20 @@ public static class MonsterMeshFactory
     public class LimbNodes
     {
         public Node3D? Head { get; set; }
+        public Node3D? Body { get; set; }        // Torso/body for sway animations
         public Node3D? LeftArm { get; set; }
         public Node3D? RightArm { get; set; }
         public Node3D? LeftLeg { get; set; }
         public Node3D? RightLeg { get; set; }
+        public Node3D? Tail { get; set; }        // Tail for wag/sway animations
         public Node3D? Weapon { get; set; }
         public Node3D? Torch { get; set; }
+
+        /// <summary>
+        /// Check if this is a quadruped (4 legs, no arms used for walking)
+        /// Can be set explicitly or detected via naming convention
+        /// </summary>
+        public bool IsQuadruped { get; set; } = false;
     }
 
     /// <summary>

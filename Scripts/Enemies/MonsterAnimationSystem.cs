@@ -241,20 +241,24 @@ public static class MonsterAnimationSystem
     private struct LimbBasePositions
     {
         public Vector3 Head;
+        public Vector3 Body;
         public Vector3 LeftArm;
         public Vector3 RightArm;
         public Vector3 LeftLeg;
         public Vector3 RightLeg;
+        public Vector3 Tail;
 
         public static LimbBasePositions FromLimbs(MonsterMeshFactory.LimbNodes limbs)
         {
             return new LimbBasePositions
             {
                 Head = limbs.Head?.Position ?? Vector3.Zero,
+                Body = limbs.Body?.Position ?? Vector3.Zero,
                 LeftArm = limbs.LeftArm?.Position ?? Vector3.Zero,
                 RightArm = limbs.RightArm?.Position ?? Vector3.Zero,
                 LeftLeg = limbs.LeftLeg?.Position ?? Vector3.Zero,
-                RightLeg = limbs.RightLeg?.Position ?? Vector3.Zero
+                RightLeg = limbs.RightLeg?.Position ?? Vector3.Zero,
+                Tail = limbs.Tail?.Position ?? Vector3.Zero
             };
         }
     }
@@ -279,6 +283,9 @@ public static class MonsterAnimationSystem
             Name = "AnimationPlayer"
         };
         parent.AddChild(player);
+
+        // Store monster type for animation style decisions
+        _currentMonsterType = monsterType;
 
         // Name the limb nodes so animation tracks can find them
         NameLimbNodes(limbs);
@@ -316,10 +323,12 @@ public static class MonsterAnimationSystem
     private static void NameLimbNodes(MonsterMeshFactory.LimbNodes limbs)
     {
         if (limbs.Head != null) limbs.Head.Name = "Head";
+        if (limbs.Body != null) limbs.Body.Name = "Body";
         if (limbs.LeftArm != null) limbs.LeftArm.Name = "LeftArm";
         if (limbs.RightArm != null) limbs.RightArm.Name = "RightArm";
         if (limbs.LeftLeg != null) limbs.LeftLeg.Name = "LeftLeg";
         if (limbs.RightLeg != null) limbs.RightLeg.Name = "RightLeg";
+        if (limbs.Tail != null) limbs.Tail.Name = "Tail";
         if (limbs.Weapon != null) limbs.Weapon.Name = "Weapon";
         if (limbs.Torch != null) limbs.Torch.Name = "Torch";
     }
@@ -331,10 +340,12 @@ public static class MonsterAnimationSystem
     private struct LimbAnimationPaths
     {
         public NodePath Head;
+        public NodePath Body;
         public NodePath LeftArm;
         public NodePath RightArm;
         public NodePath LeftLeg;
         public NodePath RightLeg;
+        public NodePath Tail;
         public NodePath Weapon;
         public NodePath Torch;
 
@@ -343,10 +354,12 @@ public static class MonsterAnimationSystem
             return new LimbAnimationPaths
             {
                 Head = GetRelativePath(root, limbs.Head),
+                Body = GetRelativePath(root, limbs.Body),
                 LeftArm = GetRelativePath(root, limbs.LeftArm),
                 RightArm = GetRelativePath(root, limbs.RightArm),
                 LeftLeg = GetRelativePath(root, limbs.LeftLeg),
                 RightLeg = GetRelativePath(root, limbs.RightLeg),
+                Tail = GetRelativePath(root, limbs.Tail),
                 Weapon = GetRelativePath(root, limbs.Weapon),
                 Torch = GetRelativePath(root, limbs.Torch)
             };
@@ -384,6 +397,9 @@ public static class MonsterAnimationSystem
 
     // Store animation paths for use in animation creation methods
     private static LimbAnimationPaths _currentPaths;
+
+    // Store current monster type for animation style decisions
+    private static string _currentMonsterType = "";
 
     /// <summary>
     /// Get animation name from type and variant index
@@ -464,12 +480,42 @@ public static class MonsterAnimationSystem
             breathingAnim.TrackSetPath(headTrack, _currentPaths.Head);
 
             // Subtle breathing motion - use base position + offset
-            float breatheAmount = 0.05f * personality.SquashStretchAmount;
+            float breatheAmount = 0.05f + 0.03f * personality.SquashStretchAmount;
             breathingAnim.PositionTrackInsertKey(headTrack, 0.0f, headBasePos);
             breathingAnim.PositionTrackInsertKey(headTrack, IDLE_DURATION * 0.5f, headBasePos + new Vector3(0, breatheAmount, 0));
             breathingAnim.PositionTrackInsertKey(headTrack, IDLE_DURATION, headBasePos);
 
             breathingAnim.TrackSetInterpolationType(headTrack, Animation.InterpolationType.Cubic);
+        }
+
+        // Tail gentle sway during breathing (if present)
+        if (limbs.Tail != null && !_currentPaths.Tail.IsEmpty)
+        {
+            int tailTrack = breathingAnim.AddTrack(Animation.TrackType.Rotation3D);
+            breathingAnim.TrackSetPath(tailTrack, _currentPaths.Tail);
+
+            float tailSwayAngle = Mathf.DegToRad(8f * personality.IdleFrequency);
+            breathingAnim.RotationTrackInsertKey(tailTrack, 0.0f, Quaternion.Identity);
+            breathingAnim.RotationTrackInsertKey(tailTrack, IDLE_DURATION * 0.25f, new Quaternion(Vector3.Up, tailSwayAngle));
+            breathingAnim.RotationTrackInsertKey(tailTrack, IDLE_DURATION * 0.5f, Quaternion.Identity);
+            breathingAnim.RotationTrackInsertKey(tailTrack, IDLE_DURATION * 0.75f, new Quaternion(Vector3.Up, -tailSwayAngle));
+            breathingAnim.RotationTrackInsertKey(tailTrack, IDLE_DURATION, Quaternion.Identity);
+
+            breathingAnim.TrackSetInterpolationType(tailTrack, Animation.InterpolationType.Cubic);
+        }
+
+        // Body subtle sway (if present)
+        if (limbs.Body != null && !_currentPaths.Body.IsEmpty)
+        {
+            int bodyTrack = breathingAnim.AddTrack(Animation.TrackType.Rotation3D);
+            breathingAnim.TrackSetPath(bodyTrack, _currentPaths.Body);
+
+            float bodySway = Mathf.DegToRad(2f * (1f - personality.Stiffness));
+            breathingAnim.RotationTrackInsertKey(bodyTrack, 0.0f, Quaternion.Identity);
+            breathingAnim.RotationTrackInsertKey(bodyTrack, IDLE_DURATION * 0.5f, EulerToQuat(bodySway, 0, bodySway * 0.5f));
+            breathingAnim.RotationTrackInsertKey(bodyTrack, IDLE_DURATION, Quaternion.Identity);
+
+            breathingAnim.TrackSetInterpolationType(bodyTrack, Animation.InterpolationType.Cubic);
         }
 
         player.AddAnimationLibrary("", new AnimationLibrary());
@@ -501,6 +547,25 @@ public static class MonsterAnimationSystem
             alertAnim.RotationTrackInsertKey(headRotTrack, 1.6f, Quaternion.Identity);
 
             alertAnim.TrackSetInterpolationType(headRotTrack, Animation.InterpolationType.Cubic);
+        }
+
+        // Tail alert twitching - faster, more nervous motion
+        if (limbs.Tail != null && !_currentPaths.Tail.IsEmpty)
+        {
+            int tailTrack = alertAnim.AddTrack(Animation.TrackType.Rotation3D);
+            alertAnim.TrackSetPath(tailTrack, _currentPaths.Tail);
+
+            float tailTwitchAngle = Mathf.DegToRad(12f * personality.IdleFrequency);
+            // Faster, irregular tail motion when alert
+            alertAnim.RotationTrackInsertKey(tailTrack, 0.0f, Quaternion.Identity);
+            alertAnim.RotationTrackInsertKey(tailTrack, 0.2f, new Quaternion(Vector3.Up, tailTwitchAngle));
+            alertAnim.RotationTrackInsertKey(tailTrack, 0.35f, Quaternion.Identity);
+            alertAnim.RotationTrackInsertKey(tailTrack, 0.5f, new Quaternion(Vector3.Up, -tailTwitchAngle * 0.7f));
+            alertAnim.RotationTrackInsertKey(tailTrack, 0.8f, Quaternion.Identity);
+            alertAnim.RotationTrackInsertKey(tailTrack, 1.0f, new Quaternion(Vector3.Up, tailTwitchAngle * 0.5f));
+            alertAnim.RotationTrackInsertKey(tailTrack, alertAnim.Length, Quaternion.Identity);
+
+            alertAnim.TrackSetInterpolationType(tailTrack, Animation.InterpolationType.Cubic);
         }
 
         player.GetAnimationLibrary("").AddAnimation("idle_1", alertAnim);
@@ -541,6 +606,22 @@ public static class MonsterAnimationSystem
             aggressiveAnim.TrackSetInterpolationType(rightArmTrack, Animation.InterpolationType.Cubic);
         }
 
+        // Tail rigid/raised when aggressive - held tense with small twitches
+        if (limbs.Tail != null && !_currentPaths.Tail.IsEmpty)
+        {
+            int tailTrack = aggressiveAnim.AddTrack(Animation.TrackType.Rotation3D);
+            aggressiveAnim.TrackSetPath(tailTrack, _currentPaths.Tail);
+
+            float tailRaiseAngle = Mathf.DegToRad(-15f); // Raised up
+            float tailTwitch = Mathf.DegToRad(3f);       // Small twitches
+            aggressiveAnim.RotationTrackInsertKey(tailTrack, 0.0f, EulerToQuat(tailRaiseAngle, 0, 0));
+            aggressiveAnim.RotationTrackInsertKey(tailTrack, aggressiveAnim.Length * 0.3f, EulerToQuat(tailRaiseAngle, tailTwitch, 0));
+            aggressiveAnim.RotationTrackInsertKey(tailTrack, aggressiveAnim.Length * 0.6f, EulerToQuat(tailRaiseAngle, -tailTwitch, 0));
+            aggressiveAnim.RotationTrackInsertKey(tailTrack, aggressiveAnim.Length, EulerToQuat(tailRaiseAngle, 0, 0));
+
+            aggressiveAnim.TrackSetInterpolationType(tailTrack, Animation.InterpolationType.Cubic);
+        }
+
         player.GetAnimationLibrary("").AddAnimation("idle_2", aggressiveAnim);
     }
 
@@ -558,20 +639,33 @@ public static class MonsterAnimationSystem
     {
         // Use passed-in base positions for animation offsets
         Vector3 headBasePos = basePos.Head;
+        bool isQuadruped = IsQuadrupedMonster(_currentMonsterType);
 
         // Variant 0: Cautious walk
-        var cautiousWalk = CreateBasicWalkCycle(limbs, headBasePos, WALK_CYCLE_DURATION * 1.3f, personality, 0.5f);
+        Animation cautiousWalk;
+        if (isQuadruped)
+            cautiousWalk = CreateQuadrupedWalkCycle(limbs, headBasePos, WALK_CYCLE_DURATION * 1.3f, personality, 0.5f);
+        else
+            cautiousWalk = CreateBasicWalkCycle(limbs, headBasePos, WALK_CYCLE_DURATION * 1.3f, personality, 0.5f);
         cautiousWalk.LoopMode = Animation.LoopModeEnum.Linear;
         player.GetAnimationLibrary("").AddAnimation("walk_0", cautiousWalk);
 
         // Variant 1: Normal walk
-        var normalWalk = CreateBasicWalkCycle(limbs, headBasePos, WALK_CYCLE_DURATION, personality, 1.0f);
+        Animation normalWalk;
+        if (isQuadruped)
+            normalWalk = CreateQuadrupedWalkCycle(limbs, headBasePos, WALK_CYCLE_DURATION, personality, 1.0f);
+        else
+            normalWalk = CreateBasicWalkCycle(limbs, headBasePos, WALK_CYCLE_DURATION, personality, 1.0f);
         normalWalk.LoopMode = Animation.LoopModeEnum.Linear;
         player.GetAnimationLibrary("").AddAnimation("walk_1", normalWalk);
 
         // Variant 2: Predatory walk (low, stalking) - create custom cycle with lowered head
         Vector3 crouchedHeadPos = headBasePos + new Vector3(0, -0.15f, 0.1f);
-        var predatoryWalk = CreateBasicWalkCycle(limbs, crouchedHeadPos, WALK_CYCLE_DURATION * 0.9f, personality, 1.2f);
+        Animation predatoryWalk;
+        if (isQuadruped)
+            predatoryWalk = CreateQuadrupedWalkCycle(limbs, crouchedHeadPos, WALK_CYCLE_DURATION * 0.9f, personality, 1.2f);
+        else
+            predatoryWalk = CreateBasicWalkCycle(limbs, crouchedHeadPos, WALK_CYCLE_DURATION * 0.9f, personality, 1.2f);
         predatoryWalk.LoopMode = Animation.LoopModeEnum.Linear;
 
         player.GetAnimationLibrary("").AddAnimation("walk_2", predatoryWalk);
@@ -643,6 +737,40 @@ public static class MonsterAnimationSystem
             anim.TrackSetInterpolationType(headBobTrack, Animation.InterpolationType.Cubic);
         }
 
+        // Tail sway during walking - counterbalance motion
+        if (limbs.Tail != null && !_currentPaths.Tail.IsEmpty)
+        {
+            int tailTrack = anim.AddTrack(Animation.TrackType.Rotation3D);
+            anim.TrackSetPath(tailTrack, _currentPaths.Tail);
+
+            // Tail swings opposite to leg motion for balance
+            float tailSwayAngle = Mathf.DegToRad(15f * intensity * (1f - personality.Stiffness));
+            anim.RotationTrackInsertKey(tailTrack, 0.0f, new Quaternion(Vector3.Up, tailSwayAngle));
+            anim.RotationTrackInsertKey(tailTrack, duration * 0.25f, Quaternion.Identity);
+            anim.RotationTrackInsertKey(tailTrack, duration * 0.5f, new Quaternion(Vector3.Up, -tailSwayAngle));
+            anim.RotationTrackInsertKey(tailTrack, duration * 0.75f, Quaternion.Identity);
+            anim.RotationTrackInsertKey(tailTrack, duration, new Quaternion(Vector3.Up, tailSwayAngle));
+
+            anim.TrackSetInterpolationType(tailTrack, Animation.InterpolationType.Cubic);
+        }
+
+        // Body sway during walking - weight shift
+        if (limbs.Body != null && !_currentPaths.Body.IsEmpty)
+        {
+            int bodyTrack = anim.AddTrack(Animation.TrackType.Rotation3D);
+            anim.TrackSetPath(bodyTrack, _currentPaths.Body);
+
+            float bodySway = Mathf.DegToRad(4f * intensity * (1f - personality.Stiffness));
+            // Shift weight side to side with steps
+            anim.RotationTrackInsertKey(bodyTrack, 0.0f, EulerToQuat(0, 0, bodySway));
+            anim.RotationTrackInsertKey(bodyTrack, duration * 0.25f, Quaternion.Identity);
+            anim.RotationTrackInsertKey(bodyTrack, duration * 0.5f, EulerToQuat(0, 0, -bodySway));
+            anim.RotationTrackInsertKey(bodyTrack, duration * 0.75f, Quaternion.Identity);
+            anim.RotationTrackInsertKey(bodyTrack, duration, EulerToQuat(0, 0, bodySway));
+
+            anim.TrackSetInterpolationType(bodyTrack, Animation.InterpolationType.Cubic);
+        }
+
         return anim;
     }
 
@@ -660,20 +788,30 @@ public static class MonsterAnimationSystem
     {
         // Use passed-in base positions for animation offsets
         Vector3 headBasePos = basePos.Head;
+        bool isQuadruped = IsQuadrupedMonster(_currentMonsterType);
 
         // Variant 0: Charge - head leaned forward
         Vector3 chargeHeadPos = headBasePos + new Vector3(0, -0.05f, 0.15f);
-        var chargeAnim = CreateBasicRunCycle(limbs, chargeHeadPos, RUN_CYCLE_DURATION, personality, 1.5f);
+        Animation chargeAnim;
+        if (isQuadruped)
+            chargeAnim = CreateQuadrupedRunCycle(limbs, chargeHeadPos, RUN_CYCLE_DURATION, personality, 1.5f);
+        else
+            chargeAnim = CreateBasicRunCycle(limbs, chargeHeadPos, RUN_CYCLE_DURATION, personality, 1.5f);
         chargeAnim.LoopMode = Animation.LoopModeEnum.Linear;
         player.GetAnimationLibrary("").AddAnimation("run_0", chargeAnim);
 
         // Variant 1: Evade - uses side-to-side motion via custom run cycle
+        // (Evade works for both bipeds and quadrupeds)
         var evadeAnim = CreateEvadeRunCycle(limbs, headBasePos, RUN_CYCLE_DURATION * 1.1f, personality, 1.2f);
         evadeAnim.LoopMode = Animation.LoopModeEnum.Linear;
         player.GetAnimationLibrary("").AddAnimation("run_1", evadeAnim);
 
         // Variant 2: Sprint
-        var sprintAnim = CreateBasicRunCycle(limbs, headBasePos, RUN_CYCLE_DURATION * 0.8f, personality, 2.0f);
+        Animation sprintAnim;
+        if (isQuadruped)
+            sprintAnim = CreateQuadrupedRunCycle(limbs, headBasePos, RUN_CYCLE_DURATION * 0.8f, personality, 2.0f);
+        else
+            sprintAnim = CreateBasicRunCycle(limbs, headBasePos, RUN_CYCLE_DURATION * 0.8f, personality, 2.0f);
         sprintAnim.LoopMode = Animation.LoopModeEnum.Linear;
         player.GetAnimationLibrary("").AddAnimation("run_2", sprintAnim);
     }
@@ -740,6 +878,41 @@ public static class MonsterAnimationSystem
             anim.PositionTrackInsertKey(headBobTrack, duration * 0.75f, headBasePos + new Vector3(0, bobAmount, 0));
             anim.PositionTrackInsertKey(headBobTrack, duration, headBasePos);
             anim.TrackSetInterpolationType(headBobTrack, Animation.InterpolationType.Linear);
+        }
+
+        // Tail whips during running - more extreme than walking
+        if (limbs.Tail != null && !_currentPaths.Tail.IsEmpty)
+        {
+            int tailTrack = anim.AddTrack(Animation.TrackType.Rotation3D);
+            anim.TrackSetPath(tailTrack, _currentPaths.Tail);
+
+            // Faster, more dramatic tail motion when running
+            float tailSwayAngle = Mathf.DegToRad(25f * intensity * (1f - personality.Stiffness * 0.5f));
+            anim.RotationTrackInsertKey(tailTrack, 0.0f, new Quaternion(Vector3.Up, tailSwayAngle));
+            anim.RotationTrackInsertKey(tailTrack, duration * 0.25f, Quaternion.Identity);
+            anim.RotationTrackInsertKey(tailTrack, duration * 0.5f, new Quaternion(Vector3.Up, -tailSwayAngle));
+            anim.RotationTrackInsertKey(tailTrack, duration * 0.75f, Quaternion.Identity);
+            anim.RotationTrackInsertKey(tailTrack, duration, new Quaternion(Vector3.Up, tailSwayAngle));
+
+            anim.TrackSetInterpolationType(tailTrack, Animation.InterpolationType.Linear);
+        }
+
+        // Body leans forward and sways during running
+        if (limbs.Body != null && !_currentPaths.Body.IsEmpty)
+        {
+            int bodyTrack = anim.AddTrack(Animation.TrackType.Rotation3D);
+            anim.TrackSetPath(bodyTrack, _currentPaths.Body);
+
+            float bodyLean = Mathf.DegToRad(8f * intensity);  // Forward lean
+            float bodySway = Mathf.DegToRad(6f * intensity * (1f - personality.Stiffness));
+            // Lean forward with side sway
+            anim.RotationTrackInsertKey(bodyTrack, 0.0f, EulerToQuat(bodyLean, 0, bodySway));
+            anim.RotationTrackInsertKey(bodyTrack, duration * 0.25f, EulerToQuat(bodyLean, 0, 0));
+            anim.RotationTrackInsertKey(bodyTrack, duration * 0.5f, EulerToQuat(bodyLean, 0, -bodySway));
+            anim.RotationTrackInsertKey(bodyTrack, duration * 0.75f, EulerToQuat(bodyLean, 0, 0));
+            anim.RotationTrackInsertKey(bodyTrack, duration, EulerToQuat(bodyLean, 0, bodySway));
+
+            anim.TrackSetInterpolationType(bodyTrack, Animation.InterpolationType.Linear);
         }
 
         return anim;
@@ -810,7 +983,246 @@ public static class MonsterAnimationSystem
             anim.TrackSetInterpolationType(headTrack, Animation.InterpolationType.Cubic);
         }
 
+        // Tail whips during evasion - erratic motion
+        if (limbs.Tail != null && !_currentPaths.Tail.IsEmpty)
+        {
+            int tailTrack = anim.AddTrack(Animation.TrackType.Rotation3D);
+            anim.TrackSetPath(tailTrack, _currentPaths.Tail);
+
+            float tailSwayAngle = Mathf.DegToRad(30f * intensity);
+            anim.RotationTrackInsertKey(tailTrack, 0.0f, new Quaternion(Vector3.Up, tailSwayAngle));
+            anim.RotationTrackInsertKey(tailTrack, duration * 0.5f, new Quaternion(Vector3.Up, -tailSwayAngle));
+            anim.RotationTrackInsertKey(tailTrack, duration, new Quaternion(Vector3.Up, tailSwayAngle));
+
+            anim.TrackSetInterpolationType(tailTrack, Animation.InterpolationType.Linear);
+        }
+
         return anim;
+    }
+
+    /// <summary>
+    /// Create a quadruped walk cycle where diagonal pairs move together
+    /// (front-left + back-right, then front-right + back-left)
+    /// </summary>
+    private static Animation CreateQuadrupedWalkCycle(MonsterMeshFactory.LimbNodes limbs, Vector3 headBasePos, float duration, MonsterPersonality personality, float intensity)
+    {
+        var anim = new Animation();
+        anim.Length = duration;
+
+        float legSwing = Mathf.DegToRad(25f) * intensity;
+        float bobAmount = 0.04f * intensity * personality.Bounciness;
+
+        // Quadruped diagonal pair movement:
+        // Phase 0.0: Front-Left + Back-Right forward, Front-Right + Back-Left back
+        // Phase 0.5: Swap
+
+        // Front left leg (LeftArm in limbs)
+        if (limbs.LeftArm != null)
+        {
+            int track = anim.AddTrack(Animation.TrackType.Rotation3D);
+            anim.TrackSetPath(track, _currentPaths.LeftArm);
+            anim.RotationTrackInsertKey(track, 0.0f, new Quaternion(Vector3.Right, legSwing));
+            anim.RotationTrackInsertKey(track, duration * 0.5f, new Quaternion(Vector3.Right, -legSwing));
+            anim.RotationTrackInsertKey(track, duration, new Quaternion(Vector3.Right, legSwing));
+            anim.TrackSetInterpolationType(track, Animation.InterpolationType.Cubic);
+        }
+
+        // Back right leg (RightLeg in limbs) - same phase as front left
+        if (limbs.RightLeg != null)
+        {
+            int track = anim.AddTrack(Animation.TrackType.Rotation3D);
+            anim.TrackSetPath(track, _currentPaths.RightLeg);
+            anim.RotationTrackInsertKey(track, 0.0f, new Quaternion(Vector3.Right, legSwing));
+            anim.RotationTrackInsertKey(track, duration * 0.5f, new Quaternion(Vector3.Right, -legSwing));
+            anim.RotationTrackInsertKey(track, duration, new Quaternion(Vector3.Right, legSwing));
+            anim.TrackSetInterpolationType(track, Animation.InterpolationType.Cubic);
+        }
+
+        // Front right leg (RightArm in limbs) - opposite phase
+        if (limbs.RightArm != null)
+        {
+            int track = anim.AddTrack(Animation.TrackType.Rotation3D);
+            anim.TrackSetPath(track, _currentPaths.RightArm);
+            anim.RotationTrackInsertKey(track, 0.0f, new Quaternion(Vector3.Right, -legSwing));
+            anim.RotationTrackInsertKey(track, duration * 0.5f, new Quaternion(Vector3.Right, legSwing));
+            anim.RotationTrackInsertKey(track, duration, new Quaternion(Vector3.Right, -legSwing));
+            anim.TrackSetInterpolationType(track, Animation.InterpolationType.Cubic);
+        }
+
+        // Back left leg (LeftLeg in limbs) - same phase as front right
+        if (limbs.LeftLeg != null)
+        {
+            int track = anim.AddTrack(Animation.TrackType.Rotation3D);
+            anim.TrackSetPath(track, _currentPaths.LeftLeg);
+            anim.RotationTrackInsertKey(track, 0.0f, new Quaternion(Vector3.Right, -legSwing));
+            anim.RotationTrackInsertKey(track, duration * 0.5f, new Quaternion(Vector3.Right, legSwing));
+            anim.RotationTrackInsertKey(track, duration, new Quaternion(Vector3.Right, -legSwing));
+            anim.TrackSetInterpolationType(track, Animation.InterpolationType.Cubic);
+        }
+
+        // Head bob - more frequent for quadrupeds (twice per cycle)
+        if (limbs.Head != null)
+        {
+            int headTrack = anim.AddTrack(Animation.TrackType.Position3D);
+            anim.TrackSetPath(headTrack, _currentPaths.Head);
+            anim.PositionTrackInsertKey(headTrack, 0.0f, headBasePos);
+            anim.PositionTrackInsertKey(headTrack, duration * 0.25f, headBasePos + new Vector3(0, bobAmount, 0));
+            anim.PositionTrackInsertKey(headTrack, duration * 0.5f, headBasePos);
+            anim.PositionTrackInsertKey(headTrack, duration * 0.75f, headBasePos + new Vector3(0, bobAmount, 0));
+            anim.PositionTrackInsertKey(headTrack, duration, headBasePos);
+            anim.TrackSetInterpolationType(headTrack, Animation.InterpolationType.Cubic);
+        }
+
+        // Tail sway - counterbalance motion
+        if (limbs.Tail != null && !_currentPaths.Tail.IsEmpty)
+        {
+            int tailTrack = anim.AddTrack(Animation.TrackType.Rotation3D);
+            anim.TrackSetPath(tailTrack, _currentPaths.Tail);
+
+            float tailSwayAngle = Mathf.DegToRad(12f * intensity * (1f - personality.Stiffness));
+            anim.RotationTrackInsertKey(tailTrack, 0.0f, new Quaternion(Vector3.Up, tailSwayAngle));
+            anim.RotationTrackInsertKey(tailTrack, duration * 0.25f, Quaternion.Identity);
+            anim.RotationTrackInsertKey(tailTrack, duration * 0.5f, new Quaternion(Vector3.Up, -tailSwayAngle));
+            anim.RotationTrackInsertKey(tailTrack, duration * 0.75f, Quaternion.Identity);
+            anim.RotationTrackInsertKey(tailTrack, duration, new Quaternion(Vector3.Up, tailSwayAngle));
+
+            anim.TrackSetInterpolationType(tailTrack, Animation.InterpolationType.Cubic);
+        }
+
+        // Body sway during quadruped walk
+        if (limbs.Body != null && !_currentPaths.Body.IsEmpty)
+        {
+            int bodyTrack = anim.AddTrack(Animation.TrackType.Rotation3D);
+            anim.TrackSetPath(bodyTrack, _currentPaths.Body);
+
+            float bodySway = Mathf.DegToRad(3f * intensity * (1f - personality.Stiffness));
+            anim.RotationTrackInsertKey(bodyTrack, 0.0f, EulerToQuat(0, 0, bodySway));
+            anim.RotationTrackInsertKey(bodyTrack, duration * 0.25f, Quaternion.Identity);
+            anim.RotationTrackInsertKey(bodyTrack, duration * 0.5f, EulerToQuat(0, 0, -bodySway));
+            anim.RotationTrackInsertKey(bodyTrack, duration * 0.75f, Quaternion.Identity);
+            anim.RotationTrackInsertKey(bodyTrack, duration, EulerToQuat(0, 0, bodySway));
+
+            anim.TrackSetInterpolationType(bodyTrack, Animation.InterpolationType.Cubic);
+        }
+
+        return anim;
+    }
+
+    /// <summary>
+    /// Create a quadruped run/gallop cycle - faster, more extreme diagonal motion
+    /// </summary>
+    private static Animation CreateQuadrupedRunCycle(MonsterMeshFactory.LimbNodes limbs, Vector3 headBasePos, float duration, MonsterPersonality personality, float intensity)
+    {
+        var anim = new Animation();
+        anim.Length = duration;
+
+        float legSwing = Mathf.DegToRad(40f) * intensity;
+        float bobAmount = 0.08f * intensity * personality.Bounciness;
+
+        // Front left + Back right (diagonal pair 1)
+        if (limbs.LeftArm != null)
+        {
+            int track = anim.AddTrack(Animation.TrackType.Rotation3D);
+            anim.TrackSetPath(track, _currentPaths.LeftArm);
+            anim.RotationTrackInsertKey(track, 0.0f, new Quaternion(Vector3.Right, legSwing));
+            anim.RotationTrackInsertKey(track, duration * 0.5f, new Quaternion(Vector3.Right, -legSwing));
+            anim.RotationTrackInsertKey(track, duration, new Quaternion(Vector3.Right, legSwing));
+            anim.TrackSetInterpolationType(track, Animation.InterpolationType.Linear);
+        }
+
+        if (limbs.RightLeg != null)
+        {
+            int track = anim.AddTrack(Animation.TrackType.Rotation3D);
+            anim.TrackSetPath(track, _currentPaths.RightLeg);
+            anim.RotationTrackInsertKey(track, 0.0f, new Quaternion(Vector3.Right, legSwing));
+            anim.RotationTrackInsertKey(track, duration * 0.5f, new Quaternion(Vector3.Right, -legSwing));
+            anim.RotationTrackInsertKey(track, duration, new Quaternion(Vector3.Right, legSwing));
+            anim.TrackSetInterpolationType(track, Animation.InterpolationType.Linear);
+        }
+
+        // Front right + Back left (diagonal pair 2)
+        if (limbs.RightArm != null)
+        {
+            int track = anim.AddTrack(Animation.TrackType.Rotation3D);
+            anim.TrackSetPath(track, _currentPaths.RightArm);
+            anim.RotationTrackInsertKey(track, 0.0f, new Quaternion(Vector3.Right, -legSwing));
+            anim.RotationTrackInsertKey(track, duration * 0.5f, new Quaternion(Vector3.Right, legSwing));
+            anim.RotationTrackInsertKey(track, duration, new Quaternion(Vector3.Right, -legSwing));
+            anim.TrackSetInterpolationType(track, Animation.InterpolationType.Linear);
+        }
+
+        if (limbs.LeftLeg != null)
+        {
+            int track = anim.AddTrack(Animation.TrackType.Rotation3D);
+            anim.TrackSetPath(track, _currentPaths.LeftLeg);
+            anim.RotationTrackInsertKey(track, 0.0f, new Quaternion(Vector3.Right, -legSwing));
+            anim.RotationTrackInsertKey(track, duration * 0.5f, new Quaternion(Vector3.Right, legSwing));
+            anim.RotationTrackInsertKey(track, duration, new Quaternion(Vector3.Right, -legSwing));
+            anim.TrackSetInterpolationType(track, Animation.InterpolationType.Linear);
+        }
+
+        // Head bob - pronounced gallop bob
+        if (limbs.Head != null)
+        {
+            int headTrack = anim.AddTrack(Animation.TrackType.Position3D);
+            anim.TrackSetPath(headTrack, _currentPaths.Head);
+            anim.PositionTrackInsertKey(headTrack, 0.0f, headBasePos);
+            anim.PositionTrackInsertKey(headTrack, duration * 0.25f, headBasePos + new Vector3(0, bobAmount, 0.02f));
+            anim.PositionTrackInsertKey(headTrack, duration * 0.5f, headBasePos);
+            anim.PositionTrackInsertKey(headTrack, duration * 0.75f, headBasePos + new Vector3(0, bobAmount, 0.02f));
+            anim.PositionTrackInsertKey(headTrack, duration, headBasePos);
+            anim.TrackSetInterpolationType(headTrack, Animation.InterpolationType.Linear);
+        }
+
+        // Tail streaming behind during run
+        if (limbs.Tail != null && !_currentPaths.Tail.IsEmpty)
+        {
+            int tailTrack = anim.AddTrack(Animation.TrackType.Rotation3D);
+            anim.TrackSetPath(tailTrack, _currentPaths.Tail);
+
+            float tailStreamAngle = Mathf.DegToRad(20f * intensity);
+            float tailSway = Mathf.DegToRad(15f * intensity);
+            // Tail streams back and sways
+            anim.RotationTrackInsertKey(tailTrack, 0.0f, EulerToQuat(tailStreamAngle, tailSway, 0));
+            anim.RotationTrackInsertKey(tailTrack, duration * 0.5f, EulerToQuat(tailStreamAngle, -tailSway, 0));
+            anim.RotationTrackInsertKey(tailTrack, duration, EulerToQuat(tailStreamAngle, tailSway, 0));
+
+            anim.TrackSetInterpolationType(tailTrack, Animation.InterpolationType.Linear);
+        }
+
+        // Body undulates during gallop
+        if (limbs.Body != null && !_currentPaths.Body.IsEmpty)
+        {
+            int bodyTrack = anim.AddTrack(Animation.TrackType.Rotation3D);
+            anim.TrackSetPath(bodyTrack, _currentPaths.Body);
+
+            float bodyFlex = Mathf.DegToRad(5f * intensity);
+            anim.RotationTrackInsertKey(bodyTrack, 0.0f, EulerToQuat(bodyFlex, 0, 0));
+            anim.RotationTrackInsertKey(bodyTrack, duration * 0.25f, EulerToQuat(0, 0, 0));
+            anim.RotationTrackInsertKey(bodyTrack, duration * 0.5f, EulerToQuat(-bodyFlex * 0.5f, 0, 0));
+            anim.RotationTrackInsertKey(bodyTrack, duration * 0.75f, EulerToQuat(0, 0, 0));
+            anim.RotationTrackInsertKey(bodyTrack, duration, EulerToQuat(bodyFlex, 0, 0));
+
+            anim.TrackSetInterpolationType(bodyTrack, Animation.InterpolationType.Linear);
+        }
+
+        return anim;
+    }
+
+    /// <summary>
+    /// Check if monster type uses quadruped animations
+    /// </summary>
+    private static bool IsQuadrupedMonster(string monsterType)
+    {
+        return monsterType.ToLower() switch
+        {
+            "dungeon_rat" or "rat" => true,
+            "badlama" or "llama" => true,
+            "wolf" => true,
+            "spider" or "spider_queen" or "clockwork_spider" => true,
+            "crawler_killer" => true,
+            _ => false
+        };
     }
 
     #endregion
