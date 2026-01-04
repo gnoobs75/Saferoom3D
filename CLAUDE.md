@@ -144,6 +144,9 @@ For detailed information on monsters, abilities, weapons, cosmetics, and porting
 Custom skills for specialized capabilities (auto-loaded in Claude Code sessions):
 - `.claude/skills/godot-3d-dev.md` - Godot 4.3 C# development workflow
 - `.claude/skills/procedural-3d-artist.md` - Procedural 3D mesh creation for monsters & props
+- `.claude/skills/dungeon-architect.md` - Procedural dungeon generation, room layouts, spawn systems
+- `.claude/skills/combat-designer.md` - Ability systems, damage formulas, status effects, enemy AI
+- `.claude/skills/animation-choreographer.md` - Procedural animation, LimbNodes, personality-driven motion
 
 ---
 
