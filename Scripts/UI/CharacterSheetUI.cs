@@ -10,6 +10,7 @@ namespace SafeRoom3D.UI;
 /// <summary>
 /// Character Sheet UI showing player stats, attributes, and equipment slots.
 /// Press C to open. Left-click equipment in inventory to equip.
+/// Features tabs: Portrait (attributes/equipment) and Run Stats (combat statistics).
 /// </summary>
 public partial class CharacterSheetUI : Control
 {
@@ -19,6 +20,14 @@ public partial class CharacterSheetUI : Control
     private PanelContainer? _mainPanel;
     private Label? _titleLabel;
     private Button? _closeButton;
+
+    // Tab system
+    private enum SheetTab { Portrait, RunStats }
+    private SheetTab _currentTab = SheetTab.Portrait;
+    private Button? _portraitTabBtn;
+    private Button? _statsTabBtn;
+    private Control? _portraitContent;
+    private Control? _statsContent;
 
     // Attribute display
     private Label? _levelLabel;
@@ -45,6 +54,20 @@ public partial class CharacterSheetUI : Control
 
     // Equipment slots
     private readonly Dictionary<EquipmentSlot, EquipmentSlotUI> _equipmentSlots = new();
+
+    // Run Stats labels
+    private Label? _runTimeLabel;
+    private Label? _totalKillsLabel;
+    private Label? _bossKillsLabel;
+    private Label? _deathsLabel;
+    private Label? _damageDealtLabel;
+    private Label? _damageTakenLabel;
+    private Label? _largestHitLabel;
+    private Label? _abilityCastsLabel;
+    private Label? _favoriteAbilityLabel;
+    private Label? _killsPerMinLabel;
+    private Label? _mostKilledLabel;
+    private VBoxContainer? _killBreakdownContainer;
 
     // Tooltip
     private PanelContainer? _tooltipPanel;
@@ -113,14 +136,119 @@ public partial class CharacterSheetUI : Control
         content.AddThemeConstantOverride("separation", 10);
         _mainPanel.AddChild(content);
 
-        // Header
+        // Header with title and close
         CreateHeader(content);
+
+        // Tab buttons
+        CreateTabButtons(content);
         content.AddChild(new HSeparator());
 
+        // Portrait Content (default tab)
+        _portraitContent = new Control();
+        _portraitContent.SizeFlagsVertical = SizeFlags.ExpandFill;
+        content.AddChild(_portraitContent);
+        CreatePortraitContent(_portraitContent);
+
+        // Run Stats Content (hidden by default)
+        _statsContent = new Control();
+        _statsContent.SizeFlagsVertical = SizeFlags.ExpandFill;
+        _statsContent.Visible = false;
+        content.AddChild(_statsContent);
+        CreateRunStatsContent(_statsContent);
+    }
+
+    private void CreateTabButtons(VBoxContainer parent)
+    {
+        var tabRow = new HBoxContainer();
+        tabRow.AddThemeConstantOverride("separation", 8);
+        parent.AddChild(tabRow);
+
+        // Portrait tab button
+        _portraitTabBtn = CreateTabButton("Portrait", true);
+        _portraitTabBtn.Pressed += () => SwitchTab(SheetTab.Portrait);
+        tabRow.AddChild(_portraitTabBtn);
+
+        // Run Stats tab button
+        _statsTabBtn = CreateTabButton("Run Stats", false);
+        _statsTabBtn.Pressed += () => SwitchTab(SheetTab.RunStats);
+        tabRow.AddChild(_statsTabBtn);
+
+        // Spacer
+        var spacer = new Control();
+        spacer.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        tabRow.AddChild(spacer);
+    }
+
+    private Button CreateTabButton(string text, bool active)
+    {
+        var btn = new Button();
+        btn.Text = text;
+        btn.CustomMinimumSize = new Vector2(100, 28);
+        btn.AddThemeFontSizeOverride("font_size", 13);
+
+        var style = new StyleBoxFlat();
+        style.BgColor = active ? new Color(0.25f, 0.2f, 0.35f) : new Color(0.12f, 0.1f, 0.18f);
+        style.BorderColor = active ? new Color(0.7f, 0.6f, 0.4f) : new Color(0.3f, 0.25f, 0.4f);
+        style.SetBorderWidthAll(active ? 2 : 1);
+        style.SetCornerRadiusAll(6);
+        btn.AddThemeStyleboxOverride("normal", style);
+
+        var hoverStyle = style.Duplicate() as StyleBoxFlat;
+        if (hoverStyle != null)
+        {
+            hoverStyle.BgColor = new Color(0.3f, 0.25f, 0.4f);
+            btn.AddThemeStyleboxOverride("hover", hoverStyle);
+        }
+
+        return btn;
+    }
+
+    private void UpdateTabButtonStyles()
+    {
+        bool portraitActive = _currentTab == SheetTab.Portrait;
+
+        // Portrait button
+        var pStyle = new StyleBoxFlat();
+        pStyle.BgColor = portraitActive ? new Color(0.25f, 0.2f, 0.35f) : new Color(0.12f, 0.1f, 0.18f);
+        pStyle.BorderColor = portraitActive ? new Color(0.7f, 0.6f, 0.4f) : new Color(0.3f, 0.25f, 0.4f);
+        pStyle.SetBorderWidthAll(portraitActive ? 2 : 1);
+        pStyle.SetCornerRadiusAll(6);
+        _portraitTabBtn?.AddThemeStyleboxOverride("normal", pStyle);
+
+        // Stats button
+        var sStyle = new StyleBoxFlat();
+        sStyle.BgColor = !portraitActive ? new Color(0.25f, 0.2f, 0.35f) : new Color(0.12f, 0.1f, 0.18f);
+        sStyle.BorderColor = !portraitActive ? new Color(0.7f, 0.6f, 0.4f) : new Color(0.3f, 0.25f, 0.4f);
+        sStyle.SetBorderWidthAll(!portraitActive ? 2 : 1);
+        sStyle.SetCornerRadiusAll(6);
+        _statsTabBtn?.AddThemeStyleboxOverride("normal", sStyle);
+    }
+
+    private void SwitchTab(SheetTab tab)
+    {
+        if (_currentTab == tab) return;
+
+        _currentTab = tab;
+        UpdateTabButtonStyles();
+
+        _portraitContent!.Visible = (tab == SheetTab.Portrait);
+        _statsContent!.Visible = (tab == SheetTab.RunStats);
+
+        if (tab == SheetTab.RunStats)
+        {
+            RefreshRunStats();
+        }
+
+        SoundManager3D.Instance?.PlaySound("menu_select");
+    }
+
+    private void CreatePortraitContent(Control parent)
+    {
         // Main area - horizontal split
         var mainArea = new HBoxContainer();
         mainArea.AddThemeConstantOverride("separation", 20);
-        content.AddChild(mainArea);
+        mainArea.SetAnchorsPreset(LayoutPreset.FullRect);
+        parent.AddChild(mainArea);
 
         // Left side - Stats
         var leftPanel = new VBoxContainer();
@@ -135,6 +263,233 @@ public partial class CharacterSheetUI : Control
         rightPanel.SizeFlagsHorizontal = SizeFlags.ExpandFill;
         CreateEquipmentPanel(rightPanel);
         mainArea.AddChild(rightPanel);
+    }
+
+    private void CreateRunStatsContent(Control parent)
+    {
+        var scroll = new ScrollContainer();
+        scroll.SetAnchorsPreset(LayoutPreset.FullRect);
+        scroll.HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled;
+        parent.AddChild(scroll);
+
+        var mainVbox = new VBoxContainer();
+        mainVbox.AddThemeConstantOverride("separation", 12);
+        mainVbox.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        scroll.AddChild(mainVbox);
+
+        // Two column layout
+        var columns = new HBoxContainer();
+        columns.AddThemeConstantOverride("separation", 30);
+        mainVbox.AddChild(columns);
+
+        // Left column - Overview stats
+        var leftCol = new VBoxContainer();
+        leftCol.AddThemeConstantOverride("separation", 6);
+        leftCol.CustomMinimumSize = new Vector2(250, 0);
+        columns.AddChild(leftCol);
+
+        CreateRunStatsSection(leftCol, "Run Overview", new Color(0.9f, 0.8f, 0.5f));
+        _runTimeLabel = CreateRunStatLabel(leftCol, "Time: 0:00");
+        _totalKillsLabel = CreateRunStatLabel(leftCol, "Total Kills: 0", new Color(0.9f, 0.4f, 0.4f));
+        _bossKillsLabel = CreateRunStatLabel(leftCol, "Bosses Slain: 0", new Color(1f, 0.7f, 0.3f));
+        _deathsLabel = CreateRunStatLabel(leftCol, "Deaths: 0", new Color(0.6f, 0.6f, 0.6f));
+        _killsPerMinLabel = CreateRunStatLabel(leftCol, "Kills/Minute: 0.0", new Color(0.7f, 0.9f, 0.7f));
+
+        leftCol.AddChild(new HSeparator());
+
+        CreateRunStatsSection(leftCol, "Damage", new Color(0.9f, 0.5f, 0.5f));
+        _damageDealtLabel = CreateRunStatLabel(leftCol, "Damage Dealt: 0");
+        _damageTakenLabel = CreateRunStatLabel(leftCol, "Damage Taken: 0");
+        _largestHitLabel = CreateRunStatLabel(leftCol, "Biggest Hit: 0", new Color(1f, 0.85f, 0.4f));
+
+        leftCol.AddChild(new HSeparator());
+
+        CreateRunStatsSection(leftCol, "Abilities", new Color(0.5f, 0.7f, 1f));
+        _abilityCastsLabel = CreateRunStatLabel(leftCol, "Abilities Cast: 0");
+        _favoriteAbilityLabel = CreateRunStatLabel(leftCol, "Most Used: -", new Color(0.7f, 0.85f, 1f));
+
+        // Right column - Kill breakdown
+        var rightCol = new VBoxContainer();
+        rightCol.AddThemeConstantOverride("separation", 6);
+        rightCol.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        columns.AddChild(rightCol);
+
+        CreateRunStatsSection(rightCol, "Kill Breakdown", new Color(0.9f, 0.6f, 0.6f));
+        _mostKilledLabel = CreateRunStatLabel(rightCol, "Most Killed: -", new Color(0.95f, 0.7f, 0.5f));
+
+        rightCol.AddChild(new HSeparator());
+
+        // Container for dynamic kill list
+        _killBreakdownContainer = new VBoxContainer();
+        _killBreakdownContainer.AddThemeConstantOverride("separation", 3);
+        rightCol.AddChild(_killBreakdownContainer);
+
+        // Placeholder text
+        var placeholder = new Label();
+        placeholder.Text = "No kills yet...";
+        placeholder.AddThemeFontSizeOverride("font_size", 11);
+        placeholder.AddThemeColorOverride("font_color", new Color(0.5f, 0.45f, 0.6f));
+        _killBreakdownContainer.AddChild(placeholder);
+    }
+
+    private void CreateRunStatsSection(VBoxContainer parent, string title, Color color)
+    {
+        var label = new Label();
+        label.Text = title;
+        label.AddThemeFontSizeOverride("font_size", 16);
+        label.AddThemeColorOverride("font_color", color);
+        parent.AddChild(label);
+    }
+
+    private Label CreateRunStatLabel(VBoxContainer parent, string text, Color? color = null)
+    {
+        var label = new Label();
+        label.Text = text;
+        label.AddThemeFontSizeOverride("font_size", 12);
+        label.AddThemeColorOverride("font_color", color ?? new Color(0.85f, 0.82f, 0.9f));
+        parent.AddChild(label);
+        return label;
+    }
+
+    private void RefreshRunStats()
+    {
+        var stats = GameStats.Instance;
+        if (stats == null) return;
+
+        // Format time
+        int mins = (int)(stats.SessionTime / 60);
+        int secs = (int)(stats.SessionTime % 60);
+        _runTimeLabel!.Text = $"Time: {mins}:{secs:D2}";
+
+        _totalKillsLabel!.Text = $"Total Kills: {stats.TotalKills}";
+        _bossKillsLabel!.Text = $"Bosses Slain: {stats.BossKills}";
+        _deathsLabel!.Text = $"Deaths: {stats.Deaths}";
+        _killsPerMinLabel!.Text = $"Kills/Minute: {stats.GetKillsPerMinute():F1}";
+
+        _damageDealtLabel!.Text = $"Damage Dealt: {stats.TotalDamageDealt:N0}";
+        _damageTakenLabel!.Text = $"Damage Taken: {stats.TotalDamageTaken:N0}";
+
+        if (stats.LargestHit > 0)
+        {
+            string target = string.IsNullOrEmpty(stats.LargestHitTarget) ? "" : $" ({stats.LargestHitTarget})";
+            _largestHitLabel!.Text = $"Biggest Hit: {stats.LargestHit:N0}{target}";
+        }
+        else
+        {
+            _largestHitLabel!.Text = "Biggest Hit: -";
+        }
+
+        _abilityCastsLabel!.Text = $"Abilities Cast: {stats.TotalAbilityCasts}";
+        _favoriteAbilityLabel!.Text = string.IsNullOrEmpty(stats.FavoriteAbility)
+            ? "Most Used: -"
+            : $"Most Used: {stats.FavoriteAbility}";
+
+        _mostKilledLabel!.Text = string.IsNullOrEmpty(stats.MostKilledMonster)
+            ? "Most Killed: -"
+            : $"Most Killed: {stats.MostKilledMonster}";
+
+        // Update kill breakdown
+        RefreshKillBreakdown(stats);
+    }
+
+    private void RefreshKillBreakdown(GameStats stats)
+    {
+        // Clear existing
+        foreach (var child in _killBreakdownContainer!.GetChildren())
+        {
+            child.QueueFree();
+        }
+
+        var topKills = stats.GetTopKills(10);
+        if (topKills.Count == 0)
+        {
+            var placeholder = new Label();
+            placeholder.Text = "No kills yet...";
+            placeholder.AddThemeFontSizeOverride("font_size", 11);
+            placeholder.AddThemeColorOverride("font_color", new Color(0.5f, 0.45f, 0.6f));
+            _killBreakdownContainer.AddChild(placeholder);
+            return;
+        }
+
+        // Get max for bar scaling
+        int maxKills = topKills[0].count;
+
+        foreach (var (monsterType, count) in topKills)
+        {
+            var row = new HBoxContainer();
+            row.AddThemeConstantOverride("separation", 8);
+
+            // Monster name
+            var nameLabel = new Label();
+            nameLabel.Text = FormatMonsterName(monsterType);
+            nameLabel.CustomMinimumSize = new Vector2(100, 0);
+            nameLabel.AddThemeFontSizeOverride("font_size", 11);
+            nameLabel.AddThemeColorOverride("font_color", new Color(0.8f, 0.75f, 0.9f));
+            row.AddChild(nameLabel);
+
+            // Bar background
+            var barBg = new ColorRect();
+            barBg.CustomMinimumSize = new Vector2(120, 14);
+            barBg.Color = new Color(0.15f, 0.12f, 0.2f);
+            row.AddChild(barBg);
+
+            // Bar fill (overlay)
+            var barFill = new ColorRect();
+            float fillWidth = (float)count / maxKills * 120f;
+            barFill.CustomMinimumSize = new Vector2(fillWidth, 14);
+            barFill.Color = GetMonsterColor(monsterType);
+            barFill.Position = barBg.Position;
+            barBg.AddChild(barFill);
+
+            // Count label
+            var countLabel = new Label();
+            countLabel.Text = count.ToString();
+            countLabel.CustomMinimumSize = new Vector2(35, 0);
+            countLabel.HorizontalAlignment = HorizontalAlignment.Right;
+            countLabel.AddThemeFontSizeOverride("font_size", 11);
+            countLabel.AddThemeColorOverride("font_color", new Color(0.9f, 0.85f, 0.95f));
+            row.AddChild(countLabel);
+
+            _killBreakdownContainer.AddChild(row);
+        }
+    }
+
+    private static string FormatMonsterName(string monsterType)
+    {
+        // Convert snake_case or PascalCase to Title Case with spaces
+        var result = "";
+        for (int i = 0; i < monsterType.Length; i++)
+        {
+            char c = monsterType[i];
+            if (c == '_')
+            {
+                result += " ";
+            }
+            else if (i > 0 && char.IsUpper(c) && !char.IsUpper(monsterType[i - 1]))
+            {
+                result += " " + c;
+            }
+            else
+            {
+                result += i == 0 || result.EndsWith(" ") ? char.ToUpper(c) : c;
+            }
+        }
+        return result.Length > 14 ? result.Substring(0, 12) + ".." : result;
+    }
+
+    private static Color GetMonsterColor(string monsterType)
+    {
+        // Color-code by monster type for visual variety
+        string lower = monsterType.ToLower();
+        if (lower.Contains("boss") || lower.Contains("lord")) return new Color(1f, 0.4f, 0.2f);
+        if (lower.Contains("goblin")) return new Color(0.4f, 0.8f, 0.3f);
+        if (lower.Contains("skeleton") || lower.Contains("undead")) return new Color(0.9f, 0.9f, 0.8f);
+        if (lower.Contains("rat")) return new Color(0.6f, 0.5f, 0.4f);
+        if (lower.Contains("spider")) return new Color(0.3f, 0.3f, 0.35f);
+        if (lower.Contains("slime") || lower.Contains("ooze")) return new Color(0.3f, 0.9f, 0.5f);
+        if (lower.Contains("demon") || lower.Contains("imp")) return new Color(0.9f, 0.2f, 0.3f);
+        if (lower.Contains("ghost") || lower.Contains("wraith")) return new Color(0.6f, 0.7f, 0.9f);
+        return new Color(0.5f, 0.6f, 0.8f); // Default blue-ish
     }
 
     private void CreateHeader(VBoxContainer parent)

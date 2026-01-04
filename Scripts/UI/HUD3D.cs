@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using SafeRoom3D.Core;
 using SafeRoom3D.Player;
 using SafeRoom3D.Abilities;
+using SafeRoom3D.Broadcaster;
 
 namespace SafeRoom3D.UI;
 
@@ -440,18 +441,13 @@ public partial class HUD3D : Control
 
     private void CreateLootNotificationPanel()
     {
-        // Create a panel in the TOP-LEFT corner for loot notifications
+        // Loot notifications are now handled by BroadcasterUI columns
+        // We keep a hidden panel for backwards compatibility (some systems may reference it)
         _lootNotificationPanel = new VBoxContainer();
         _lootNotificationPanel.Name = "LootNotifications";
-
-        // Position at the very top-left of screen
-        _lootNotificationPanel.SetAnchorsPreset(LayoutPreset.TopLeft);
-        _lootNotificationPanel.Position = new Vector2(20, 20); // Top-left corner
-        _lootNotificationPanel.CustomMinimumSize = new Vector2(260, 200);
-        _lootNotificationPanel.AddThemeConstantOverride("separation", 4);
-
+        _lootNotificationPanel.Visible = false; // Hidden - BroadcasterUI handles display
         AddChild(_lootNotificationPanel);
-        GD.Print("[HUD3D] Loot notification panel created (top-left)");
+        GD.Print("[HUD3D] Loot notifications forwarded to BroadcasterUI");
     }
 
     /// <summary>
@@ -459,7 +455,18 @@ public partial class HUD3D : Control
     /// </summary>
     public void ShowLootNotification(string itemName, int quantity, Color itemColor)
     {
+        // Forward to BroadcasterUI if available
+        var broadcasterUI = AIBroadcaster.Instance?.UI;
+        if (broadcasterUI != null)
+        {
+            string qtyStr = quantity > 1 ? $" x{quantity}" : "";
+            broadcasterUI.AddLootNotification($"{itemName}{qtyStr}", itemColor);
+            return;
+        }
+
+        // Fallback to internal display if BroadcasterUI not available
         if (_lootNotificationPanel == null) return;
+        _lootNotificationPanel.Visible = true;
 
         // Remove oldest notifications if at max
         while (_lootNotifications.Count >= MaxLootNotifications)
@@ -560,17 +567,13 @@ public partial class HUD3D : Control
 
     private void CreateAchievementNotificationPanel()
     {
-        // Achievement notifications appear below loot notifications (at top-left)
+        // Achievement notifications are now handled by BroadcasterUI columns
+        // We keep a hidden panel for backwards compatibility
         _achievementNotificationPanel = new VBoxContainer();
         _achievementNotificationPanel.Name = "AchievementNotifications";
-
-        _achievementNotificationPanel.SetAnchorsPreset(LayoutPreset.TopLeft);
-        _achievementNotificationPanel.Position = new Vector2(20, 180); // Below loot notifications (they start at 20)
-        _achievementNotificationPanel.CustomMinimumSize = new Vector2(300, 150);
-        _achievementNotificationPanel.AddThemeConstantOverride("separation", 6);
-
+        _achievementNotificationPanel.Visible = false; // Hidden - BroadcasterUI handles display
         AddChild(_achievementNotificationPanel);
-        GD.Print("[HUD3D] Achievement notification panel created");
+        GD.Print("[HUD3D] Achievement notifications forwarded to BroadcasterUI");
     }
 
     /// <summary>
@@ -578,7 +581,18 @@ public partial class HUD3D : Control
     /// </summary>
     public void ShowAchievementNotification(string title, string description, Color accentColor)
     {
+        // Forward to BroadcasterUI if available
+        var broadcasterUI = AIBroadcaster.Instance?.UI;
+        if (broadcasterUI != null)
+        {
+            broadcasterUI.AddAchievementNotification($"★ {title} ★ {description}", accentColor);
+            SoundManager3D.Instance?.PlayAchievementSound();
+            return;
+        }
+
+        // Fallback to internal display if BroadcasterUI not available
         if (_achievementNotificationPanel == null) return;
+        _achievementNotificationPanel.Visible = true;
 
         // Remove oldest if at max
         while (_achievementNotifications.Count >= MaxAchievementNotifications)

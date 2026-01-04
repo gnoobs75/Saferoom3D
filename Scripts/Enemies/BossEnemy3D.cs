@@ -968,6 +968,9 @@ public partial class BossEnemy3D : CharacterBody3D
         // Notify AI broadcaster of boss defeat
         AIBroadcaster.Instance?.OnBossDefeated(BossName);
 
+        // Record boss kill in game stats
+        GameStats.Instance?.RecordKill(MonsterType, isBoss: true);
+
         // Award XP to player
         if (FPSController.Instance != null && ExperienceReward > 0)
         {

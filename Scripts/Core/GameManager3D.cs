@@ -97,6 +97,11 @@ public partial class GameManager3D : Node
         _soundManager.Name = "SoundManager";
         AddChild(_soundManager);
 
+        // Create stats tracker
+        var gameStats = new GameStats();
+        gameStats.Name = "GameStats";
+        AddChild(gameStats);
+
         // Start background music
         _soundManager.StartRandomMusic();
 

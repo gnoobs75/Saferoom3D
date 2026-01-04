@@ -2350,6 +2350,9 @@ public partial class BasicEnemy3D : CharacterBody3D
 
             // Notify AI broadcaster of kill
             AIBroadcaster.Instance?.OnMonsterKilled(MonsterType);
+
+            // Record kill in game stats
+            GameStats.Instance?.RecordKill(MonsterType);
         }
 
         // Wait for death animation to complete before spawning corpse

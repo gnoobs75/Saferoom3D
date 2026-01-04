@@ -1,12 +1,14 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using SafeRoom3D.Core;
 
 namespace SafeRoom3D.Broadcaster;
 
 /// <summary>
 /// Database of snarky commentary lines organized by event type.
 /// The AI broadcaster pulls from these to comment on gameplay.
+/// Enhanced with stat-based commentary that references player performance.
 /// </summary>
 public class CommentaryDatabase
 {
@@ -21,7 +23,8 @@ public class CommentaryDatabase
     /// </summary>
     public string? GetLine(BroadcastEvent evt, string context, int totalKills, int totalDeaths)
     {
-        var lines = GetLinesForEvent(evt, context, totalKills, totalDeaths);
+        var stats = GameStats.Instance;
+        var lines = GetLinesForEvent(evt, context, totalKills, totalDeaths, stats);
         if (lines == null || lines.Count == 0)
             return null;
 
@@ -39,7 +42,27 @@ public class CommentaryDatabase
         line = line.Replace("{deaths}", totalDeaths.ToString());
         line = line.Replace("{count}", context);
 
+        // Stat-based placeholders
+        if (stats != null)
+        {
+            line = line.Replace("{kpm}", stats.GetKillsPerMinute().ToString("F1"));
+            line = line.Replace("{favorite_ability}", string.IsNullOrEmpty(stats.FavoriteAbility) ? "nothing" : stats.FavoriteAbility);
+            line = line.Replace("{most_killed}", string.IsNullOrEmpty(stats.MostKilledMonster) ? "nothing" : FormatMonsterName(stats.MostKilledMonster));
+            line = line.Replace("{damage_dealt}", stats.TotalDamageDealt.ToString("N0"));
+            line = line.Replace("{damage_taken}", stats.TotalDamageTaken.ToString("N0"));
+            line = line.Replace("{biggest_hit}", stats.LargestHit.ToString("N0"));
+            line = line.Replace("{ability_casts}", stats.TotalAbilityCasts.ToString());
+            line = line.Replace("{session_time}", FormatTime(stats.SessionTime));
+        }
+
         return line;
+    }
+
+    private static string FormatTime(float seconds)
+    {
+        int mins = (int)(seconds / 60);
+        int secs = (int)(seconds % 60);
+        return $"{mins}:{secs:D2}";
     }
 
     private int GetNonRecentIndex(BroadcastEvent evt, int lineCount)
@@ -79,26 +102,26 @@ public class CommentaryDatabase
         return name.Replace("_", " ");
     }
 
-    private List<string>? GetLinesForEvent(BroadcastEvent evt, string context, int totalKills, int totalDeaths)
+    private List<string>? GetLinesForEvent(BroadcastEvent evt, string context, int totalKills, int totalDeaths, GameStats? stats)
     {
         return evt switch
         {
             BroadcastEvent.GameStarted => GameStartedLines,
-            BroadcastEvent.MonsterKilled => GetKillLines(context, totalKills),
+            BroadcastEvent.MonsterKilled => GetKillLines(context, totalKills, stats),
             BroadcastEvent.MultiKill => MultiKillLines,
             BroadcastEvent.FirstBlood => FirstBloodLines,
             BroadcastEvent.BossEncounter => BossEncounterLines,
-            BroadcastEvent.BossDefeated => BossDefeatedLines,
-            BroadcastEvent.PlayerDamaged => PlayerDamagedLines,
+            BroadcastEvent.BossDefeated => GetBossDefeatedLines(stats),
+            BroadcastEvent.PlayerDamaged => GetDamageLines(stats),
             BroadcastEvent.NearDeath => NearDeathLines,
-            BroadcastEvent.PlayerDeath => GetDeathLines(totalDeaths),
-            BroadcastEvent.FloorCleared => FloorClearedLines,
+            BroadcastEvent.PlayerDeath => GetDeathLines(totalDeaths, stats),
+            BroadcastEvent.FloorCleared => GetFloorClearedLines(stats),
             BroadcastEvent.FloorEntered => FloorEnteredLines,
             BroadcastEvent.ItemLooted => ItemLootedLines,
             BroadcastEvent.RareLoot => RareLootLines,
-            BroadcastEvent.AbilityUsed => AbilityUsedLines,
+            BroadcastEvent.AbilityUsed => GetAbilityUsedLines(stats),
             BroadcastEvent.AbilityMissed => AbilityMissedLines,
-            BroadcastEvent.IdleTooLong => IdleLines,
+            BroadcastEvent.IdleTooLong => GetIdleLines(stats),
             BroadcastEvent.Comeback => ComebackLines,
             BroadcastEvent.PlayerMutedAI => MutedLines,
             BroadcastEvent.PlayerUnmutedAI => UnmutedLines,
@@ -106,7 +129,7 @@ public class CommentaryDatabase
         };
     }
 
-    private List<string> GetKillLines(string monsterType, int totalKills)
+    private List<string> GetKillLines(string monsterType, int totalKills, GameStats? stats)
     {
         // Check for monster-specific lines first
         string monster = monsterType.ToLower();
@@ -130,16 +153,74 @@ public class CommentaryDatabase
         if (totalKills == 50)
             return new List<string> { "Fifty down. Only several hundred more to go. Probably." };
 
+        // Add stat-based kill lines occasionally
+        if (stats != null && _random.NextDouble() < 0.2f)
+        {
+            return StatBasedKillLines;
+        }
+
         return GenericKillLines;
     }
 
-    private List<string> GetDeathLines(int totalDeaths)
+    private List<string> GetDeathLines(int totalDeaths, GameStats? stats)
     {
         if (totalDeaths == 1)
             return FirstDeathLines;
         if (totalDeaths >= 10)
             return ManyDeathsLines;
+
+        // Add stat-based death commentary
+        if (stats != null && totalDeaths >= 3 && _random.NextDouble() < 0.3f)
+        {
+            return StatBasedDeathLines;
+        }
+
         return DeathLines;
+    }
+
+    private List<string> GetDamageLines(GameStats? stats)
+    {
+        if (stats != null && stats.TotalDamageTaken > 500 && _random.NextDouble() < 0.25f)
+        {
+            return StatBasedDamageLines;
+        }
+        return PlayerDamagedLines;
+    }
+
+    private List<string> GetAbilityUsedLines(GameStats? stats)
+    {
+        if (stats != null && stats.TotalAbilityCasts > 10 && _random.NextDouble() < 0.3f)
+        {
+            return StatBasedAbilityLines;
+        }
+        return AbilityUsedLines;
+    }
+
+    private List<string> GetIdleLines(GameStats? stats)
+    {
+        if (stats != null && _random.NextDouble() < 0.25f)
+        {
+            return StatBasedIdleLines;
+        }
+        return IdleLines;
+    }
+
+    private List<string> GetFloorClearedLines(GameStats? stats)
+    {
+        if (stats != null && _random.NextDouble() < 0.3f)
+        {
+            return StatBasedFloorClearedLines;
+        }
+        return FloorClearedLines;
+    }
+
+    private List<string> GetBossDefeatedLines(GameStats? stats)
+    {
+        if (stats != null && stats.TotalKills > 50 && _random.NextDouble() < 0.3f)
+        {
+            return StatBasedBossDefeatedLines;
+        }
+        return BossDefeatedLines;
     }
 
     #region Commentary Lines
@@ -391,6 +472,61 @@ public class CommentaryDatabase
         "Welcome back to the land of actually hearing wisdom.",
         "I knew you couldn't stay away. They never can.",
         "Unmuted! The natural order is restored!",
+    };
+
+    // === STAT-BASED COMMENTARY ===
+
+    private readonly List<string> StatBasedKillLines = new()
+    {
+        "{kills} kills in {session_time}. That's {kpm} kills per minute. The audience is tracking these numbers.",
+        "You've dealt {damage_dealt} total damage. The {most_killed}s have suffered most.",
+        "Kill number {kills}. Your biggest hit was {biggest_hit} damage. Remember that one?",
+        "Another one for the stats. You really have it out for {most_killed}s, don't you?",
+        "{kpm} kills per minute. Is that good? I genuinely don't know anymore.",
+    };
+
+    private readonly List<string> StatBasedDeathLines = new()
+    {
+        "Death #{deaths}. You've taken {damage_taken} damage total. Perhaps try... not doing that?",
+        "Dead again. Your kill-to-death ratio isn't looking great at {kills} to {deaths}.",
+        "You've died {deaths} times in {session_time}. The audience is doing the math.",
+        "RIP. Again. Your {ability_casts} ability casts weren't enough to save you.",
+    };
+
+    private readonly List<string> StatBasedDamageLines = new()
+    {
+        "That's {damage_taken} total damage absorbed. You're basically a sponge at this point.",
+        "More damage? You've already taken {damage_taken}. Your HP bar is crying.",
+        "The damage counter keeps climbing. {damage_taken} and counting.",
+    };
+
+    private readonly List<string> StatBasedAbilityLines = new()
+    {
+        "{favorite_ability} again? That's your {ability_casts}th spell cast. Creature of habit, I see.",
+        "Another {favorite_ability}! It's clearly your favorite. The audience has noticed.",
+        "Ability number {ability_casts}! Your loyalty to {favorite_ability} is... touching.",
+    };
+
+    private readonly List<string> StatBasedIdleLines = new()
+    {
+        "You've killed {kills} things in {session_time}. Why stop now? The {most_killed}s won't kill themselves.",
+        "Your {kpm} kills per minute average is... declining. Rapidly.",
+        "The audience was enjoying your {kpm} kills-per-minute pace. Was.",
+        "You've dealt {damage_dealt} damage today. Add to it. Move. Please.",
+    };
+
+    private readonly List<string> StatBasedFloorClearedLines = new()
+    {
+        "Floor cleared! Stats update: {kills} kills, {deaths} deaths, {session_time} total time. The bookies are adjusting.",
+        "Another floor done! {damage_dealt} damage dealt this run. Not bad. Not great either.",
+        "{favorite_ability} carried you through with {ability_casts} casts. Well done, you and your one spell.",
+    };
+
+    private readonly List<string> StatBasedBossDefeatedLines = new()
+    {
+        "Boss down! {kills} kills total, biggest hit was {biggest_hit}. The sponsors are pleased.",
+        "Incredible! {damage_dealt} damage dealt this run, and the boss is toast!",
+        "Victory! {session_time} elapsed. Your {kpm} kills per minute is legendary. Or at least notable.",
     };
 
     #endregion

@@ -53,6 +53,9 @@ public partial class AIBroadcaster : Control
     private BroadcasterAvatar? _avatar;
     private CommentaryDatabase? _commentary;
 
+    // Public accessor for UI (for notification forwarding)
+    public BroadcasterUI? UI => _ui;
+
     // State
     private bool _isMuted = false;
     private bool _isMinimized = false;
@@ -390,19 +393,27 @@ public partial class AIBroadcaster : Control
 
     private AvatarExpression GetExpressionForEvent(BroadcastEvent evt)
     {
+        // Sometimes add eye roll for extra snark
+        if (GD.Randf() < 0.15f && evt is BroadcastEvent.MonsterKilled or BroadcastEvent.IdleTooLong or BroadcastEvent.PlayerDamaged)
+        {
+            return AvatarExpression.EyeRoll;
+        }
+
         return evt switch
         {
-            BroadcastEvent.MonsterKilled => AvatarExpression.Bored,
+            BroadcastEvent.MonsterKilled => GD.Randf() < 0.3f ? AvatarExpression.Skeptical : AvatarExpression.Bored,
             BroadcastEvent.MultiKill => AvatarExpression.FakeExcited,
             BroadcastEvent.BossEncounter => AvatarExpression.Excited,
             BroadcastEvent.BossDefeated => AvatarExpression.Impressed,
-            BroadcastEvent.PlayerDamaged => AvatarExpression.Smug,
+            BroadcastEvent.PlayerDamaged => GD.Randf() < 0.4f ? AvatarExpression.Skeptical : AvatarExpression.Smug,
             BroadcastEvent.NearDeath => AvatarExpression.FakeWorried,
-            BroadcastEvent.PlayerDeath => AvatarExpression.Disappointed,
+            BroadcastEvent.PlayerDeath => _totalDeaths > 3 ? AvatarExpression.EyeRoll : AvatarExpression.Disappointed,
             BroadcastEvent.FloorCleared => AvatarExpression.SlightlyImpressed,
             BroadcastEvent.RareLoot => AvatarExpression.Surprised,
-            BroadcastEvent.IdleTooLong => AvatarExpression.Bored,
+            BroadcastEvent.IdleTooLong => GD.Randf() < 0.5f ? AvatarExpression.Thinking : AvatarExpression.Bored,
             BroadcastEvent.PlayerMutedAI => AvatarExpression.Angry,
+            BroadcastEvent.AbilityUsed => AvatarExpression.Thinking,
+            BroadcastEvent.FirstBlood => AvatarExpression.SlightlyImpressed,
             _ => AvatarExpression.Idle
         };
     }

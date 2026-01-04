@@ -1108,6 +1108,12 @@ public partial class FPSController : CharacterBody3D
                         enemy3D.Call("TakeDamage", (float)damage, GlobalPosition, "Melee");
                         hitSomething = true;
 
+                        // Record damage dealt in game stats
+                        string targetType = GetEnemyDisplayName(enemy3D);
+                        GameStats.Instance?.RecordDamageDealt(damage, targetType);
+                        GameStats.Instance?.RecordMeleeAttack();
+                        if (isCrit) GameStats.Instance?.RecordCriticalHit();
+
                         // Life on hit
                         if (Stats.LifeOnHit > 0)
                         {
@@ -1119,7 +1125,7 @@ public partial class FPSController : CharacterBody3D
                         }
 
                         // Log to combat log
-                        string enemyName = GetEnemyDisplayName(enemy3D);
+                        string enemyName = targetType;
                         string attackType = isCrit ? "critical melee" : "melee";
                         HUD3D.Instance?.LogPlayerDamage(enemyName, damage, attackType);
 
@@ -1189,6 +1195,12 @@ public partial class FPSController : CharacterBody3D
                         enemy3D.Call("TakeDamage", (float)strongDamage, GlobalPosition, "StrongMelee");
                         hitSomething = true;
 
+                        // Record damage dealt in game stats
+                        string targetType = GetEnemyDisplayName(enemy3D);
+                        GameStats.Instance?.RecordDamageDealt(strongDamage, targetType);
+                        GameStats.Instance?.RecordMeleeAttack();
+                        if (isCrit) GameStats.Instance?.RecordCriticalHit();
+
                         // Life on hit
                         if (Stats.LifeOnHit > 0)
                         {
@@ -1200,7 +1212,7 @@ public partial class FPSController : CharacterBody3D
                         }
 
                         // Log to combat log
-                        string enemyName = GetEnemyDisplayName(enemy3D);
+                        string enemyName = targetType;
                         string attackType = isCrit ? "critical strong melee" : "strong melee";
                         HUD3D.Instance?.LogPlayerDamage(enemyName, strongDamage, attackType);
 
@@ -1433,6 +1445,9 @@ public partial class FPSController : CharacterBody3D
         float healthPercent = (float)CurrentHealth / MaxHealth;
         AIBroadcaster.Instance?.OnPlayerDamaged(healthPercent);
 
+        // Record damage taken in game stats
+        GameStats.Instance?.RecordDamageTaken(finalDamage);
+
         if (CurrentHealth <= 0)
         {
             Die();
@@ -1571,6 +1586,9 @@ public partial class FPSController : CharacterBody3D
 
         // Notify AI broadcaster of death
         AIBroadcaster.Instance?.OnPlayerDeath();
+
+        // Record death in game stats
+        GameStats.Instance?.RecordDeath();
 
         // Cancel any active ability targeting
         if (Abilities.AbilityManager3D.Instance?.IsTargeting == true)

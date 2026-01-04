@@ -414,6 +414,9 @@ public partial class AbilityManager3D : Node
 
             // Log spell cast to combat log
             HUD3D.Instance?.LogSpellCast(ability.AbilityName);
+
+            // Record ability cast in game stats
+            GameStats.Instance?.RecordAbilityCast(ability.AbilityName);
         }
 
         return success;
@@ -485,6 +488,9 @@ public partial class AbilityManager3D : Node
 
             // Log spell cast to combat log
             HUD3D.Instance?.LogSpellCast(_targetingAbility.AbilityName);
+
+            // Record ability cast in game stats
+            GameStats.Instance?.RecordAbilityCast(_targetingAbility.AbilityName);
         }
 
         EndTargeting();
@@ -517,12 +523,12 @@ public partial class AbilityManager3D : Node
         Input.MouseMode = Input.MouseModeEnum.Captured;
         GD.Print("[AbilityManager3D] Set MouseMode = Captured");
 
-        // STEP 2: Resume time
+        // STEP 2: Resume time to configured game speed
         if (_wasTimePaused)
         {
-            Engine.TimeScale = 1.0;
+            Core.GameConfig.ResumeToNormalSpeed();
             _wasTimePaused = false;
-            GD.Print("[AbilityManager3D] TIME RESUMED (TimeScale = 1.0)");
+            GD.Print($"[AbilityManager3D] TIME RESUMED (TimeScale = {Core.GameConfig.GameSpeed})");
         }
 
         // STEP 3: Unlock mouse control LAST (after mouse is already captured)
