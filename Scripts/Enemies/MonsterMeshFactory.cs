@@ -1853,6 +1853,61 @@ public static class MonsterMeshFactory
         body.Scale = new Vector3(bodyScaleX, bodyScaleY, 0.95f); // Broad-shouldered
         parent.AddChild(body);
 
+        // Bulging muscle definition (emphasizes strength)
+        if (lod >= LODLevel.Medium)
+        {
+            var muscleMesh = new SphereMesh { Radius = 0.08f * scale, Height = 0.16f * scale, RadialSegments = 12, Rings = 8 };
+            // Pectoral muscles
+            var leftPec = new MeshInstance3D { Mesh = muscleMesh, MaterialOverride = skinMat };
+            leftPec.Position = new Vector3(-0.12f * scale, 0.7f * scale, 0.22f * scale);
+            leftPec.Scale = new Vector3(1.2f, 0.7f, 0.6f);
+            parent.AddChild(leftPec);
+            var rightPec = new MeshInstance3D { Mesh = muscleMesh, MaterialOverride = skinMat };
+            rightPec.Position = new Vector3(0.12f * scale, 0.7f * scale, 0.22f * scale);
+            rightPec.Scale = new Vector3(1.2f, 0.7f, 0.6f);
+            parent.AddChild(rightPec);
+
+            // Bicep bulges (visible below pauldrons)
+            var bicepMesh = new SphereMesh { Radius = 0.06f * scale, Height = 0.12f * scale, RadialSegments = 10, Rings = 6 };
+            var leftBicep = new MeshInstance3D { Mesh = bicepMesh, MaterialOverride = skinMat };
+            leftBicep.Position = new Vector3(-0.38f * scale, 0.6f * scale, 0.02f * scale);
+            leftBicep.Scale = new Vector3(1.3f, 1f, 1f);
+            parent.AddChild(leftBicep);
+            var rightBicep = new MeshInstance3D { Mesh = bicepMesh, MaterialOverride = skinMat };
+            rightBicep.Position = new Vector3(0.38f * scale, 0.6f * scale, 0.02f * scale);
+            rightBicep.Scale = new Vector3(1.3f, 1f, 1f);
+            parent.AddChild(rightBicep);
+        }
+
+        // Battle scars (dark healed wounds)
+        if (lod == LODLevel.High)
+        {
+            var scarMat = new StandardMaterial3D
+            {
+                AlbedoColor = skinColor.Darkened(0.35f),
+                Roughness = 0.9f
+            };
+            var scarMesh = new BoxMesh { Size = new Vector3(0.02f * scale, 0.12f * scale, 0.01f * scale) };
+
+            // Diagonal slash scar across chest
+            var chestScar1 = new MeshInstance3D { Mesh = scarMesh, MaterialOverride = scarMat };
+            chestScar1.Position = new Vector3(0.08f * scale, 0.72f * scale, 0.28f * scale);
+            chestScar1.RotationDegrees = new Vector3(0, 0, 35);
+            parent.AddChild(chestScar1);
+
+            var chestScar2 = new MeshInstance3D { Mesh = scarMesh, MaterialOverride = scarMat };
+            chestScar2.Position = new Vector3(0.14f * scale, 0.66f * scale, 0.28f * scale);
+            chestScar2.RotationDegrees = new Vector3(0, 0, 35);
+            parent.AddChild(chestScar2);
+
+            // Face scar (visible through helmet)
+            var faceScar = new MeshInstance3D { Mesh = scarMesh, MaterialOverride = scarMat };
+            faceScar.Position = new Vector3(-0.04f * scale, 1.1f * scale, 0.28f * scale);
+            faceScar.RotationDegrees = new Vector3(0, 0, -25);
+            faceScar.Scale = new Vector3(0.8f, 0.6f, 1f);
+            parent.AddChild(faceScar);
+        }
+
         // Chest armor plate
         var chestPlate = new MeshInstance3D();
         var plateMesh = new BoxMesh { Size = new Vector3(0.5f * scale, 0.5f * scale, 0.08f * scale) };
@@ -1860,6 +1915,51 @@ public static class MonsterMeshFactory
         chestPlate.MaterialOverride = armorMat;
         chestPlate.Position = new Vector3(0, 0.65f * scale, 0.2f * scale);
         parent.AddChild(chestPlate);
+
+        // War trophies (skull tokens on belt/chest)
+        if (lod >= LODLevel.Medium)
+        {
+            var boneMat = new StandardMaterial3D
+            {
+                AlbedoColor = new Color(0.85f, 0.82f, 0.75f),
+                Roughness = 0.8f
+            };
+            var skullMesh = new SphereMesh { Radius = 0.035f * scale, Height = 0.07f * scale, RadialSegments = 10, Rings = 6 };
+
+            // Skulls hanging from belt
+            for (int s = 0; s < 3; s++)
+            {
+                var skull = new MeshInstance3D { Mesh = skullMesh, MaterialOverride = boneMat };
+                skull.Position = new Vector3((-0.12f + s * 0.12f) * scale, 0.38f * scale, 0.2f * scale);
+                skull.Scale = new Vector3(0.8f, 1f, 0.7f);
+                parent.AddChild(skull);
+
+                // Eye sockets (dark holes)
+                var socketMesh = new SphereMesh { Radius = 0.008f * scale, Height = 0.016f * scale };
+                var socketMat = new StandardMaterial3D { AlbedoColor = Colors.Black };
+                var leftSocket = new MeshInstance3D { Mesh = socketMesh, MaterialOverride = socketMat };
+                leftSocket.Position = new Vector3((-0.13f + s * 0.12f) * scale, 0.39f * scale, 0.22f * scale);
+                parent.AddChild(leftSocket);
+                var rightSocket = new MeshInstance3D { Mesh = socketMesh, MaterialOverride = socketMat };
+                rightSocket.Position = new Vector3((-0.11f + s * 0.12f) * scale, 0.39f * scale, 0.22f * scale);
+                parent.AddChild(rightSocket);
+            }
+
+            // Tooth necklace
+            var toothMesh = new CylinderMesh {
+                TopRadius = 0.004f * scale,
+                BottomRadius = 0.01f * scale,
+                Height = 0.03f * scale
+            };
+            for (int t = 0; t < 6; t++)
+            {
+                float tAngle = (-0.4f + t * 0.16f);
+                var tooth = new MeshInstance3D { Mesh = toothMesh, MaterialOverride = boneMat };
+                tooth.Position = new Vector3(tAngle * 0.5f * scale, 0.88f * scale, 0.28f * scale);
+                tooth.RotationDegrees = new Vector3(180, 0, tAngle * 20);
+                parent.AddChild(tooth);
+            }
+        }
 
         // Shoulder pauldrons
         var leftPauldron = new MeshInstance3D();
@@ -1934,6 +2034,51 @@ public static class MonsterMeshFactory
         spike.MaterialOverride = armorMat;
         spike.Position = new Vector3(0, 0.35f * scale, 0);
         headNode.AddChild(spike);
+
+        // Helmet face guard (intimidating grille)
+        if (lod >= LODLevel.Medium)
+        {
+            var faceGuardMat = new StandardMaterial3D
+            {
+                AlbedoColor = armorColor.Darkened(0.1f),
+                Metallic = 0.75f,
+                Roughness = 0.35f
+            };
+            var barMesh = new CylinderMesh {
+                TopRadius = 0.008f * scale,
+                BottomRadius = 0.008f * scale,
+                Height = 0.12f * scale,
+                RadialSegments = 6
+            };
+            // Vertical bars on face guard
+            for (int b = 0; b < 4; b++)
+            {
+                var bar = new MeshInstance3D { Mesh = barMesh, MaterialOverride = faceGuardMat };
+                bar.Position = new Vector3((-0.06f + b * 0.04f) * scale, -0.08f * scale, 0.2f * scale);
+                headNode.AddChild(bar);
+            }
+            // Horizontal brow guard
+            var browMesh = new BoxMesh { Size = new Vector3(0.2f * scale, 0.02f * scale, 0.03f * scale) };
+            var brow = new MeshInstance3D { Mesh = browMesh, MaterialOverride = faceGuardMat };
+            brow.Position = new Vector3(0, -0.02f * scale, 0.19f * scale);
+            headNode.AddChild(brow);
+        }
+
+        // Side helmet horns
+        var sideHornMesh = new CylinderMesh {
+            TopRadius = 0.005f * scale,
+            BottomRadius = 0.025f * scale,
+            Height = 0.12f * scale
+        };
+        var leftHorn = new MeshInstance3D { Mesh = sideHornMesh, MaterialOverride = armorMat };
+        leftHorn.Position = new Vector3(-0.2f * scale, 0.1f * scale, -0.02f * scale);
+        leftHorn.RotationDegrees = new Vector3(25, 0, -45);
+        headNode.AddChild(leftHorn);
+
+        var rightHorn = new MeshInstance3D { Mesh = sideHornMesh, MaterialOverride = armorMat };
+        rightHorn.Position = new Vector3(0.2f * scale, 0.1f * scale, -0.02f * scale);
+        rightHorn.RotationDegrees = new Vector3(25, 0, 45);
+        headNode.AddChild(rightHorn);
 
         // Menacing red eyes (glowing) - using standardized proportions
         var (warlordEyeR, _, warlordEyeY, warlordEyeX, warlordEyeZ, _) = CalculateEyeGeometry(headRadius, EyeProportions.Menacing, scale);
@@ -2262,6 +2407,37 @@ public static class MonsterMeshFactory
         highlight2.Position = new Vector3(0.15f, 0.5f, 0.18f);
         highlight2.Scale = new Vector3(0.5f, 0.3f, 0.2f);
         parent.AddChild(highlight2);
+
+        // Surface wobble bulges - organic deformations for natural slime look
+        var wobbleMesh = new SphereMesh { Radius = 0.12f, Height = 0.24f, RadialSegments = 16, Rings = 12 };
+        float[] wobbleAngles = { 35f, 105f, 180f, 250f, 320f };
+        float[] wobbleY = { 0.28f, 0.42f, 0.32f, 0.45f, 0.35f };
+        float[] wobbleScales = { 0.7f, 0.55f, 0.65f, 0.5f, 0.6f };
+        for (int i = 0; i < 5; i++)
+        {
+            var wobble = new MeshInstance3D { Mesh = wobbleMesh, MaterialOverride = slimeMat };
+            float wAngle = wobbleAngles[i] * Mathf.Pi / 180f;
+            wobble.Position = new Vector3(Mathf.Cos(wAngle) * 0.32f, wobbleY[i], Mathf.Sin(wAngle) * 0.32f);
+            wobble.Scale = new Vector3(wobbleScales[i], wobbleScales[i] * 0.7f, wobbleScales[i] * 0.8f);
+            parent.AddChild(wobble);
+        }
+
+        // Internal vein/tendril structures visible through translucent body
+        var veinMat = new StandardMaterial3D
+        {
+            AlbedoColor = new Color(slimeColor.Darkened(0.25f).R, slimeColor.Darkened(0.25f).G, slimeColor.Darkened(0.25f).B, 0.6f),
+            Transparency = BaseMaterial3D.TransparencyEnum.Alpha,
+            Roughness = 0.4f
+        };
+        var internalVeinMesh = new CylinderMesh { TopRadius = 0.008f, BottomRadius = 0.015f, Height = 0.18f, RadialSegments = 8 };
+        for (int i = 0; i < 4; i++)
+        {
+            var vein = new MeshInstance3D { Mesh = internalVeinMesh, MaterialOverride = veinMat };
+            float vAngle = i * Mathf.Pi / 2f + 0.3f;
+            vein.Position = new Vector3(Mathf.Cos(vAngle) * 0.12f, 0.28f + (i % 2) * 0.08f, Mathf.Sin(vAngle) * 0.12f);
+            vein.RotationDegrees = new Vector3(25 - i * 8, vAngle * 57.3f, 15);
+            parent.AddChild(vein);
+        }
 
         // Drips/tendrils at base
         var dripMesh = new CylinderMesh { TopRadius = 0.02f, BottomRadius = 0.06f, Height = 0.12f };
@@ -2847,6 +3023,19 @@ public static class MonsterMeshFactory
         neck.RotationDegrees = new Vector3(-50, 0, 0);
         parent.AddChild(neck);
 
+        // Neck/chest fur ruff - thick fur around neck and chest (wolf mane)
+        var ruffMesh = new CylinderMesh { TopRadius = 0.015f * scale, BottomRadius = 0.04f * scale, Height = 0.06f * scale, RadialSegments = 8 };
+        for (int r = 0; r < 8; r++)
+        {
+            var ruff = new MeshInstance3D { Mesh = ruffMesh, MaterialOverride = darkFurMat };
+            float rAngle = r * Mathf.Pi / 4f;
+            float rZ = neckAttachZ + 0.05f * scale + Mathf.Cos(rAngle) * 0.08f * scale;
+            float rX = Mathf.Sin(rAngle) * 0.1f * scale;
+            ruff.Position = new Vector3(rX, neckAttachY + 0.02f * scale, rZ);
+            ruff.RotationDegrees = new Vector3(-30 + Mathf.Cos(rAngle) * 15, rAngle * 57.3f, Mathf.Sin(rAngle) * 20);
+            parent.AddChild(ruff);
+        }
+
         // Head - positioned to connect to neck with overlap
         float headCenterZ = neckAttachZ + 0.2f * scale;  // Forward from neck
         float headCenterY = neckAttachY + 0.08f * scale;  // Slightly above neck
@@ -3059,6 +3248,35 @@ public static class MonsterMeshFactory
         paw.Scale = new Vector3(0.9f, 0.5f, 1.1f);
         legNode.AddChild(paw);
 
+        // Paw pads - central large pad and 4 toe pads
+        var padMat = new StandardMaterial3D { AlbedoColor = new Color(0.25f, 0.2f, 0.18f), Roughness = 0.4f };
+        var centralPadMesh = new SphereMesh { Radius = 0.018f, Height = 0.036f, RadialSegments = 10, Rings = 8 };
+        var centralPad = new MeshInstance3D { Mesh = centralPadMesh, MaterialOverride = padMat };
+        centralPad.Position = new Vector3(0, -0.27f, 0.015f);
+        centralPad.Scale = new Vector3(1.2f, 0.4f, 1.4f);
+        legNode.AddChild(centralPad);
+
+        // Toe pads
+        var toePadMesh = new SphereMesh { Radius = 0.008f, Height = 0.016f, RadialSegments = 8, Rings = 6 };
+        for (int t = 0; t < 4; t++)
+        {
+            var toePad = new MeshInstance3D { Mesh = toePadMesh, MaterialOverride = padMat };
+            toePad.Position = new Vector3(-0.015f + t * 0.01f, -0.27f, 0.038f);
+            toePad.Scale = new Vector3(1f, 0.5f, 1.2f);
+            legNode.AddChild(toePad);
+        }
+
+        // Fur tufts on upper leg
+        var tuftMesh = new CylinderMesh { TopRadius = 0.002f, BottomRadius = 0.012f, Height = 0.03f, RadialSegments = 6 };
+        for (int t = 0; t < 3; t++)
+        {
+            var tuft = new MeshInstance3D { Mesh = tuftMesh, MaterialOverride = furMat };
+            float tAngle = (t - 1) * 0.4f;
+            tuft.Position = new Vector3(side * 0.03f, -0.04f - t * 0.03f, 0.02f);
+            tuft.RotationDegrees = new Vector3(15, 0, side * (20 + t * 5));
+            legNode.AddChild(tuft);
+        }
+
         // Claws
         var clawMesh = new CylinderMesh { TopRadius = 0.003f, BottomRadius = 0.008f, Height = 0.025f };
         for (int c = 0; c < 4; c++)
@@ -3153,6 +3371,26 @@ public static class MonsterMeshFactory
             var belly = new MeshInstance3D { Mesh = bellyMesh, MaterialOverride = bellyMat };
             belly.Position = new Vector3(0, 0.72f * baseSize, 0.06f * baseSize);
             parent.AddChild(belly);
+        }
+
+        // Fur texture tufts on body - gives fuzzy bat appearance
+        if (lodLevel == 0)
+        {
+            var furTuftMesh = new CylinderMesh { TopRadius = 0.002f * baseSize, BottomRadius = 0.008f * baseSize, Height = 0.025f * baseSize, RadialSegments = 6 };
+            var furTuftMat = new StandardMaterial3D { AlbedoColor = bodyColor.Lightened(0.05f), Roughness = 0.95f };
+            for (int f = 0; f < 12; f++)
+            {
+                var furTuft = new MeshInstance3D { Mesh = furTuftMesh, MaterialOverride = furTuftMat };
+                float fAngle = f * Mathf.Pi / 6f;
+                float fY = 0.75f + (f % 3) * 0.04f;
+                furTuft.Position = new Vector3(
+                    Mathf.Cos(fAngle) * 0.1f * baseSize,
+                    fY * baseSize,
+                    Mathf.Sin(fAngle) * 0.08f * baseSize
+                );
+                furTuft.RotationDegrees = new Vector3(Mathf.Cos(fAngle) * 30, fAngle * 57.3f, Mathf.Sin(fAngle) * 20);
+                parent.AddChild(furTuft);
+            }
         }
 
         // === NECK JOINT ===
@@ -3653,7 +3891,7 @@ public static class MonsterMeshFactory
             }
         }
 
-        // Back spines - scale ridges
+        // Back spines - scale ridges (enhanced with double row and varying sizes)
         if (lodLevel < 2 && spineCount > 0)
         {
             var spineMesh = new CylinderMesh {
@@ -3661,13 +3899,66 @@ public static class MonsterMeshFactory
                 BottomRadius = 0.025f * scale,
                 Height = 0.12f * scale
             };
+            var largeSpineMesh = new CylinderMesh {
+                TopRadius = 0.007f * scale,
+                BottomRadius = 0.032f * scale,
+                Height = 0.16f * scale
+            };
             for (int i = 0; i < spineCount; i++)
             {
-                var spine = new MeshInstance3D { Mesh = spineMesh, MaterialOverride = hornMat };
+                // Main central spine (larger on every other)
+                var spine = new MeshInstance3D {
+                    Mesh = (i % 2 == 0) ? largeSpineMesh : spineMesh,
+                    MaterialOverride = hornMat
+                };
                 float zPos = 0.35f - i * 0.11f;
                 spine.Position = new Vector3(0, 0.92f * scale - i * 0.03f * scale, zPos * scale);
                 spine.RotationDegrees = new Vector3(-15 - i * 3, 0, 0);
                 parent.AddChild(spine);
+
+                // Side scale ridges (triangular scale plates flanking the spine)
+                if (lodLevel == 0)
+                {
+                    var ridgeMesh = new CylinderMesh {
+                        TopRadius = 0.003f * scale,
+                        BottomRadius = 0.018f * scale,
+                        Height = 0.06f * scale
+                    };
+                    var leftRidge = new MeshInstance3D { Mesh = ridgeMesh, MaterialOverride = scaleMat };
+                    leftRidge.Position = new Vector3(-0.08f * scale, 0.88f * scale - i * 0.03f * scale, zPos * scale);
+                    leftRidge.RotationDegrees = new Vector3(-10 - i * 2, 0, 25);
+                    parent.AddChild(leftRidge);
+
+                    var rightRidge = new MeshInstance3D { Mesh = ridgeMesh, MaterialOverride = scaleMat };
+                    rightRidge.Position = new Vector3(0.08f * scale, 0.88f * scale - i * 0.03f * scale, zPos * scale);
+                    rightRidge.RotationDegrees = new Vector3(-10 - i * 2, 0, -25);
+                    parent.AddChild(rightRidge);
+                }
+            }
+
+            // Additional body scale texture (small raised scales across body)
+            if (lodLevel == 0)
+            {
+                var scaleRidgeMesh = new CylinderMesh {
+                    TopRadius = 0.002f * scale,
+                    BottomRadius = 0.012f * scale,
+                    Height = 0.035f * scale
+                };
+                for (int row = 0; row < 3; row++)
+                {
+                    for (int col = 0; col < 4; col++)
+                    {
+                        float angle = (col * 45f + row * 22f) * Mathf.Pi / 180f;
+                        float yOffset = 0.65f + row * 0.08f;
+                        float xPos = Mathf.Sin(angle) * 0.28f * scale;
+                        float zOffset = Mathf.Cos(angle) * 0.15f * scale;
+
+                        var scaleRidge = new MeshInstance3D { Mesh = scaleRidgeMesh, MaterialOverride = scaleMat };
+                        scaleRidge.Position = new Vector3(xPos, yOffset * scale, zOffset);
+                        scaleRidge.RotationDegrees = new Vector3(0, 0, Mathf.Sin(angle) * 30f);
+                        parent.AddChild(scaleRidge);
+                    }
+                }
             }
         }
 
@@ -3832,6 +4123,52 @@ public static class MonsterMeshFactory
                 var smokeRight = new MeshInstance3D { Mesh = smokeMesh, MaterialOverride = smokeMat };
                 smokeRight.Position = new Vector3(0.04f * scale, 0.01f * scale, 0.32f * scale);
                 headNode.AddChild(smokeRight);
+
+                // Rising smoke trail particles
+                var trailMesh = new SphereMesh { Radius = 0.01f * scale, Height = 0.02f * scale };
+                for (int p = 0; p < 3; p++)
+                {
+                    float yOff = 0.02f + p * 0.025f;
+                    float zOff = 0.33f + p * 0.015f;
+                    float alphaFade = 0.35f - p * 0.1f;
+                    var trailMatL = new StandardMaterial3D
+                    {
+                        AlbedoColor = new Color(glowColor.R, glowColor.G, glowColor.B, alphaFade),
+                        EmissionEnabled = true,
+                        Emission = glowColor * (0.4f - p * 0.1f),
+                        Transparency = BaseMaterial3D.TransparencyEnum.Alpha
+                    };
+                    var trailL = new MeshInstance3D { Mesh = trailMesh, MaterialOverride = trailMatL };
+                    trailL.Position = new Vector3(-0.04f * scale + p * 0.005f * scale, yOff * scale, zOff * scale);
+                    trailL.Scale = Vector3.One * (1f - p * 0.15f);
+                    headNode.AddChild(trailL);
+
+                    var trailR = new MeshInstance3D { Mesh = trailMesh, MaterialOverride = trailMatL };
+                    trailR.Position = new Vector3(0.04f * scale - p * 0.005f * scale, yOff * scale, zOff * scale);
+                    trailR.Scale = Vector3.One * (1f - p * 0.15f);
+                    headNode.AddChild(trailR);
+                }
+
+                // Small ember particles
+                var emberMat = new StandardMaterial3D
+                {
+                    AlbedoColor = new Color(1f, 0.5f, 0.1f, 0.7f),
+                    EmissionEnabled = true,
+                    Emission = new Color(1f, 0.4f, 0.05f) * 1.2f,
+                    Transparency = BaseMaterial3D.TransparencyEnum.Alpha
+                };
+                var emberMesh = new SphereMesh { Radius = 0.004f * scale, Height = 0.008f * scale };
+                for (int e = 0; e < 4; e++)
+                {
+                    float angle = e * 0.8f;
+                    var ember = new MeshInstance3D { Mesh = emberMesh, MaterialOverride = emberMat };
+                    ember.Position = new Vector3(
+                        (-0.03f + e * 0.02f) * scale,
+                        (0.015f + Mathf.Sin(angle) * 0.02f) * scale,
+                        (0.34f + e * 0.01f) * scale
+                    );
+                    headNode.AddChild(ember);
+                }
             }
         }
 
@@ -4076,7 +4413,7 @@ public static class MonsterMeshFactory
             }
         }
 
-        // Wing membrane
+        // Wing membrane with vein details
         var wingBoxMesh = new BoxMesh {
             Size = new Vector3(0.55f * scale * wingScale, 0.015f * scale, 0.38f * scale)
         };
@@ -4084,6 +4421,32 @@ public static class MonsterMeshFactory
         leftWingMesh.Position = new Vector3(-0.32f * scale * wingScale, 0, 0);
         leftWingMesh.RotationDegrees = new Vector3(0, 0, 28);
         leftWing.AddChild(leftWingMesh);
+
+        // Wing membrane veins (dark lines radiating from wing bone)
+        if (lodLevel == 0)
+        {
+            var veinMat = new StandardMaterial3D {
+                AlbedoColor = scaleColor.Darkened(0.4f),
+                Roughness = 0.7f
+            };
+            var veinMesh = new CylinderMesh {
+                TopRadius = 0.003f * scale,
+                BottomRadius = 0.006f * scale,
+                Height = 0.28f * scale * wingScale
+            };
+            // Left wing veins
+            for (int v = 0; v < 5; v++)
+            {
+                var vein = new MeshInstance3D { Mesh = veinMesh, MaterialOverride = veinMat };
+                vein.Position = new Vector3(
+                    (-0.18f - v * 0.07f) * scale * wingScale,
+                    0.008f * scale,
+                    (-0.08f + v * 0.06f) * scale
+                );
+                vein.RotationDegrees = new Vector3(0, -5 + v * 8, 65 + v * 3);
+                leftWing.AddChild(vein);
+            }
+        }
 
         // Right Wing
         var rightWing = new Node3D();
@@ -4130,6 +4493,31 @@ public static class MonsterMeshFactory
         rightWingMesh.Position = new Vector3(0.32f * scale * wingScale, 0, 0);
         rightWingMesh.RotationDegrees = new Vector3(0, 0, -28);
         rightWing.AddChild(rightWingMesh);
+
+        // Right wing veins
+        if (lodLevel == 0)
+        {
+            var veinMat = new StandardMaterial3D {
+                AlbedoColor = scaleColor.Darkened(0.4f),
+                Roughness = 0.7f
+            };
+            var veinMesh = new CylinderMesh {
+                TopRadius = 0.003f * scale,
+                BottomRadius = 0.006f * scale,
+                Height = 0.28f * scale * wingScale
+            };
+            for (int v = 0; v < 5; v++)
+            {
+                var vein = new MeshInstance3D { Mesh = veinMesh, MaterialOverride = veinMat };
+                vein.Position = new Vector3(
+                    (0.18f + v * 0.07f) * scale * wingScale,
+                    0.008f * scale,
+                    (-0.08f + v * 0.06f) * scale
+                );
+                vein.RotationDegrees = new Vector3(0, 5 - v * 8, -65 - v * 3);
+                rightWing.AddChild(vein);
+            }
+        }
 
         // === POWERFUL LEGS (All Four Separate) ===
         CreateDragonLeg(parent, limbs, scaleMat, clawMat, scale, true, lodLevel);  // Front left
@@ -5777,6 +6165,37 @@ public static class MonsterMeshFactory
         snout.RotationDegrees = new Vector3(-70, 0, 0);
         headNode.AddChild(snout);
 
+        // Dewlap (throat pouch) - extendable throat fan under chin
+        if (lodLevel < 2)
+        {
+            var dewlapMat = new StandardMaterial3D
+            {
+                AlbedoColor = new Color(scaleColor.Lightened(0.1f).R, scaleColor.Lightened(0.1f).G + 0.15f, scaleColor.Lightened(0.1f).B, 0.85f),
+                Transparency = BaseMaterial3D.TransparencyEnum.Alpha,
+                Roughness = 0.5f,
+                CullMode = BaseMaterial3D.CullModeEnum.Disabled
+            };
+            // Main dewlap membrane
+            var dewlapMesh = new SphereMesh { Radius = 0.06f * sizeVariation, Height = 0.12f * sizeVariation, RadialSegments = 12, Rings = 8 };
+            var dewlap = new MeshInstance3D { Mesh = dewlapMesh, MaterialOverride = dewlapMat };
+            dewlap.Position = new Vector3(0, -0.1f * sizeVariation, 0.06f * sizeVariation);
+            dewlap.Scale = new Vector3(0.6f, 1.2f, 0.4f); // Thin, vertical membrane
+            headNode.AddChild(dewlap);
+
+            // Dewlap support ridges (cartilage-like)
+            if (lodLevel == 0)
+            {
+                var dewlapRidgeMesh = new CylinderMesh { TopRadius = 0.002f * sizeVariation, BottomRadius = 0.004f * sizeVariation, Height = 0.05f * sizeVariation, RadialSegments = 6 };
+                for (int d = 0; d < 3; d++)
+                {
+                    var dewlapRidge = new MeshInstance3D { Mesh = dewlapRidgeMesh, MaterialOverride = scaleMat };
+                    dewlapRidge.Position = new Vector3((d - 1) * 0.015f * sizeVariation, -0.08f * sizeVariation, 0.065f * sizeVariation);
+                    dewlapRidge.RotationDegrees = new Vector3(15, 0, (d - 1) * 10);
+                    headNode.AddChild(dewlapRidge);
+                }
+            }
+        }
+
         // Nostrils - high LOD only
         if (lodLevel == 0)
         {
@@ -6105,7 +6524,8 @@ public static class MonsterMeshFactory
         {
             AlbedoColor = new Color(0.2f, 1f, 0.4f),
             EmissionEnabled = true,
-            Emission = new Color(0.2f, 1f, 0.4f) * 0.8f
+            Emission = new Color(0.2f, 1f, 0.4f) * 2.0f,
+            EmissionEnergyMultiplier = 2.5f
         };
 
         float scale = 1.4f;
@@ -6158,13 +6578,48 @@ public static class MonsterMeshFactory
         spine.Position = new Vector3(0, 1.0f * scale, 0);
         parent.AddChild(spine);
 
-        // Cape
+        // Cape with tattered edges
         var cape = new MeshInstance3D();
         var capeMesh = new BoxMesh { Size = new Vector3(0.6f * scale, 0.8f * scale, 0.05f * scale) };
         cape.Mesh = capeMesh;
         cape.MaterialOverride = capeMat;
         cape.Position = new Vector3(0, 0.9f * scale, -0.15f * scale);
         parent.AddChild(cape);
+
+        // Tattered cape edges (hanging strips)
+        var tatterMat = new StandardMaterial3D
+        {
+            AlbedoColor = capeColor.Darkened(0.15f),
+            Roughness = 0.95f
+        };
+        var tatterMesh = new BoxMesh { Size = new Vector3(0.08f * scale, 0.25f * scale, 0.02f * scale) };
+        for (int t = 0; t < 6; t++)
+        {
+            float xPos = (-0.25f + t * 0.1f) * scale;
+            float height = 0.2f + (t % 2) * 0.08f;
+            var tatter = new MeshInstance3D { Mesh = tatterMesh, MaterialOverride = tatterMat };
+            tatter.Position = new Vector3(xPos, 0.4f * scale, -0.17f * scale);
+            tatter.Scale = new Vector3(0.8f + (t % 3) * 0.15f, height, 1f);
+            tatter.RotationDegrees = new Vector3(-5 + (t % 2) * 10, 0, (t - 3) * 4);
+            parent.AddChild(tatter);
+        }
+
+        // Cape collar (ornate)
+        var collarMat = new StandardMaterial3D
+        {
+            AlbedoColor = new Color(0.85f, 0.7f, 0.25f),
+            Metallic = 0.7f,
+            Roughness = 0.3f
+        };
+        var collarMesh = new CylinderMesh {
+            TopRadius = 0.2f * scale,
+            BottomRadius = 0.18f * scale,
+            Height = 0.06f * scale,
+            RadialSegments = 16
+        };
+        var collar = new MeshInstance3D { Mesh = collarMesh, MaterialOverride = collarMat };
+        collar.Position = new Vector3(0, 1.32f * scale, -0.02f * scale);
+        parent.AddChild(collar);
 
         // Ribs (bigger)
         for (int i = 0; i < 5; i++)
@@ -6221,23 +6676,81 @@ public static class MonsterMeshFactory
         lowerArm.Position = new Vector3(0, -0.4f * scale, 0);
         armNode.AddChild(lowerArm);
 
-        // Right hand holds a sword
+        // Right hand holds a massive runed greatsword
         if (!isLeft)
         {
             var swordMat = new StandardMaterial3D
             {
-                AlbedoColor = new Color(0.7f, 0.7f, 0.75f),
-                Metallic = 0.9f,
-                Roughness = 0.3f
+                AlbedoColor = new Color(0.5f, 0.5f, 0.55f),
+                Metallic = 0.95f,
+                Roughness = 0.25f
             };
+            var runeMat = new StandardMaterial3D
+            {
+                AlbedoColor = new Color(0.2f, 1f, 0.4f),
+                EmissionEnabled = true,
+                Emission = new Color(0.2f, 1f, 0.4f) * 1.5f
+            };
+
+            // Larger sword blade
             var sword = new MeshInstance3D();
-            var swordMesh = new BoxMesh { Size = new Vector3(0.04f * scale, 0.6f * scale, 0.01f * scale) };
+            var swordMesh = new BoxMesh { Size = new Vector3(0.08f * scale, 0.9f * scale, 0.015f * scale) };
             sword.Mesh = swordMesh;
             sword.MaterialOverride = swordMat;
-            sword.Position = new Vector3(0, -0.8f * scale, 0);
+            sword.Position = new Vector3(0, -0.95f * scale, 0);
             armNode.AddChild(sword);
             limbs.Weapon = sword;
+
+            // Sword handle
+            var handleMat = new StandardMaterial3D
+            {
+                AlbedoColor = new Color(0.15f, 0.1f, 0.08f),
+                Roughness = 0.85f
+            };
+            var handleMesh = new CylinderMesh {
+                TopRadius = 0.02f * scale,
+                BottomRadius = 0.02f * scale,
+                Height = 0.18f * scale
+            };
+            var handle = new MeshInstance3D { Mesh = handleMesh, MaterialOverride = handleMat };
+            handle.Position = new Vector3(0, -0.42f * scale, 0);
+            armNode.AddChild(handle);
+
+            // Sword crossguard
+            var guardMesh = new BoxMesh { Size = new Vector3(0.18f * scale, 0.03f * scale, 0.025f * scale) };
+            var guard = new MeshInstance3D { Mesh = guardMesh, MaterialOverride = swordMat };
+            guard.Position = new Vector3(0, -0.52f * scale, 0);
+            armNode.AddChild(guard);
+
+            // Glowing runes on blade
+            var runeMesh = new BoxMesh { Size = new Vector3(0.02f * scale, 0.08f * scale, 0.02f * scale) };
+            for (int r = 0; r < 4; r++)
+            {
+                var rune = new MeshInstance3D { Mesh = runeMesh, MaterialOverride = runeMat };
+                rune.Position = new Vector3(0, (-0.65f - r * 0.15f) * scale, 0.012f * scale);
+                armNode.AddChild(rune);
+            }
+
+            // Skull pommel
+            var skullPommelMesh = new SphereMesh { Radius = 0.025f * scale, Height = 0.05f * scale };
+            var pommel = new MeshInstance3D { Mesh = skullPommelMesh, MaterialOverride = material };
+            pommel.Position = new Vector3(0, -0.33f * scale, 0);
+            pommel.Scale = new Vector3(0.9f, 1f, 0.8f);
+            armNode.AddChild(pommel);
         }
+
+        // Shoulder armor pauldron
+        var armorMat = new StandardMaterial3D
+        {
+            AlbedoColor = new Color(0.4f, 0.38f, 0.42f),
+            Metallic = 0.7f,
+            Roughness = 0.4f
+        };
+        var pauldronMesh = new SphereMesh { Radius = 0.06f * scale, Height = 0.12f * scale };
+        var pauldron = new MeshInstance3D { Mesh = pauldronMesh, MaterialOverride = armorMat };
+        pauldron.Position = new Vector3(side * 0.03f * scale, 0.02f * scale, 0);
+        pauldron.Scale = new Vector3(1.2f, 0.6f, 1f);
+        armNode.AddChild(pauldron);
     }
 
     /// <summary>
@@ -6301,8 +6814,96 @@ public static class MonsterMeshFactory
         bodyScar.RotationDegrees = new Vector3(0, 25, 35);
         parent.AddChild(bodyScar);
 
-        // Broken horn tip (optional dramatic flair)
-        // Could add a jagged break to one of the horns
+        // Additional battle scars (claw marks pattern)
+        var clawScarMesh = new BoxMesh { Size = new Vector3(0.08f * scale, 0.02f * scale, 0.18f * scale) };
+        for (int i = 0; i < 3; i++)
+        {
+            var clawScar = new MeshInstance3D { Mesh = clawScarMesh, MaterialOverride = scarMat };
+            clawScar.Position = new Vector3(-0.15f * scale + i * 0.08f * scale, 0.62f * scale, 0.12f * scale);
+            clawScar.RotationDegrees = new Vector3(0, -15, 45 + i * 8);
+            parent.AddChild(clawScar);
+        }
+
+        // Ornate scale plates (royal armor-like patterns on body)
+        var royalScaleMat = new StandardMaterial3D
+        {
+            AlbedoColor = new Color(0.2f, 0.15f, 0.25f),
+            Metallic = 0.3f,
+            Roughness = 0.5f
+        };
+        var ornateScaleMesh = new CylinderMesh {
+            TopRadius = 0.015f * scale,
+            BottomRadius = 0.04f * scale,
+            Height = 0.08f * scale
+        };
+
+        // Chest plate scales (ornate patterns)
+        for (int row = 0; row < 3; row++)
+        {
+            for (int col = 0; col < 5; col++)
+            {
+                float xOffset = (-0.12f + col * 0.06f) * scale;
+                float yOffset = (0.5f + row * 0.08f) * scale;
+                float zOffset = 0.25f * scale;
+
+                var ornateScale = new MeshInstance3D { Mesh = ornateScaleMesh, MaterialOverride = royalScaleMat };
+                ornateScale.Position = new Vector3(xOffset, yOffset, zOffset);
+                ornateScale.RotationDegrees = new Vector3(-25, 0, (col - 2) * 8);
+                parent.AddChild(ornateScale);
+            }
+        }
+
+        // Royal gold accents on wing edges
+        var goldAccentMat = new StandardMaterial3D
+        {
+            AlbedoColor = new Color(0.85f, 0.7f, 0.25f),
+            Metallic = 0.85f,
+            Roughness = 0.25f,
+            EmissionEnabled = true,
+            Emission = new Color(0.85f, 0.7f, 0.25f) * 0.2f
+        };
+        var accentMesh = new CylinderMesh {
+            TopRadius = 0.008f * scale,
+            BottomRadius = 0.008f * scale,
+            Height = 0.15f * scale
+        };
+
+        if (limbs.LeftArm != null)
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                var accent = new MeshInstance3D { Mesh = accentMesh, MaterialOverride = goldAccentMat };
+                accent.Position = new Vector3(-0.15f * scale - i * 0.12f * scale, 0.02f * scale, 0.05f * scale);
+                accent.RotationDegrees = new Vector3(0, 0, 75);
+                limbs.LeftArm.AddChild(accent);
+            }
+        }
+
+        if (limbs.RightArm != null)
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                var accent = new MeshInstance3D { Mesh = accentMesh, MaterialOverride = goldAccentMat };
+                accent.Position = new Vector3(0.15f * scale + i * 0.12f * scale, 0.02f * scale, 0.05f * scale);
+                accent.RotationDegrees = new Vector3(0, 0, -75);
+                limbs.RightArm.AddChild(accent);
+            }
+        }
+
+        // Neck rings (royal collar)
+        var collarMesh = new CylinderMesh {
+            TopRadius = 0.14f * scale,
+            BottomRadius = 0.15f * scale,
+            Height = 0.025f * scale,
+            RadialSegments = 20
+        };
+        for (int r = 0; r < 2; r++)
+        {
+            var collar = new MeshInstance3D { Mesh = collarMesh, MaterialOverride = goldAccentMat };
+            collar.Position = new Vector3(0, 1.05f * scale + r * 0.04f * scale, 0.48f * scale);
+            collar.RotationDegrees = new Vector3(35, 0, 0);
+            parent.AddChild(collar);
+        }
     }
 
     /// <summary>
@@ -6458,6 +7059,73 @@ public static class MonsterMeshFactory
         mark3.Scale = new Vector3(0.7f, 0.7f, 0.7f);
         parent.AddChild(mark3);
 
+        // === EGG SAC (hanging from back of abdomen) ===
+        var eggSacMat = new StandardMaterial3D
+        {
+            AlbedoColor = new Color(0.95f, 0.92f, 0.85f, 0.85f),
+            Transparency = BaseMaterial3D.TransparencyEnum.Alpha,
+            Roughness = 0.4f
+        };
+        var eggSacMesh = new SphereMesh { Radius = 0.18f * scale, Height = 0.36f * scale };
+        var eggSac = new MeshInstance3D { Mesh = eggSacMesh, MaterialOverride = eggSacMat };
+        eggSac.Position = new Vector3(0, 0.25f * scale, -0.65f * scale);
+        eggSac.Scale = new Vector3(1f, 0.85f, 1.1f);
+        parent.AddChild(eggSac);
+
+        // Eggs visible inside sac (darker spots)
+        var eggMat = new StandardMaterial3D
+        {
+            AlbedoColor = new Color(0.6f, 0.55f, 0.5f, 0.7f),
+            Transparency = BaseMaterial3D.TransparencyEnum.Alpha
+        };
+        var eggMesh = new SphereMesh { Radius = 0.03f * scale, Height = 0.06f * scale };
+        for (int e = 0; e < 8; e++)
+        {
+            float eAngle = e * Mathf.Pi * 2f / 8f;
+            float eRadius = 0.1f + (e % 2) * 0.03f;
+            var egg = new MeshInstance3D { Mesh = eggMesh, MaterialOverride = eggMat };
+            egg.Position = new Vector3(
+                Mathf.Cos(eAngle) * eRadius * scale * 0.6f,
+                (0.22f + (e % 3) * 0.04f) * scale,
+                (-0.65f + Mathf.Sin(eAngle) * eRadius * 0.5f) * scale
+            );
+            parent.AddChild(egg);
+        }
+
+        // Web strands connecting egg sac to abdomen
+        var webMat = new StandardMaterial3D
+        {
+            AlbedoColor = new Color(0.9f, 0.88f, 0.82f, 0.6f),
+            Transparency = BaseMaterial3D.TransparencyEnum.Alpha
+        };
+        var webMesh = new CylinderMesh {
+            TopRadius = 0.004f * scale,
+            BottomRadius = 0.004f * scale,
+            Height = 0.12f * scale
+        };
+        for (int w = 0; w < 4; w++)
+        {
+            float wAngle = (w - 1.5f) * 0.4f;
+            var web = new MeshInstance3D { Mesh = webMesh, MaterialOverride = webMat };
+            web.Position = new Vector3(wAngle * 0.08f * scale, 0.35f * scale, -0.52f * scale);
+            web.RotationDegrees = new Vector3(-25 + w * 5, wAngle * 15, 0);
+            parent.AddChild(web);
+        }
+
+        // Royal purple shimmer on abdomen (royal coloring)
+        var royalShimmerMat = new StandardMaterial3D
+        {
+            AlbedoColor = new Color(0.4f, 0.15f, 0.45f, 0.4f),
+            Transparency = BaseMaterial3D.TransparencyEnum.Alpha,
+            EmissionEnabled = true,
+            Emission = new Color(0.4f, 0.15f, 0.45f) * 0.15f
+        };
+        var shimmerMesh = new SphereMesh { Radius = 0.32f * scale, Height = 0.64f * scale };
+        var shimmer = new MeshInstance3D { Mesh = shimmerMesh, MaterialOverride = royalShimmerMat };
+        shimmer.Position = new Vector3(0, 0.48f * scale, -0.28f * scale);
+        shimmer.Scale = new Vector3(0.95f, 0.75f, 1.25f);
+        parent.AddChild(shimmer);
+
         // === PEDICEL JOINT (narrow waist between abdomen and cephalothorax) ===
         float pedicelRadius = 0.08f * scale;
         float pedicelZ = (abdomenFrontZ + cephaloCenterZ) / 2f;  // Midpoint
@@ -6477,15 +7145,62 @@ public static class MonsterMeshFactory
         cephalo.MaterialOverride = bodyMat;
         headNode.AddChild(cephalo);
 
-        // Crown of small spikes
+        // Royal tiara (ornate crown with jewels)
+        var tiaraMat = new StandardMaterial3D
+        {
+            AlbedoColor = new Color(0.85f, 0.75f, 0.25f),
+            Metallic = 0.9f,
+            Roughness = 0.2f,
+            EmissionEnabled = true,
+            Emission = new Color(0.85f, 0.75f, 0.25f) * 0.3f
+        };
+        var jewelMat = new StandardMaterial3D
+        {
+            AlbedoColor = new Color(0.9f, 0.15f, 0.25f),
+            EmissionEnabled = true,
+            Emission = new Color(0.9f, 0.15f, 0.25f) * 0.8f
+        };
+
+        // Tiara band
+        var tiaraBandMesh = new CylinderMesh {
+            TopRadius = 0.17f * scale,
+            BottomRadius = 0.15f * scale,
+            Height = 0.04f * scale,
+            RadialSegments = 20
+        };
+        var tiaraBand = new MeshInstance3D { Mesh = tiaraBandMesh, MaterialOverride = tiaraMat };
+        tiaraBand.Position = new Vector3(0, 0.2f * scale, 0);
+        headNode.AddChild(tiaraBand);
+
+        // Tiara spikes with alternating heights
         var spikeMesh = new CylinderMesh { TopRadius = 0.005f * scale, BottomRadius = 0.02f * scale, Height = 0.1f * scale };
+        var tallSpikeMesh = new CylinderMesh { TopRadius = 0.006f * scale, BottomRadius = 0.025f * scale, Height = 0.14f * scale };
         for (int i = 0; i < 6; i++)
         {
-            var spike = new MeshInstance3D { Mesh = spikeMesh, MaterialOverride = markingMat };
+            bool isTall = (i % 2 == 0);
+            var spike = new MeshInstance3D {
+                Mesh = isTall ? tallSpikeMesh : spikeMesh,
+                MaterialOverride = tiaraMat
+            };
             float angle = i * Mathf.Pi * 2f / 6f;
-            spike.Position = new Vector3(Mathf.Cos(angle) * 0.15f * scale, 0.18f * scale, Mathf.Sin(angle) * 0.15f * scale);
+            spike.Position = new Vector3(Mathf.Cos(angle) * 0.15f * scale, (isTall ? 0.25f : 0.22f) * scale, Mathf.Sin(angle) * 0.15f * scale);
             headNode.AddChild(spike);
+
+            // Jewels on tall spikes
+            if (isTall)
+            {
+                var jewelMesh = new SphereMesh { Radius = 0.015f * scale, Height = 0.03f * scale };
+                var jewel = new MeshInstance3D { Mesh = jewelMesh, MaterialOverride = jewelMat };
+                jewel.Position = new Vector3(Mathf.Cos(angle) * 0.15f * scale, 0.34f * scale, Mathf.Sin(angle) * 0.15f * scale);
+                headNode.AddChild(jewel);
+            }
         }
+
+        // Central front jewel (largest)
+        var centralJewelMesh = new SphereMesh { Radius = 0.025f * scale, Height = 0.05f * scale };
+        var centralJewel = new MeshInstance3D { Mesh = centralJewelMesh, MaterialOverride = jewelMat };
+        centralJewel.Position = new Vector3(0, 0.26f * scale, 0.14f * scale);
+        headNode.AddChild(centralJewel);
 
         // 8 glowing eyes - using standardized Arachnid proportions
         var (spiderEyeR, _, _, _, _, _) = CalculateEyeGeometry(cephaloRadius, EyeProportions.Arachnid, scale);
@@ -6520,9 +7235,22 @@ public static class MonsterMeshFactory
         rightFang.RotationDegrees = new Vector3(20, 0, -10);
         headNode.AddChild(rightFang);
 
-        // 8 long legs
+        // 8 long legs with royal stripes
         var legMesh = new CylinderMesh { TopRadius = 0.025f * scale, BottomRadius = 0.02f * scale, Height = 0.45f * scale };
         float[] legAngles = { 25f, 55f, 125f, 155f };
+
+        // Leg stripe material (gold bands)
+        var stripeMat = new StandardMaterial3D
+        {
+            AlbedoColor = new Color(0.85f, 0.7f, 0.25f),
+            Metallic = 0.6f,
+            Roughness = 0.35f
+        };
+        var stripeMesh = new CylinderMesh {
+            TopRadius = 0.027f * scale,
+            BottomRadius = 0.027f * scale,
+            Height = 0.015f * scale
+        };
 
         for (int side = -1; side <= 1; side += 2)
         {
@@ -6538,11 +7266,40 @@ public static class MonsterMeshFactory
                 leg.Position = new Vector3(side * 0.22f * scale, 0, 0);
                 legNode.AddChild(leg);
 
+                // Stripes on upper leg
+                for (int s = 0; s < 3; s++)
+                {
+                    var stripe = new MeshInstance3D { Mesh = stripeMesh, MaterialOverride = stripeMat };
+                    stripe.Position = new Vector3(side * 0.22f * scale, (0.1f - s * 0.12f) * scale, 0);
+                    stripe.RotationDegrees = new Vector3(0, 0, -side * (35 + i * 12));
+                    legNode.AddChild(stripe);
+                }
+
                 // Lower leg segment
                 var lowerLeg = new MeshInstance3D { Mesh = legMesh, MaterialOverride = bodyMat };
                 lowerLeg.Position = new Vector3(side * 0.42f * scale, -0.15f * scale, 0);
                 lowerLeg.RotationDegrees = new Vector3(0, 0, side * -30);
                 legNode.AddChild(lowerLeg);
+
+                // Stripes on lower leg
+                for (int s = 0; s < 2; s++)
+                {
+                    var stripe = new MeshInstance3D { Mesh = stripeMesh, MaterialOverride = stripeMat };
+                    stripe.Position = new Vector3(side * 0.42f * scale, (-0.05f - s * 0.12f) * scale, 0);
+                    stripe.RotationDegrees = new Vector3(0, 0, side * -30 - side * (35 + i * 12));
+                    legNode.AddChild(stripe);
+                }
+
+                // Pointed leg tips (claws)
+                var clawMesh = new CylinderMesh {
+                    TopRadius = 0.003f * scale,
+                    BottomRadius = 0.015f * scale,
+                    Height = 0.06f * scale
+                };
+                var claw = new MeshInstance3D { Mesh = clawMesh, MaterialOverride = markingMat };
+                claw.Position = new Vector3(side * 0.42f * scale, -0.38f * scale, 0);
+                claw.RotationDegrees = new Vector3(0, 0, side * -30);
+                legNode.AddChild(claw);
 
                 if (i == 0)
                 {
@@ -7100,14 +7857,45 @@ public static class MonsterMeshFactory
             parent.AddChild(glow);
         }
 
-        // Crown/spikes on top
+        // Enhanced internal glow core
+        var innerGlowMat = new StandardMaterial3D
+        {
+            AlbedoColor = new Color(toxicGlow.R, toxicGlow.G, toxicGlow.B, 0.5f),
+            Transparency = BaseMaterial3D.TransparencyEnum.Alpha,
+            EmissionEnabled = true,
+            Emission = toxicGlow * 0.8f,
+            EmissionEnergyMultiplier = 2f
+        };
+        var innerGlowMesh = new SphereMesh { Radius = 0.25f, Height = 0.5f, RadialSegments = 24, Rings = 18 };
+        var innerGlow = new MeshInstance3D { Mesh = innerGlowMesh, MaterialOverride = innerGlowMat };
+        innerGlow.Position = new Vector3(0, 0.4f * bossScale, 0);
+        innerGlow.Scale = Vector3.One * bossScale * 0.6f;
+        parent.AddChild(innerGlow);
+
+        // Add OmniLight for real illumination
+        var coreLight = new OmniLight3D();
+        coreLight.LightColor = toxicGlow;
+        coreLight.LightEnergy = 1.2f;
+        coreLight.OmniRange = 4f * bossScale;
+        coreLight.Position = new Vector3(0, 0.4f * bossScale, 0);
+        parent.AddChild(coreLight);
+
+        // Crown embedded in slime (partially submerged)
         var crownMat = new StandardMaterial3D
         {
-            AlbedoColor = new Color(0.8f, 0.7f, 0.2f), // Gold
-            Metallic = 0.8f,
-            Roughness = 0.3f,
+            AlbedoColor = new Color(0.8f, 0.7f, 0.2f),
+            Metallic = 0.85f,
+            Roughness = 0.25f,
             EmissionEnabled = true,
-            Emission = new Color(0.8f, 0.7f, 0.2f) * 0.2f
+            Emission = new Color(0.8f, 0.7f, 0.2f) * 0.3f
+        };
+
+        // Slime coating on crown
+        var slimeCoatMat = new StandardMaterial3D
+        {
+            AlbedoColor = new Color(bossColor.R, bossColor.G, bossColor.B, 0.5f),
+            Transparency = BaseMaterial3D.TransparencyEnum.Alpha,
+            Roughness = 0.15f
         };
 
         int spikeCount = 8;
@@ -7120,23 +7908,45 @@ public static class MonsterMeshFactory
 
             float angle = i * (360f / spikeCount) * Mathf.Pi / 180f;
             float crownRadius = 0.35f * bossScale;
+            // Crown sits lower, partially embedded in slime
             spike.Position = new Vector3(
                 Mathf.Cos(angle) * crownRadius,
-                0.75f * bossScale,
+                0.58f * bossScale,
                 Mathf.Sin(angle) * crownRadius
             );
-            spike.RotationDegrees = new Vector3(-10, 0, 0);
+            spike.RotationDegrees = new Vector3(-10 - (i % 3) * 5, 0, (i % 2) * 8 - 4);
             spike.Scale = new Vector3(1f, 1f + (i % 2) * 0.3f, 1f);
             parent.AddChild(spike);
+
+            // Slime dripping from spike tips
+            if (i % 2 == 0)
+            {
+                var dripMesh = new CylinderMesh { TopRadius = 0.02f, BottomRadius = 0.005f, Height = 0.08f };
+                var drip = new MeshInstance3D { Mesh = dripMesh, MaterialOverride = slimeCoatMat };
+                drip.Position = new Vector3(
+                    Mathf.Cos(angle) * crownRadius * 1.02f,
+                    0.72f * bossScale,
+                    Mathf.Sin(angle) * crownRadius * 1.02f
+                );
+                parent.AddChild(drip);
+            }
         }
 
-        // Crown band
+        // Crown band (lower, embedded)
         var crownBand = new MeshInstance3D();
         var bandMesh = new CylinderMesh { TopRadius = 0.38f * bossScale, BottomRadius = 0.42f * bossScale, Height = 0.08f };
         crownBand.Mesh = bandMesh;
         crownBand.MaterialOverride = crownMat;
-        crownBand.Position = new Vector3(0, 0.68f * bossScale, 0);
+        crownBand.Position = new Vector3(0, 0.52f * bossScale, 0);
         parent.AddChild(crownBand);
+
+        // Slime coating over crown band
+        var crownCoat = new MeshInstance3D();
+        var coatMesh = new CylinderMesh { TopRadius = 0.4f * bossScale, BottomRadius = 0.44f * bossScale, Height = 0.1f };
+        crownCoat.Mesh = coatMesh;
+        crownCoat.MaterialOverride = slimeCoatMat;
+        crownCoat.Position = new Vector3(0, 0.51f * bossScale, 0);
+        parent.AddChild(crownCoat);
 
         // Many bubbles
         var bubbleMat = new StandardMaterial3D
@@ -8521,12 +9331,21 @@ public static class MonsterMeshFactory
         Color bodyColor = colorOverride ?? new Color(0.3f, 0.3f, 0.35f);
         Color lensColor = new Color(0.1f, 0.1f, 0.15f);
         Color lightColor = new Color(1f, 0.2f, 0.2f); // Red recording light
+        Color accentColor = new Color(0.4f, 0.4f, 0.45f);
 
         int radialSegs = GetRadialSegments(lod);
         int rings = GetRings(lod);
 
         var bodyMat = new StandardMaterial3D { AlbedoColor = bodyColor, Metallic = 0.6f, Roughness = 0.4f };
+        var accentMat = new StandardMaterial3D { AlbedoColor = accentColor, Metallic = 0.7f, Roughness = 0.35f };
         var lensMat = new StandardMaterial3D { AlbedoColor = lensColor, Metallic = 0.9f, Roughness = 0.1f };
+        var glassMat = new StandardMaterial3D
+        {
+            AlbedoColor = new Color(0.2f, 0.25f, 0.35f, 0.7f),
+            Transparency = BaseMaterial3D.TransparencyEnum.Alpha,
+            Metallic = 0.8f,
+            Roughness = 0.05f
+        };
         var lightMat = new StandardMaterial3D
         {
             AlbedoColor = lightColor,
@@ -8545,19 +9364,73 @@ public static class MonsterMeshFactory
         body.Position = new Vector3(0, floatY, 0);
         parent.AddChild(body);
 
-        // Camera lens
-        var lens = new MeshInstance3D();
-        lens.Mesh = new CylinderMesh { TopRadius = 0.08f * scale, BottomRadius = 0.1f * scale, Height = 0.08f * scale, RadialSegments = radialSegs };
-        lens.MaterialOverride = lensMat;
-        lens.Position = new Vector3(0, floatY, 0.15f * scale);
-        lens.RotationDegrees = new Vector3(90, 0, 0);
-        parent.AddChild(lens);
+        // Body accent ring (equatorial)
+        var bodyRing = new MeshInstance3D();
+        bodyRing.Mesh = new CylinderMesh { TopRadius = 0.205f * scale, BottomRadius = 0.205f * scale, Height = 0.02f * scale, RadialSegments = radialSegs };
+        bodyRing.MaterialOverride = accentMat;
+        bodyRing.Position = new Vector3(0, floatY, 0);
+        parent.AddChild(bodyRing);
 
-        // Recording light - Height = 2*Radius for proper sphere
+        // === CAMERA GIMBAL SYSTEM ===
+        // Gimbal mount (Y-axis rotation)
+        var gimbalMount = new MeshInstance3D();
+        gimbalMount.Mesh = new CylinderMesh { TopRadius = 0.06f * scale, BottomRadius = 0.06f * scale, Height = 0.02f * scale, RadialSegments = radialSegs };
+        gimbalMount.MaterialOverride = accentMat;
+        gimbalMount.Position = new Vector3(0, floatY - 0.1f * scale, 0.1f * scale);
+        gimbalMount.RotationDegrees = new Vector3(90, 0, 0);
+        parent.AddChild(gimbalMount);
+
+        // Gimbal arm (connects to camera housing)
+        var gimbalArm = new MeshInstance3D();
+        gimbalArm.Mesh = new BoxMesh { Size = new Vector3(0.02f * scale, 0.06f * scale, 0.02f * scale) };
+        gimbalArm.MaterialOverride = bodyMat;
+        gimbalArm.Position = new Vector3(0, floatY - 0.12f * scale, 0.12f * scale);
+        parent.AddChild(gimbalArm);
+
+        // Camera housing (box around lens)
+        var cameraHousing = new MeshInstance3D();
+        cameraHousing.Mesh = new BoxMesh { Size = new Vector3(0.12f * scale, 0.1f * scale, 0.08f * scale) };
+        cameraHousing.MaterialOverride = bodyMat;
+        cameraHousing.Position = new Vector3(0, floatY - 0.12f * scale, 0.18f * scale);
+        parent.AddChild(cameraHousing);
+
+        // Camera lens (main) - multi-element lens detail
+        var lensOuter = new MeshInstance3D();
+        lensOuter.Mesh = new CylinderMesh { TopRadius = 0.045f * scale, BottomRadius = 0.05f * scale, Height = 0.04f * scale, RadialSegments = radialSegs };
+        lensOuter.MaterialOverride = lensMat;
+        lensOuter.Position = new Vector3(0, floatY - 0.12f * scale, 0.24f * scale);
+        lensOuter.RotationDegrees = new Vector3(90, 0, 0);
+        parent.AddChild(lensOuter);
+
+        // Lens glass element - Height = 2*Radius for proper sphere
+        var lensGlass = new MeshInstance3D();
+        lensGlass.Mesh = new SphereMesh { Radius = 0.035f * scale, Height = 0.07f * scale, RadialSegments = radialSegs, Rings = rings };
+        lensGlass.MaterialOverride = glassMat;
+        lensGlass.Position = new Vector3(0, floatY - 0.12f * scale, 0.27f * scale);
+        lensGlass.Scale = new Vector3(1f, 1f, 0.3f);
+        parent.AddChild(lensGlass);
+
+        // Inner lens ring (aperture detail)
+        var apertureRing = new MeshInstance3D();
+        apertureRing.Mesh = new CylinderMesh { TopRadius = 0.025f * scale, BottomRadius = 0.03f * scale, Height = 0.01f * scale, RadialSegments = radialSegs };
+        apertureRing.MaterialOverride = new StandardMaterial3D { AlbedoColor = Colors.Black, Roughness = 0.9f };
+        apertureRing.Position = new Vector3(0, floatY - 0.12f * scale, 0.22f * scale);
+        apertureRing.RotationDegrees = new Vector3(90, 0, 0);
+        parent.AddChild(apertureRing);
+
+        // Lens hood
+        var lensHood = new MeshInstance3D();
+        lensHood.Mesh = new CylinderMesh { TopRadius = 0.055f * scale, BottomRadius = 0.05f * scale, Height = 0.015f * scale, RadialSegments = radialSegs };
+        lensHood.MaterialOverride = lensMat;
+        lensHood.Position = new Vector3(0, floatY - 0.12f * scale, 0.285f * scale);
+        lensHood.RotationDegrees = new Vector3(90, 0, 0);
+        parent.AddChild(lensHood);
+
+        // Recording light on camera housing - Height = 2*Radius for proper sphere
         var recLight = new MeshInstance3D();
-        recLight.Mesh = new SphereMesh { Radius = 0.02f * scale, Height = 0.04f * scale, RadialSegments = radialSegs / 2, Rings = rings / 2 };
+        recLight.Mesh = new SphereMesh { Radius = 0.015f * scale, Height = 0.03f * scale, RadialSegments = radialSegs / 2, Rings = rings / 2 };
         recLight.MaterialOverride = lightMat;
-        recLight.Position = new Vector3(0.1f * scale, floatY + 0.1f * scale, 0.1f * scale);
+        recLight.Position = new Vector3(0.05f * scale, floatY - 0.08f * scale, 0.22f * scale);
         parent.AddChild(recLight);
 
         // Head node (the whole drone is the "head" for animation)
@@ -8566,18 +9439,18 @@ public static class MonsterMeshFactory
         parent.AddChild(headNode);
         limbs.Head = headNode;
 
-        // Propeller arms (4)
+        // === PROPELLER ARMS WITH HOVER JETS ===
         for (int i = 0; i < 4; i++)
         {
             float angle = i * Mathf.Tau / 4f + Mathf.Tau / 8f;
             float armX = Mathf.Cos(angle) * 0.18f * scale;
             float armZ = Mathf.Sin(angle) * 0.18f * scale;
 
+            // Arm structure
             var arm = new MeshInstance3D();
-            arm.Mesh = new BoxMesh { Size = new Vector3(0.04f * scale, 0.02f * scale, 0.15f * scale) };
+            arm.Mesh = new BoxMesh { Size = new Vector3(0.04f * scale, 0.025f * scale, 0.15f * scale) };
             arm.MaterialOverride = bodyMat;
             arm.Position = new Vector3(armX, floatY, armZ);
-            // Calculate rotation manually (LookAt requires node to be in tree)
             var armTarget = new Vector3(0, floatY, 0);
             var armDir = (armTarget - arm.Position).Normalized();
             if (armDir.LengthSquared() > 0.001f)
@@ -8587,24 +9460,87 @@ public static class MonsterMeshFactory
             }
             parent.AddChild(arm);
 
-            // Propeller disc
-            var prop = new MeshInstance3D();
-            prop.Mesh = new CylinderMesh { TopRadius = 0.06f * scale, BottomRadius = 0.06f * scale, Height = 0.01f * scale };
-            prop.MaterialOverride = bodyMat;
-            prop.Position = new Vector3(armX * 1.5f, floatY + 0.03f * scale, armZ * 1.5f);
-            parent.AddChild(prop);
+            // Motor housing
+            var motorHousing = new MeshInstance3D();
+            motorHousing.Mesh = new CylinderMesh { TopRadius = 0.035f * scale, BottomRadius = 0.04f * scale, Height = 0.03f * scale, RadialSegments = radialSegs };
+            motorHousing.MaterialOverride = accentMat;
+            motorHousing.Position = new Vector3(armX * 1.5f, floatY + 0.015f * scale, armZ * 1.5f);
+            parent.AddChild(motorHousing);
 
-            // Propeller blades
-            var bladeMesh = new BoxMesh { Size = new Vector3(0.12f * scale, 0.005f * scale, 0.015f * scale) };
-            var blade = new MeshInstance3D { Mesh = bladeMesh, MaterialOverride = bodyMat };
-            blade.Position = new Vector3(armX * 1.5f, floatY + 0.04f * scale, armZ * 1.5f);
-            blade.RotationDegrees = new Vector3(0, i * 45, 0);
-            parent.AddChild(blade);
+            // Propeller hub
+            var propHub = new MeshInstance3D();
+            propHub.Mesh = new CylinderMesh { TopRadius = 0.02f * scale, BottomRadius = 0.02f * scale, Height = 0.02f * scale, RadialSegments = radialSegs };
+            propHub.MaterialOverride = bodyMat;
+            propHub.Position = new Vector3(armX * 1.5f, floatY + 0.04f * scale, armZ * 1.5f);
+            parent.AddChild(propHub);
+
+            // Propeller blades (3 per motor)
+            for (int b = 0; b < 3; b++)
+            {
+                var bladeMesh = new BoxMesh { Size = new Vector3(0.12f * scale, 0.004f * scale, 0.018f * scale) };
+                var blade = new MeshInstance3D { Mesh = bladeMesh, MaterialOverride = accentMat };
+                blade.Position = new Vector3(armX * 1.5f, floatY + 0.045f * scale, armZ * 1.5f);
+                blade.RotationDegrees = new Vector3(0, i * 45 + b * 120, 5);
+                parent.AddChild(blade);
+            }
+
+            // Hover jet glow under each motor (emissive)
+            var jetGlowMat = new StandardMaterial3D
+            {
+                AlbedoColor = new Color(0.3f, 0.6f, 1f, 0.6f),
+                EmissionEnabled = true,
+                Emission = new Color(0.4f, 0.7f, 1f),
+                EmissionEnergyMultiplier = 1.5f,
+                Transparency = BaseMaterial3D.TransparencyEnum.Alpha
+            };
+            var jetGlow = new MeshInstance3D();
+            jetGlow.Mesh = new CylinderMesh { TopRadius = 0.03f * scale, BottomRadius = 0.02f * scale, Height = 0.04f * scale, RadialSegments = radialSegs / 2 };
+            jetGlow.MaterialOverride = jetGlowMat;
+            jetGlow.Position = new Vector3(armX * 1.5f, floatY - 0.02f * scale, armZ * 1.5f);
+            parent.AddChild(jetGlow);
+
+            // LED status light on each arm
+            var armLightMat = new StandardMaterial3D
+            {
+                AlbedoColor = i % 2 == 0 ? new Color(0.2f, 1f, 0.3f) : new Color(1f, 0.5f, 0.1f),
+                EmissionEnabled = true,
+                Emission = i % 2 == 0 ? new Color(0.2f, 1f, 0.3f) : new Color(1f, 0.5f, 0.1f),
+                EmissionEnergyMultiplier = 1.5f
+            };
+            var armLight = new MeshInstance3D();
+            armLight.Mesh = new CylinderMesh { TopRadius = 0.008f * scale, BottomRadius = 0.008f * scale, Height = 0.005f * scale, RadialSegments = 6 };
+            armLight.MaterialOverride = armLightMat;
+            armLight.Position = new Vector3(armX * 1.2f, floatY + 0.015f * scale, armZ * 1.2f);
+            parent.AddChild(armLight);
         }
 
-        // Secondary recording light (green status)
-        var statusLight = new MeshInstance3D();
-        statusLight.Mesh = new CylinderMesh { TopRadius = 0.015f * scale, BottomRadius = 0.015f * scale, Height = 0.008f * scale, RadialSegments = radialSegs / 2 };
+        // === ANTENNA ARRAY (dual antennas) ===
+        var antennaMat = new StandardMaterial3D { AlbedoColor = bodyColor.Darkened(0.2f), Metallic = 0.5f, Roughness = 0.5f };
+
+        // Main antenna
+        var mainAntenna = new MeshInstance3D();
+        mainAntenna.Mesh = new CylinderMesh { TopRadius = 0.004f * scale, BottomRadius = 0.01f * scale, Height = 0.08f * scale, RadialSegments = 6 };
+        mainAntenna.MaterialOverride = antennaMat;
+        mainAntenna.Position = new Vector3(0, floatY + 0.24f * scale, 0);
+        parent.AddChild(mainAntenna);
+
+        // Antenna tip ball - Height = 2*Radius for proper sphere
+        var antennaTip = new MeshInstance3D();
+        antennaTip.Mesh = new SphereMesh { Radius = 0.012f * scale, Height = 0.024f * scale, RadialSegments = 8, Rings = 6 };
+        antennaTip.MaterialOverride = lightMat;
+        antennaTip.Position = new Vector3(0, floatY + 0.29f * scale, 0);
+        parent.AddChild(antennaTip);
+
+        // Secondary antenna (shorter, angled)
+        var secondAntenna = new MeshInstance3D();
+        secondAntenna.Mesh = new CylinderMesh { TopRadius = 0.003f * scale, BottomRadius = 0.006f * scale, Height = 0.05f * scale, RadialSegments = 6 };
+        secondAntenna.MaterialOverride = antennaMat;
+        secondAntenna.Position = new Vector3(-0.04f * scale, floatY + 0.2f * scale, -0.02f * scale);
+        secondAntenna.RotationDegrees = new Vector3(-15, 0, 20);
+        parent.AddChild(secondAntenna);
+
+        // === STATUS LIGHTS PANEL ===
+        // Green power light
         var greenMat = new StandardMaterial3D
         {
             AlbedoColor = new Color(0.2f, 1f, 0.3f),
@@ -8612,25 +9548,73 @@ public static class MonsterMeshFactory
             Emission = new Color(0.2f, 1f, 0.3f),
             EmissionEnergyMultiplier = 1.5f
         };
-        statusLight.MaterialOverride = greenMat;
-        statusLight.Position = new Vector3(-0.1f * scale, floatY + 0.1f * scale, 0.1f * scale);
-        parent.AddChild(statusLight);
+        var statusLight1 = new MeshInstance3D();
+        statusLight1.Mesh = new CylinderMesh { TopRadius = 0.01f * scale, BottomRadius = 0.01f * scale, Height = 0.005f * scale, RadialSegments = 8 };
+        statusLight1.MaterialOverride = greenMat;
+        statusLight1.Position = new Vector3(-0.08f * scale, floatY + 0.12f * scale, 0.12f * scale);
+        statusLight1.RotationDegrees = new Vector3(45, 0, 0);
+        parent.AddChild(statusLight1);
 
-        // Lens glass reflection ring
-        var lensRing = new MeshInstance3D();
-        var lensRingMat = new StandardMaterial3D { AlbedoColor = new Color(0.4f, 0.4f, 0.5f), Metallic = 1f, Roughness = 0.1f };
-        lensRing.Mesh = new CylinderMesh { TopRadius = 0.095f * scale, BottomRadius = 0.095f * scale, Height = 0.015f * scale, RadialSegments = radialSegs };
-        lensRing.MaterialOverride = lensRingMat;
-        lensRing.Position = new Vector3(0, floatY, 0.19f * scale);
-        lensRing.RotationDegrees = new Vector3(90, 0, 0);
-        parent.AddChild(lensRing);
+        // Blue WiFi/signal light
+        var blueMat = new StandardMaterial3D
+        {
+            AlbedoColor = new Color(0.3f, 0.5f, 1f),
+            EmissionEnabled = true,
+            Emission = new Color(0.3f, 0.5f, 1f),
+            EmissionEnergyMultiplier = 1.5f
+        };
+        var statusLight2 = new MeshInstance3D();
+        statusLight2.Mesh = new CylinderMesh { TopRadius = 0.01f * scale, BottomRadius = 0.01f * scale, Height = 0.005f * scale, RadialSegments = 8 };
+        statusLight2.MaterialOverride = blueMat;
+        statusLight2.Position = new Vector3(0.08f * scale, floatY + 0.12f * scale, 0.12f * scale);
+        statusLight2.RotationDegrees = new Vector3(45, 0, 0);
+        parent.AddChild(statusLight2);
 
-        // Antenna on top
-        var droneAntenna = new MeshInstance3D();
-        droneAntenna.Mesh = new CylinderMesh { TopRadius = 0.005f * scale, BottomRadius = 0.01f * scale, Height = 0.06f * scale, RadialSegments = radialSegs / 2 };
-        droneAntenna.MaterialOverride = bodyMat;
-        droneAntenna.Position = new Vector3(0, floatY + 0.22f * scale, 0);
-        parent.AddChild(droneAntenna);
+        // Yellow battery light
+        var yellowMat = new StandardMaterial3D
+        {
+            AlbedoColor = new Color(1f, 0.8f, 0.2f),
+            EmissionEnabled = true,
+            Emission = new Color(1f, 0.8f, 0.2f),
+            EmissionEnergyMultiplier = 1.2f
+        };
+        var statusLight3 = new MeshInstance3D();
+        statusLight3.Mesh = new CylinderMesh { TopRadius = 0.01f * scale, BottomRadius = 0.01f * scale, Height = 0.005f * scale, RadialSegments = 8 };
+        statusLight3.MaterialOverride = yellowMat;
+        statusLight3.Position = new Vector3(0, floatY + 0.14f * scale, 0.14f * scale);
+        statusLight3.RotationDegrees = new Vector3(45, 0, 0);
+        parent.AddChild(statusLight3);
+
+        // === SENSOR ARRAY (back) ===
+        var sensorMat = new StandardMaterial3D { AlbedoColor = new Color(0.15f, 0.15f, 0.2f), Metallic = 0.7f, Roughness = 0.3f };
+        var sensorPanel = new MeshInstance3D();
+        sensorPanel.Mesh = new BoxMesh { Size = new Vector3(0.1f * scale, 0.06f * scale, 0.02f * scale) };
+        sensorPanel.MaterialOverride = sensorMat;
+        sensorPanel.Position = new Vector3(0, floatY, -0.18f * scale);
+        parent.AddChild(sensorPanel);
+
+        // Sensor dots on panel - Height = 2*Radius for proper sphere
+        var sensorDotMesh = new SphereMesh { Radius = 0.008f * scale, Height = 0.016f * scale, RadialSegments = 6, Rings = 4 };
+        for (int i = 0; i < 3; i++)
+        {
+            var sensorDot = new MeshInstance3D { Mesh = sensorDotMesh, MaterialOverride = lensMat };
+            sensorDot.Position = new Vector3((i - 1) * 0.03f * scale, floatY + 0.01f * scale, -0.19f * scale);
+            parent.AddChild(sensorDot);
+        }
+
+        // Cooling vents on sides
+        var ventMat = new StandardMaterial3D { AlbedoColor = bodyColor.Darkened(0.3f), Roughness = 0.8f };
+        for (int side = -1; side <= 1; side += 2)
+        {
+            for (int v = 0; v < 3; v++)
+            {
+                var vent = new MeshInstance3D();
+                vent.Mesh = new BoxMesh { Size = new Vector3(0.01f * scale, 0.04f * scale, 0.008f * scale) };
+                vent.MaterialOverride = ventMat;
+                vent.Position = new Vector3(side * 0.19f * scale, floatY + (v - 1) * 0.03f * scale, -0.05f * scale);
+                parent.AddChild(vent);
+            }
+        }
     }
 
     /// <summary>
@@ -10597,17 +11581,22 @@ public static class MonsterMeshFactory
     // ========================================================================
 
     /// <summary>
-    /// The Butcher - Massive orc with meat cleaver
+    /// The Butcher - DCC horror butcher with bloody apron, stitched skin, meat hooks, gore splatter
     /// </summary>
     private static void CreateButcherMesh(Node3D parent, LimbNodes limbs, Color? colorOverride, LODLevel lod = LODLevel.High)
     {
         float scale = 2.0f; // Boss scale
         Color skinColor = colorOverride ?? new Color(0.5f, 0.25f, 0.2f); // Dark red skin
-        Color apronColor = new Color(0.9f, 0.85f, 0.8f); // Bloodstained white
+        Color apronColor = new Color(0.85f, 0.8f, 0.75f); // Dirty white apron
+        Color stitchColor = new Color(0.25f, 0.15f, 0.1f);
+        Color goreColor = new Color(0.4f, 0.05f, 0.05f);
 
         var skinMat = new StandardMaterial3D { AlbedoColor = skinColor, Roughness = 0.85f };
         var apronMat = new StandardMaterial3D { AlbedoColor = apronColor, Roughness = 0.7f };
         var metalMat = new StandardMaterial3D { AlbedoColor = new Color(0.5f, 0.5f, 0.55f), Metallic = 0.8f, Roughness = 0.4f };
+        var stitchMat = new StandardMaterial3D { AlbedoColor = stitchColor, Roughness = 0.9f };
+        var goreMat = new StandardMaterial3D { AlbedoColor = goreColor, Roughness = 0.6f };
+        var freshBloodMat = new StandardMaterial3D { AlbedoColor = new Color(0.7f, 0.15f, 0.1f), Roughness = 0.5f };
 
         // Massive body
         var body = new MeshInstance3D();
@@ -10616,12 +11605,39 @@ public static class MonsterMeshFactory
         body.Position = new Vector3(0, 0.6f * scale, 0);
         parent.AddChild(body);
 
-        // Apron
+        // Stitched scars across torso
+        var stitchMesh = new BoxMesh { Size = new Vector3(0.22f * scale, 0.012f * scale, 0.008f * scale) };
+        for (int si = 0; si < 4; si++)
+        {
+            var stitch = new MeshInstance3D { Mesh = stitchMesh, MaterialOverride = stitchMat };
+            stitch.Position = new Vector3(0.08f * scale, 0.45f * scale + si * 0.1f * scale, 0.36f * scale);
+            stitch.RotationDegrees = new Vector3(0, 0, (si % 2 == 0 ? 12 : -8));
+            parent.AddChild(stitch);
+        }
+
+        // Apron with neck strap and side ties
         var apron = new MeshInstance3D();
-        apron.Mesh = new BoxMesh { Size = new Vector3(0.5f * scale, 0.5f * scale, 0.05f * scale) };
+        apron.Mesh = new BoxMesh { Size = new Vector3(0.55f * scale, 0.6f * scale, 0.04f * scale) };
         apron.MaterialOverride = apronMat;
-        apron.Position = new Vector3(0, 0.5f * scale, 0.25f * scale);
+        apron.Position = new Vector3(0, 0.45f * scale, 0.28f * scale);
         parent.AddChild(apron);
+
+        // Apron neck strap
+        var strapMesh = new BoxMesh { Size = new Vector3(0.05f * scale, 0.22f * scale, 0.015f * scale) };
+        var apronStrap = new MeshInstance3D { Mesh = strapMesh, MaterialOverride = apronMat };
+        apronStrap.Position = new Vector3(0, 0.85f * scale, 0.2f * scale);
+        parent.AddChild(apronStrap);
+
+        // Gore splatter on body - Height = 2*Radius
+        var goreSplatterMesh = new SphereMesh { Radius = 0.035f * scale, Height = 0.07f * scale, RadialSegments = 8, Rings = 6 };
+        for (int gi = 0; gi < 3; gi++)
+        {
+            float goreAngle = gi * Mathf.Pi / 2.5f + Mathf.Pi * 0.4f;
+            var gore = new MeshInstance3D { Mesh = goreSplatterMesh, MaterialOverride = goreMat };
+            gore.Position = new Vector3(Mathf.Cos(goreAngle) * 0.38f * scale, 0.55f * scale + (gi % 2) * 0.12f * scale, Mathf.Sin(goreAngle) * 0.28f * scale);
+            gore.Scale = new Vector3(1.4f, 0.5f, 1f);
+            parent.AddChild(gore);
+        }
 
         // Head node
         var headNode = new Node3D();
@@ -10728,19 +11744,41 @@ public static class MonsterMeshFactory
             parent.AddChild(blood);
         }
 
-        // Meat hook on belt
+        // Multiple meat hooks on belt with blood drips
         var hookMat = new StandardMaterial3D { AlbedoColor = new Color(0.4f, 0.4f, 0.42f), Metallic = 0.9f, Roughness = 0.3f };
-        var hookMesh = new CylinderMesh { TopRadius = 0.02f * scale, BottomRadius = 0.02f * scale, Height = 0.15f * scale };
-        var hook = new MeshInstance3D { Mesh = hookMesh, MaterialOverride = hookMat };
-        hook.Position = new Vector3(-0.35f * scale, 0.35f * scale, 0.2f * scale);
-        hook.RotationDegrees = new Vector3(0, 0, 30);
-        parent.AddChild(hook);
-        var hookTip = new MeshInstance3D();
-        hookTip.Mesh = new CylinderMesh { TopRadius = 0.005f * scale, BottomRadius = 0.02f * scale, Height = 0.08f * scale };
-        hookTip.MaterialOverride = hookMat;
-        hookTip.Position = new Vector3(-0.38f * scale, 0.28f * scale, 0.2f * scale);
-        hookTip.RotationDegrees = new Vector3(45, 0, 60);
-        parent.AddChild(hookTip);
+        var hookMesh = new CylinderMesh { TopRadius = 0.015f * scale, BottomRadius = 0.015f * scale, Height = 0.12f * scale };
+        var hookTipMesh = new CylinderMesh { TopRadius = 0.003f * scale, BottomRadius = 0.015f * scale, Height = 0.06f * scale };
+        for (int hi = 0; hi < 3; hi++)
+        {
+            var hook = new MeshInstance3D { Mesh = hookMesh, MaterialOverride = hookMat };
+            hook.Position = new Vector3(-0.32f * scale - hi * 0.08f * scale, 0.32f * scale, 0.18f * scale);
+            hook.RotationDegrees = new Vector3(0, 0, 25 + hi * 5);
+            parent.AddChild(hook);
+            var hookTip = new MeshInstance3D { Mesh = hookTipMesh, MaterialOverride = hookMat };
+            hookTip.Position = new Vector3(-0.35f * scale - hi * 0.08f * scale, 0.24f * scale, 0.18f * scale);
+            hookTip.RotationDegrees = new Vector3(50, 0, 55 + hi * 5);
+            parent.AddChild(hookTip);
+            // Blood drip on hooks
+            if (hi % 2 == 0)
+            {
+                var hookBloodMesh = new CylinderMesh { TopRadius = 0.004f * scale, BottomRadius = 0.012f * scale, Height = 0.03f * scale };
+                var hookBlood = new MeshInstance3D { Mesh = hookBloodMesh, MaterialOverride = freshBloodMat };
+                hookBlood.Position = new Vector3(-0.36f * scale - hi * 0.08f * scale, 0.2f * scale, 0.18f * scale);
+                parent.AddChild(hookBlood);
+            }
+        }
+        // Right side hook with meat chunk - Height = 2*Radius
+        var rightHook = new MeshInstance3D { Mesh = hookMesh, MaterialOverride = hookMat };
+        rightHook.Position = new Vector3(0.35f * scale, 0.32f * scale, 0.18f * scale);
+        rightHook.RotationDegrees = new Vector3(0, 0, -25);
+        parent.AddChild(rightHook);
+        var meatMat = new StandardMaterial3D { AlbedoColor = new Color(0.6f, 0.25f, 0.2f), Roughness = 0.85f };
+        var meatChunk = new MeshInstance3D();
+        meatChunk.Mesh = new SphereMesh { Radius = 0.04f * scale, Height = 0.08f * scale, RadialSegments = 8, Rings = 6 };
+        meatChunk.MaterialOverride = meatMat;
+        meatChunk.Position = new Vector3(0.38f * scale, 0.22f * scale, 0.18f * scale);
+        meatChunk.Scale = new Vector3(1.2f, 0.8f, 0.6f);
+        parent.AddChild(meatChunk);
 
         // Cleaver blade edge highlight
         var edgeMat = new StandardMaterial3D { AlbedoColor = new Color(0.8f, 0.8f, 0.85f), Metallic = 0.95f, Roughness = 0.15f };
@@ -10783,16 +11821,23 @@ public static class MonsterMeshFactory
     }
 
     /// <summary>
-    /// Syndicate Enforcer - Combat robot boss
+    /// Syndicate Enforcer - DCC suit/uniform enforcer with sunglasses, earpiece, concealed weapons, intimidating stance
     /// </summary>
     private static void CreateSyndicateEnforcerMesh(Node3D parent, LimbNodes limbs, Color? colorOverride, LODLevel lod = LODLevel.High)
     {
         float scale = 2.2f;
-        Color bodyColor = colorOverride ?? new Color(0.35f, 0.38f, 0.42f);
+        Color suitColor = colorOverride ?? new Color(0.12f, 0.12f, 0.15f); // Dark suit
+        Color shirtColor = new Color(0.9f, 0.9f, 0.92f); // White shirt
+        Color tieColor = new Color(0.5f, 0.1f, 0.1f); // Red tie
+        Color glassesColor = new Color(0.05f, 0.05f, 0.08f); // Dark sunglasses
         Color lightColor = new Color(0.3f, 0.5f, 0.9f);
 
-        var metalMat = new StandardMaterial3D { AlbedoColor = bodyColor, Metallic = 0.85f, Roughness = 0.3f };
-        var darkMat = new StandardMaterial3D { AlbedoColor = bodyColor.Darkened(0.3f), Metallic = 0.8f, Roughness = 0.4f };
+        var suitMat = new StandardMaterial3D { AlbedoColor = suitColor, Roughness = 0.6f };
+        var shirtMat = new StandardMaterial3D { AlbedoColor = shirtColor, Roughness = 0.5f };
+        var tieMat = new StandardMaterial3D { AlbedoColor = tieColor, Roughness = 0.55f };
+        var glassesMat = new StandardMaterial3D { AlbedoColor = glassesColor, Metallic = 0.3f, Roughness = 0.15f };
+        var metalMat = new StandardMaterial3D { AlbedoColor = new Color(0.35f, 0.38f, 0.42f), Metallic = 0.85f, Roughness = 0.3f };
+        var darkMat = new StandardMaterial3D { AlbedoColor = suitColor.Darkened(0.3f), Metallic = 0.8f, Roughness = 0.4f };
         var lightMat = new StandardMaterial3D
         {
             AlbedoColor = lightColor,
@@ -10800,6 +11845,7 @@ public static class MonsterMeshFactory
             Emission = lightColor,
             EmissionEnergyMultiplier = 2f
         };
+        var earPieceMat = new StandardMaterial3D { AlbedoColor = new Color(0.15f, 0.15f, 0.18f), Roughness = 0.4f };
 
         // Large angular body
         var body = new MeshInstance3D();
@@ -10951,7 +11997,7 @@ public static class MonsterMeshFactory
     }
 
     /// <summary>
-    /// Hive Mother - Insect queen boss
+    /// Hive Mother - DCC bloated egg-laying queen with multiple appendages, larval attachments, pulsing sacs
     /// </summary>
     private static void CreateHiveMotherMesh(Node3D parent, LimbNodes limbs, Color? colorOverride, LODLevel lod = LODLevel.High)
     {
@@ -10967,13 +12013,37 @@ public static class MonsterMeshFactory
             Emission = eyeColor
         };
 
-        // Large abdomen - Height = 2*Radius for proper sphere
+        // Large bloated abdomen - Height = 2*Radius for proper sphere
         var abdomen = new MeshInstance3D();
         abdomen.Mesh = new SphereMesh { Radius = 0.4f * scale, Height = 0.8f * scale };
         abdomen.MaterialOverride = chitinMat;
         abdomen.Position = new Vector3(0, 0.5f * scale, -0.3f * scale);
         abdomen.Scale = new Vector3(1f, 0.8f, 1.4f);
         parent.AddChild(abdomen);
+
+        // Pulsing egg sacs on abdomen - Height = 2*Radius
+        var sacMat = new StandardMaterial3D { AlbedoColor = new Color(0.6f, 0.5f, 0.35f, 0.8f), Roughness = 0.4f, Transparency = BaseMaterial3D.TransparencyEnum.Alpha };
+        var sacMesh = new SphereMesh { Radius = 0.08f * scale, Height = 0.16f * scale, RadialSegments = 12, Rings = 8 };
+        for (int si = 0; si < 6; si++)
+        {
+            float sacAngle = si * Mathf.Tau / 6f;
+            var sac = new MeshInstance3D { Mesh = sacMesh, MaterialOverride = sacMat };
+            sac.Position = new Vector3(Mathf.Cos(sacAngle) * 0.3f * scale, 0.4f * scale + (si % 2) * 0.1f * scale, -0.35f * scale + Mathf.Sin(sacAngle) * 0.25f * scale);
+            sac.Scale = new Vector3(1f + (si % 3) * 0.2f, 0.8f + (si % 2) * 0.3f, 1f);
+            parent.AddChild(sac);
+        }
+
+        // Larval attachments crawling on body - Height = 2*Radius
+        var larvaeMat = new StandardMaterial3D { AlbedoColor = new Color(0.7f, 0.65f, 0.5f), Roughness = 0.7f };
+        var larvaeMesh = new SphereMesh { Radius = 0.025f * scale, Height = 0.05f * scale, RadialSegments = 8, Rings = 6 };
+        for (int li = 0; li < 8; li++)
+        {
+            float larvaeAngle = li * Mathf.Tau / 8f + Mathf.Pi / 8f;
+            var larvae = new MeshInstance3D { Mesh = larvaeMesh, MaterialOverride = larvaeMat };
+            larvae.Position = new Vector3(Mathf.Cos(larvaeAngle) * 0.35f * scale, 0.55f * scale, -0.25f * scale + Mathf.Sin(larvaeAngle) * 0.3f * scale);
+            larvae.Scale = new Vector3(0.8f, 0.5f, 1.2f);
+            parent.AddChild(larvae);
+        }
 
         // Thorax - Height = 2*Radius for proper sphere
         var thorax = new MeshInstance3D();
@@ -11105,7 +12175,7 @@ public static class MonsterMeshFactory
     }
 
     /// <summary>
-    /// Architect's Favorite - Angelic horror boss
+    /// Architect's Favorite - DCC mechanical/magical hybrid with ornate design, glowing runes, asymmetric form
     /// </summary>
     private static void CreateArchitectsFavoriteMesh(Node3D parent, LimbNodes limbs, Color? colorOverride, LODLevel lod = LODLevel.High)
     {
@@ -11273,7 +12343,7 @@ public static class MonsterMeshFactory
     }
 
     /// <summary>
-    /// Mordecai's Shadow - Corrupted sponsor champion boss
+    /// Mordecai's Shadow - DCC ethereal shadow form with wispy edges, glowing eyes, tattered cloak
     /// </summary>
     private static void CreateMordecaisShadowMesh(Node3D parent, LimbNodes limbs, Color? colorOverride, LODLevel lod = LODLevel.High)
     {
@@ -11491,7 +12561,7 @@ public static class MonsterMeshFactory
     // ========================================================================
 
     /// <summary>
-    /// Mordecai the Traitor - Cunning dual-wielding rogue
+    /// Mordecai the Traitor - DCC detailed robes, staff, magical aura, beard, sinister expression
     /// Tall hooded figure with two daggers and a treacherous grin
     /// </summary>
     private static void CreateMordecaiTheTraitorMesh(Node3D parent, LimbNodes limbs, Color? colorOverride, LODLevel lod = LODLevel.High)
@@ -11633,7 +12703,7 @@ public static class MonsterMeshFactory
     }
 
     /// <summary>
-    /// Princess Donut - Cat boss that's fast and agile
+    /// Princess Donut - DCC cat body with tiara, fluffy fur, collar with gem, regal pose, expressive eyes
     /// Elegant cat with a crown and fluffy tail
     /// </summary>
     private static void CreatePrincessDonutMesh(Node3D parent, LimbNodes limbs, Color? colorOverride, LODLevel lod = LODLevel.High)
@@ -11716,7 +12786,33 @@ public static class MonsterMeshFactory
             var crownPoint = new MeshInstance3D { Mesh = crownPointMesh, MaterialOverride = crownMat };
             crownPoint.Position = new Vector3(Mathf.Cos(angle) * 0.07f * scale, 0.22f * scale, Mathf.Sin(angle) * 0.07f * scale);
             headNode.AddChild(crownPoint);
+
+            // Gem on top of each crown point - Height = 2*Radius
+            if (i % 2 == 0)
+            {
+                var gemMat = new StandardMaterial3D { AlbedoColor = new Color(0.8f, 0.2f, 0.3f), EmissionEnabled = true, Emission = new Color(0.6f, 0.1f, 0.2f), EmissionEnergyMultiplier = 0.5f };
+                var gem = new MeshInstance3D();
+                gem.Mesh = new SphereMesh { Radius = 0.012f * scale, Height = 0.024f * scale, RadialSegments = 8, Rings = 6 };
+                gem.MaterialOverride = gemMat;
+                gem.Position = new Vector3(Mathf.Cos(angle) * 0.07f * scale, 0.26f * scale, Mathf.Sin(angle) * 0.07f * scale);
+                headNode.AddChild(gem);
+            }
         }
+
+        // Regal collar with gem
+        var collarMat = new StandardMaterial3D { AlbedoColor = new Color(0.6f, 0.15f, 0.2f), Roughness = 0.5f };
+        var collarMesh = new CylinderMesh { TopRadius = 0.1f * scale, BottomRadius = 0.11f * scale, Height = 0.03f * scale, RadialSegments = radialSegs };
+        var collar = new MeshInstance3D { Mesh = collarMesh, MaterialOverride = collarMat };
+        collar.Position = new Vector3(0, -0.12f * scale, 0);
+        headNode.AddChild(collar);
+
+        // Gem pendant on collar - Height = 2*Radius
+        var pendantGemMat = new StandardMaterial3D { AlbedoColor = new Color(0.3f, 0.7f, 0.9f), EmissionEnabled = true, Emission = new Color(0.2f, 0.5f, 0.7f), EmissionEnergyMultiplier = 1f };
+        var pendantGem = new MeshInstance3D();
+        pendantGem.Mesh = new SphereMesh { Radius = 0.025f * scale, Height = 0.05f * scale, RadialSegments = 10, Rings = 8 };
+        pendantGem.MaterialOverride = pendantGemMat;
+        pendantGem.Position = new Vector3(0, -0.15f * scale, 0.1f * scale);
+        headNode.AddChild(pendantGem);
 
         // Cat eyes with pupils - large expressive cat eyes with vertical slit pupils
         var catEyeMesh = new SphereMesh { Radius = 0.045f * scale, Height = 0.09f * scale, RadialSegments = radialSegs, Rings = rings };
@@ -11807,7 +12903,7 @@ public static class MonsterMeshFactory
     }
 
     /// <summary>
-    /// Mongo the Destroyer - Massive titan boss
+    /// Mongo the Destroyer - DCC massive muscles, primitive armor, war paint, trophy necklace, huge weapon
     /// Huge muscular humanoid with armored plating
     /// </summary>
     private static void CreateMongoTheDestroyerMesh(Node3D parent, LimbNodes limbs, Color? colorOverride, LODLevel lod = LODLevel.High)
@@ -11830,14 +12926,45 @@ public static class MonsterMeshFactory
             EmissionEnergyMultiplier = 2f
         };
 
-        // Massive body
+        // Massive muscular body
         var body = new MeshInstance3D();
         body.Mesh = new CylinderMesh { TopRadius = 0.35f * scale, BottomRadius = 0.4f * scale, Height = 0.7f * scale, RadialSegments = radialSegs };
         body.MaterialOverride = skinMat;
         body.Position = new Vector3(0, 0.7f * scale, 0);
         parent.AddChild(body);
 
-        // Chest armor plate
+        // War paint stripes on body
+        var warPaintMat = new StandardMaterial3D { AlbedoColor = new Color(0.7f, 0.15f, 0.1f), Roughness = 0.8f };
+        var warPaintMesh = new BoxMesh { Size = new Vector3(0.5f * scale, 0.04f * scale, 0.01f * scale) };
+        for (int wi = 0; wi < 4; wi++)
+        {
+            var warPaint = new MeshInstance3D { Mesh = warPaintMesh, MaterialOverride = warPaintMat };
+            warPaint.Position = new Vector3(0, 0.55f * scale + wi * 0.12f * scale, 0.38f * scale);
+            warPaint.RotationDegrees = new Vector3(0, 0, (wi % 2 == 0 ? 5 : -5));
+            parent.AddChild(warPaint);
+        }
+
+        // Trophy necklace with skulls - Height = 2*Radius
+        var necklaceMat = new StandardMaterial3D { AlbedoColor = new Color(0.4f, 0.35f, 0.25f), Roughness = 0.7f };
+        var necklaceMesh = new CylinderMesh { TopRadius = 0.28f * scale, BottomRadius = 0.28f * scale, Height = 0.02f * scale };
+        var necklace = new MeshInstance3D { Mesh = necklaceMesh, MaterialOverride = necklaceMat };
+        necklace.Position = new Vector3(0, 1.0f * scale, 0.05f * scale);
+        necklace.RotationDegrees = new Vector3(75, 0, 0);
+        parent.AddChild(necklace);
+
+        // Trophy skulls on necklace - Height = 2*Radius
+        var skullMat = new StandardMaterial3D { AlbedoColor = new Color(0.9f, 0.88f, 0.8f), Roughness = 0.6f };
+        var skullMesh = new SphereMesh { Radius = 0.035f * scale, Height = 0.07f * scale, RadialSegments = 8, Rings = 6 };
+        for (int ski = 0; ski < 5; ski++)
+        {
+            float skullAngle = (ski - 2) * Mathf.Pi / 8f;
+            var skull = new MeshInstance3D { Mesh = skullMesh, MaterialOverride = skullMat };
+            skull.Position = new Vector3(Mathf.Sin(skullAngle) * 0.26f * scale, 0.95f * scale, 0.18f * scale + Mathf.Cos(skullAngle) * 0.08f * scale);
+            skull.Scale = new Vector3(0.8f, 1f, 0.7f);
+            parent.AddChild(skull);
+        }
+
+        // Chest armor plate (primitive)
         var chestPlate = new MeshInstance3D();
         chestPlate.Mesh = new BoxMesh { Size = new Vector3(0.5f * scale, 0.4f * scale, 0.1f * scale) };
         chestPlate.MaterialOverride = armorMat;
@@ -11956,7 +13083,7 @@ public static class MonsterMeshFactory
     }
 
     /// <summary>
-    /// Zev the Loot Goblin - Fast greedy goblin lord
+    /// Zev the Loot Goblin - DCC bulging bags, coins spilling, merchant clothing, shifty eyes, many pockets
     /// Goblin with gold jewelry and a giant money bag
     /// </summary>
     private static void CreateZevTheLootGoblinMesh(Node3D parent, LimbNodes limbs, Color? colorOverride, LODLevel lod = LODLevel.High)
@@ -12070,20 +13197,45 @@ public static class MonsterMeshFactory
         rightArm.Position = new Vector3(0, -0.15f * scale, 0);
         rightArmNode.AddChild(rightArm);
 
-        // Money bag in right hand! - Height = 2*Radius for proper sphere
+        // Bulging money bag in right hand! - Height = 2*Radius for proper sphere
         var moneyBag = new MeshInstance3D();
-        moneyBag.Mesh = new SphereMesh { Radius = 0.12f * scale, Height = 0.24f * scale, RadialSegments = radialSegs, Rings = rings };
+        moneyBag.Mesh = new SphereMesh { Radius = 0.14f * scale, Height = 0.28f * scale, RadialSegments = radialSegs, Rings = rings };
         moneyBag.MaterialOverride = bagMat;
-        moneyBag.Position = new Vector3(0.08f * scale, -0.35f * scale, 0.1f * scale);
-        moneyBag.Scale = new Vector3(1f, 1.2f, 0.8f);
+        moneyBag.Position = new Vector3(0.08f * scale, -0.38f * scale, 0.1f * scale);
+        moneyBag.Scale = new Vector3(1.1f, 1.3f, 0.85f);
         rightArmNode.AddChild(moneyBag);
         limbs.Weapon = rightArmNode;
+
+        // Coins spilling from bag - Height = 2*Radius
+        var coinMesh = new CylinderMesh { TopRadius = 0.015f * scale, BottomRadius = 0.015f * scale, Height = 0.004f * scale };
+        for (int ci = 0; ci < 8; ci++)
+        {
+            var coin = new MeshInstance3D { Mesh = coinMesh, MaterialOverride = goldMat };
+            float coinAngle = ci * Mathf.Tau / 8f;
+            coin.Position = new Vector3(
+                0.08f * scale + Mathf.Cos(coinAngle) * 0.08f * scale,
+                -0.5f * scale - ci * 0.02f * scale,
+                0.1f * scale + Mathf.Sin(coinAngle) * 0.04f * scale
+            );
+            coin.RotationDegrees = new Vector3(ci * 25, ci * 40, ci * 15);
+            rightArmNode.AddChild(coin);
+        }
 
         // Dollar sign on bag
         var dollarMesh = new BoxMesh { Size = new Vector3(0.06f * scale, 0.08f * scale, 0.01f * scale) };
         var dollarSign = new MeshInstance3D { Mesh = dollarMesh, MaterialOverride = goldMat };
-        dollarSign.Position = new Vector3(0.08f * scale, -0.35f * scale, 0.2f * scale);
+        dollarSign.Position = new Vector3(0.08f * scale, -0.38f * scale, 0.22f * scale);
         rightArmNode.AddChild(dollarSign);
+
+        // Many pockets on vest
+        var pocketMat = new StandardMaterial3D { AlbedoColor = new Color(0.4f, 0.12f, 0.12f), Roughness = 0.75f };
+        var pocketMesh = new BoxMesh { Size = new Vector3(0.06f * scale, 0.08f * scale, 0.02f * scale) };
+        for (int pi = 0; pi < 4; pi++)
+        {
+            var pocket = new MeshInstance3D { Mesh = pocketMesh, MaterialOverride = pocketMat };
+            pocket.Position = new Vector3((pi % 2 == 0 ? -0.12f : 0.12f) * scale, 0.5f * scale - (pi / 2) * 0.1f * scale, 0.18f * scale);
+            parent.AddChild(pocket);
+        }
 
         var leftArmNode = new Node3D();
         leftArmNode.Position = new Vector3(-0.2f * scale, shoulderY, 0);
