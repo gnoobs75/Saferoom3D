@@ -46,7 +46,10 @@
       "Bash(if not exist \"C:\\Claude\\SafeRoom3D\\maps\" mkdir \"C:\\Claude\\SafeRoom3D\\maps\")",
       "Bash(dir \"%APPDATA%\\Godot\\app_userdata\\Safe Room 3D\\maps\")",
       "Bash(del \"C:\\Claude\\SafeRoom3D\\Scripts\\UI\\DebugMenu3D.cs\")",
-      "Bash(dotnet test:*)"
+      "Bash(dotnet test:*)",
+      "Bash(git config:*)",
+      "Bash(gh auth:*)",
+      "Bash(git remote:*)"
     ]
   }
 }

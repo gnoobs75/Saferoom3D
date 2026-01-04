@@ -132,7 +132,7 @@ public partial class InventoryUI3D : Control
 
         // Instructions
         var instructions = new Label();
-        instructions.Text = "Left-click to use | Shift+drag consumables to hotbar";
+        instructions.Text = "Left-drag to hotbar | Right-click to use";
         instructions.AddThemeFontSizeOverride("font_size", 10);
         instructions.AddThemeColorOverride("font_color", new Color(0.6f, 0.55f, 0.7f));
         instructions.HorizontalAlignment = HorizontalAlignment.Center;
@@ -371,41 +371,28 @@ public partial class InventoryUI3D : Control
 
             if (mb.ButtonIndex == MouseButton.Left)
             {
-                // Equipment items: start drag to equip
-                if (item.Type == ItemType.Equipment && item.Equipment != null)
+                // Left-click: Start drag for all item types
+                // Equipment drags to character sheet, consumables drag to hotbar
+                StartItemDrag(slot.Index, item);
+            }
+            else if (mb.ButtonIndex == MouseButton.Right)
+            {
+                // Right-click: Use consumable or show tooltip for other items
+                if (item.Type == ItemType.Consumable)
                 {
-                    StartItemDrag(slot.Index, item);
-                }
-                // Consumable items: Shift+Click to drag to hotbar, regular click to use
-                else if (item.Type == ItemType.Consumable)
-                {
-                    if (Input.IsKeyPressed(Key.Shift))
+                    var player = FPSController.Instance;
+                    if (player != null && ConsumableItems3D.UseItem(item.Id, player))
                     {
-                        // Shift+Click: Start drag to assign to hotbar
-                        StartItemDrag(slot.Index, item);
-                    }
-                    else
-                    {
-                        // Regular click: use directly
-                        var player = FPSController.Instance;
-                        if (player != null && ConsumableItems3D.UseItem(item.Id, player))
-                        {
-                            Inventory3D.Instance?.UseItem(slot.Index);
-                            RefreshSlots();
-                            HUD3D.Instance?.RefreshConsumableStacks();
-                        }
+                        Inventory3D.Instance?.UseItem(slot.Index);
+                        RefreshSlots();
+                        HUD3D.Instance?.RefreshConsumableStacks();
                     }
                 }
                 else
                 {
-                    // Other items: just start drag
-                    StartItemDrag(slot.Index, item);
+                    // Show tooltip for non-consumables
+                    ShowTooltip(slot, item);
                 }
-            }
-            else if (mb.ButtonIndex == MouseButton.Right)
-            {
-                // Show tooltip
-                ShowTooltip(slot, item);
             }
         }
         else if (e is InputEventMouseMotion)

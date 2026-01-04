@@ -455,6 +455,9 @@ public partial class Steve3D : Node3D
     {
         if (_missileCooldown > 0 || _player == null) return;
 
+        // Don't attack during edit mode (map editor)
+        if (_player is FPSController fps && fps.IsEditMode) return;
+
         // Find enemies that are attacking the player
         var enemies = GetTree().GetNodesInGroup("Enemies");
         foreach (var node in enemies)

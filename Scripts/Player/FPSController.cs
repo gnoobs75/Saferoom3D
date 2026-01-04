@@ -1641,6 +1641,11 @@ public partial class FPSController : CharacterBody3D
             Input.MouseMode = Input.MouseModeEnum.Captured;
             GD.Print("[FPSController] Window focus regained - mouse recaptured");
         }
+
+        // Clear any stuck modifier key states that may have occurred during alt-tab
+        // This helps prevent issues where Alt/Shift appear "stuck" after returning from alt-tab
+        Input.FlushBufferedEvents();
+        GD.Print("[FPSController] Flushed buffered input events after focus regain");
     }
 
     /// <summary>

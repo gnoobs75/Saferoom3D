@@ -180,24 +180,25 @@ public partial class AbilityManager3D : Node
             }
         }
 
-        // Determine which hotbar row to use based on modifiers
-        int hotbarRow = 0;
-        if (Input.IsKeyPressed(Key.Shift))
-        {
-            hotbarRow = 1;
-        }
-        else if (Input.IsKeyPressed(Key.Alt))
-        {
-            hotbarRow = 2;
-        }
-
         // Handle hotbar input (number keys 1-0)
-        for (int i = 0; i < 10; i++)
+        // Check modifiers from the current event to avoid stuck modifier keys after alt-tab
+        if (@event is InputEventKey keyEvent && keyEvent.Pressed && !keyEvent.Echo)
         {
-            string action = $"hotbar_{i + 1}";
-            if (Input.IsActionJustPressed(action))
+            int slot = GetHotbarSlotFromKeycode(keyEvent.Keycode);
+            if (slot >= 0)
             {
-                TryActivateHotbarSlot(hotbarRow, i);
+                // Use event modifiers (not Input.IsKeyPressed) for reliable modifier detection
+                int hotbarRow = 0;
+                if (keyEvent.ShiftPressed)
+                {
+                    hotbarRow = 1;
+                }
+                else if (keyEvent.AltPressed)
+                {
+                    hotbarRow = 2;
+                }
+
+                TryActivateHotbarSlot(hotbarRow, slot);
                 return;
             }
         }
@@ -210,6 +211,27 @@ public partial class AbilityManager3D : Node
         {
             UpdateTargetingIndicator();
         }
+    }
+
+    /// <summary>
+    /// Converts a keycode to a hotbar slot index (0-9), or -1 if not a hotbar key.
+    /// </summary>
+    private static int GetHotbarSlotFromKeycode(Key keycode)
+    {
+        return keycode switch
+        {
+            Key.Key1 => 0,
+            Key.Key2 => 1,
+            Key.Key3 => 2,
+            Key.Key4 => 3,
+            Key.Key5 => 4,
+            Key.Key6 => 5,
+            Key.Key7 => 6,
+            Key.Key8 => 7,
+            Key.Key9 => 8,
+            Key.Key0 => 9,
+            _ => -1
+        };
     }
 
     private void UpdateTargetingIndicator()

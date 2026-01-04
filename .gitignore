@@ -1,0 +1,40 @@
+# Godot 4 specific ignores
+.godot/
+
+# Mono/C# specific ignores
+.mono/
+data_*/
+mono_crash.*.json
+
+# Build outputs
+bin/
+obj/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# IDE specific
+.vs/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS specific
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Export templates
+.export/
+
+# Temporary files
+*.tmp
+*.temp
+nul
+
+# Logs
+*.log
