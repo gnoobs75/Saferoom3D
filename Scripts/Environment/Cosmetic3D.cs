@@ -1867,6 +1867,53 @@ public partial class Cosmetic3D : StaticBody3D
         }
     }
 
+    private void AddRotatedBoxToSurfaceTool(SurfaceTool st, Vector3 center, Vector3 size, float yRotation)
+    {
+        // Helper to add a Y-axis rotated box to the surface tool
+        Vector3 half = size / 2f;
+        float cos = Mathf.Cos(yRotation);
+        float sin = Mathf.Sin(yRotation);
+
+        // Define the 8 vertices (local space, unrotated)
+        Vector3[] localVerts = {
+            new Vector3(-half.X, -half.Y, -half.Z),
+            new Vector3(half.X, -half.Y, -half.Z),
+            new Vector3(half.X, half.Y, -half.Z),
+            new Vector3(-half.X, half.Y, -half.Z),
+            new Vector3(-half.X, -half.Y, half.Z),
+            new Vector3(half.X, -half.Y, half.Z),
+            new Vector3(half.X, half.Y, half.Z),
+            new Vector3(-half.X, half.Y, half.Z),
+        };
+
+        // Rotate and translate vertices
+        Vector3[] verts = new Vector3[8];
+        for (int i = 0; i < 8; i++)
+        {
+            float rotX = localVerts[i].X * cos - localVerts[i].Z * sin;
+            float rotZ = localVerts[i].X * sin + localVerts[i].Z * cos;
+            verts[i] = center + new Vector3(rotX, localVerts[i].Y, rotZ);
+        }
+
+        // Define the 6 faces (2 triangles each)
+        int[][] faces = {
+            new[] {0, 1, 2, 0, 2, 3}, // front
+            new[] {5, 4, 7, 5, 7, 6}, // back
+            new[] {4, 0, 3, 4, 3, 7}, // left
+            new[] {1, 5, 6, 1, 6, 2}, // right
+            new[] {3, 2, 6, 3, 6, 7}, // top
+            new[] {4, 5, 1, 4, 1, 0}, // bottom
+        };
+
+        foreach (var face in faces)
+        {
+            foreach (var idx in face)
+            {
+                st.AddVertex(verts[idx]);
+            }
+        }
+    }
+
     private void AddSphereToSurfaceTool(SurfaceTool st, Vector3 center, float radius)
     {
         // Create a low-poly sphere (icosahedron-like)
@@ -1921,35 +1968,203 @@ public partial class Cosmetic3D : StaticBody3D
         var surfaceTool = new SurfaceTool();
         surfaceTool.Begin(Mesh.PrimitiveType.Triangles);
         float s = PropScale;
-        var boneColor = new Color(0.9f, 0.85f, 0.7f);
 
-        // Skull in center
-        AddSphereToSurfaceTool(surfaceTool, new Vector3(0, 0.15f * s, 0), 0.12f * s);
-        // Eye sockets (small indents simulated by darker spheres overlaid in material)
+        // Bone color with aged yellowing variation
+        // Note: Using single material, variety through geometry placement
 
-        // Scattered bones (cylinders for long bones)
-        for (int i = 0; i < 8; i++)
+        // === DETAILED SKULL ===
+        float skullY = 0.12f * s;
+        float skullRadius = 0.1f * s;
+
+        // Main cranium (slightly elongated sphere)
+        AddSphereToSurfaceTool(surfaceTool, new Vector3(0, skullY + 0.02f * s, 0), skullRadius);
+
+        // Forehead ridge
+        AddSphereToSurfaceTool(surfaceTool, new Vector3(0, skullY + 0.08f * s, 0.04f * s), skullRadius * 0.5f);
+
+        // Eye sockets (recessed areas created by surrounding bone)
+        float eyeSpacing = 0.04f * s;
+        float eyeSocketRadius = 0.025f * s;
+        // Left eye socket rim
+        AddSphereToSurfaceTool(surfaceTool, new Vector3(-eyeSpacing, skullY + 0.02f * s, 0.07f * s), eyeSocketRadius * 1.3f);
+        // Right eye socket rim
+        AddSphereToSurfaceTool(surfaceTool, new Vector3(eyeSpacing, skullY + 0.02f * s, 0.07f * s), eyeSocketRadius * 1.3f);
+
+        // Nasal cavity (triangular approximation)
+        AddBoxToSurfaceTool(surfaceTool, new Vector3(0, skullY - 0.01f * s, 0.08f * s),
+            new Vector3(0.02f * s, 0.03f * s, 0.015f * s));
+
+        // Cheekbones (zygomatic arch)
+        AddSphereToSurfaceTool(surfaceTool, new Vector3(-0.055f * s, skullY - 0.01f * s, 0.05f * s), 0.02f * s);
+        AddSphereToSurfaceTool(surfaceTool, new Vector3(0.055f * s, skullY - 0.01f * s, 0.05f * s), 0.02f * s);
+
+        // Jaw bone (mandible) - separate piece
+        float jawY = skullY - 0.06f * s;
+        // Main jaw curve
+        AddBoxToSurfaceTool(surfaceTool, new Vector3(0, jawY, 0.05f * s),
+            new Vector3(0.07f * s, 0.025f * s, 0.02f * s));
+        // Jaw sides (rami)
+        AddBoxToSurfaceTool(surfaceTool, new Vector3(-0.04f * s, jawY + 0.015f * s, 0.02f * s),
+            new Vector3(0.015f * s, 0.035f * s, 0.02f * s));
+        AddBoxToSurfaceTool(surfaceTool, new Vector3(0.04f * s, jawY + 0.015f * s, 0.02f * s),
+            new Vector3(0.015f * s, 0.035f * s, 0.02f * s));
+
+        // Teeth (row of small boxes)
+        for (int t = -3; t <= 3; t++)
         {
-            float angle = rng.Randf() * Mathf.Tau;
-            float dist = rng.RandfRange(0.1f, 0.4f) * s;
-            float boneLen = rng.RandfRange(0.15f, 0.3f) * s;
-            float boneRad = rng.RandfRange(0.02f, 0.04f) * s;
-            Vector3 pos = new Vector3(Mathf.Cos(angle) * dist, boneRad, Mathf.Sin(angle) * dist);
-            // Simple bone as elongated box
-            float rotAngle = rng.Randf() * Mathf.Tau;
-            AddBoxToSurfaceTool(surfaceTool, pos, new Vector3(boneLen, boneRad * 2, boneRad * 2));
+            float toothX = t * 0.008f * s;
+            AddBoxToSurfaceTool(surfaceTool, new Vector3(toothX, jawY + 0.018f * s, 0.065f * s),
+                new Vector3(0.006f * s, 0.01f * s, 0.005f * s));
         }
 
-        // Rib cage pieces
-        for (int i = 0; i < 4; i++)
+        // === ANATOMICALLY-SHAPED FEMURS (long bones with knobby ends) ===
+        int numFemurs = rng.RandiRange(3, 5);
+        for (int i = 0; i < numFemurs; i++)
         {
-            float x = (i - 1.5f) * 0.08f * s;
-            AddBoxToSurfaceTool(surfaceTool, new Vector3(x, 0.08f * s, -0.15f * s), new Vector3(0.02f * s, 0.12f * s, 0.02f * s));
+            float angle = rng.Randf() * Mathf.Tau;
+            float dist = rng.RandfRange(0.12f, 0.35f) * s;
+            float x = Mathf.Cos(angle) * dist;
+            float z = Mathf.Sin(angle) * dist;
+            float boneLen = rng.RandfRange(0.18f, 0.28f) * s;
+            float boneRad = rng.RandfRange(0.015f, 0.022f) * s;
+            float boneY = boneRad + rng.RandfRange(0, 0.02f) * s;
+
+            // Shaft (main bone body)
+            AddBoxToSurfaceTool(surfaceTool, new Vector3(x, boneY, z),
+                new Vector3(boneLen, boneRad * 2f, boneRad * 2f));
+
+            // Proximal end (ball joint - larger knob)
+            float knobOffset = boneLen / 2f - boneRad;
+            AddSphereToSurfaceTool(surfaceTool, new Vector3(x + knobOffset, boneY, z), boneRad * 1.6f);
+
+            // Distal end (condyles - two smaller knobs)
+            AddSphereToSurfaceTool(surfaceTool, new Vector3(x - knobOffset, boneY + boneRad * 0.3f, z + boneRad * 0.4f), boneRad * 1.2f);
+            AddSphereToSurfaceTool(surfaceTool, new Vector3(x - knobOffset, boneY + boneRad * 0.3f, z - boneRad * 0.4f), boneRad * 1.2f);
+        }
+
+        // === CURVED RIBS (using angled box segments) ===
+        int numRibs = rng.RandiRange(4, 7);
+        float ribBaseZ = -0.2f * s;
+        for (int i = 0; i < numRibs; i++)
+        {
+            float ribX = (i - numRibs / 2f) * 0.05f * s + rng.RandfRange(-0.01f, 0.01f) * s;
+            float ribY = 0.03f * s + rng.RandfRange(0, 0.03f) * s;
+            float ribThick = rng.RandfRange(0.008f, 0.012f) * s;
+
+            // Create curved rib with 3-4 segments
+            int segments = 3 + (i % 2);
+            float segmentLen = 0.04f * s;
+            float curveAngle = 0.2f + (i % 3) * 0.1f;
+
+            Vector3 segStart = new Vector3(ribX, ribY, ribBaseZ);
+            for (int seg = 0; seg < segments; seg++)
+            {
+                float segAngle = -Mathf.Pi / 4f + seg * curveAngle;
+                float nextX = segStart.X + Mathf.Sin(segAngle) * segmentLen * 0.3f;
+                float nextY = segStart.Y + Mathf.Cos(segAngle) * segmentLen * 0.5f;
+                float nextZ = segStart.Z + segmentLen * 0.4f;
+
+                // Rib segment
+                AddBoxToSurfaceTool(surfaceTool, segStart,
+                    new Vector3(ribThick * 2f, segmentLen * 0.6f, ribThick * 2f));
+
+                segStart = new Vector3(nextX, nextY, nextZ);
+            }
+        }
+
+        // === VERTEBRAE CHAIN (small cylinders with disc shapes) ===
+        int numVertebrae = rng.RandiRange(4, 7);
+        float vertX = rng.RandfRange(-0.15f, 0.15f) * s;
+        float vertZ = rng.RandfRange(-0.1f, 0.1f) * s;
+        for (int i = 0; i < numVertebrae; i++)
+        {
+            float vertY = 0.015f * s + i * 0.022f * s;
+            float vertRadius = 0.018f * s - i * 0.001f * s;
+
+            // Vertebral body (disc-like)
+            AddBoxToSurfaceTool(surfaceTool, new Vector3(vertX, vertY, vertZ),
+                new Vector3(vertRadius * 2f, 0.012f * s, vertRadius * 2f));
+
+            // Spinous process (small projection)
+            AddBoxToSurfaceTool(surfaceTool, new Vector3(vertX, vertY + 0.01f * s, vertZ - vertRadius * 0.8f),
+                new Vector3(0.005f * s, 0.015f * s, 0.01f * s));
+
+            // Transverse processes (side projections)
+            AddBoxToSurfaceTool(surfaceTool, new Vector3(vertX - vertRadius * 0.7f, vertY, vertZ),
+                new Vector3(0.012f * s, 0.006f * s, 0.006f * s));
+            AddBoxToSurfaceTool(surfaceTool, new Vector3(vertX + vertRadius * 0.7f, vertY, vertZ),
+                new Vector3(0.012f * s, 0.006f * s, 0.006f * s));
+        }
+
+        // === PELVIS SUGGESTION (curved box arrangement) ===
+        float pelvisX = rng.RandfRange(-0.2f, 0.2f) * s;
+        float pelvisZ = rng.RandfRange(0.1f, 0.25f) * s;
+        float pelvisY = 0.04f * s;
+
+        // Sacrum (central triangular piece)
+        AddBoxToSurfaceTool(surfaceTool, new Vector3(pelvisX, pelvisY, pelvisZ),
+            new Vector3(0.06f * s, 0.03f * s, 0.04f * s));
+
+        // Iliac crests (wing-like projections)
+        AddBoxToSurfaceTool(surfaceTool, new Vector3(pelvisX - 0.06f * s, pelvisY + 0.015f * s, pelvisZ + 0.01f * s),
+            new Vector3(0.05f * s, 0.025f * s, 0.03f * s));
+        AddBoxToSurfaceTool(surfaceTool, new Vector3(pelvisX + 0.06f * s, pelvisY + 0.015f * s, pelvisZ + 0.01f * s),
+            new Vector3(0.05f * s, 0.025f * s, 0.03f * s));
+
+        // Ischium (lower curves)
+        AddSphereToSurfaceTool(surfaceTool, new Vector3(pelvisX - 0.04f * s, pelvisY - 0.01f * s, pelvisZ + 0.02f * s), 0.02f * s);
+        AddSphereToSurfaceTool(surfaceTool, new Vector3(pelvisX + 0.04f * s, pelvisY - 0.01f * s, pelvisZ + 0.02f * s), 0.02f * s);
+
+        // === SMALL BONE FRAGMENTS (scattered around) ===
+        int fragments = rng.RandiRange(6, 10);
+        for (int i = 0; i < fragments; i++)
+        {
+            float angle = rng.Randf() * Mathf.Tau;
+            float dist = rng.RandfRange(0.15f, 0.4f) * s;
+            float fragX = Mathf.Cos(angle) * dist;
+            float fragZ = Mathf.Sin(angle) * dist;
+            float fragLen = rng.RandfRange(0.02f, 0.06f) * s;
+            float fragRad = rng.RandfRange(0.005f, 0.012f) * s;
+
+            AddBoxToSurfaceTool(surfaceTool, new Vector3(fragX, fragRad, fragZ),
+                new Vector3(fragLen, fragRad * 2f, fragRad * 2f));
+
+            // Some fragments have knobby ends
+            if (rng.Randf() > 0.5f)
+            {
+                AddSphereToSurfaceTool(surfaceTool, new Vector3(fragX + fragLen / 2f, fragRad, fragZ), fragRad * 1.3f);
+            }
+        }
+
+        // === ADDITIONAL SCATTERED BONES FOR DENSITY ===
+        // Finger/toe bones (phalanges)
+        int numPhalanges = rng.RandiRange(5, 10);
+        for (int i = 0; i < numPhalanges; i++)
+        {
+            float angle = rng.Randf() * Mathf.Tau;
+            float dist = rng.RandfRange(0.08f, 0.35f) * s;
+            float phalX = Mathf.Cos(angle) * dist;
+            float phalZ = Mathf.Sin(angle) * dist;
+            float phalLen = rng.RandfRange(0.015f, 0.025f) * s;
+            float phalRad = 0.004f * s;
+
+            // Small bone cylinder
+            AddBoxToSurfaceTool(surfaceTool, new Vector3(phalX, phalRad, phalZ),
+                new Vector3(phalLen, phalRad * 2f, phalRad * 2f));
+
+            // Tiny knob at end
+            AddSphereToSurfaceTool(surfaceTool, new Vector3(phalX + phalLen / 2f, phalRad, phalZ), phalRad * 1.2f);
         }
 
         surfaceTool.GenerateNormals();
         var mesh = surfaceTool.Commit();
-        var material = new StandardMaterial3D { AlbedoColor = boneColor, Roughness = 0.9f };
+
+        // Bone material with aged yellowing
+        var material = new StandardMaterial3D
+        {
+            AlbedoColor = new Color(0.88f, 0.82f, 0.68f), // Aged bone yellow
+            Roughness = 0.9f
+        };
         mesh.SurfaceSetMaterial(0, material);
         return mesh;
     }
@@ -1960,28 +2175,67 @@ public partial class Cosmetic3D : StaticBody3D
         surfaceTool.Begin(Mesh.PrimitiveType.Triangles);
         float s = PropScale;
 
-        // Create chain links as connected tori (simplified as small cylinders)
-        int links = 12;
+        // ENHANCED: Rounded oval chain links in a coiled pile
+        int links = 14;
         for (int i = 0; i < links; i++)
         {
-            float angle = i * 0.5f + rng.Randf() * 0.2f;
-            float radius = 0.15f * s + i * 0.015f * s;
+            float angle = i * 0.45f + rng.Randf() * 0.15f;
+            float radius = 0.12f * s + i * 0.012f * s;
             float x = Mathf.Cos(angle) * radius;
             float z = Mathf.Sin(angle) * radius;
-            float y = 0.02f * s + (i % 2) * 0.02f * s;
-            // Link as small elongated box
-            AddBoxToSurfaceTool(surfaceTool, new Vector3(x, y, z), new Vector3(0.05f * s, 0.02f * s, 0.03f * s));
+            float y = 0.015f * s + (i % 3) * 0.015f * s;
+            float linkAngle = angle + Mathf.Pi / 2f + rng.Randf() * 0.3f;
+
+            // Each link is an oval shape - create with two spheres and a connecting box
+            float linkLen = 0.045f * s;
+            float linkWidth = 0.025f * s;
+            float linkThickness = 0.012f * s;
+
+            // Link body (elongated oval box)
+            Vector3 linkPos = new Vector3(x, y, z);
+            float cosA = Mathf.Cos(linkAngle);
+            float sinA = Mathf.Sin(linkAngle);
+
+            // Main link body - oval shaped
+            AddBoxToSurfaceTool(surfaceTool, linkPos, new Vector3(linkLen, linkThickness, linkWidth));
+
+            // Rounded ends using spheres
+            Vector3 end1 = linkPos + new Vector3(cosA * linkLen * 0.4f, 0, sinA * linkLen * 0.4f);
+            Vector3 end2 = linkPos - new Vector3(cosA * linkLen * 0.4f, 0, sinA * linkLen * 0.4f);
+            AddSphereToSurfaceTool(surfaceTool, end1, linkThickness * 0.8f);
+            AddSphereToSurfaceTool(surfaceTool, end2, linkThickness * 0.8f);
         }
+
+        // END HOOKS - curved hooks at the chain ends
+        // Hook 1 at start of chain
+        float hookX1 = Mathf.Cos(0.2f) * 0.1f * s;
+        float hookZ1 = Mathf.Sin(0.2f) * 0.1f * s;
+        AddBoxToSurfaceTool(surfaceTool, new Vector3(hookX1, 0.025f * s, hookZ1), new Vector3(0.04f * s, 0.015f * s, 0.015f * s));
+        AddBoxToSurfaceTool(surfaceTool, new Vector3(hookX1 - 0.025f * s, 0.015f * s, hookZ1), new Vector3(0.015f * s, 0.03f * s, 0.015f * s));
+        AddSphereToSurfaceTool(surfaceTool, new Vector3(hookX1 - 0.025f * s, 0.005f * s, hookZ1), 0.01f * s);
+
+        // Hook 2 at end of chain
+        float hookX2 = Mathf.Cos(links * 0.45f) * (0.12f * s + links * 0.012f * s);
+        float hookZ2 = Mathf.Sin(links * 0.45f) * (0.12f * s + links * 0.012f * s);
+        AddBoxToSurfaceTool(surfaceTool, new Vector3(hookX2, 0.04f * s, hookZ2), new Vector3(0.04f * s, 0.015f * s, 0.015f * s));
+        AddBoxToSurfaceTool(surfaceTool, new Vector3(hookX2 + 0.025f * s, 0.03f * s, hookZ2), new Vector3(0.015f * s, 0.035f * s, 0.015f * s));
+        AddSphereToSurfaceTool(surfaceTool, new Vector3(hookX2 + 0.025f * s, 0.015f * s, hookZ2), 0.012f * s);
 
         surfaceTool.GenerateNormals();
         var mesh = surfaceTool.Commit();
+
+        // Base rusted iron material
         var material = new StandardMaterial3D
         {
-            AlbedoColor = new Color(0.35f, 0.32f, 0.28f), // Rusted iron
-            Roughness = 0.8f,
-            Metallic = 0.6f
+            AlbedoColor = new Color(0.38f, 0.34f, 0.3f), // Rusted iron base
+            Roughness = 0.85f,
+            Metallic = 0.55f
         };
         mesh.SurfaceSetMaterial(0, material);
+
+        // Note: Rust color patches would require a second surface/material
+        // For simplicity, the base color already suggests rust
+
         return mesh;
     }
 
@@ -2428,20 +2682,88 @@ public partial class Cosmetic3D : StaticBody3D
         surfaceTool.Begin(Mesh.PrimitiveType.Triangles);
         float s = PropScale;
 
-        // Blade (lying flat)
-        AddBoxToSurfaceTool(surfaceTool, new Vector3(0, 0.02f * s, 0), new Vector3(0.04f * s, 0.02f * s, 0.6f * s));
-        // Crossguard
-        AddBoxToSurfaceTool(surfaceTool, new Vector3(0, 0.02f * s, -0.25f * s), new Vector3(0.15f * s, 0.03f * s, 0.03f * s));
-        // Handle
-        AddBoxToSurfaceTool(surfaceTool, new Vector3(0, 0.02f * s, -0.35f * s), new Vector3(0.03f * s, 0.03f * s, 0.12f * s));
+        // Sword lying flat on ground, slightly angled
+        float swordY = 0.015f * s;
+        float bladeLen = 0.55f * s;
+        float bladeWidth = 0.045f * s;
+
+        // === BLADE with beveled edge ===
+        // Main blade body (center is thicker)
+        AddBoxToSurfaceTool(surfaceTool, new Vector3(0, swordY, bladeLen * 0.2f), new Vector3(bladeWidth, 0.018f * s, bladeLen));
+
+        // Beveled cutting edges (angled boxes on each side)
+        float edgeOffset = bladeWidth * 0.45f;
+        float edgeThickness = 0.008f * s;
+        // Left edge
+        AddBoxToSurfaceTool(surfaceTool, new Vector3(-edgeOffset, swordY - 0.003f * s, bladeLen * 0.2f),
+            new Vector3(0.012f * s, edgeThickness, bladeLen * 0.95f));
+        // Right edge
+        AddBoxToSurfaceTool(surfaceTool, new Vector3(edgeOffset, swordY - 0.003f * s, bladeLen * 0.2f),
+            new Vector3(0.012f * s, edgeThickness, bladeLen * 0.95f));
+
+        // BLOOD GROOVE (fuller) - narrow depression down center of blade
+        AddBoxToSurfaceTool(surfaceTool, new Vector3(0, swordY + 0.008f * s, bladeLen * 0.15f),
+            new Vector3(0.008f * s, 0.003f * s, bladeLen * 0.7f));
+
+        // Blade tip (pointed)
+        AddBoxToSurfaceTool(surfaceTool, new Vector3(0, swordY, bladeLen * 0.72f),
+            new Vector3(bladeWidth * 0.6f, 0.012f * s, 0.08f * s));
+
+        // === CROSSGUARD with detail ===
+        float guardZ = -0.03f * s;
+        float guardLen = 0.16f * s;
+        // Main crossguard bar
+        AddBoxToSurfaceTool(surfaceTool, new Vector3(0, swordY + 0.01f * s, guardZ),
+            new Vector3(guardLen, 0.025f * s, 0.025f * s));
+        // Crossguard ends (quillons) - slightly curved up
+        AddSphereToSurfaceTool(surfaceTool, new Vector3(-guardLen * 0.48f, swordY + 0.015f * s, guardZ), 0.018f * s);
+        AddSphereToSurfaceTool(surfaceTool, new Vector3(guardLen * 0.48f, swordY + 0.015f * s, guardZ), 0.018f * s);
+        // Guard ricasso (where blade meets guard)
+        AddBoxToSurfaceTool(surfaceTool, new Vector3(0, swordY + 0.01f * s, guardZ + 0.02f * s),
+            new Vector3(bladeWidth * 0.8f, 0.022f * s, 0.025f * s));
+
+        // === LEATHER GRIP WRAPPING ===
+        float gripZ = -0.12f * s;
+        float gripLen = 0.1f * s;
+        // Main grip wood core
+        AddBoxToSurfaceTool(surfaceTool, new Vector3(0, swordY + 0.01f * s, gripZ),
+            new Vector3(0.028f * s, 0.028f * s, gripLen));
+        // Leather wrapping bands (simulated with small boxes)
+        int wrapBands = 6;
+        for (int w = 0; w < wrapBands; w++)
+        {
+            float wrapZ = gripZ + gripLen * 0.4f - w * (gripLen * 0.8f / wrapBands);
+            AddBoxToSurfaceTool(surfaceTool, new Vector3(0, swordY + 0.023f * s, wrapZ),
+                new Vector3(0.032f * s, 0.008f * s, 0.012f * s));
+        }
+
+        // POMMEL (end cap)
+        AddSphereToSurfaceTool(surfaceTool, new Vector3(0, swordY + 0.015f * s, gripZ - gripLen * 0.55f), 0.022f * s);
+
+        // === RUST PATCHES (darker spots on blade) ===
+        int rustSpots = rng.RandiRange(2, 4);
+        for (int r = 0; r < rustSpots; r++)
+        {
+            float rustZ = rng.RandfRange(0.05f, 0.4f) * s;
+            float rustX = rng.RandfRange(-0.015f, 0.015f) * s;
+            float rustSize = rng.RandfRange(0.015f, 0.03f) * s;
+            AddSphereToSurfaceTool(surfaceTool, new Vector3(rustX, swordY + 0.012f * s, rustZ), rustSize);
+        }
+
+        // === BLOOD STAINS (optional dark red spots) ===
+        if (rng.Randf() > 0.5f)
+        {
+            float bloodZ = rng.RandfRange(0.15f, 0.35f) * s;
+            AddSphereToSurfaceTool(surfaceTool, new Vector3(rng.RandfRange(-0.01f, 0.01f) * s, swordY + 0.01f * s, bloodZ), 0.02f * s);
+        }
 
         surfaceTool.GenerateNormals();
         var mesh = surfaceTool.Commit();
         var material = new StandardMaterial3D
         {
-            AlbedoColor = new Color(0.5f, 0.48f, 0.45f), // Rusty metal
-            Roughness = 0.7f,
-            Metallic = 0.5f
+            AlbedoColor = new Color(0.52f, 0.5f, 0.48f), // Weathered steel
+            Roughness = 0.65f,
+            Metallic = 0.55f
         };
         mesh.SurfaceSetMaterial(0, material);
         return mesh;
@@ -2893,26 +3215,204 @@ public partial class Cosmetic3D : StaticBody3D
         surfaceTool.Begin(Mesh.PrimitiveType.Triangles);
         float s = PropScale;
 
-        // Messy pile of twigs, cloth, bones
-        int items = rng.RandiRange(12, 18);
-        for (int i = 0; i < items; i++)
+        // Colors for different nest materials
+        var strawColor = new Color(0.65f, 0.55f, 0.3f);      // Golden straw
+        var dirtyStrawColor = new Color(0.45f, 0.38f, 0.25f); // Dirty straw
+        var fabricColor = new Color(0.35f, 0.3f, 0.35f);      // Faded fabric
+        var fabricRedColor = new Color(0.45f, 0.25f, 0.2f);   // Faded red fabric
+        var boneColor = new Color(0.85f, 0.8f, 0.7f);         // Bone white
+        var droppingColor = new Color(0.15f, 0.12f, 0.08f);   // Dark brown droppings
+
+        // === STRUCTURAL BOWL BASE ===
+        // Create bowl-shaped foundation using overlapping curved segments
+        int bowlSegments = 16;
+        float bowlRadius = 0.28f * s;
+        float bowlHeight = 0.08f * s;
+        for (int i = 0; i < bowlSegments; i++)
+        {
+            float angle1 = (i / (float)bowlSegments) * Mathf.Tau;
+            float angle2 = ((i + 1) / (float)bowlSegments) * Mathf.Tau;
+            float midAngle = (angle1 + angle2) / 2f;
+
+            // Outer rim pieces (thicker at edges, forming bowl lip)
+            float rimX = Mathf.Cos(midAngle) * bowlRadius;
+            float rimZ = Mathf.Sin(midAngle) * bowlRadius;
+            float rimLen = 0.12f * s;
+            float rimThick = 0.025f * s;
+            // Angle the rim pieces to follow the curve
+            AddRotatedBoxToSurfaceTool(surfaceTool, new Vector3(rimX, bowlHeight * 0.6f, rimZ),
+                new Vector3(rimLen, rimThick, rimThick * 1.5f), midAngle + Mathf.Pi/2);
+        }
+
+        // Inner bowl floor (woven base)
+        int floorPieces = 12;
+        for (int i = 0; i < floorPieces; i++)
+        {
+            float angle = (i / (float)floorPieces) * Mathf.Tau + rng.RandfRange(-0.1f, 0.1f);
+            float dist = rng.RandfRange(0.02f, 0.18f) * s;
+            float x = Mathf.Cos(angle) * dist;
+            float z = Mathf.Sin(angle) * dist;
+            float pieceLen = rng.RandfRange(0.08f, 0.16f) * s;
+            float pieceThick = rng.RandfRange(0.008f, 0.015f) * s;
+            // Woven floor pieces cross at angles
+            AddRotatedBoxToSurfaceTool(surfaceTool, new Vector3(x, 0.015f * s, z),
+                new Vector3(pieceLen, pieceThick, pieceThick), angle + rng.RandfRange(-0.3f, 0.3f));
+        }
+
+        // === STRAW/HAY STRANDS (thin cylinders approximated with elongated boxes) ===
+        int strawCount = rng.RandiRange(25, 35);
+        for (int i = 0; i < strawCount; i++)
+        {
+            float angle = rng.Randf() * Mathf.Tau;
+            float dist = rng.RandfRange(0f, 0.26f) * s;
+            float x = Mathf.Cos(angle) * dist;
+            float z = Mathf.Sin(angle) * dist;
+            // Straw accumulates higher toward center (bowl depression)
+            float heightBase = dist < 0.12f * s ? 0.02f : 0.04f;
+            float y = rng.RandfRange(heightBase, heightBase + 0.08f) * s;
+
+            // Very thin, long straw pieces
+            float strawLen = rng.RandfRange(0.06f, 0.14f) * s;
+            float strawThick = rng.RandfRange(0.004f, 0.008f) * s;
+
+            // Random orientation (straw goes in many directions)
+            float strawAngle = rng.Randf() * Mathf.Tau;
+            float tilt = rng.RandfRange(-0.3f, 0.3f);
+
+            // Alternate between clean and dirty straw colors
+            bool isDirty = rng.Randf() > 0.6f;
+            surfaceTool.SetColor(isDirty ? dirtyStrawColor : strawColor);
+            AddRotatedBoxToSurfaceTool(surfaceTool, new Vector3(x, y, z),
+                new Vector3(strawLen, strawThick, strawThick), strawAngle);
+        }
+
+        // === FABRIC SCRAPS (flat irregular boxes) ===
+        int fabricCount = rng.RandiRange(4, 7);
+        for (int i = 0; i < fabricCount; i++)
+        {
+            float angle = rng.Randf() * Mathf.Tau;
+            float dist = rng.RandfRange(0.05f, 0.22f) * s;
+            float x = Mathf.Cos(angle) * dist;
+            float z = Mathf.Sin(angle) * dist;
+            float y = rng.RandfRange(0.03f, 0.1f) * s;
+
+            // Flat, irregular fabric pieces
+            float fabricW = rng.RandfRange(0.03f, 0.06f) * s;
+            float fabricL = rng.RandfRange(0.04f, 0.08f) * s;
+            float fabricH = rng.RandfRange(0.003f, 0.008f) * s; // Very flat
+
+            float fabricAngle = rng.Randf() * Mathf.Tau;
+
+            // Alternate fabric colors
+            bool isRed = rng.Randf() > 0.5f;
+            surfaceTool.SetColor(isRed ? fabricRedColor : fabricColor);
+            AddRotatedBoxToSurfaceTool(surfaceTool, new Vector3(x, y, z),
+                new Vector3(fabricL, fabricH, fabricW), fabricAngle);
+
+            // Some fabric scraps have frayed edges (tiny boxes around edge)
+            if (rng.Randf() > 0.5f)
+            {
+                for (int f = 0; f < 3; f++)
+                {
+                    float frayX = x + rng.RandfRange(-fabricL/2, fabricL/2);
+                    float frayZ = z + rng.RandfRange(-fabricW/2, fabricW/2);
+                    AddBoxToSurfaceTool(surfaceTool, new Vector3(frayX, y, frayZ),
+                        new Vector3(0.008f * s, 0.002f * s, 0.003f * s));
+                }
+            }
+        }
+
+        // === BONE FRAGMENTS ===
+        int boneCount = rng.RandiRange(3, 6);
+        surfaceTool.SetColor(boneColor);
+        for (int i = 0; i < boneCount; i++)
+        {
+            float angle = rng.Randf() * Mathf.Tau;
+            float dist = rng.RandfRange(0.03f, 0.2f) * s;
+            float x = Mathf.Cos(angle) * dist;
+            float z = Mathf.Sin(angle) * dist;
+            float y = rng.RandfRange(0.02f, 0.07f) * s;
+
+            float boneAngle = rng.Randf() * Mathf.Tau;
+
+            int boneType = rng.RandiRange(0, 2);
+            if (boneType == 0)
+            {
+                // Long bone (like a small femur)
+                float boneLen = rng.RandfRange(0.04f, 0.07f) * s;
+                float boneThick = 0.008f * s;
+                AddRotatedBoxToSurfaceTool(surfaceTool, new Vector3(x, y, z),
+                    new Vector3(boneLen, boneThick, boneThick), boneAngle);
+                // Bone ends (knobs)
+                float endOffset = boneLen / 2f - 0.005f * s;
+                AddBoxToSurfaceTool(surfaceTool, new Vector3(x + Mathf.Cos(boneAngle) * endOffset, y, z + Mathf.Sin(boneAngle) * endOffset),
+                    new Vector3(0.012f * s, 0.012f * s, 0.012f * s));
+                AddBoxToSurfaceTool(surfaceTool, new Vector3(x - Mathf.Cos(boneAngle) * endOffset, y, z - Mathf.Sin(boneAngle) * endOffset),
+                    new Vector3(0.01f * s, 0.01f * s, 0.01f * s));
+            }
+            else if (boneType == 1)
+            {
+                // Rib fragment (curved approximation with 2 angled pieces)
+                float ribLen = 0.025f * s;
+                float ribThick = 0.006f * s;
+                AddRotatedBoxToSurfaceTool(surfaceTool, new Vector3(x, y, z),
+                    new Vector3(ribLen, ribThick, ribThick), boneAngle);
+                AddRotatedBoxToSurfaceTool(surfaceTool, new Vector3(x + 0.02f * s, y + 0.008f * s, z),
+                    new Vector3(ribLen, ribThick, ribThick), boneAngle + 0.4f);
+            }
+            else
+            {
+                // Skull fragment (flat irregular piece)
+                AddBoxToSurfaceTool(surfaceTool, new Vector3(x, y, z),
+                    new Vector3(rng.RandfRange(0.015f, 0.025f) * s, 0.005f * s, rng.RandfRange(0.012f, 0.02f) * s));
+            }
+        }
+
+        // === DROPPINGS (small dark spheres approximated with cubes) ===
+        int droppingCount = rng.RandiRange(8, 14);
+        surfaceTool.SetColor(droppingColor);
+        for (int i = 0; i < droppingCount; i++)
         {
             float angle = rng.Randf() * Mathf.Tau;
             float dist = rng.RandfRange(0f, 0.25f) * s;
             float x = Mathf.Cos(angle) * dist;
             float z = Mathf.Sin(angle) * dist;
-            float y = rng.RandfRange(0.01f, 0.15f) * s;
-            float itemLen = rng.RandfRange(0.05f, 0.12f) * s;
-            float itemW = rng.RandfRange(0.01f, 0.03f) * s;
-            AddBoxToSurfaceTool(surfaceTool, new Vector3(x, y, z), new Vector3(itemLen, itemW, itemW));
+            float y = rng.RandfRange(0.005f, 0.04f) * s;
+
+            // Small oval droppings (slightly elongated cubes)
+            float dropLen = rng.RandfRange(0.006f, 0.012f) * s;
+            float dropW = dropLen * rng.RandfRange(0.5f, 0.7f);
+            AddBoxToSurfaceTool(surfaceTool, new Vector3(x, y, z),
+                new Vector3(dropLen, dropW, dropW));
+        }
+
+        // === SCATTERED DEBRIS on top ===
+        // Small twigs and bits on the surface
+        int debrisCount = rng.RandiRange(6, 10);
+        for (int i = 0; i < debrisCount; i++)
+        {
+            float angle = rng.Randf() * Mathf.Tau;
+            float dist = rng.RandfRange(0.02f, 0.24f) * s;
+            float x = Mathf.Cos(angle) * dist;
+            float z = Mathf.Sin(angle) * dist;
+            float y = rng.RandfRange(0.06f, 0.12f) * s; // On top of nest
+
+            float debrisLen = rng.RandfRange(0.02f, 0.05f) * s;
+            float debrisThick = rng.RandfRange(0.003f, 0.006f) * s;
+            float debrisAngle = rng.Randf() * Mathf.Tau;
+
+            surfaceTool.SetColor(rng.Randf() > 0.5f ? strawColor : dirtyStrawColor);
+            AddRotatedBoxToSurfaceTool(surfaceTool, new Vector3(x, y, z),
+                new Vector3(debrisLen, debrisThick, debrisThick), debrisAngle);
         }
 
         surfaceTool.GenerateNormals();
         var mesh = surfaceTool.Commit();
         var material = new StandardMaterial3D
         {
-            AlbedoColor = new Color(0.4f, 0.35f, 0.28f), // Dirty brown
-            Roughness = 0.95f
+            AlbedoColor = new Color(0.5f, 0.42f, 0.3f), // Base nest color
+            Roughness = 0.95f,
+            VertexColorUseAsAlbedo = true  // Use vertex colors for variety
         };
         mesh.SurfaceSetMaterial(0, material);
         return mesh;
@@ -2955,26 +3455,182 @@ public partial class Cosmetic3D : StaticBody3D
         surfaceTool.Begin(Mesh.PrimitiveType.Triangles);
         float s = PropScale;
 
-        // Gold and silver coins scattered
-        int coins = rng.RandiRange(8, 15);
-        for (int i = 0; i < coins; i++)
+        // === COIN MATERIALS (gold and silver with variation) ===
+        // Note: SurfaceTool uses single material, so we'll use gold as base
+        // and create visual variety through geometry
+
+        // === STACKED COIN PILES (2-4 piles with 3-6 coins each) ===
+        int numPiles = rng.RandiRange(2, 4);
+        for (int pile = 0; pile < numPiles; pile++)
+        {
+            float pileAngle = pile * Mathf.Tau / numPiles + rng.RandfRange(-0.3f, 0.3f);
+            float pileDist = rng.RandfRange(0.08f, 0.18f) * s;
+            float pileX = Mathf.Cos(pileAngle) * pileDist;
+            float pileZ = Mathf.Sin(pileAngle) * pileDist;
+
+            int coinsInPile = rng.RandiRange(3, 6);
+            float baseY = 0.003f * s;
+            float coinThickness = 0.004f * s;
+
+            for (int c = 0; c < coinsInPile; c++)
+            {
+                // Vary coin size (small, medium, large)
+                float coinSize = rng.RandfRange(0.018f, 0.032f) * s;
+                float coinY = baseY + c * coinThickness * 0.9f; // Slight overlap
+
+                // Small offset for each coin in pile (not perfectly aligned)
+                float offsetX = rng.RandfRange(-0.003f, 0.003f) * s;
+                float offsetZ = rng.RandfRange(-0.003f, 0.003f) * s;
+
+                // Coin body (short cylinder approximated as octagonal boxes)
+                AddBoxToSurfaceTool(surfaceTool,
+                    new Vector3(pileX + offsetX, coinY, pileZ + offsetZ),
+                    new Vector3(coinSize * 2f, coinThickness, coinSize * 2f));
+
+                // Embossed face detail on top coins (raised center)
+                if (c == coinsInPile - 1 || rng.Randf() > 0.6f)
+                {
+                    // Center emboss (profile/design)
+                    AddSphereToSurfaceTool(surfaceTool,
+                        new Vector3(pileX + offsetX, coinY + coinThickness * 0.6f, pileZ + offsetZ),
+                        coinSize * 0.4f);
+
+                    // Rim detail (raised edge)
+                    float rimThickness = coinSize * 0.08f;
+                    for (int r = 0; r < 8; r++)
+                    {
+                        float rimAngle = r * Mathf.Tau / 8f;
+                        float rimX = Mathf.Cos(rimAngle) * coinSize * 0.85f;
+                        float rimZ = Mathf.Sin(rimAngle) * coinSize * 0.85f;
+                        AddBoxToSurfaceTool(surfaceTool,
+                            new Vector3(pileX + offsetX + rimX, coinY + coinThickness * 0.55f, pileZ + offsetZ + rimZ),
+                            new Vector3(rimThickness * 2f, coinThickness * 0.3f, rimThickness * 2f));
+                    }
+                }
+            }
+        }
+
+        // === SCATTERED FLAT COINS (individual coins around piles) ===
+        int scatteredCoins = rng.RandiRange(8, 14);
+        for (int i = 0; i < scatteredCoins; i++)
         {
             float angle = rng.Randf() * Mathf.Tau;
-            float dist = rng.RandfRange(0.02f, 0.25f) * s;
+            float dist = rng.RandfRange(0.05f, 0.3f) * s;
             float x = Mathf.Cos(angle) * dist;
             float z = Mathf.Sin(angle) * dist;
-            float coinR = rng.RandfRange(0.02f, 0.035f) * s;
-            // Coin as flat cylinder (simplified as very short box)
-            AddBoxToSurfaceTool(surfaceTool, new Vector3(x, 0.005f * s, z), new Vector3(coinR * 2, 0.005f * s, coinR * 2));
+
+            // Varied coin sizes
+            int sizeType = rng.RandiRange(0, 2);
+            float coinR = sizeType switch
+            {
+                0 => rng.RandfRange(0.015f, 0.02f) * s,  // Small
+                1 => rng.RandfRange(0.022f, 0.028f) * s, // Medium
+                _ => rng.RandfRange(0.03f, 0.038f) * s   // Large
+            };
+            float coinThick = 0.004f * s;
+
+            // Some coins on edge or tilted
+            bool onEdge = rng.Randf() > 0.8f;
+            bool tilted = !onEdge && rng.Randf() > 0.7f;
+
+            if (onEdge)
+            {
+                // Coin standing on edge (rotated 90 degrees)
+                float edgeAngle = rng.Randf() * Mathf.Tau;
+                AddBoxToSurfaceTool(surfaceTool,
+                    new Vector3(x, coinR, z),
+                    new Vector3(coinThick, coinR * 2f, coinR * 2f));
+            }
+            else if (tilted)
+            {
+                // Tilted coin (leaning against something)
+                // Approximate with angled box
+                float tiltHeight = coinR * 0.6f;
+                AddBoxToSurfaceTool(surfaceTool,
+                    new Vector3(x, tiltHeight, z),
+                    new Vector3(coinR * 1.8f, coinThick * 1.5f, coinR * 1.8f));
+                // Add support wedge
+                AddBoxToSurfaceTool(surfaceTool,
+                    new Vector3(x, tiltHeight * 0.3f, z + coinR * 0.3f),
+                    new Vector3(coinR * 0.8f, tiltHeight * 0.5f, coinThick * 2f));
+            }
+            else
+            {
+                // Flat coin
+                AddBoxToSurfaceTool(surfaceTool,
+                    new Vector3(x, coinThick * 0.5f, z),
+                    new Vector3(coinR * 2f, coinThick, coinR * 2f));
+
+                // Embossed detail on some flat coins
+                if (rng.Randf() > 0.5f)
+                {
+                    AddSphereToSurfaceTool(surfaceTool,
+                        new Vector3(x, coinThick * 1.1f, z),
+                        coinR * 0.35f);
+                }
+            }
+        }
+
+        // === GLINTING HIGHLIGHT COINS (special coins with raised detail) ===
+        int glintCoins = rng.RandiRange(2, 4);
+        for (int i = 0; i < glintCoins; i++)
+        {
+            float angle = rng.Randf() * Mathf.Tau;
+            float dist = rng.RandfRange(0.1f, 0.25f) * s;
+            float x = Mathf.Cos(angle) * dist;
+            float z = Mathf.Sin(angle) * dist;
+            float coinR = rng.RandfRange(0.028f, 0.035f) * s;
+            float coinThick = 0.005f * s;
+
+            // Main coin body
+            AddBoxToSurfaceTool(surfaceTool,
+                new Vector3(x, coinThick * 0.5f, z),
+                new Vector3(coinR * 2f, coinThick, coinR * 2f));
+
+            // Prominent embossed face (like a royal seal)
+            AddSphereToSurfaceTool(surfaceTool,
+                new Vector3(x, coinThick * 1.2f, z),
+                coinR * 0.5f);
+
+            // Crown/star detail on top
+            for (int p = 0; p < 5; p++)
+            {
+                float pointAngle = p * Mathf.Tau / 5f;
+                float pointX = Mathf.Cos(pointAngle) * coinR * 0.35f;
+                float pointZ = Mathf.Sin(pointAngle) * coinR * 0.35f;
+                AddBoxToSurfaceTool(surfaceTool,
+                    new Vector3(x + pointX, coinThick * 1.3f, z + pointZ),
+                    new Vector3(coinR * 0.1f, coinThick * 0.4f, coinR * 0.1f));
+            }
+        }
+
+        // === SMALL SCATTERED BITS (broken coin fragments) ===
+        int fragments = rng.RandiRange(3, 6);
+        for (int i = 0; i < fragments; i++)
+        {
+            float angle = rng.Randf() * Mathf.Tau;
+            float dist = rng.RandfRange(0.15f, 0.35f) * s;
+            float x = Mathf.Cos(angle) * dist;
+            float z = Mathf.Sin(angle) * dist;
+            float fragSize = rng.RandfRange(0.006f, 0.012f) * s;
+
+            AddBoxToSurfaceTool(surfaceTool,
+                new Vector3(x, fragSize * 0.5f, z),
+                new Vector3(fragSize * rng.RandfRange(0.8f, 1.5f), fragSize * 0.5f, fragSize * rng.RandfRange(0.8f, 1.5f)));
         }
 
         surfaceTool.GenerateNormals();
         var mesh = surfaceTool.Commit();
+
+        // Gold material with metallic sheen
         var material = new StandardMaterial3D
         {
             AlbedoColor = new Color(0.85f, 0.7f, 0.2f), // Gold
-            Roughness = 0.3f,
-            Metallic = 0.8f
+            Roughness = 0.25f,
+            Metallic = 0.85f,
+            // Add slight emission for glinting effect
+            EmissionEnabled = true,
+            Emission = new Color(0.4f, 0.3f, 0.1f) * 0.15f
         };
         mesh.SurfaceSetMaterial(0, material);
         return mesh;
