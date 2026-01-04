@@ -1105,7 +1105,7 @@ public partial class FPSController : CharacterBody3D
                     {
                         // Use CharacterStats for damage calculation
                         var (damage, isCrit) = Stats.CalculateMeleeDamage();
-                        enemy3D.Call("TakeDamage", (float)damage, GlobalPosition, "Melee");
+                        enemy3D.Call("TakeDamage", (float)damage, GlobalPosition, "Melee", isCrit);
                         hitSomething = true;
 
                         // Record damage dealt in game stats
@@ -1192,7 +1192,7 @@ public partial class FPSController : CharacterBody3D
                 {
                     if (enemy3D.HasMethod("TakeDamage"))
                     {
-                        enemy3D.Call("TakeDamage", (float)strongDamage, GlobalPosition, "StrongMelee");
+                        enemy3D.Call("TakeDamage", (float)strongDamage, GlobalPosition, "StrongMelee", isCrit);
                         hitSomething = true;
 
                         // Record damage dealt in game stats

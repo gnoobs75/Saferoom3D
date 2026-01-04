@@ -30,6 +30,7 @@ public partial class BasicEnemy3D : CharacterBody3D
     public float AggroRange { get; private set; } = 15f;
     public float DeaggroRange { get; private set; } = 25f;
     public float AttackRange { get; private set; } = 2f;
+    public float MinStopDistance { get; private set; } = 3.5f;  // Minimum distance to stop from player
     public float PatrolRadius { get; private set; } = 8f;
     public float PatrolSpeed { get; private set; } = 2f;
 
@@ -358,11 +359,31 @@ public partial class BasicEnemy3D : CharacterBody3D
                 Damage = 6f;
                 AttackRange = 1f;
                 AggroRange = 15f;
+                MinStopDistance = 1.5f;  // Small critter can get close
                 _baseColor = new Color(0.35f, 0.3f, 0.28f); // Rat gray-brown
                 break;
             default:
                 _baseColor = new Color(0.5f, 0.5f, 0.5f);
                 break;
+        }
+
+        // Set MinStopDistance based on attack style - ranged stay back, melee stop at 3.5
+        if (MinStopDistance == 3.5f)  // Still at default, auto-calculate
+        {
+            if (AttackRange >= 6f)
+            {
+                // Ranged attackers - stay at their attack range
+                MinStopDistance = AttackRange - 1f;
+            }
+            else
+            {
+                // Melee - ensure they can attack from stop distance
+                MinStopDistance = 3.5f;
+                if (AttackRange < MinStopDistance)
+                {
+                    AttackRange = MinStopDistance + 0.5f;  // Can attack from stop distance
+                }
+            }
         }
 
         // Apply level scaling
@@ -676,36 +697,75 @@ public partial class BasicEnemy3D : CharacterBody3D
         _healthBarFillMat.Emission = healthColor * 0.3f;
     }
 
-    private void SpawnFloatingDamageText(int damage)
+    private void SpawnFloatingDamageText(int damage, bool isCrit = false)
     {
         // Cache position (may not be in tree)
         var spawnPosition = IsInsideTree() ? GlobalPosition : Position;
 
-        // Create floating damage number
+        // Create floating damage number - start lower on the body (waist level)
         var textContainer = new Node3D();
         GetTree().Root.AddChild(textContainer);
-        // Set position after adding to tree
-        textContainer.GlobalPosition = spawnPosition + new Vector3(0, 2.5f, 0);
+        textContainer.GlobalPosition = spawnPosition + new Vector3(0, 0.8f, 0);  // Lower start position
 
         // Create 3D label
         var label = new Label3D();
-        label.Text = damage.ToString();
-        label.FontSize = 64;
-        label.OutlineSize = 8;
-        label.Modulate = damage >= 20 ? new Color(1f, 0.3f, 0.1f) : new Color(1f, 0.9f, 0.2f);
+        label.Text = isCrit ? $"!{damage}!" : damage.ToString();
+        label.FontSize = isCrit ? 96 : 64;  // Bigger font for crits
+        label.OutlineSize = isCrit ? 12 : 8;
+        label.Modulate = new Color(1f, 0.15f, 0.1f);  // Always red damage
         label.Billboard = BaseMaterial3D.BillboardModeEnum.Enabled;
         label.NoDepthTest = true;
         textContainer.AddChild(label);
 
-        // Random horizontal offset
-        float xOffset = (float)GD.RandRange(-0.5, 0.5);
+        // Crits get extra bold outline color
+        if (isCrit)
+        {
+            label.OutlineModulate = new Color(1f, 0.9f, 0.2f);  // Gold outline for crits
+        }
 
-        // Animate upward and fade
+        // Arc to left or right (rainbow arc pattern)
+        bool goRight = GD.Randf() > 0.5f;
+        float arcDirection = goRight ? 1f : -1f;
+        float arcDistance = (float)GD.RandRange(1.2f, 1.8f);
+
+        // Animation duration
+        float duration = isCrit ? 1.2f : 0.9f;  // Crits stay visible longer
+
+        // Animate in a curved arc path
         var tween = textContainer.CreateTween();
         tween.SetParallel(true);
-        tween.TweenProperty(textContainer, "position:y", textContainer.Position.Y + 1.5f, 0.8f);
-        tween.TweenProperty(textContainer, "position:x", textContainer.Position.X + xOffset, 0.8f);
-        tween.TweenProperty(label, "modulate:a", 0f, 0.8f).SetDelay(0.3f);
+
+        // Vertical: rise up in an arc (higher in middle)
+        float peakHeight = spawnPosition.Y + 2.5f;
+        float endHeight = spawnPosition.Y + 1.8f;
+
+        // Use custom tweener for arc motion
+        tween.TweenMethod(
+            Callable.From((float t) =>
+            {
+                // Parabolic arc for Y position (peaks at 0.5, ends lower)
+                float arcY = -4f * (t - 0.5f) * (t - 0.5f) + 1f;  // Parabola peaking at t=0.5
+                float y = Mathf.Lerp(spawnPosition.Y + 0.8f, endHeight, t) + arcY * 0.8f;
+
+                // Horizontal: curve outward
+                float x = spawnPosition.X + arcDirection * t * arcDistance;
+
+                textContainer.GlobalPosition = new Vector3(x, y, spawnPosition.Z);
+            }),
+            0f, 1f, duration
+        );
+
+        // Scale: crits pulse bigger
+        if (isCrit)
+        {
+            label.Scale = new Vector3(1.3f, 1.3f, 1f);
+            tween.TweenProperty(label, "scale", new Vector3(1f, 1f, 1f), duration * 0.3f);
+        }
+
+        // Fade out at the end
+        tween.TweenProperty(label, "modulate:a", 0f, duration * 0.4f).SetDelay(duration * 0.6f);
+
+        // Cleanup
         tween.Chain().TweenCallback(Callable.From(() => textContainer.QueueFree()));
     }
 
@@ -1826,14 +1886,24 @@ public partial class BasicEnemy3D : CharacterBody3D
             return;
         }
 
-        // Chase player
+        // Chase player - but stop at MinStopDistance so player can see health bar and combat text
         if (_player != null)
         {
             Vector3 direction = (_player.GlobalPosition - GlobalPosition).Normalized();
             direction.Y = 0;
-            float slowMult = EngineOfTomorrow3D.GetGlobalSlowMultiplier();
-            float speed = MoveSpeed * slowMult;
-            Velocity = new Vector3(direction.X * speed, Velocity.Y, direction.Z * speed);
+
+            // Only move if we're further than the minimum stop distance
+            if (dist > MinStopDistance)
+            {
+                float slowMult = EngineOfTomorrow3D.GetGlobalSlowMultiplier();
+                float speed = MoveSpeed * slowMult;
+                Velocity = new Vector3(direction.X * speed, Velocity.Y, direction.Z * speed);
+            }
+            else
+            {
+                // Stop moving but maintain facing
+                Velocity = new Vector3(0, Velocity.Y, 0);
+            }
 
             // Face player - model's face is at +Z, so point +Z toward player
             if (direction.LengthSquared() > 0.01f)
@@ -2270,7 +2340,7 @@ public partial class BasicEnemy3D : CharacterBody3D
         }
     }
 
-    public void TakeDamage(float damage, Vector3 fromPosition, string source = "Unknown")
+    public void TakeDamage(float damage, Vector3 fromPosition, string source = "Unknown", bool isCrit = false)
     {
         if (CurrentState == State.Dead) return;
 
@@ -2298,8 +2368,8 @@ public partial class BasicEnemy3D : CharacterBody3D
         // Update health bar visuals (not billboard - that's updated periodically)
         UpdateHealthBarVisuals();
 
-        // Spawn floating damage text
-        SpawnFloatingDamageText(intDamage);
+        // Spawn floating damage text with crit info
+        SpawnFloatingDamageText(intDamage, isCrit);
 
         // Play monster-specific hit sound
         PlayMonsterSound("hit");

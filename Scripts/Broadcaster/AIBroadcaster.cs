@@ -69,6 +69,7 @@ public partial class AIBroadcaster : Control
     private Queue<QueuedComment> _commentQueue = new();
 
     // Timing configuration
+    [Export] public float StartupDelay = 10f;            // Seconds to wait before first comment (let welcome messages play)
     [Export] public float MinTimeBetweenComments = 8f;   // Minimum seconds between comments
     [Export] public float MaxTimeBetweenComments = 30f;  // Max time before idle comment
     [Export] public float IdleCommentChance = 0.3f;      // Chance of idle comment when max time reached
@@ -127,10 +128,10 @@ public partial class AIBroadcaster : Control
         _ui.MutePressed += OnMutePressed;
         _ui.MinimizePressed += OnMinimizePressed;
 
-        // Start with a greeting
-        CallDeferred(nameof(DelayedGreeting));
+        // Start with a greeting after the startup delay (let welcome messages play first)
+        GetTree().CreateTimer(StartupDelay).Timeout += DelayedGreeting;
 
-        GD.Print("[AIBroadcaster] Initialized - Your snarky companion awaits");
+        GD.Print($"[AIBroadcaster] Initialized - First comment in {StartupDelay}s");
     }
 
     private void DelayedGreeting()
@@ -284,7 +285,11 @@ public partial class AIBroadcaster : Control
 
     private bool ShouldComment(BroadcastEvent evt)
     {
-        // Critical events always get through
+        // During startup delay, don't comment (let welcome messages play)
+        if (_gameTime < StartupDelay)
+            return false;
+
+        // Critical events always get through (after startup delay)
         if (CriticalEvents.Contains(evt))
             return true;
 
