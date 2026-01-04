@@ -1,0 +1,15 @@
+C:\Claude\SafeRoom3D\.godot\mono\temp\obj\Debug\SafeRoom3D.csproj.AssemblyReference.cache
+C:\Claude\SafeRoom3D\.godot\mono\temp\obj\Debug\SafeRoom3D.GeneratedMSBuildEditorConfig.editorconfig
+C:\Claude\SafeRoom3D\.godot\mono\temp\obj\Debug\SafeRoom3D.csproj.CoreCompileInputs.cache
+C:\Claude\SafeRoom3D\.godot\mono\temp\bin\Debug\SafeRoom3D.deps.json
+C:\Claude\SafeRoom3D\.godot\mono\temp\bin\Debug\SafeRoom3D.runtimeconfig.json
+C:\Claude\SafeRoom3D\.godot\mono\temp\bin\Debug\SafeRoom3D.dll
+C:\Claude\SafeRoom3D\.godot\mono\temp\bin\Debug\SafeRoom3D.pdb
+C:\Claude\SafeRoom3D\.godot\mono\temp\bin\Debug\GodotSharp.dll
+C:\Claude\SafeRoom3D\.godot\mono\temp\bin\Debug\GodotSharpEditor.dll
+C:\Claude\SafeRoom3D\.godot\mono\temp\obj\Debug\SafeRoom3D.csproj.Up2Date
+C:\Claude\SafeRoom3D\.godot\mono\temp\obj\Debug\SafeRoom3D.dll
+C:\Claude\SafeRoom3D\.godot\mono\temp\obj\Debug\refint\SafeRoom3D.dll
+C:\Claude\SafeRoom3D\.godot\mono\temp\obj\Debug\SafeRoom3D.pdb
+C:\Claude\SafeRoom3D\.godot\mono\temp\obj\Debug\SafeRoom3D.genruntimeconfig.cache
+C:\Claude\SafeRoom3D\.godot\mono\temp\obj\Debug\ref\SafeRoom3D.dll

@@ -1,0 +1,24 @@
+[remap]
+
+importer="wav"
+type="AudioStreamWAV"
+uid="uid://c8135c8kvil4q"
+path="res://.godot/imported/Impact2.wav-d062e00846f79b444fbbea5d997aa3ac.sample"
+
+[deps]
+
+source_file="res://Assets/NinjaAdventure/Audio/Sounds/Hit & Impact/Impact2.wav"
+dest_files=["res://.godot/imported/Impact2.wav-d062e00846f79b444fbbea5d997aa3ac.sample"]
+
+[params]
+
+force/8_bit=false
+force/mono=false
+force/max_rate=false
+force/max_rate_hz=44100
+edit/trim=false
+edit/normalize=false
+edit/loop_mode=0
+edit/loop_begin=0
+edit/loop_end=-1
+compress/mode=2

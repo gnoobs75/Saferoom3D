@@ -1,0 +1,797 @@
+    /// <summary>
+    /// Creates an enhanced majestic Dragon mesh with LOD support and variation parameters.
+    /// Features serpentine neck chain, articulated wings, segmented tail for animation.
+    /// </summary>
+    /// <param name="parent">Parent node</param>
+    /// <param name="limbs">Limb nodes for animation</param>
+    /// <param name="lodLevel">Level of detail: 0=High (full detail), 1=Medium (simplified), 2=Low (silhouette)</param>
+    /// <param name="scaleColorType">Scale color type: 0=Red, 1=Black, 2=Green, 3=Blue, 4=Gold</param>
+    /// <param name="hornStyle">Horn style: 0=Curved, 1=Straight, 2=Branching</param>
+    /// <param name="wingSpan">Wing span multiplier (0.8-1.5)</param>
+    /// <param name="tailStyle">Tail style: 0=Spade, 1=Spikes, 2=Plain</param>
+    /// <param name="sizeScale">Overall size multiplier (default 1.5x enemy size, 2-3x for bosses)</param>
+    /// <param name="bossPresence">Enable boss-level effects (chest glow, smoke, etc.)</param>
+    private static void CreateDragonMesh(Node3D parent, LimbNodes limbs, int lodLevel = 0,
+        int scaleColorType = 0, int hornStyle = 0, float wingSpan = 1.0f, int tailStyle = 1,
+        float sizeScale = 1.5f, bool bossPresence = false)
+    {
+        // Scale color variations
+        Color scaleColor = scaleColorType switch
+        {
+            1 => new Color(0.15f, 0.15f, 0.18f), // Black dragon
+            2 => new Color(0.2f, 0.5f, 0.15f),   // Green dragon
+            3 => new Color(0.15f, 0.3f, 0.6f),   // Blue dragon
+            4 => new Color(0.8f, 0.65f, 0.2f),   // Gold dragon
+            _ => new Color(0.7f, 0.2f, 0.15f)    // Red dragon (default)
+        };
+
+        Color bellyColor = scaleColorType == 4 ?
+            new Color(0.95f, 0.85f, 0.5f) : // Gold belly for gold dragon
+            new Color(0.9f, 0.7f, 0.4f);
+        Color wingColor = scaleColor.Darkened(0.2f);
+        Color hornColor = scaleColor.Darkened(0.3f);
+        Color clawColor = new Color(0.2f, 0.15f, 0.12f);
+
+        // Glow colors based on scale type
+        Color glowColor = scaleColorType switch
+        {
+            1 => new Color(0.6f, 0.2f, 0.8f),  // Black = purple fire
+            2 => new Color(0.2f, 0.8f, 0.2f),  // Green = poison fire
+            3 => new Color(0.3f, 0.5f, 1.0f),  // Blue = ice/lightning
+            4 => new Color(1.0f, 0.9f, 0.4f),  // Gold = divine fire
+            _ => new Color(1.0f, 0.6f, 0.1f)   // Red = classic fire
+        };
+
+        // Materials
+        var scaleMat = new StandardMaterial3D
+        {
+            AlbedoColor = scaleColor,
+            Roughness = 0.6f,
+            Metallic = scaleColorType == 4 ? 0.5f : 0.2f // Gold is more metallic
+        };
+        var bellyMat = new StandardMaterial3D { AlbedoColor = bellyColor, Roughness = 0.7f };
+        var hornMat = new StandardMaterial3D { AlbedoColor = hornColor, Roughness = 0.5f, Metallic = 0.1f };
+        var clawMat = new StandardMaterial3D { AlbedoColor = clawColor, Roughness = 0.6f };
+        var wingMat = new StandardMaterial3D
+        {
+            AlbedoColor = wingColor,
+            CullMode = BaseMaterial3D.CullModeEnum.Disabled,
+            Transparency = lodLevel == 2 ? BaseMaterial3D.TransparencyEnum.Alpha : BaseMaterial3D.TransparencyEnum.Disabled
+        };
+        var eyeMat = new StandardMaterial3D
+        {
+            AlbedoColor = new Color(1f, 0.8f, 0.2f),
+            EmissionEnabled = true,
+            Emission = glowColor * (bossPresence ? 0.8f : 0.6f)
+        };
+        var pupilMat = new StandardMaterial3D { AlbedoColor = Colors.Black };
+        var toothMat = new StandardMaterial3D { AlbedoColor = new Color(0.95f, 0.93f, 0.85f), Roughness = 0.5f };
+
+        // Chest glow material for boss presence (fire within)
+        var chestGlowMat = new StandardMaterial3D
+        {
+            AlbedoColor = glowColor,
+            EmissionEnabled = true,
+            Emission = glowColor * 1.2f,
+            Transparency = BaseMaterial3D.TransparencyEnum.Alpha
+        };
+
+        float scale = sizeScale; // Default 1.5x, 2-3x for bosses
+
+        // LOD-based mesh quality
+        int bodySegments = lodLevel == 0 ? 24 : (lodLevel == 1 ? 16 : 8);
+        int bodyRings = lodLevel == 0 ? 12 : (lodLevel == 1 ? 8 : 4);
+        int headSegments = lodLevel == 0 ? 28 : (lodLevel == 1 ? 16 : 10);
+        int headRings = lodLevel == 0 ? 20 : (lodLevel == 1 ? 12 : 8);
+        int hornSegments = lodLevel == 0 ? 16 : (lodLevel == 1 ? 10 : 6);
+        int spineCount = lodLevel == 0 ? 8 : (lodLevel == 1 ? 5 : 0);
+        int neckSpineCount = lodLevel == 0 ? 3 : (lodLevel == 1 ? 2 : 0);
+        int wingFingers = lodLevel == 0 ? 4 : (lodLevel == 1 ? 3 : 0);
+        int neckSegments = lodLevel == 0 ? 3 : (lodLevel == 1 ? 2 : 1);
+        int tailSegments = lodLevel == 0 ? 5 : (lodLevel == 1 ? 3 : 1);
+
+        // === BODY ===
+        var body = new MeshInstance3D();
+        var bodyMesh = new CapsuleMesh {
+            Radius = 0.34f * scale,
+            Height = 0.98f * scale,
+            RadialSegments = bodySegments,
+            Rings = bodyRings
+        };
+        body.Mesh = bodyMesh;
+        body.MaterialOverride = scaleMat;
+        body.Position = new Vector3(0, 0.7f * scale, 0);
+        body.RotationDegrees = new Vector3(0, 0, 90);
+        body.Scale = new Vector3(1f, 1f, 1.02f);
+        parent.AddChild(body);
+
+        // Belly - vulnerable underbelly
+        if (lodLevel < 2)
+        {
+            var belly = new MeshInstance3D();
+            var bellyMesh = new CapsuleMesh {
+                Radius = 0.25f * scale,
+                Height = 0.58f * scale,
+                RadialSegments = bodySegments - 4,
+                Rings = bodyRings - 2
+            };
+            belly.Mesh = bellyMesh;
+            belly.MaterialOverride = bellyMat;
+            belly.Position = new Vector3(0, 0.55f * scale, 0.13f * scale);
+            belly.RotationDegrees = new Vector3(0, 0, 90);
+            parent.AddChild(belly);
+
+            // Boss presence: Glowing chest (fire within)
+            if (bossPresence)
+            {
+                var chestGlow = new MeshInstance3D();
+                var glowMesh = new SphereMesh { Radius = 0.12f * scale, Height = 0.24f * scale };
+                chestGlow.Mesh = glowMesh;
+                chestGlow.MaterialOverride = chestGlowMat;
+                chestGlow.Position = new Vector3(0, 0.65f * scale, 0.18f * scale);
+                parent.AddChild(chestGlow);
+
+                // Pulsing light from chest
+                var chestLight = new OmniLight3D();
+                chestLight.LightColor = glowColor;
+                chestLight.LightEnergy = 0.8f;
+                chestLight.OmniRange = 4f * scale;
+                chestLight.Position = new Vector3(0, 0.65f * scale, 0.18f * scale);
+                parent.AddChild(chestLight);
+            }
+        }
+
+        // Back spines - scale ridges
+        if (lodLevel < 2 && spineCount > 0)
+        {
+            var spineMesh = new CylinderMesh {
+                TopRadius = 0.005f * scale,
+                BottomRadius = 0.025f * scale,
+                Height = 0.12f * scale
+            };
+            for (int i = 0; i < spineCount; i++)
+            {
+                var spine = new MeshInstance3D { Mesh = spineMesh, MaterialOverride = hornMat };
+                float zPos = 0.35f - i * 0.11f;
+                spine.Position = new Vector3(0, 0.92f * scale - i * 0.03f * scale, zPos * scale);
+                spine.RotationDegrees = new Vector3(-15 - i * 3, 0, 0);
+                parent.AddChild(spine);
+            }
+        }
+
+        // === SERPENTINE NECK (Animation Chain) ===
+        var neckChain = new Node3D();
+        neckChain.Position = new Vector3(0, 0.95f * scale, 0.3f * scale);
+        parent.AddChild(neckChain);
+
+        Vector3 neckPos = Vector3.Zero;
+        float neckAngle = -25f;
+        Node3D previousNeckSegment = neckChain;
+
+        for (int i = 0; i < neckSegments; i++)
+        {
+            var neckSegNode = new Node3D();
+            neckSegNode.Position = neckPos;
+            neckSegNode.RotationDegrees = new Vector3(neckAngle, 0, 0);
+            previousNeckSegment.AddChild(neckSegNode);
+
+            var neckSeg = new MeshInstance3D();
+            var neckMesh = new CylinderMesh {
+                TopRadius = (0.11f - i * 0.02f) * scale,
+                BottomRadius = (0.17f - i * 0.02f) * scale,
+                Height = 0.22f * scale
+            };
+            neckSeg.Mesh = neckMesh;
+            neckSeg.MaterialOverride = scaleMat;
+            neckSeg.Position = new Vector3(0, 0.11f * scale, 0);
+            neckSegNode.AddChild(neckSeg);
+
+            // Neck spines on each segment
+            if (lodLevel == 0 && neckSpineCount > 0 && i < neckSegments - 1)
+            {
+                var spineMesh = new CylinderMesh {
+                    TopRadius = 0.004f * scale,
+                    BottomRadius = 0.02f * scale,
+                    Height = 0.1f * scale
+                };
+                var neckSpine = new MeshInstance3D { Mesh = spineMesh, MaterialOverride = hornMat };
+                neckSpine.Position = new Vector3(0, 0.16f * scale, -0.03f * scale);
+                neckSpine.RotationDegrees = new Vector3(-15, 0, 0);
+                neckSegNode.AddChild(neckSpine);
+            }
+
+            neckPos = new Vector3(0, 0.22f * scale, 0);
+            neckAngle = -8f + i * 2f;
+            previousNeckSegment = neckSegNode;
+        }
+
+        // === HEAD (Animation Node) ===
+        var headNode = new Node3D();
+        headNode.Position = new Vector3(0, 0.15f * scale, 0);
+        previousNeckSegment.AddChild(headNode);
+        limbs.Head = headNode;
+
+        // Head mesh
+        var head = new MeshInstance3D();
+        var headMesh = new SphereMesh {
+            Radius = 0.18f * scale,
+            Height = 0.36f * scale,
+            RadialSegments = headSegments,
+            Rings = headRings
+        };
+        head.Mesh = headMesh;
+        head.MaterialOverride = scaleMat;
+        head.Scale = new Vector3(0.86f, 0.76f, 1.18f); // Elongated dragon skull
+        headNode.AddChild(head);
+
+        // Head crest (dorsal ridge)
+        if (lodLevel < 2)
+        {
+            var crestMesh = new BoxMesh { Size = new Vector3(0.12f * scale, 0.04f * scale, 0.1f * scale) };
+            var crest = new MeshInstance3D { Mesh = crestMesh, MaterialOverride = scaleMat };
+            crest.Position = new Vector3(0, 0.12f * scale, -0.05f * scale);
+            crest.RotationDegrees = new Vector3(10, 0, 0);
+            headNode.AddChild(crest);
+
+            // Brow ridges
+            var browMesh = new BoxMesh { Size = new Vector3(0.08f * scale, 0.025f * scale, 0.04f * scale) };
+            var leftBrow = new MeshInstance3D { Mesh = browMesh, MaterialOverride = scaleMat };
+            leftBrow.Position = new Vector3(-0.08f * scale, 0.08f * scale, 0.08f * scale);
+            leftBrow.RotationDegrees = new Vector3(0, 0, 15);
+            headNode.AddChild(leftBrow);
+            var rightBrow = new MeshInstance3D { Mesh = browMesh, MaterialOverride = scaleMat };
+            rightBrow.Position = new Vector3(0.08f * scale, 0.08f * scale, 0.08f * scale);
+            rightBrow.RotationDegrees = new Vector3(0, 0, -15);
+            headNode.AddChild(rightBrow);
+        }
+
+        // Long snout
+        var snout = new MeshInstance3D();
+        var snoutMesh = new CylinderMesh {
+            TopRadius = 0.055f * scale,
+            BottomRadius = 0.09f * scale,
+            Height = 0.22f * scale
+        };
+        snout.Mesh = snoutMesh;
+        snout.MaterialOverride = scaleMat;
+        snout.Position = new Vector3(0, -0.02f * scale, 0.18f * scale);
+        snout.RotationDegrees = new Vector3(-72, 0, 0);
+        headNode.AddChild(snout);
+
+        // Nostrils
+        if (lodLevel < 2)
+        {
+            var nostrilMesh = new SphereMesh { Radius = 0.02f * scale, Height = 0.04f * scale };
+            var nostrilMat = new StandardMaterial3D { AlbedoColor = new Color(0.1f, 0.05f, 0.05f) };
+            var leftNostril = new MeshInstance3D { Mesh = nostrilMesh, MaterialOverride = nostrilMat };
+            leftNostril.Position = new Vector3(-0.035f * scale, -0.02f * scale, 0.28f * scale);
+            headNode.AddChild(leftNostril);
+            var rightNostril = new MeshInstance3D { Mesh = nostrilMesh, MaterialOverride = nostrilMat };
+            rightNostril.Position = new Vector3(0.035f * scale, -0.02f * scale, 0.28f * scale);
+            headNode.AddChild(rightNostril);
+
+            // Smoke/ember wisps from nostrils (boss presence)
+            if (bossPresence)
+            {
+                var smokeMat = new StandardMaterial3D
+                {
+                    AlbedoColor = new Color(glowColor.R, glowColor.G, glowColor.B, 0.4f),
+                    EmissionEnabled = true,
+                    Emission = glowColor * 0.5f,
+                    Transparency = BaseMaterial3D.TransparencyEnum.Alpha
+                };
+                var smokeMesh = new SphereMesh { Radius = 0.015f * scale, Height = 0.03f * scale };
+                var smokeLeft = new MeshInstance3D { Mesh = smokeMesh, MaterialOverride = smokeMat };
+                smokeLeft.Position = new Vector3(-0.04f * scale, 0.01f * scale, 0.32f * scale);
+                headNode.AddChild(smokeLeft);
+                var smokeRight = new MeshInstance3D { Mesh = smokeMesh, MaterialOverride = smokeMat };
+                smokeRight.Position = new Vector3(0.04f * scale, 0.01f * scale, 0.32f * scale);
+                headNode.AddChild(smokeRight);
+            }
+        }
+
+        // Jaw (animation-ready for roaring)
+        if (lodLevel < 2)
+        {
+            var jawMesh = new BoxMesh { Size = new Vector3(0.1f * scale, 0.02f * scale, 0.08f * scale) };
+            var upperJaw = new MeshInstance3D { Mesh = jawMesh, MaterialOverride = scaleMat };
+            upperJaw.Position = new Vector3(0, -0.06f * scale, 0.22f * scale);
+            headNode.AddChild(upperJaw);
+
+            var lowerJaw = new MeshInstance3D { Mesh = jawMesh, MaterialOverride = scaleMat };
+            lowerJaw.Position = new Vector3(0, -0.09f * scale, 0.20f * scale);
+            headNode.AddChild(lowerJaw);
+        }
+
+        // Sharp fangs - visible and menacing
+        var fangMesh = new CylinderMesh {
+            TopRadius = 0.004f * scale,
+            BottomRadius = 0.012f * scale,
+            Height = 0.05f * scale
+        };
+        var leftFang = new MeshInstance3D { Mesh = fangMesh, MaterialOverride = toothMat };
+        leftFang.Position = new Vector3(-0.035f * scale, -0.09f * scale, 0.24f * scale);
+        leftFang.RotationDegrees = new Vector3(10, 0, 5);
+        headNode.AddChild(leftFang);
+        var rightFang = new MeshInstance3D { Mesh = fangMesh, MaterialOverride = toothMat };
+        rightFang.Position = new Vector3(0.035f * scale, -0.09f * scale, 0.24f * scale);
+        rightFang.RotationDegrees = new Vector3(10, 0, -5);
+        headNode.AddChild(rightFang);
+
+        // Additional teeth (high LOD only)
+        if (lodLevel == 0)
+        {
+            var smallToothMesh = new CylinderMesh {
+                TopRadius = 0.002f * scale,
+                BottomRadius = 0.006f * scale,
+                Height = 0.025f * scale
+            };
+            for (int t = 0; t < 4; t++)
+            {
+                var tooth = new MeshInstance3D { Mesh = smallToothMesh, MaterialOverride = toothMat };
+                tooth.Position = new Vector3((-0.015f + t * 0.01f) * scale, -0.075f * scale, 0.23f * scale);
+                tooth.RotationDegrees = new Vector3(8, 0, 0);
+                headNode.AddChild(tooth);
+            }
+        }
+
+        // Glowing reptilian eyes with slit pupils
+        var eyeMesh = new SphereMesh {
+            Radius = 0.048f * scale,
+            Height = 0.096f * scale,
+            RadialSegments = 20,
+            Rings = 16
+        };
+        var pupilMesh = new CylinderMesh {
+            TopRadius = 0.009f * scale,
+            BottomRadius = 0.009f * scale,
+            Height = 0.025f * scale,
+            RadialSegments = 12
+        };
+
+        var leftEye = new MeshInstance3D { Mesh = eyeMesh, MaterialOverride = eyeMat };
+        leftEye.Position = new Vector3(-0.095f * scale, 0.05f * scale, 0.1f * scale);
+        leftEye.Scale = new Vector3(0.98f, 1f, 1.02f);
+        headNode.AddChild(leftEye);
+        var leftPupil = new MeshInstance3D { Mesh = pupilMesh, MaterialOverride = pupilMat };
+        leftPupil.Position = new Vector3(-0.095f * scale, 0.05f * scale, 0.145f * scale);
+        leftPupil.RotationDegrees = new Vector3(90, 0, 0);
+        leftPupil.Scale = new Vector3(0.9f, 1f, 3.2f); // Narrow vertical slit
+        headNode.AddChild(leftPupil);
+
+        var rightEye = new MeshInstance3D { Mesh = eyeMesh, MaterialOverride = eyeMat };
+        rightEye.Position = new Vector3(0.09f * scale, 0.05f * scale, 0.1f * scale);
+        rightEye.Scale = new Vector3(1.02f, 1f, 0.98f);
+        headNode.AddChild(rightEye);
+        var rightPupil = new MeshInstance3D { Mesh = pupilMesh, MaterialOverride = pupilMat };
+        rightPupil.Position = new Vector3(0.09f * scale, 0.05f * scale, 0.145f * scale);
+        rightPupil.RotationDegrees = new Vector3(90, 0, 0);
+        rightPupil.Scale = new Vector3(1.1f, 1f, 3.2f);
+        headNode.AddChild(rightPupil);
+
+        // === HORNS (Style Variations) ===
+        if (lodLevel < 2)
+        {
+            switch (hornStyle)
+            {
+                case 0: // Curved (default)
+                    {
+                        var hornMesh = new CylinderMesh {
+                            TopRadius = 0.008f * scale,
+                            BottomRadius = 0.042f * scale,
+                            Height = 0.24f * scale,
+                            RadialSegments = hornSegments,
+                            Rings = 8
+                        };
+                        var leftHorn = new MeshInstance3D { Mesh = hornMesh, MaterialOverride = hornMat };
+                        leftHorn.Position = new Vector3(-0.1f * scale, 0.15f * scale, -0.04f * scale);
+                        leftHorn.RotationDegrees = new Vector3(28, 18, -28);
+                        leftHorn.Scale = new Vector3(1.05f, 1f, 0.98f);
+                        headNode.AddChild(leftHorn);
+
+                        var rightHorn = new MeshInstance3D { Mesh = hornMesh, MaterialOverride = hornMat };
+                        rightHorn.Position = new Vector3(0.1f * scale, 0.15f * scale, -0.04f * scale);
+                        rightHorn.RotationDegrees = new Vector3(25, -15, 25);
+                        rightHorn.Scale = new Vector3(0.98f, 1f, 1.02f);
+                        headNode.AddChild(rightHorn);
+
+                        // Secondary horns
+                        var smallHornMesh = new CylinderMesh {
+                            TopRadius = 0.004f * scale,
+                            BottomRadius = 0.022f * scale,
+                            Height = 0.12f * scale,
+                            RadialSegments = hornSegments - 4,
+                            Rings = 5
+                        };
+                        var leftSmallHorn = new MeshInstance3D { Mesh = smallHornMesh, MaterialOverride = hornMat };
+                        leftSmallHorn.Position = new Vector3(-0.13f * scale, 0.06f * scale, -0.02f * scale);
+                        leftSmallHorn.RotationDegrees = new Vector3(42, 22, -42);
+                        headNode.AddChild(leftSmallHorn);
+                        var rightSmallHorn = new MeshInstance3D { Mesh = smallHornMesh, MaterialOverride = hornMat };
+                        rightSmallHorn.Position = new Vector3(0.12f * scale, 0.06f * scale, -0.02f * scale);
+                        rightSmallHorn.RotationDegrees = new Vector3(38, -18, 38);
+                        headNode.AddChild(rightSmallHorn);
+                    }
+                    break;
+
+                case 1: // Straight (forward-pointing)
+                    {
+                        var hornMesh = new CylinderMesh {
+                            TopRadius = 0.005f * scale,
+                            BottomRadius = 0.04f * scale,
+                            Height = 0.28f * scale,
+                            RadialSegments = hornSegments,
+                            Rings = 6
+                        };
+                        var leftHorn = new MeshInstance3D { Mesh = hornMesh, MaterialOverride = hornMat };
+                        leftHorn.Position = new Vector3(-0.09f * scale, 0.14f * scale, -0.03f * scale);
+                        leftHorn.RotationDegrees = new Vector3(-12, 5, -8);
+                        headNode.AddChild(leftHorn);
+
+                        var rightHorn = new MeshInstance3D { Mesh = hornMesh, MaterialOverride = hornMat };
+                        rightHorn.Position = new Vector3(0.09f * scale, 0.14f * scale, -0.03f * scale);
+                        rightHorn.RotationDegrees = new Vector3(-12, -5, 8);
+                        headNode.AddChild(rightHorn);
+                    }
+                    break;
+
+                case 2: // Branching (antler-like)
+                    {
+                        var mainHornMesh = new CylinderMesh {
+                            TopRadius = 0.012f * scale,
+                            BottomRadius = 0.04f * scale,
+                            Height = 0.2f * scale,
+                            RadialSegments = hornSegments,
+                            Rings = 5
+                        };
+                        var branchMesh = new CylinderMesh {
+                            TopRadius = 0.004f * scale,
+                            BottomRadius = 0.015f * scale,
+                            Height = 0.1f * scale,
+                            RadialSegments = hornSegments - 4
+                        };
+
+                        // Left main horn
+                        var leftMainHorn = new MeshInstance3D { Mesh = mainHornMesh, MaterialOverride = hornMat };
+                        leftMainHorn.Position = new Vector3(-0.1f * scale, 0.15f * scale, -0.04f * scale);
+                        leftMainHorn.RotationDegrees = new Vector3(20, 10, -20);
+                        headNode.AddChild(leftMainHorn);
+
+                        // Left branches
+                        var leftBranch1 = new MeshInstance3D { Mesh = branchMesh, MaterialOverride = hornMat };
+                        leftBranch1.Position = new Vector3(-0.12f * scale, 0.24f * scale, -0.08f * scale);
+                        leftBranch1.RotationDegrees = new Vector3(35, 15, -35);
+                        headNode.AddChild(leftBranch1);
+                        var leftBranch2 = new MeshInstance3D { Mesh = branchMesh, MaterialOverride = hornMat };
+                        leftBranch2.Position = new Vector3(-0.14f * scale, 0.28f * scale, -0.06f * scale);
+                        leftBranch2.RotationDegrees = new Vector3(15, 20, -45);
+                        headNode.AddChild(leftBranch2);
+
+                        // Right main horn
+                        var rightMainHorn = new MeshInstance3D { Mesh = mainHornMesh, MaterialOverride = hornMat };
+                        rightMainHorn.Position = new Vector3(0.1f * scale, 0.15f * scale, -0.04f * scale);
+                        rightMainHorn.RotationDegrees = new Vector3(20, -10, 20);
+                        headNode.AddChild(rightMainHorn);
+
+                        // Right branches
+                        var rightBranch1 = new MeshInstance3D { Mesh = branchMesh, MaterialOverride = hornMat };
+                        rightBranch1.Position = new Vector3(0.12f * scale, 0.24f * scale, -0.08f * scale);
+                        rightBranch1.RotationDegrees = new Vector3(35, -15, 35);
+                        headNode.AddChild(rightBranch1);
+                        var rightBranch2 = new MeshInstance3D { Mesh = branchMesh, MaterialOverride = hornMat };
+                        rightBranch2.Position = new Vector3(0.14f * scale, 0.28f * scale, -0.06f * scale);
+                        rightBranch2.RotationDegrees = new Vector3(15, -20, 45);
+                        headNode.AddChild(rightBranch2);
+                    }
+                    break;
+            }
+        }
+
+        // === MASSIVE WINGS (Animation-Ready with Fingers) ===
+        float wingScale = wingSpan;
+
+        // Left Wing
+        var leftWing = new Node3D();
+        leftWing.Position = new Vector3(-0.33f * scale, 0.88f * scale, -0.1f * scale);
+        parent.AddChild(leftWing);
+        limbs.LeftArm = leftWing;
+
+        if (lodLevel < 2)
+        {
+            // Wing arm bone
+            var wingBoneMesh = new CylinderMesh {
+                TopRadius = 0.02f * scale,
+                BottomRadius = 0.03f * scale,
+                Height = 0.25f * scale * wingScale
+            };
+            var leftWingArm = new MeshInstance3D { Mesh = wingBoneMesh, MaterialOverride = scaleMat };
+            leftWingArm.Position = new Vector3(-0.12f * scale * wingScale, 0, 0);
+            leftWingArm.RotationDegrees = new Vector3(0, 0, 60);
+            leftWing.AddChild(leftWingArm);
+
+            // Wing fingers (bat-like structure)
+            if (wingFingers > 0)
+            {
+                var fingerMesh = new CylinderMesh {
+                    TopRadius = 0.008f * scale,
+                    BottomRadius = 0.015f * scale,
+                    Height = 0.35f * scale * wingScale
+                };
+                for (int f = 0; f < wingFingers; f++)
+                {
+                    var finger = new MeshInstance3D { Mesh = fingerMesh, MaterialOverride = scaleMat };
+                    finger.Position = new Vector3(
+                        (-0.28f - f * 0.08f) * scale * wingScale,
+                        0.02f * scale,
+                        (-0.05f + f * 0.08f) * scale
+                    );
+                    finger.RotationDegrees = new Vector3(0, -10 + f * 12, 70);
+                    leftWing.AddChild(finger);
+                }
+            }
+        }
+
+        // Wing membrane
+        var wingBoxMesh = new BoxMesh {
+            Size = new Vector3(0.55f * scale * wingScale, 0.015f * scale, 0.38f * scale)
+        };
+        var leftWingMesh = new MeshInstance3D { Mesh = wingBoxMesh, MaterialOverride = wingMat };
+        leftWingMesh.Position = new Vector3(-0.32f * scale * wingScale, 0, 0);
+        leftWingMesh.RotationDegrees = new Vector3(0, 0, 28);
+        leftWing.AddChild(leftWingMesh);
+
+        // Right Wing
+        var rightWing = new Node3D();
+        rightWing.Position = new Vector3(0.33f * scale, 0.88f * scale, -0.1f * scale);
+        parent.AddChild(rightWing);
+        limbs.RightArm = rightWing;
+
+        if (lodLevel < 2)
+        {
+            var rightWingArm = new MeshInstance3D {
+                Mesh = new CylinderMesh {
+                    TopRadius = 0.02f * scale,
+                    BottomRadius = 0.03f * scale,
+                    Height = 0.25f * scale * wingScale
+                },
+                MaterialOverride = scaleMat
+            };
+            rightWingArm.Position = new Vector3(0.12f * scale * wingScale, 0, 0);
+            rightWingArm.RotationDegrees = new Vector3(0, 0, -60);
+            rightWing.AddChild(rightWingArm);
+
+            if (wingFingers > 0)
+            {
+                var fingerMesh = new CylinderMesh {
+                    TopRadius = 0.008f * scale,
+                    BottomRadius = 0.015f * scale,
+                    Height = 0.35f * scale * wingScale
+                };
+                for (int f = 0; f < wingFingers; f++)
+                {
+                    var finger = new MeshInstance3D { Mesh = fingerMesh, MaterialOverride = scaleMat };
+                    finger.Position = new Vector3(
+                        (0.28f + f * 0.08f) * scale * wingScale,
+                        0.02f * scale,
+                        (-0.05f + f * 0.08f) * scale
+                    );
+                    finger.RotationDegrees = new Vector3(0, 10 - f * 12, -70);
+                    rightWing.AddChild(finger);
+                }
+            }
+        }
+
+        var rightWingMesh = new MeshInstance3D { Mesh = wingBoxMesh, MaterialOverride = wingMat };
+        rightWingMesh.Position = new Vector3(0.32f * scale * wingScale, 0, 0);
+        rightWingMesh.RotationDegrees = new Vector3(0, 0, -28);
+        rightWing.AddChild(rightWingMesh);
+
+        // === POWERFUL LEGS (All Four Separate) ===
+        CreateDragonLeg(parent, limbs, scaleMat, clawMat, scale, true, lodLevel);  // Front left
+        CreateDragonLeg(parent, limbs, scaleMat, clawMat, scale, false, lodLevel); // Front right
+
+        // Rear legs (slightly back and smaller)
+        if (lodLevel < 2)
+        {
+            var rearLeftLeg = new Node3D();
+            rearLeftLeg.Position = new Vector3(-0.22f * scale, 0.28f * scale, -0.25f * scale);
+            parent.AddChild(rearLeftLeg);
+
+            var rearLegMesh = new CylinderMesh {
+                TopRadius = 0.07f * scale,
+                BottomRadius = 0.055f * scale,
+                Height = 0.25f * scale
+            };
+            var rearLeftUpper = new MeshInstance3D { Mesh = rearLegMesh, MaterialOverride = scaleMat };
+            rearLeftUpper.Position = new Vector3(0, -0.12f * scale, 0);
+            rearLeftLeg.AddChild(rearLeftUpper);
+
+            var footMesh = new BoxMesh { Size = new Vector3(0.09f * scale, 0.03f * scale, 0.13f * scale) };
+            var rearLeftFoot = new MeshInstance3D { Mesh = footMesh, MaterialOverride = scaleMat };
+            rearLeftFoot.Position = new Vector3(0, -0.26f * scale, 0.04f * scale);
+            rearLeftLeg.AddChild(rearLeftFoot);
+
+            // Rear claws
+            var clawMesh = new CylinderMesh {
+                TopRadius = 0.003f * scale,
+                BottomRadius = 0.012f * scale,
+                Height = 0.05f * scale
+            };
+            for (int c = 0; c < 3; c++)
+            {
+                var claw = new MeshInstance3D { Mesh = clawMesh, MaterialOverride = clawMat };
+                claw.Position = new Vector3((-0.03f + c * 0.03f) * scale, -0.28f * scale, 0.11f * scale);
+                claw.RotationDegrees = new Vector3(-55, 0, -8 + c * 8);
+                rearLeftLeg.AddChild(claw);
+            }
+
+            // Rear right leg (mirrored)
+            var rearRightLeg = new Node3D();
+            rearRightLeg.Position = new Vector3(0.22f * scale, 0.28f * scale, -0.25f * scale);
+            parent.AddChild(rearRightLeg);
+
+            var rearRightUpper = new MeshInstance3D { Mesh = rearLegMesh, MaterialOverride = scaleMat };
+            rearRightUpper.Position = new Vector3(0, -0.12f * scale, 0);
+            rearRightLeg.AddChild(rearRightUpper);
+
+            var rearRightFoot = new MeshInstance3D { Mesh = footMesh, MaterialOverride = scaleMat };
+            rearRightFoot.Position = new Vector3(0, -0.26f * scale, 0.04f * scale);
+            rearRightLeg.AddChild(rearRightFoot);
+
+            for (int c = 0; c < 3; c++)
+            {
+                var claw = new MeshInstance3D { Mesh = clawMesh, MaterialOverride = clawMat };
+                claw.Position = new Vector3((-0.03f + c * 0.03f) * scale, -0.28f * scale, 0.11f * scale);
+                claw.RotationDegrees = new Vector3(-55, 0, -8 + c * 8);
+                rearRightLeg.AddChild(claw);
+            }
+        }
+
+        // === LONG TAIL (Segmented Chain for Animation) ===
+        var tailChain = new Node3D();
+        tailChain.Position = new Vector3(0, 0.55f * scale, -0.4f * scale);
+        tailChain.RotationDegrees = new Vector3(-55, 0, 0);
+        parent.AddChild(tailChain);
+
+        Node3D previousTailSegment = tailChain;
+        float tailRadius = 0.12f;
+
+        for (int i = 0; i < tailSegments; i++)
+        {
+            var tailSegNode = new Node3D();
+            tailSegNode.Position = new Vector3(0, -0.18f * scale, 0);
+            tailSegNode.RotationDegrees = new Vector3(-5 + i * 2, 0, 0);
+            previousTailSegment.AddChild(tailSegNode);
+
+            float topRadius = (tailRadius * 0.3f - i * 0.015f) * scale;
+            float bottomRadius = (tailRadius - i * 0.015f) * scale;
+            var tailSegMesh = new CylinderMesh {
+                TopRadius = topRadius,
+                BottomRadius = bottomRadius,
+                Height = 0.2f * scale
+            };
+
+            var tailSeg = new MeshInstance3D { Mesh = tailSegMesh, MaterialOverride = scaleMat };
+            tailSeg.Position = new Vector3(0, -0.1f * scale, 0);
+            tailSegNode.AddChild(tailSeg);
+
+            // Tail spines (style variation)
+            if (lodLevel == 0 && tailStyle == 1 && i < tailSegments - 1) // Spikes style
+            {
+                var tailSpineMesh = new CylinderMesh {
+                    TopRadius = 0.004f * scale,
+                    BottomRadius = 0.018f * scale,
+                    Height = 0.08f * scale
+                };
+                var tailSpine = new MeshInstance3D { Mesh = tailSpineMesh, MaterialOverride = hornMat };
+                tailSpine.Position = new Vector3(0, -0.05f * scale, -bottomRadius * 0.8f);
+                tailSpine.RotationDegrees = new Vector3(-25, 0, 0);
+                tailSegNode.AddChild(tailSpine);
+            }
+
+            previousTailSegment = tailSegNode;
+            tailRadius -= 0.02f;
+        }
+
+        // Tail end (style variation)
+        switch (tailStyle)
+        {
+            case 0: // Spade
+                {
+                    var spadeMesh = new BoxMesh { Size = new Vector3(0.15f * scale, 0.02f * scale, 0.12f * scale) };
+                    var spade = new MeshInstance3D { Mesh = spadeMesh, MaterialOverride = scaleMat };
+                    spade.Position = new Vector3(0, -0.15f * scale, 0);
+                    spade.Scale = new Vector3(1f, 1f, 1.5f);
+                    previousTailSegment.AddChild(spade);
+                }
+                break;
+
+            case 1: // Large spike
+                {
+                    var tailSpikeMesh = new CylinderMesh {
+                        TopRadius = 0.003f * scale,
+                        BottomRadius = 0.025f * scale,
+                        Height = 0.1f * scale
+                    };
+                    var tailSpike = new MeshInstance3D { Mesh = tailSpikeMesh, MaterialOverride = hornMat };
+                    tailSpike.Position = new Vector3(0, -0.12f * scale, 0);
+                    tailSpike.RotationDegrees = new Vector3(-15, 0, 0);
+                    previousTailSegment.AddChild(tailSpike);
+                }
+                break;
+
+            case 2: // Plain tapered end (already created by segments)
+                break;
+        }
+    }
+
+    private static void CreateDragonLeg(Node3D parent, LimbNodes limbs, StandardMaterial3D scaleMat,
+        StandardMaterial3D clawMat, float scale, bool isLeft, int lodLevel = 0)
+    {
+        float side = isLeft ? -1 : 1;
+
+        var legNode = new Node3D();
+        legNode.Position = new Vector3(side * 0.24f * scale, 0.32f * scale, 0.05f * scale);
+        parent.AddChild(legNode);
+
+        if (isLeft) limbs.LeftLeg = legNode;
+        else limbs.RightLeg = legNode;
+
+        int legSegments = lodLevel == 0 ? 12 : (lodLevel == 1 ? 8 : 6);
+
+        // Upper leg (thigh)
+        var upperLegMesh = new CylinderMesh {
+            TopRadius = 0.08f * scale,
+            BottomRadius = 0.065f * scale,
+            Height = 0.2f * scale,
+            RadialSegments = legSegments
+        };
+        var upperLeg = new MeshInstance3D { Mesh = upperLegMesh, MaterialOverride = scaleMat };
+        upperLeg.Position = new Vector3(0, -0.08f * scale, 0);
+        legNode.AddChild(upperLeg);
+
+        // Lower leg (shin)
+        var lowerLegMesh = new CylinderMesh {
+            TopRadius = 0.06f * scale,
+            BottomRadius = 0.05f * scale,
+            Height = 0.18f * scale,
+            RadialSegments = legSegments
+        };
+        var lowerLeg = new MeshInstance3D { Mesh = lowerLegMesh, MaterialOverride = scaleMat };
+        lowerLeg.Position = new Vector3(0, -0.22f * scale, 0);
+        legNode.AddChild(lowerLeg);
+
+        // Foot
+        var footMesh = new BoxMesh { Size = new Vector3(0.1f * scale, 0.035f * scale, 0.15f * scale) };
+        var foot = new MeshInstance3D { Mesh = footMesh, MaterialOverride = scaleMat };
+        foot.Position = new Vector3(0, -0.32f * scale, 0.04f * scale);
+        legNode.AddChild(foot);
+
+        // Sharp claws
+        var clawMesh = new CylinderMesh {
+            TopRadius = 0.003f * scale,
+            BottomRadius = 0.012f * scale,
+            Height = 0.05f * scale
+        };
+        for (int c = 0; c < 3; c++)
+        {
+            var claw = new MeshInstance3D { Mesh = clawMesh, MaterialOverride = clawMat };
+            claw.Position = new Vector3((-0.03f + c * 0.03f) * scale, -0.34f * scale, 0.12f * scale);
+            claw.RotationDegrees = new Vector3(-55, 0, -8 + c * 8);
+            legNode.AddChild(claw);
+        }
+
+        // Knee spike (high LOD only)
+        if (lodLevel == 0)
+        {
+            var kneeSpikeMesh = new CylinderMesh {
+                TopRadius = 0.004f * scale,
+                BottomRadius = 0.015f * scale,
+                Height = 0.06f * scale
+            };
+            var kneeSpike = new MeshInstance3D { Mesh = kneeSpikeMesh, MaterialOverride = scaleMat };
+            kneeSpike.Position = new Vector3(side * 0.04f * scale, -0.16f * scale, -0.02f * scale);
+            kneeSpike.RotationDegrees = new Vector3(0, 0, side * 45);
+            legNode.AddChild(kneeSpike);
+        }
+    }

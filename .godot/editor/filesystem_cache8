@@ -1,0 +1,461 @@
+ea4bc82a6ad023ab7ee23ee620429895
+::res://::1767487651
+CLAUDE3D.md::TextFile::-1::1767047546::0::1::::<><>::
+CLAUDE.md::TextFile::-1::1767481732::0::1::::<><>::
+DragonMeshEnhanced.txt::TextFile::-1::1767254378::0::1::::<><>::
+DUNGEON_PROPS_ENHANCEMENT_GUIDE.md::TextFile::-1::1767118346::0::1::::<><>::
+ENHANCEMENT_SUMMARY.md::TextFile::-1::1767118584::0::1::::<><>::
+icon.svg::CompressedTexture2D::4665770519263600290::1766902950::1767251209::1::::<><>::
+PROPS_ENHANCEMENT_COMPLETE.md::TextFile::-1::1767118470::0::1::::<><>::
+PROP_VISUAL_REFERENCE.md::TextFile::-1::1767118676::0::1::::<><>::
+::res://Assets/::1767251139
+::res://Assets/Audio/::1767251139
+::res://Assets/Audio/Music/::1767251209
+Trap Drum Loop-01.ogg::AudioStreamOggVorbis::1433480373182519560::1766032186::1767251208::1::::<><>::
+Trap Drum Loop-02.ogg::AudioStreamOggVorbis::3522384351537078612::1766032186::1767251208::1::::<><>::
+Trap Drum Loop-03.ogg::AudioStreamOggVorbis::584820506476562295::1766032186::1767251208::1::::<><>::
+Trap Drum Loop-04.ogg::AudioStreamOggVorbis::2946466661416984740::1766032186::1767251208::1::::<><>::
+Trap Drum Loop-05.ogg::AudioStreamOggVorbis::1772497390341922390::1766032186::1767251208::1::::<><>::
+Trap Drum Loop-06.ogg::AudioStreamOggVorbis::5597157600579976285::1766032186::1767251208::1::::<><>::
+Trap Drum Loop-07.ogg::AudioStreamOggVorbis::5029717620377966368::1766032186::1767251208::1::::<><>::
+Trap Drum Loop-08.ogg::AudioStreamOggVorbis::1496293083844123500::1766032186::1767251208::1::::<><>::
+Trap Drum Loop-09.ogg::AudioStreamOggVorbis::2020814583983839919::1766032186::1767251208::1::::<><>::
+Trap Drum Loop-10.ogg::AudioStreamOggVorbis::9099547818850855088::1766032186::1767251208::1::::<><>::
+Trap Drum Loop-11.ogg::AudioStreamOggVorbis::4255858347918966213::1766032186::1767251208::1::::<><>::
+Trap Drum Loop-12.ogg::AudioStreamOggVorbis::6247293557911794701::1766032186::1767251208::1::::<><>::
+Trap Drum Loop-13.ogg::AudioStreamOggVorbis::7331340617211487887::1766032186::1767251208::1::::<><>::
+Trap Drum Loop-14.ogg::AudioStreamOggVorbis::8667846154532474321::1766032186::1767251208::1::::<><>::
+Trap Drum Loop-15.ogg::AudioStreamOggVorbis::1738995191795034406::1766032186::1767251208::1::::<><>::
+Trap Drum Loop-16.ogg::AudioStreamOggVorbis::484835083800492028::1766032186::1767251208::1::::<><>::
+Trap Drum Loop-17.ogg::AudioStreamOggVorbis::5465943807621880482::1766032186::1767251208::1::::<><>::
+Trap Drum Loop-18.ogg::AudioStreamOggVorbis::663707649579757419::1766032186::1767251208::1::::<><>::
+Trap Drum Loop-19.ogg::AudioStreamOggVorbis::6142760737035087871::1766032186::1767251208::1::::<><>::
+Trap Drum Loop-20.ogg::AudioStreamOggVorbis::7912904714831545435::1766032186::1767251208::1::::<><>::
+Trap Drum Loop-21.ogg::AudioStreamOggVorbis::6831284266438054644::1766032186::1767251209::1::::<><>::
+Trap Drum Loop-22.ogg::AudioStreamOggVorbis::7794363793525377625::1766032186::1767251209::1::::<><>::
+Trap Drum Loop-23.ogg::AudioStreamOggVorbis::8625536841788090094::1766032186::1767251209::1::::<><>::
+Trap Drum Loop-24.ogg::AudioStreamOggVorbis::4901501940810878257::1766032186::1767251209::1::::<><>::
+Trap Drum Loop-25.ogg::AudioStreamOggVorbis::7138095853195390283::1766032186::1767251209::1::::<><>::
+Trap Drum Loop-26.ogg::AudioStreamOggVorbis::4846116381372409902::1766032186::1767251209::1::::<><>::
+Trap Drum Loop-27.ogg::AudioStreamOggVorbis::1403107379934062386::1766032186::1767251209::1::::<><>::
+Trap Drum Loop-28.ogg::AudioStreamOggVorbis::7719781252359260606::1766032186::1767251209::1::::<><>::
+Trap Drum Loop-29.ogg::AudioStreamOggVorbis::2433082608326032905::1766032188::1767251209::1::::<><>::
+Trap Drum Loop-30.ogg::AudioStreamOggVorbis::3547155765283274172::1766032188::1767251209::1::::<><>::
+Trap Drum Loop-31.ogg::AudioStreamOggVorbis::8518076217855683801::1766032188::1767251209::1::::<><>::
+Trap Drum Loop-32.ogg::AudioStreamOggVorbis::417461511570899866::1766032188::1767251209::1::::<><>::
+Trap Drum Loop-33.ogg::AudioStreamOggVorbis::1414790575894684119::1766032188::1767251209::1::::<><>::
+Trap Drum Loop-34.ogg::AudioStreamOggVorbis::5390527990494606843::1766032188::1767251209::1::::<><>::
+Trap Drum Loop-35.ogg::AudioStreamOggVorbis::603051760723444892::1766032188::1767251209::1::::<><>::
+Trap Drum Loop-36.ogg::AudioStreamOggVorbis::5867669706885403843::1766032188::1767251209::1::::<><>::
+Trap Drum Loop-37.ogg::AudioStreamOggVorbis::8707932629806073476::1766032188::1767251209::1::::<><>::
+Trap Drum Loop-38.ogg::AudioStreamOggVorbis::5652967186765303394::1766032188::1767251209::1::::<><>::
+Trap Drum Loop-39.ogg::AudioStreamOggVorbis::4781769227657567462::1766032188::1767251209::1::::<><>::
+Trap Drum Loop-40.ogg::AudioStreamOggVorbis::4891112882771806767::1766032188::1767251208::1::::<><>::
+Trap Drum Loop-41.ogg::AudioStreamOggVorbis::5501975433504463730::1766032188::1767251208::1::::<><>::
+Trap Drum Loop-42.ogg::AudioStreamOggVorbis::2237865107500062435::1766032188::1767251208::1::::<><>::
+Trap Drum Loop-43.ogg::AudioStreamOggVorbis::8222443188798167566::1766032188::1767251208::1::::<><>::
+Trap Drum Loop-44.ogg::AudioStreamOggVorbis::7549416022735787229::1766032188::1767251208::1::::<><>::
+Trap Drum Loop-45.ogg::AudioStreamOggVorbis::756125909927300149::1766032188::1767251208::1::::<><>::
+Trap Drum Loop-46.ogg::AudioStreamOggVorbis::8939794838682800709::1766032188::1767251208::1::::<><>::
+Trap Drum Loop-47.ogg::AudioStreamOggVorbis::5281393529118708804::1766032188::1767251208::1::::<><>::
+Trap Drum Loop-48.ogg::AudioStreamOggVorbis::6211208877989348933::1766032188::1767251208::1::::<><>::
+Trap Drum Loop-49.ogg::AudioStreamOggVorbis::692000855552549001::1766032188::1767251208::1::::<><>::
+::res://Assets/Audio/Sounds/::1767251139
+::res://Assets/Audio/Sounds/Events/::1767251208
+ai_aw_isnt_that_sweet.mp3::AudioStreamMP3::2770325512090540116::1767083918::1767251208::1::::<><>::
+ai_by_the_gods.mp3::AudioStreamMP3::3472262847647994572::1767084314::1767251208::1::::<><>::
+ai_congratulations.mp3::AudioStreamMP3::7687755445446306846::1767083858::1767251208::1::::<><>::
+ai_dude.mp3::AudioStreamMP3::7992039232017655127::1767083962::1767251208::1::::<><>::
+ai_good_luck_with_that_van_damme.mp3::AudioStreamMP3::2177001897112541599::1767083974::1767251208::1::::<><>::
+ai_guild_master_mordecai.mp3::AudioStreamMP3::5008013958249992695::1767084172::1767251208::1::::<><>::
+ai_holy_crap_dude.mp3::AudioStreamMP3::8089777333786778::1767084196::1767251208::1::::<><>::
+ai_new_achievement.mp3::AudioStreamMP3::1291543520814535909::1767083944::1767251208::1::::<><>::
+ai_potophilia.mp3::AudioStreamMP3::8056324461230823068::1767084208::1767251208::1::::<><>::
+ai_reward.mp3::AudioStreamMP3::3443569477011636738::1767083908::1767251208::1::::<><>::
+ai_seriously.mp3::AudioStreamMP3::5747248391382987706::1767083968::1767251208::1::::<><>::
+ai_sucker.mp3::AudioStreamMP3::2142464236809655368::1767083952::1767251208::1::::<><>::
+ai_thats_kind_of_fucked_up.mp3::AudioStreamMP3::7756802192565005760::1767084200::1767251208::1::::<><>::
+ai_this_is_a_safe_zone.mp3::AudioStreamMP3::118244504533983718::1767084110::1767251208::1::::<><>::
+ai_warning.mp3::AudioStreamMP3::8154500460833619142::1767084118::1767251208::1::::<><>::
+ai_welcome_crawler.mp3::AudioStreamMP3::3627804097338169527::1767083816::1767251208::1::::<><>::
+ai_youve_killed_a_mob_youre_a_murderer.mp3::AudioStreamMP3::4252276552163240318::1767084190::1767251208::1::::<><>::
+ai_youve_received_a_bronze_pet_box.mp3::AudioStreamMP3::1612259688695113444::1767083934::1767251208::1::::<><>::
+ai_you_are_so_dead.mp3::AudioStreamMP3::7320146370417915925::1767083982::1767251208::1::::<><>::
+ai_you_monster.mp3::AudioStreamMP3::8280809539672689729::1767084334::1767251208::1::::<><>::
+carl_come_on_you_little_shit_.mp3::AudioStreamMP3::2234670103211440500::1767083724::1767251208::1::::<><>::
+carl_youre_not_going_to_break_me.mp3::AudioStreamMP3::3789931170270741352::1767084296::1767251208::1::::<><>::
+cascadia_now_get_out_there_and_kill_kill_kill.mp3::AudioStreamMP3::8110177472267049581::1767084372::1767251208::1::::<><>::
+donut_i_like_it_alot.mp3::AudioStreamMP3::7872776243855740534::1767084344::1767251208::1::::<><>::
+mordecai_by_his_left_tit.mp3::AudioStreamMP3::8740370018995232575::1767084028::1767251208::1::::<><>::
+mordecai_holy_tits.mp3::AudioStreamMP3::3377427562573962589::1767084180::1767251208::1::::<><>::
+mordecai_nobody_tells_old_mordecai_anything.mp3::AudioStreamMP3::560514725480183640::1767084038::1767251208::1::::<><>::
+::res://Assets/Audio/Sounds/Goblin/::1767251208
+Goblin_Aggro.ogg::AudioStreamOggVorbis::2024451709372009502::1767081864::1767251208::1::::<><>::
+Goblin_Attack.ogg::AudioStreamOggVorbis::6299692259363720858::1767081864::1767251208::1::::<><>::
+Goblin_Death.ogg::AudioStreamOggVorbis::1578017951250001137::1767081864::1767251208::1::::<><>::
+Goblin_Hit.ogg::AudioStreamOggVorbis::922278062659880980::1767081864::1767251208::1::::<><>::
+Goblin_Idle2.ogg::AudioStreamOggVorbis::6359269111380858193::1767081866::1767082136::1::::<><>::
+Goblin_Idle3.ogg::AudioStreamOggVorbis::8346324187137926889::1767081866::1767082136::1::::<><>::
+Goblin_Idle.ogg::AudioStreamOggVorbis::5800916007698762516::1767081866::1767082136::1::::<><>::
+::res://Assets/Materials/::1766902384
+::res://Assets/NinjaAdventure/::1767251139
+::res://Assets/NinjaAdventure/Audio/::1767251139
+::res://Assets/NinjaAdventure/Audio/Sounds/::1767251139
+::res://Assets/NinjaAdventure/Audio/Sounds/Alert/::1767251210
+Alert2.wav::AudioStreamWAV::3645108317262033568::1766032194::1767251210::1::::<><>::
+Alert3.wav::AudioStreamWAV::4824268361837004007::1766032194::1767251210::1::::<><>::
+Alert4.wav::AudioStreamWAV::2605440632165964962::1766032194::1767251210::1::::<><>::
+Alert5.wav::AudioStreamWAV::1497817456456381244::1766032194::1767251210::1::::<><>::
+Alert6.wav::AudioStreamWAV::6877820436673951088::1766032194::1767251210::1::::<><>::
+Alert.wav::AudioStreamWAV::8087192209758082319::1766032194::1767251210::1::::<><>::
+::res://Assets/NinjaAdventure/Audio/Sounds/Ambient/::1767251210
+Rain2.wav::AudioStreamWAV::6061900766620636312::1766032194::1767251210::1::::<><>::
+Rain3.wav::AudioStreamWAV::5704307675315159941::1766032194::1767251210::1::::<><>::
+Rain.wav::AudioStreamWAV::7373599259518615832::1766032194::1767251210::1::::<><>::
+River.wav::AudioStreamWAV::292227133598260895::1766032194::1767251210::1::::<><>::
+Storm.wav::AudioStreamWAV::5040102015260672814::1766032194::1767251210::1::::<><>::
+Wave.wav::AudioStreamWAV::3045484213433658855::1766032194::1767251210::1::::<><>::
+WaveFar.wav::AudioStreamWAV::557636728017780020::1766032194::1767251210::1::::<><>::
+Wind2.wav::AudioStreamWAV::1141428014744859546::1766032194::1767251210::1::::<><>::
+Wind.wav::AudioStreamWAV::3601105905570583921::1766032194::1767251210::1::::<><>::
+::res://Assets/NinjaAdventure/Audio/Sounds/Bonus/::1767251210
+Bonus2.wav::AudioStreamWAV::6326168092284673481::1766032194::1767251210::1::::<><>::
+Bonus3.wav::AudioStreamWAV::230108434637911961::1766032194::1767251210::1::::<><>::
+Bonus.wav::AudioStreamWAV::4635638388147549572::1766032194::1767251210::1::::<><>::
+Coin2.wav::AudioStreamWAV::8106454681453922326::1766032194::1767251210::1::::<><>::
+Coin3.wav::AudioStreamWAV::3111055538408854224::1766032194::1767251210::1::::<><>::
+Coin.wav::AudioStreamWAV::3721302643707592927::1766032194::1767251210::1::::<><>::
+Gold1.wav::AudioStreamWAV::196125816445887682::1766032194::1767251210::1::::<><>::
+Gold2.wav::AudioStreamWAV::7437757720216642369::1766032194::1767251210::1::::<><>::
+PowerUp1.wav::AudioStreamWAV::8094072106559119957::1766032194::1767251210::1::::<><>::
+PowerUp2.wav::AudioStreamWAV::1238194947205889533::1766032194::1767251210::1::::<><>::
+::res://Assets/NinjaAdventure/Audio/Sounds/Creature/::1767251210
+Bird.wav::AudioStreamWAV::337433026298836236::1766032194::1767251210::1::::<><>::
+Dog.wav::AudioStreamWAV::2269084900479340189::1766032194::1767251210::1::::<><>::
+Duck.wav::AudioStreamWAV::2262493960429668473::1766032194::1767251210::1::::<><>::
+Wings2.wav::AudioStreamWAV::3980556890119112117::1766032194::1767251210::1::::<><>::
+Wings.wav::AudioStreamWAV::6150607116878446083::1766032194::1767251210::1::::<><>::
+::res://Assets/NinjaAdventure/Audio/Sounds/Elemental/::1767251210
+Bubble2.wav::AudioStreamWAV::7935192897360859722::1766032194::1767251210::1::::<><>::
+Bubble.wav::AudioStreamWAV::3404521669553015982::1766032194::1767251210::1::::<><>::
+Explosion2.wav::AudioStreamWAV::3277389307534314226::1766032194::1767251210::1::::<><>::
+Explosion3.wav::AudioStreamWAV::988437297010443029::1766032194::1767251209::1::::<><>::
+Explosion4.wav::AudioStreamWAV::3235474503878584145::1766032194::1767251209::1::::<><>::
+Explosion5.wav::AudioStreamWAV::2398764351311523181::1766032194::1767251209::1::::<><>::
+Explosion6.wav::AudioStreamWAV::5489526949319207472::1766032194::1767251209::1::::<><>::
+Explosion.wav::AudioStreamWAV::922026959930371389::1766032194::1767251209::1::::<><>::
+Fire2.wav::AudioStreamWAV::8425552553292978519::1766032194::1767251209::1::::<><>::
+Fire3.wav::AudioStreamWAV::5141546733288444435::1766032194::1767251209::1::::<><>::
+Fire.wav::AudioStreamWAV::3278628070429294819::1766032194::1767251209::1::::<><>::
+Fireball2.wav::AudioStreamWAV::5348584730196678264::1766032194::1767251209::1::::<><>::
+Fireball.wav::AudioStreamWAV::1283717872448196304::1766032194::1767251209::1::::<><>::
+Grass2.wav::AudioStreamWAV::3117417724532713660::1766032194::1767251209::1::::<><>::
+Grass.wav::AudioStreamWAV::4213654805813019004::1766032194::1767251209::1::::<><>::
+Water1.wav::AudioStreamWAV::3386584159637253888::1766032194::1767251209::1::::<><>::
+Water2.wav::AudioStreamWAV::3668983353439014023::1766032194::1767251209::1::::<><>::
+Water3.wav::AudioStreamWAV::6203055265958182694::1766032194::1767251209::1::::<><>::
+Water4.wav::AudioStreamWAV::6890701736756217398::1766032194::1767251209::1::::<><>::
+Water5.wav::AudioStreamWAV::6562305347328359557::1766032194::1767251210::1::::<><>::
+Water6.wav::AudioStreamWAV::1303014656556702894::1766032194::1767251210::1::::<><>::
+Water7.wav::AudioStreamWAV::5652751160836161968::1766032194::1767251210::1::::<><>::
+Water8.wav::AudioStreamWAV::962711679008826917::1766032194::1767251209::1::::<><>::
+Water9.wav::AudioStreamWAV::2189636283993817713::1766032194::1767251210::1::::<><>::
+Water10.wav::AudioStreamWAV::1725308587865144794::1766032194::1767251210::1::::<><>::
+WaterDrop.wav::AudioStreamWAV::5773943742830852216::1766032194::1767251209::1::::<><>::
+::res://Assets/NinjaAdventure/Audio/Sounds/Hit & Impact/::1767251210
+Hit1.wav::AudioStreamWAV::5231090007856933590::1766032194::1767251209::1::::<><>::
+Hit2.wav::AudioStreamWAV::5771501314625024923::1766032194::1767251209::1::::<><>::
+Hit3.wav::AudioStreamWAV::256112151670075810::1766032194::1767251209::1::::<><>::
+Hit5.wav::AudioStreamWAV::9048332964565258383::1766032194::1767251209::1::::<><>::
+Hit6.wav::AudioStreamWAV::8492280712613159385::1766032194::1767251209::1::::<><>::
+Hit7.wav::AudioStreamWAV::5179712343000348431::1766032194::1767251209::1::::<><>::
+Hit8.wav::AudioStreamWAV::5166895854542067580::1766032194::1767251209::1::::<><>::
+Hit9.wav::AudioStreamWAV::1770894337309655124::1766032194::1767251209::1::::<><>::
+Impact2.wav::AudioStreamWAV::7144500835169424294::1766032194::1767251209::1::::<><>::
+Impact3.wav::AudioStreamWAV::94205180374874933::1766032194::1767251209::1::::<><>::
+Impact4.wav::AudioStreamWAV::795747810572495950::1766032194::1767251210::1::::<><>::
+Impact5.wav::AudioStreamWAV::3646191961298918616::1766032194::1767251210::1::::<><>::
+Impact.wav::AudioStreamWAV::829714323949921390::1766032194::1767251210::1::::<><>::
+::res://Assets/NinjaAdventure/Audio/Sounds/Jump & Bounce/::1767251210
+Bounce2.wav::AudioStreamWAV::799366389488663753::1766032194::1767251210::1::::<><>::
+Bounce3.wav::AudioStreamWAV::8136508825362947283::1766032194::1767251210::1::::<><>::
+Bounce4.wav::AudioStreamWAV::117658173020789545::1766032194::1767251210::1::::<><>::
+Bounce5.wav::AudioStreamWAV::7454239155778902150::1766032194::1767251210::1::::<><>::
+Bounce.wav::AudioStreamWAV::7073397338878537304::1766032194::1767251210::1::::<><>::
+Jump2.wav::AudioStreamWAV::927414002734642096::1766032194::1767251210::1::::<><>::
+Jump3.wav::AudioStreamWAV::8279484011337309879::1766032194::1767251210::1::::<><>::
+Jump.wav::AudioStreamWAV::4632372074631562339::1766032194::1767251210::1::::<><>::
+::res://Assets/NinjaAdventure/Audio/Sounds/Magic & Skill/::1767251210
+Fx.wav::AudioStreamWAV::5636346839149767924::1766032194::1767251210::1::::<><>::
+Heal2.wav::AudioStreamWAV::7077757157695914166::1766032194::1767251210::1::::<><>::
+Heal3.wav::AudioStreamWAV::7678220115280825222::1766032194::1767251210::1::::<><>::
+Heal.wav::AudioStreamWAV::6410901262422671956::1766032194::1767251210::1::::<><>::
+Magic1.wav::AudioStreamWAV::6257623523435151450::1766032194::1767251210::1::::<><>::
+Magic2.wav::AudioStreamWAV::3245219632091318682::1766032194::1767251210::1::::<><>::
+Magic3.wav::AudioStreamWAV::2425786737358242624::1766032194::1767251210::1::::<><>::
+Magic4.wav::AudioStreamWAV::6513016898287400005::1766032194::1767251210::1::::<><>::
+Magic5.wav::AudioStreamWAV::4789196659999630833::1766032194::1767251210::1::::<><>::
+Spirit.wav::AudioStreamWAV::7552704995795875755::1766032194::1767251210::1::::<><>::
+Strange.wav::AudioStreamWAV::2309463869144345966::1766032194::1767251210::1::::<><>::
+::res://Assets/NinjaAdventure/Audio/Sounds/Menu/::1767251210
+Accept2.wav::AudioStreamWAV::1661027275994439336::1766032194::1767251210::1::::<><>::
+Accept3.wav::AudioStreamWAV::4689795380261552230::1766032194::1767251210::1::::<><>::
+Accept4.wav::AudioStreamWAV::3845403575351619447::1766032194::1767251210::1::::<><>::
+Accept5.wav::AudioStreamWAV::1584687773676313545::1766032194::1767251210::1::::<><>::
+Accept6.wav::AudioStreamWAV::8239775980973336160::1766032194::1767251210::1::::<><>::
+Accept7.wav::AudioStreamWAV::4916042731568308039::1766032194::1767251210::1::::<><>::
+Accept8.wav::AudioStreamWAV::5741822881712629032::1766032194::1767251210::1::::<><>::
+Accept9.wav::AudioStreamWAV::3038184424686641627::1766032194::1767251210::1::::<><>::
+Accept.wav::AudioStreamWAV::6312545838060684289::1766032194::1767251210::1::::<><>::
+Cancel2.wav::AudioStreamWAV::8278390036710094878::1766032194::1767251210::1::::<><>::
+Cancel.wav::AudioStreamWAV::5341635503294246655::1766032194::1767251210::1::::<><>::
+Menu5.wav::AudioStreamWAV::786019358999803224::1766032194::1767251210::1::::<><>::
+Menu6.wav::AudioStreamWAV::7853707043693235725::1766032194::1767251210::1::::<><>::
+Menu8.wav::AudioStreamWAV::6573855294348137173::1766032194::1767251210::1::::<><>::
+Menu10.wav::AudioStreamWAV::6427247305446874843::1766032194::1767251210::1::::<><>::
+Menu11.wav::AudioStreamWAV::6884678860981859954::1766032194::1767251210::1::::<><>::
+Menu12.wav::AudioStreamWAV::8822742011960107137::1766032194::1767251210::1::::<><>::
+Move1.wav::AudioStreamWAV::4966427969442900027::1766032194::1767251210::1::::<><>::
+Move2.wav::AudioStreamWAV::436859390858703471::1766032194::1767251210::1::::<><>::
+Move3.wav::AudioStreamWAV::1735300941743736747::1766032194::1767251210::1::::<><>::
+Move4.wav::AudioStreamWAV::2081630801642378673::1766032194::1767251210::1::::<><>::
+Move5.wav::AudioStreamWAV::3558992637800423080::1766032194::1767251210::1::::<><>::
+Move6.wav::AudioStreamWAV::5663102706109567735::1766032194::1767251210::1::::<><>::
+Move7.wav::AudioStreamWAV::5842354870339471450::1766032194::1767251210::1::::<><>::
+Move8.wav::AudioStreamWAV::5656611960769278697::1766032194::1767251210::1::::<><>::
+::res://Assets/NinjaAdventure/Audio/Sounds/Voice/::1767251210
+Voice1.wav::AudioStreamWAV::8895043829765518791::1766032194::1767251210::1::::<><>::
+Voice2.wav::AudioStreamWAV::8039558877747826197::1766032194::1767251210::1::::<><>::
+Voice3.wav::AudioStreamWAV::2062712683059827390::1766032194::1767251210::1::::<><>::
+Voice4.wav::AudioStreamWAV::7165254707592498361::1766032194::1767251210::1::::<><>::
+Voice5.wav::AudioStreamWAV::5993742998415518356::1766032194::1767251210::1::::<><>::
+Voice6.wav::AudioStreamWAV::7120612393444374169::1766032194::1767251210::1::::<><>::
+Voice7.wav::AudioStreamWAV::2596907927489742896::1766032194::1767251210::1::::<><>::
+Voice8.wav::AudioStreamWAV::666199799097826731::1766032194::1767251210::1::::<><>::
+Voice9.wav::AudioStreamWAV::8604594815231567761::1766032194::1767251210::1::::<><>::
+Voice10.wav::AudioStreamWAV::7985147833990980756::1766032194::1767251210::1::::<><>::
+::res://Assets/NinjaAdventure/Audio/Sounds/Whoosh & Slash/::1767251210
+Launch.wav::AudioStreamWAV::3288486837004114232::1766032194::1767251210::1::::<><>::
+Slash2.wav::AudioStreamWAV::8774514438757607469::1766032194::1767251210::1::::<><>::
+Slash3.wav::AudioStreamWAV::1177176201751250630::1766032194::1767251210::1::::<><>::
+Slash4.wav::AudioStreamWAV::1186599382303211451::1766032194::1767251210::1::::<><>::
+Slash5.wav::AudioStreamWAV::7211269045663634551::1766032194::1767251210::1::::<><>::
+Slash.wav::AudioStreamWAV::356366980447219491::1766032194::1767251210::1::::<><>::
+Sword2.wav::AudioStreamWAV::5188333446401467253::1766032194::1767251210::1::::<><>::
+Whoosh2.wav::AudioStreamWAV::5617503739355509149::1766032194::1767251210::1::::<><>::
+Whoosh.wav::AudioStreamWAV::5226643679612382238::1766032194::1767251210::1::::<><>::
+::res://Assets/Shaders/::1766902384
+::res://Assets/Splash/::1767251209
+Splash.png::CompressedTexture2D::8600891004478428230::1766032198::1767251209::1::::<><>::
+::res://Assets/Splash/Splash_frames/::1767251209
+frame_001.png::CompressedTexture2D::4665515610719150876::1766032198::1767251209::1::::<><>::
+frame_002.png::CompressedTexture2D::366130556727573631::1766032198::1767251209::1::::<><>::
+frame_003.png::CompressedTexture2D::3393358266594105240::1766032198::1767251209::1::::<><>::
+frame_004.png::CompressedTexture2D::3206813821375230665::1766032198::1767251209::1::::<><>::
+frame_005.png::CompressedTexture2D::6565198429760505599::1766032198::1767251209::1::::<><>::
+frame_006.png::CompressedTexture2D::983883323778955434::1766032198::1767251209::1::::<><>::
+frame_007.png::CompressedTexture2D::7543123096637415925::1766032198::1767251209::1::::<><>::
+frame_008.png::CompressedTexture2D::3523704559093660003::1766032198::1767251209::1::::<><>::
+frame_009.png::CompressedTexture2D::3382526268798165082::1766032198::1767251209::1::::<><>::
+frame_010.png::CompressedTexture2D::2864865421798420040::1766032198::1767251209::1::::<><>::
+frame_011.png::CompressedTexture2D::5371021925581361907::1766032198::1767251209::1::::<><>::
+frame_012.png::CompressedTexture2D::4382994214969288373::1766032198::1767251209::1::::<><>::
+frame_013.png::CompressedTexture2D::2191608914480057087::1766032198::1767251209::1::::<><>::
+frame_014.png::CompressedTexture2D::4539608809268760258::1766032198::1767251209::1::::<><>::
+frame_015.png::CompressedTexture2D::1918765409841515264::1766032198::1767251209::1::::<><>::
+frame_016.png::CompressedTexture2D::3185988430653548918::1766032198::1767251209::1::::<><>::
+frame_017.png::CompressedTexture2D::7845578275160574581::1766032198::1767251209::1::::<><>::
+frame_018.png::CompressedTexture2D::7371363297496597418::1766032198::1767251209::1::::<><>::
+frame_019.png::CompressedTexture2D::535694627704011557::1766032198::1767251209::1::::<><>::
+frame_020.png::CompressedTexture2D::3135775595900878214::1766032198::1767251209::1::::<><>::
+frame_021.png::CompressedTexture2D::4813081274338744388::1766032198::1767251209::1::::<><>::
+frame_022.png::CompressedTexture2D::4312480436136392798::1766032198::1767251209::1::::<><>::
+frame_023.png::CompressedTexture2D::7685661386425525972::1766032198::1767251209::1::::<><>::
+frame_024.png::CompressedTexture2D::1712967547714509661::1766032198::1767251209::1::::<><>::
+frame_025.png::CompressedTexture2D::1564168373547546697::1766032198::1767251209::1::::<><>::
+frame_026.png::CompressedTexture2D::6106591236328729164::1766032198::1767251209::1::::<><>::
+frame_027.png::CompressedTexture2D::8624889288345053548::1766032198::1767251209::1::::<><>::
+frame_028.png::CompressedTexture2D::8257222757593630259::1766032198::1767251209::1::::<><>::
+frame_029.png::CompressedTexture2D::3937972281097522831::1766032198::1767251209::1::::<><>::
+frame_030.png::CompressedTexture2D::6415715769567917222::1766032198::1767251209::1::::<><>::
+frame_031.png::CompressedTexture2D::3513707594718508798::1766032198::1767251209::1::::<><>::
+frame_032.png::CompressedTexture2D::1154808202006718736::1766032198::1767251209::1::::<><>::
+frame_033.png::CompressedTexture2D::3096425844577197380::1766032198::1767251209::1::::<><>::
+frame_034.png::CompressedTexture2D::3871049295702874709::1766032198::1767251209::1::::<><>::
+frame_035.png::CompressedTexture2D::8531658714831589632::1766032198::1767251209::1::::<><>::
+frame_036.png::CompressedTexture2D::6760257731930315557::1766032198::1767251209::1::::<><>::
+frame_037.png::CompressedTexture2D::7589066705807393189::1766032198::1767251209::1::::<><>::
+frame_038.png::CompressedTexture2D::2163480682652053514::1766032198::1767251209::1::::<><>::
+frame_039.png::CompressedTexture2D::2350906933362549057::1766032198::1767251209::1::::<><>::
+frame_040.png::CompressedTexture2D::3532115307181049069::1766032198::1767251209::1::::<><>::
+frame_041.png::CompressedTexture2D::2764907149423318187::1766032198::1767251209::1::::<><>::
+frame_042.png::CompressedTexture2D::1127625226384145802::1766032198::1767251209::1::::<><>::
+frame_043.png::CompressedTexture2D::9069138762975520096::1766032198::1767251209::1::::<><>::
+frame_044.png::CompressedTexture2D::8457826898613953870::1766032198::1767251209::1::::<><>::
+frame_045.png::CompressedTexture2D::6307877307263120228::1766032198::1767251209::1::::<><>::
+frame_046.png::CompressedTexture2D::8411935044679184754::1766032198::1767251209::1::::<><>::
+frame_047.png::CompressedTexture2D::3795949994530438479::1766032198::1767251209::1::::<><>::
+frame_048.png::CompressedTexture2D::1151775791176686019::1766032198::1767251209::1::::<><>::
+frame_049.png::CompressedTexture2D::6377953304938207448::1766032198::1767251209::1::::<><>::
+frame_050.png::CompressedTexture2D::6567191479637415215::1766032198::1767251209::1::::<><>::
+frame_051.png::CompressedTexture2D::6974027452831127399::1766032198::1767251209::1::::<><>::
+frame_052.png::CompressedTexture2D::6558127588599741405::1766032198::1767251209::1::::<><>::
+frame_053.png::CompressedTexture2D::8073574915439611007::1766032198::1767251209::1::::<><>::
+frame_054.png::CompressedTexture2D::4210464805313420956::1766032198::1767251209::1::::<><>::
+frame_055.png::CompressedTexture2D::485522922261367388::1766032198::1767251209::1::::<><>::
+frame_056.png::CompressedTexture2D::4874678079057077798::1766032198::1767251209::1::::<><>::
+frame_057.png::CompressedTexture2D::4225369350779331950::1766032198::1767251209::1::::<><>::
+frame_058.png::CompressedTexture2D::4325963880849282390::1766032200::1767076926::1::::<><>::
+frame_059.png::CompressedTexture2D::2327956616950551610::1766032200::1767076926::1::::<><>::
+frame_060.png::CompressedTexture2D::125146131981506055::1766032200::1767076926::1::::<><>::
+frame_061.png::CompressedTexture2D::4556593178370859180::1766032200::1767076926::1::::<><>::
+frame_062.png::CompressedTexture2D::8979676460196038665::1766032200::1767076926::1::::<><>::
+frame_063.png::CompressedTexture2D::1448039759311372193::1766032200::1767076926::1::::<><>::
+frame_064.png::CompressedTexture2D::4028650885652625766::1766032200::1767076926::1::::<><>::
+frame_065.png::CompressedTexture2D::7082235644134532695::1766032200::1767076926::1::::<><>::
+frame_066.png::CompressedTexture2D::3211018425900870117::1766032200::1767076926::1::::<><>::
+frame_067.png::CompressedTexture2D::8645042331155341783::1766032200::1767076926::1::::<><>::
+frame_068.png::CompressedTexture2D::7937309998758588255::1766032200::1767076926::1::::<><>::
+frame_069.png::CompressedTexture2D::3898564170695448115::1766032200::1767251209::1::::<><>::
+frame_070.png::CompressedTexture2D::6211689896098122071::1766032200::1767251209::1::::<><>::
+frame_071.png::CompressedTexture2D::6832763899858650389::1766032200::1767251209::1::::<><>::
+frame_072.png::CompressedTexture2D::2738579099252155361::1766032200::1767251209::1::::<><>::
+frame_073.png::CompressedTexture2D::8572941768225580564::1766032200::1767251209::1::::<><>::
+::res://bugs/::1767474942
+dungeon_map.json::JSON::-1::1767338644::0::1::::<><>::
+editor.png::CompressedTexture2D::6297204636999263756::1767335316::1767335331::1::::<><>::
+goblin.png::CompressedTexture2D::4546133275772782465::1767416025::1767419003::1::::<><>::
+Hall.png::CompressedTexture2D::4255388873523693790::1767338952::1767339104::1::::<><>::
+map.png::CompressedTexture2D::8514562102962633088::1767326350::1767329445::1::::<><>::
+mapfromjson.png::CompressedTexture2D::7745021243242740596::1767337646::1767337925::1::::<><>::
+map_2.png::CompressedTexture2D::4351692879798249093::1767334568::1767334702::1::::<><>::
+mimic.png::CompressedTexture2D::1883622953260445861::1767415984::1767419003::1::::<><>::
+pre-map.png::CompressedTexture2D::6887934457055032369::1767474422::1767474942::1::::<><>::
+rat.png::CompressedTexture2D::3273516166712098765::1767415962::1767419003::1::::<><>::
+sadmap.png::CompressedTexture2D::7226773443261019864::1767423193::1767425815::1::::<><>::
+spider.png::CompressedTexture2D::8644231737423476108::1767416054::1767419003::1::::<><>::
+::res://maps/::1767423056
+Classic Dungeon.json::JSON::-1::1767337512::0::1::::<><>::
+floor_1.json::JSON::-1::1767423056::0::1::::<><>::
+::res://SafeRoom3D/::1767251189
+::res://Scenes/::1767480059
+Main3D.tscn::PackedScene::4029567121485758878::1767480059::0::1::::<><>::res://Scripts/Core/GameManager3D.cs
+Splash3D.tscn::PackedScene::969092875015::1767075898::0::1::::<><>::res://Scripts/UI/SplashScreen3D.cs
+::res://Scripts/::1767251140
+::res://Scripts/Abilities/::1767251140
+Ability3D.cs::CSharpScript::-1::1766979284::0::1::::<>Node<>::
+AbilityManager3D.cs::CSharpScript::-1::1767161150::0::1::::<>Node<>::
+::res://Scripts/Abilities/Effects/::1767251140
+AudienceFavorite3D.cs::CSharpScript::-1::1766968426::0::1::::<>Node<>::
+BansheesWail3D.cs::CSharpScript::-1::1766968182::0::1::::<>Node<>::
+Berserk3D.cs::CSharpScript::-1::1766968220::0::1::::<>Node<>::
+ChainLightning3D.cs::CSharpScript::-1::1766970824::0::1::::<>Node<>::
+DeadMansRally3D.cs::CSharpScript::-1::1766968320::0::1::::<>Node<>::
+EngineOfTomorrow3D.cs::CSharpScript::-1::1766968268::0::1::::<>Node<>::
+Fireball3D.cs::CSharpScript::-1::1767162444::0::1::::<>Node<>::
+GravityWell3D.cs::CSharpScript::-1::1766968000::0::1::::<>Node<>::
+InfernalGround3D.cs::CSharpScript::-1::1766970972::0::1::::<>Node<>::
+MirrorImage3D.cs::CSharpScript::-1::1766968386::0::1::::<>Node<>::
+ProtectiveShell3D.cs::CSharpScript::-1::1767041848::0::1::::<>Node<>::
+SoulLeech3D.cs::CSharpScript::-1::1766967860::0::1::::<>Node<>::
+SponsorBlessing3D.cs::CSharpScript::-1::1766968476::0::1::::<>Node<>::
+TargetingIndicator3D.cs::CSharpScript::-1::1766991950::0::1::::<>Node3D<>::
+TimestopBubble3D.cs::CSharpScript::-1::1766970970::0::1::::<>Node<>::
+::res://Scripts/Combat/::1767338381
+MeleeSlashEffect3D.cs::CSharpScript::-1::1767073868::0::1::::<>Node3D<>::
+Projectile3D.cs::CSharpScript::-1::1767338381::0::1::::<>Area3D<>::
+ThrownProjectile3D.cs::CSharpScript::-1::1767160714::0::1::::<>Area3D<>::
+::res://Scripts/Core/::1767486112
+AffixData.cs::CSharpScript::-1::1767484699::0::1::::<><>::
+AudioConfig.cs::CSharpScript::-1::1766906984::0::1::::<><>::
+CharacterStats.cs::CSharpScript::-1::1767484818::0::1::::<><>::
+Constants.cs::CSharpScript::-1::1767172786::0::1::::<><>::
+DungeonGenerator3D.cs::CSharpScript::-1::1767425099::0::1::::<>Node3D<>::
+EquipmentData.cs::CSharpScript::-1::1767484549::0::1::::<><>::
+GameManager3D.cs::CSharpScript::-1::1767486112::0::1::::<>Node<>::
+GraphicsConfig.cs::CSharpScript::-1::1767344583::0::1::::<><>::
+KeybindingsManager.cs::CSharpScript::-1::1766994176::0::1::::<><>::
+LODManager.cs::CSharpScript::-1::1767118100::0::1::::<>Node<>::
+LOD_INTEGRATION_GUIDE.md::TextFile::-1::1767118224::0::1::::<><>::
+MapBuilder.cs::CSharpScript::-1::1767480192::0::1::::<><>::
+MapDefinition.cs::CSharpScript::-1::1767479731::0::1::::<><>::
+MapParser.cs::CSharpScript::-1::1767334175::0::1::::<><>::
+MonsterSounds.cs::CSharpScript::-1::1767345561::0::1::::<><>::
+PerformanceMonitor.cs::CSharpScript::-1::1767477076::0::1::::<>CanvasLayer<>::
+SoundManager3D.cs::CSharpScript::-1::1767338499::0::1::::<>Node<>::
+StatusEffect.cs::CSharpScript::-1::1766999016::0::1::::<><>::
+StatusEffectVisuals.cs::CSharpScript::-1::1766999120::0::1::::<><>::
+TileDataEncoder.cs::CSharpScript::-1::1767474065::0::1::::<><>::
+::res://Scripts/Enemies/::1767485854
+BasicEnemy3D.cs::CSharpScript::-1::1767485726::0::1::::<>CharacterBody3D<>::
+BossEnemy3D.cs::CSharpScript::-1::1767485854::0::1::::<>CharacterBody3D<>::
+Corpse3D.cs::CSharpScript::-1::1767485682::0::1::::<>StaticBody3D<>::
+GoblinShaman.cs::CSharpScript::-1::1767485809::0::1::::<>CharacterBody3D<>::
+GoblinThrower.cs::CSharpScript::-1::1767485775::0::1::::<>CharacterBody3D<>::
+MonsterAnimationSystem.cs::CSharpScript::-1::1767345150::0::1::::<><>::
+MonsterLODSystem.cs::CSharpScript::-1::1767251702::0::1::::<><>::
+MonsterMeshFactory.cs::CSharpScript::-1::1767422601::0::1::::<><>::
+WeaponFactory.cs::CSharpScript::-1::1767328345::0::1::::<><>::
+::res://Scripts/Environment/::1767411526
+Cosmetic3D.cs::CSharpScript::-1::1767411526::0::1::::<>StaticBody3D<>::
+Cosmetic3D_Enhanced.cs::CSharpScript::-1::1767118242::0::1::::<><>::
+ProceduralMesh3D.cs::CSharpScript::-1::1767041248::0::1::::<><>::
+WaterEffects3D.cs::CSharpScript::-1::1767143106::0::1::::<><>::
+::res://Scripts/Items/::1767485612
+ConsumableItems3D.cs::CSharpScript::-1::1766985524::0::1::::<><>::
+EquipmentManager.cs::CSharpScript::-1::1767484883::0::1::::<><>::
+Inventory3D.cs::CSharpScript::-1::1767485575::0::1::::<>Node<>::
+ItemDatabase.cs::CSharpScript::-1::1766993514::0::1::::<><>::
+LootBag.cs::CSharpScript::-1::1767485612::0::1::::<><>::
+LootGenerator.cs::CSharpScript::-1::1767485003::0::1::::<><>::
+::res://Scripts/Pet/::1767251140
+Steve3D.cs::CSharpScript::-1::1767162362::0::1::::<>Node3D<>::
+::res://Scripts/Player/::1767486173
+FPSController.cs::CSharpScript::-1::1767486173::0::1::::<>CharacterBody3D<>::
+::res://Scripts/UI/::1767486318
+AbilityIcons.cs::CSharpScript::-1::1766973036::0::1::::<><>::
+CharacterSheetUI.cs::CSharpScript::-1::1767486318::0::1::::<>Control<>::
+EditorScreen3D.cs::CSharpScript::-1::1767480270::0::1::::<>Control<>::
+EscapeMenu3D.cs::CSharpScript::-1::1767477618::0::1::::<>Control<>::
+FloorSelector3D.cs::CSharpScript::-1::1767117528::0::1::::<>Control<>::
+HUD3D.cs::CSharpScript::-1::1767165682::0::1::::<>Control<>::
+InMapEditor.cs::CSharpScript::-1::1767479781::0::1::::<>Control<>::
+InspectMode3D.cs::CSharpScript::-1::1767085524::0::1::::<>CanvasLayer<>::
+InventoryUI3D.cs::CSharpScript::-1::1766985584::0::1::::<>Control<>::
+LootUI3D.cs::CSharpScript::-1::1766993628::0::1::::<>Control<>::
+MapEditorTab.cs::CSharpScript::-1::1767473962::0::1::::<>Control<>::
+SpellBook3D.cs::CSharpScript::-1::1766985188::0::1::::<>Control<>::
+SplashScreen3D.cs::CSharpScript::-1::1767480284::0::1::::<>Control<>::
+::res://Tests/::1767251140
+::res://Tests/SafeRoom3D.Tests/::1767481675
+MapDefinitionTests.cs::CSharpScript::-1::1767481439::0::1::::<><>::
+TileDataEncoderTests.cs::CSharpScript::-1::1767481675::0::1::::<><>::
+::res://Tests/SafeRoom3D.Tests/bin/::1767481450
+::res://Tests/SafeRoom3D.Tests/bin/Debug/::1767481450
+::res://Tests/SafeRoom3D.Tests/bin/Debug/net8.0/::1767481684
+SafeRoom3D.Tests.deps.json::JSON::-1::1767481452::0::1::::<><>::
+SafeRoom3D.Tests.runtimeconfig.json::JSON::-1::1767481452::0::1::::<><>::
+::res://Tests/SafeRoom3D.Tests/bin/Debug/net8.0/cs/::1767481452
+::res://Tests/SafeRoom3D.Tests/bin/Debug/net8.0/de/::1767481452
+::res://Tests/SafeRoom3D.Tests/bin/Debug/net8.0/es/::1767481452
+::res://Tests/SafeRoom3D.Tests/bin/Debug/net8.0/fr/::1767481452
+::res://Tests/SafeRoom3D.Tests/bin/Debug/net8.0/it/::1767481452
+::res://Tests/SafeRoom3D.Tests/bin/Debug/net8.0/ja/::1767481452
+::res://Tests/SafeRoom3D.Tests/bin/Debug/net8.0/ko/::1767481452
+::res://Tests/SafeRoom3D.Tests/bin/Debug/net8.0/pl/::1767481452
+::res://Tests/SafeRoom3D.Tests/bin/Debug/net8.0/pt-BR/::1767481452
+::res://Tests/SafeRoom3D.Tests/bin/Debug/net8.0/ru/::1767481452
+::res://Tests/SafeRoom3D.Tests/bin/Debug/net8.0/tr/::1767481452
+::res://Tests/SafeRoom3D.Tests/bin/Debug/net8.0/zh-Hans/::1767481452
+::res://Tests/SafeRoom3D.Tests/bin/Debug/net8.0/zh-Hant/::1767481452
+::res://Tests/SafeRoom3D.Tests/obj/::1767481450
+project.assets.json::JSON::-1::1767481450::0::1::::<><>::
+SafeRoom3D.Tests.csproj.nuget.dgspec.json::JSON::-1::1767481450::0::1::::<><>::
+::res://Tests/SafeRoom3D.Tests/obj/Debug/::1767481450
+::res://Tests/SafeRoom3D.Tests/obj/Debug/net8.0/::1767481452
+.NETCoreApp,Version=v8.0.AssemblyAttributes.cs::CSharpScript::-1::1767481451::0::1::::<><>::
+SafeRoom3D.Tests.AssemblyInfo.cs::CSharpScript::-1::1767481451::0::1::::<><>::
+SafeRoom3D.Tests.csproj.FileListAbsolute.txt::TextFile::-1::1767481452::0::1::::<><>::
+SafeRoom3D.Tests.GlobalUsings.g.cs::CSharpScript::-1::1767481450::0::1::::<><>::
+::res://Tests/SafeRoom3D.Tests/obj/Debug/net8.0/ref/::1767481452
+::res://Tests/SafeRoom3D.Tests/obj/Debug/net8.0/refint/::1767481452

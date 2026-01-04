@@ -1,0 +1,229 @@
+{
+  "version": "1.0",
+  "name": "Floor 1",
+  "width": 160,
+  "depth": 160,
+  "spawnRoom": 0,
+  "rooms": [
+    {
+      "id": 0,
+      "position": { "x": 110, "z": 130 },
+      "size": { "x": 18, "z": 18 },
+      "type": "spawn",
+      "isSpawnRoom": true
+    },
+    {
+      "id": 1,
+      "position": { "x": 130, "z": 95 },
+      "size": { "x": 20, "z": 25 },
+      "type": "cathedral",
+      "isSpawnRoom": false
+    },
+    {
+      "id": 2,
+      "position": { "x": 95, "z": 95 },
+      "size": { "x": 25, "z": 30 },
+      "type": "throne",
+      "isSpawnRoom": false
+    },
+    {
+      "id": 3,
+      "position": { "x": 130, "z": 60 },
+      "size": { "x": 18, "z": 25 },
+      "type": "library",
+      "isSpawnRoom": false
+    },
+    {
+      "id": 4,
+      "position": { "x": 95, "z": 55 },
+      "size": { "x": 25, "z": 30 },
+      "type": "armory",
+      "isSpawnRoom": false
+    },
+    {
+      "id": 5,
+      "position": { "x": 130, "z": 10 },
+      "size": { "x": 20, "z": 35 },
+      "type": "crypt",
+      "isSpawnRoom": false
+    },
+    {
+      "id": 6,
+      "position": { "x": 95, "z": 10 },
+      "size": { "x": 25, "z": 30 },
+      "type": "storage",
+      "isSpawnRoom": false
+    },
+    {
+      "id": 7,
+      "position": { "x": 55, "z": 130 },
+      "size": { "x": 30, "z": 20 },
+      "type": "library",
+      "isSpawnRoom": false
+    },
+    {
+      "id": 8,
+      "position": { "x": 55, "z": 95 },
+      "size": { "x": 28, "z": 25 },
+      "type": "storage",
+      "isSpawnRoom": false
+    },
+    {
+      "id": 9,
+      "position": { "x": 55, "z": 55 },
+      "size": { "x": 30, "z": 30 },
+      "type": "cathedral",
+      "isSpawnRoom": false
+    },
+    {
+      "id": 10,
+      "position": { "x": 55, "z": 10 },
+      "size": { "x": 28, "z": 30 },
+      "type": "armory",
+      "isSpawnRoom": false
+    },
+    {
+      "id": 11,
+      "position": { "x": 10, "z": 130 },
+      "size": { "x": 30, "z": 20 },
+      "type": "crypt",
+      "isSpawnRoom": false
+    },
+    {
+      "id": 12,
+      "position": { "x": 10, "z": 95 },
+      "size": { "x": 35, "z": 28 },
+      "type": "throne",
+      "isSpawnRoom": false
+    },
+    {
+      "id": 13,
+      "position": { "x": 10, "z": 55 },
+      "size": { "x": 35, "z": 30 },
+      "type": "library",
+      "isSpawnRoom": false
+    },
+    {
+      "id": 14,
+      "position": { "x": 10, "z": 10 },
+      "size": { "x": 35, "z": 35 },
+      "type": "barracks",
+      "isSpawnRoom": false
+    },
+    {
+      "id": 15,
+      "position": { "x": 75, "z": 75 },
+      "size": { "x": 12, "z": 12 },
+      "type": "storage",
+      "isSpawnRoom": false
+    },
+    {
+      "id": 16,
+      "position": { "x": 35, "z": 75 },
+      "size": { "x": 12, "z": 12 },
+      "type": "crypt",
+      "isSpawnRoom": false
+    },
+    {
+      "id": 17,
+      "position": { "x": 115, "z": 75 },
+      "size": { "x": 10, "z": 10 },
+      "type": "storage",
+      "isSpawnRoom": false
+    },
+    {
+      "id": 18,
+      "position": { "x": 75, "z": 120 },
+      "size": { "x": 12, "z": 8 },
+      "type": "armory",
+      "isSpawnRoom": false
+    },
+    {
+      "id": 19,
+      "position": { "x": 35, "z": 120 },
+      "size": { "x": 12, "z": 8 },
+      "type": "storage",
+      "isSpawnRoom": false
+    },
+    {
+      "id": 20,
+      "position": { "x": 75, "z": 35 },
+      "size": { "x": 12, "z": 12 },
+      "type": "library",
+      "isSpawnRoom": false
+    },
+    {
+      "id": 21,
+      "position": { "x": 35, "z": 35 },
+      "size": { "x": 12, "z": 12 },
+      "type": "crypt",
+      "isSpawnRoom": false
+    },
+    {
+      "id": 22,
+      "position": { "x": 115, "z": 35 },
+      "size": { "x": 10, "z": 10 },
+      "type": "armory",
+      "isSpawnRoom": false
+    },
+    {
+      "id": 23,
+      "position": { "x": 5, "z": 75 },
+      "size": { "x": 8, "z": 10 },
+      "type": "storage",
+      "isSpawnRoom": false
+    },
+    {
+      "id": 24,
+      "position": { "x": 5, "z": 35 },
+      "size": { "x": 8, "z": 10 },
+      "type": "crypt",
+      "isSpawnRoom": false
+    }
+  ],
+  "corridors": [
+    { "from": 0, "to": 7, "width": 6 },
+    { "from": 0, "to": 1, "width": 6 },
+    { "from": 0, "to": 18, "width": 5 },
+    { "from": 1, "to": 2, "width": 6 },
+    { "from": 1, "to": 3, "width": 6 },
+    { "from": 1, "to": 17, "width": 5 },
+    { "from": 2, "to": 4, "width": 6 },
+    { "from": 2, "to": 8, "width": 6 },
+    { "from": 2, "to": 15, "width": 5 },
+    { "from": 3, "to": 4, "width": 6 },
+    { "from": 3, "to": 5, "width": 6 },
+    { "from": 4, "to": 6, "width": 6 },
+    { "from": 4, "to": 9, "width": 6 },
+    { "from": 4, "to": 22, "width": 5 },
+    { "from": 5, "to": 6, "width": 6 },
+    { "from": 6, "to": 10, "width": 6 },
+    { "from": 7, "to": 8, "width": 6 },
+    { "from": 7, "to": 11, "width": 6 },
+    { "from": 7, "to": 19, "width": 5 },
+    { "from": 8, "to": 9, "width": 6 },
+    { "from": 8, "to": 12, "width": 6 },
+    { "from": 8, "to": 16, "width": 5 },
+    { "from": 9, "to": 10, "width": 6 },
+    { "from": 9, "to": 13, "width": 6 },
+    { "from": 9, "to": 20, "width": 5 },
+    { "from": 10, "to": 14, "width": 6 },
+    { "from": 11, "to": 12, "width": 6 },
+    { "from": 12, "to": 13, "width": 6 },
+    { "from": 12, "to": 23, "width": 5 },
+    { "from": 13, "to": 14, "width": 6 },
+    { "from": 13, "to": 24, "width": 5 },
+    { "from": 15, "to": 16, "width": 5 },
+    { "from": 15, "to": 17, "width": 5 },
+    { "from": 15, "to": 20, "width": 5 },
+    { "from": 16, "to": 21, "width": 5 },
+    { "from": 16, "to": 23, "width": 5 },
+    { "from": 18, "to": 19, "width": 5 },
+    { "from": 20, "to": 21, "width": 5 },
+    { "from": 20, "to": 22, "width": 5 },
+    { "from": 21, "to": 24, "width": 5 }
+  ],
+  "enemies": [],
+  "monsterGroups": [],
+  "groupTemplates": []
+}

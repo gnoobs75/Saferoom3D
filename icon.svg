@@ -1,0 +1,10 @@
+<svg height="128" width="128" xmlns="http://www.w3.org/2000/svg">
+  <rect fill="#363d52" height="128" width="128"/>
+  <g fill="#fff" transform="translate(20,20)">
+    <rect height="50" width="10" x="0" y="19"/>
+    <rect height="50" width="10" x="78" y="19"/>
+    <rect height="10" width="88" x="0" y="19"/>
+    <rect height="10" width="88" x="0" y="59"/>
+    <text font-family="monospace" font-size="36" font-weight="bold" x="12" y="55">3D</text>
+  </g>
+</svg>

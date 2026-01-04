@@ -1,0 +1,633 @@
+using Godot;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+
+namespace SafeRoom3D.Core;
+
+/// <summary>
+/// Data classes for custom map definitions. Maps can be loaded from JSON files
+/// created by Claude from dungeon images, or manually edited by users.
+/// </summary>
+
+/// <summary>
+/// Root container for a complete map definition.
+/// </summary>
+public class MapDefinition
+{
+    [JsonPropertyName("version")]
+    public string Version { get; set; } = "1.0";
+
+    [JsonPropertyName("name")]
+    public string Name { get; set; } = "Custom Dungeon";
+
+    /// <summary>
+    /// Map mode: "rooms" for traditional room-based maps, "tiles" for WYSIWYG tile-painted maps.
+    /// </summary>
+    [JsonPropertyName("mode")]
+    public string Mode { get; set; } = "rooms";
+
+    [JsonPropertyName("width")]
+    public int Width { get; set; } = 80;
+
+    [JsonPropertyName("depth")]
+    public int Depth { get; set; } = 80;
+
+    [JsonPropertyName("spawnRoom")]
+    public int SpawnRoom { get; set; } = 0;
+
+    /// <summary>
+    /// Spawn position for tile-mode maps. Ignored for room-mode maps.
+    /// </summary>
+    [JsonPropertyName("spawnPosition")]
+    public PositionData? SpawnPosition { get; set; }
+
+    /// <summary>
+    /// RLE+Base64 encoded tile data for tile-mode maps.
+    /// Each tile is 0 (void) or 1 (floor). Ignored for room-mode maps.
+    /// </summary>
+    [JsonPropertyName("tileData")]
+    public string? TileData { get; set; }
+
+    [JsonPropertyName("rooms")]
+    public List<RoomDefinition> Rooms { get; set; } = new();
+
+    [JsonPropertyName("corridors")]
+    public List<CorridorDefinition> Corridors { get; set; } = new();
+
+    [JsonPropertyName("enemies")]
+    public List<EnemyPlacement> Enemies { get; set; } = new();
+
+    [JsonPropertyName("monsterGroups")]
+    public List<MonsterGroupPlacement> MonsterGroups { get; set; } = new();
+
+    [JsonPropertyName("groupTemplates")]
+    public List<MonsterGroupTemplate> GroupTemplates { get; set; } = new();
+
+    /// <summary>
+    /// Custom tile overrides. Each entry specifies a tile position and whether it's floor (1) or void (0).
+    /// This allows manually editing tiles that differ from the room/corridor-generated layout.
+    /// Used in room-mode for manual edits. In tile-mode, use TileData instead.
+    /// </summary>
+    [JsonPropertyName("customTiles")]
+    public List<TileOverride> CustomTiles { get; set; } = new();
+
+    /// <summary>
+    /// Player-placed props from In-Map Edit Mode.
+    /// These are placed in first-person view and saved with the map.
+    /// </summary>
+    [JsonPropertyName("placedProps")]
+    public List<PropPlacement> PlacedProps { get; set; } = new();
+
+    /// <summary>
+    /// Whether to use procedural prop generation for rooms.
+    /// If false, only player-placed props are used.
+    /// </summary>
+    [JsonPropertyName("useProceduralProps")]
+    public bool UseProceduralProps { get; set; } = true;
+
+    /// <summary>
+    /// Returns true if this is a tile-mode map (WYSIWYG painted).
+    /// </summary>
+    [JsonIgnore]
+    public bool IsTileMode => Mode == "tiles";
+
+    /// <summary>
+    /// Loads a map definition from a JSON file.
+    /// </summary>
+    public static MapDefinition? LoadFromJson(string path)
+    {
+        try
+        {
+            string jsonContent;
+
+            // Handle both user:// and res:// paths
+            if (path.StartsWith("user://") || path.StartsWith("res://"))
+            {
+                using var file = FileAccess.Open(path, FileAccess.ModeFlags.Read);
+                if (file == null)
+                {
+                    GD.PrintErr($"[MapDefinition] Failed to open file: {path}");
+                    return null;
+                }
+                jsonContent = file.GetAsText();
+            }
+            else
+            {
+                // Assume it's a system path
+                if (!System.IO.File.Exists(path))
+                {
+                    GD.PrintErr($"[MapDefinition] File not found: {path}");
+                    return null;
+                }
+                jsonContent = System.IO.File.ReadAllText(path);
+            }
+
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true,
+                ReadCommentHandling = JsonCommentHandling.Skip,
+                AllowTrailingCommas = true
+            };
+
+            var map = JsonSerializer.Deserialize<MapDefinition>(jsonContent, options);
+            if (map != null)
+            {
+                GD.Print($"[MapDefinition] Loaded map '{map.Name}' with {map.Rooms.Count} rooms, {map.Enemies.Count} enemies");
+            }
+            return map;
+        }
+        catch (System.Exception ex)
+        {
+            GD.PrintErr($"[MapDefinition] Error loading map from {path}: {ex.Message}");
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// Saves this map definition to a JSON file.
+    /// </summary>
+    public bool SaveToJson(string path)
+    {
+        try
+        {
+            var options = new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
+
+            string jsonContent = JsonSerializer.Serialize(this, options);
+
+            // Handle user:// paths
+            if (path.StartsWith("user://"))
+            {
+                // Ensure the maps directory exists
+                var dir = DirAccess.Open("user://");
+                if (dir != null && !dir.DirExists("maps"))
+                {
+                    dir.MakeDir("maps");
+                }
+
+                using var file = FileAccess.Open(path, FileAccess.ModeFlags.Write);
+                if (file == null)
+                {
+                    GD.PrintErr($"[MapDefinition] Failed to create file: {path}");
+                    return false;
+                }
+                file.StoreString(jsonContent);
+            }
+            else
+            {
+                // System path
+                System.IO.File.WriteAllText(path, jsonContent);
+            }
+
+            GD.Print($"[MapDefinition] Saved map '{Name}' to {path}");
+            return true;
+        }
+        catch (System.Exception ex)
+        {
+            GD.PrintErr($"[MapDefinition] Error saving map to {path}: {ex.Message}");
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Creates a deep copy of this map definition.
+    /// </summary>
+    public MapDefinition Clone()
+    {
+        var options = new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        };
+        var json = JsonSerializer.Serialize(this, options);
+        return JsonSerializer.Deserialize<MapDefinition>(json, options) ?? new MapDefinition();
+    }
+
+    /// <summary>
+    /// Gets a list of all saved maps from both user://maps/ and res://maps/ directories.
+    /// Returns tuples of (displayName, fullPath).
+    /// </summary>
+    public static List<(string Name, string Path)> GetSavedMapFilesWithPaths()
+    {
+        var maps = new List<(string Name, string Path)>();
+        GD.Print("[MapDefinition] GetSavedMapFilesWithPaths() called");
+
+        // Check user://maps/ first (user-created maps)
+        var userDir = DirAccess.Open("user://maps");
+        if (userDir == null)
+        {
+            GD.Print("[MapDefinition] user://maps/ does not exist, creating...");
+            // Try to create the directory
+            var baseDir = DirAccess.Open("user://");
+            baseDir?.MakeDir("maps");
+        }
+        else
+        {
+            GD.Print("[MapDefinition] Scanning user://maps/");
+            userDir.ListDirBegin();
+            string fileName = userDir.GetNext();
+            while (!string.IsNullOrEmpty(fileName))
+            {
+                GD.Print($"[MapDefinition] Found file in user://maps/: {fileName}");
+                if (!userDir.CurrentIsDir() && fileName.EndsWith(".json"))
+                {
+                    string displayName = fileName.Replace(".json", "");
+                    maps.Add((displayName, $"user://maps/{fileName}"));
+                }
+                fileName = userDir.GetNext();
+            }
+            userDir.ListDirEnd();
+        }
+
+        // Check res://maps/ (bundled maps)
+        var resDir = DirAccess.Open("res://maps");
+        if (resDir != null)
+        {
+            GD.Print("[MapDefinition] Scanning res://maps/");
+            resDir.ListDirBegin();
+            string fileName = resDir.GetNext();
+            while (!string.IsNullOrEmpty(fileName))
+            {
+                GD.Print($"[MapDefinition] Found file in res://maps/: {fileName}");
+                if (!resDir.CurrentIsDir() && fileName.EndsWith(".json"))
+                {
+                    string displayName = fileName.Replace(".json", "");
+                    // Only add if not already in list (user maps take priority)
+                    if (!maps.Exists(m => m.Name == displayName))
+                    {
+                        maps.Add((displayName, $"res://maps/{fileName}"));
+                    }
+                }
+                fileName = resDir.GetNext();
+            }
+            resDir.ListDirEnd();
+        }
+        else
+        {
+            GD.Print("[MapDefinition] res://maps/ does not exist");
+        }
+
+        // Also check absolute path for development
+        string devPath = "C:/Claude/SafeRoom3D/maps";
+        GD.Print($"[MapDefinition] Checking dev path: {devPath}");
+        if (System.IO.Directory.Exists(devPath))
+        {
+            GD.Print($"[MapDefinition] Dev path exists, scanning...");
+            foreach (var file in System.IO.Directory.GetFiles(devPath, "*.json"))
+            {
+                GD.Print($"[MapDefinition] Found file: {file}");
+                string displayName = System.IO.Path.GetFileNameWithoutExtension(file);
+                if (!maps.Exists(m => m.Name == displayName))
+                {
+                    maps.Add((displayName, file.Replace("\\", "/")));
+                }
+            }
+        }
+        else
+        {
+            GD.Print($"[MapDefinition] Dev path does not exist: {devPath}");
+        }
+
+        GD.Print($"[MapDefinition] Total maps found: {maps.Count}");
+        maps.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.OrdinalIgnoreCase));
+        return maps;
+    }
+
+    /// <summary>
+    /// Gets a list of all saved map names (for backward compatibility).
+    /// </summary>
+    public static List<string> GetSavedMapFiles()
+    {
+        return GetSavedMapFilesWithPaths().Select(m => m.Name + ".json").ToList();
+    }
+}
+
+/// <summary>
+/// Defines a room's position, size, and type.
+/// </summary>
+public class RoomDefinition
+{
+    [JsonPropertyName("id")]
+    public int Id { get; set; }
+
+    [JsonPropertyName("position")]
+    public PositionData Position { get; set; } = new();
+
+    [JsonPropertyName("size")]
+    public SizeData Size { get; set; } = new();
+
+    [JsonPropertyName("type")]
+    public string Type { get; set; } = "storage";
+
+    [JsonPropertyName("isSpawnRoom")]
+    public bool IsSpawnRoom { get; set; } = false;
+
+    /// <summary>
+    /// Helper to get position as Vector3I (grid coordinates).
+    /// </summary>
+    [JsonIgnore]
+    public Vector3I GridPosition => new Vector3I(Position.X, 0, Position.Z);
+
+    /// <summary>
+    /// Helper to get size as Vector3I.
+    /// </summary>
+    [JsonIgnore]
+    public Vector3I GridSize => new Vector3I(Size.X, 1, Size.Z);
+}
+
+/// <summary>
+/// 2D position data for JSON serialization.
+/// </summary>
+public class PositionData
+{
+    [JsonPropertyName("x")]
+    public int X { get; set; }
+
+    [JsonPropertyName("z")]
+    public int Z { get; set; }
+}
+
+/// <summary>
+/// 2D size data for JSON serialization.
+/// </summary>
+public class SizeData
+{
+    [JsonPropertyName("x")]
+    public int X { get; set; } = 10;
+
+    [JsonPropertyName("z")]
+    public int Z { get; set; } = 10;
+}
+
+/// <summary>
+/// Override for a single tile. Used to manually fix corridor/room tiles.
+/// </summary>
+public class TileOverride
+{
+    [JsonPropertyName("x")]
+    public int X { get; set; }
+
+    [JsonPropertyName("z")]
+    public int Z { get; set; }
+
+    [JsonPropertyName("floor")]
+    public bool IsFloor { get; set; }
+}
+
+/// <summary>
+/// A prop placed by the player in In-Map Edit Mode.
+/// </summary>
+public class PropPlacement
+{
+    [JsonPropertyName("type")]
+    public string Type { get; set; } = "barrel";
+
+    [JsonPropertyName("x")]
+    public float X { get; set; }
+
+    [JsonPropertyName("y")]
+    public float Y { get; set; }
+
+    [JsonPropertyName("z")]
+    public float Z { get; set; }
+
+    [JsonPropertyName("rotationY")]
+    public float RotationY { get; set; }
+
+    [JsonPropertyName("scale")]
+    public float Scale { get; set; } = 1f;
+}
+
+/// <summary>
+/// Defines a corridor connecting two rooms.
+/// </summary>
+public class CorridorDefinition
+{
+    [JsonPropertyName("from")]
+    public int FromRoom { get; set; }
+
+    [JsonPropertyName("to")]
+    public int ToRoom { get; set; }
+
+    [JsonPropertyName("width")]
+    public int Width { get; set; } = 5;
+}
+
+/// <summary>
+/// Placement of an individual enemy in the map.
+/// </summary>
+public class EnemyPlacement
+{
+    [JsonPropertyName("type")]
+    public string Type { get; set; } = "goblin";
+
+    [JsonPropertyName("roomId")]
+    public int RoomId { get; set; } = -1;  // -1 = corridor/unassigned
+
+    [JsonPropertyName("position")]
+    public PositionData Position { get; set; } = new();
+
+    [JsonPropertyName("level")]
+    public int Level { get; set; } = 1;
+
+    [JsonPropertyName("isBoss")]
+    public bool IsBoss { get; set; } = false;
+
+    [JsonPropertyName("rotationY")]
+    public float RotationY { get; set; } = 0f;
+
+    /// <summary>
+    /// Unique ID for this placement (used in editor).
+    /// </summary>
+    [JsonIgnore]
+    public string PlacementId { get; set; } = System.Guid.NewGuid().ToString();
+
+    /// <summary>
+    /// Helper to get position as Vector3.
+    /// </summary>
+    [JsonIgnore]
+    public Vector3 WorldPosition => new Vector3(Position.X, 0, Position.Z);
+}
+
+/// <summary>
+/// Placement of a monster group in the map.
+/// </summary>
+public class MonsterGroupPlacement
+{
+    [JsonPropertyName("id")]
+    public string Id { get; set; } = "";
+
+    [JsonPropertyName("name")]
+    public string Name { get; set; } = "";
+
+    [JsonPropertyName("roomId")]
+    public int RoomId { get; set; } = -1;
+
+    [JsonPropertyName("center")]
+    public PositionData Center { get; set; } = new();
+
+    [JsonPropertyName("monsters")]
+    public List<GroupMonster> Monsters { get; set; } = new();
+
+    /// <summary>
+    /// Helper to get center as Vector3.
+    /// </summary>
+    [JsonIgnore]
+    public Vector3 WorldCenter => new Vector3(Center.X, 0, Center.Z);
+}
+
+/// <summary>
+/// A monster within a group, with offset from group center.
+/// </summary>
+public class GroupMonster
+{
+    [JsonPropertyName("type")]
+    public string Type { get; set; } = "goblin";
+
+    [JsonPropertyName("offsetX")]
+    public float OffsetX { get; set; }
+
+    [JsonPropertyName("offsetZ")]
+    public float OffsetZ { get; set; }
+
+    [JsonPropertyName("level")]
+    public int Level { get; set; } = 1;
+
+    [JsonPropertyName("isBoss")]
+    public bool IsBoss { get; set; } = false;
+}
+
+/// <summary>
+/// A reusable template for monster groups.
+/// </summary>
+public class MonsterGroupTemplate
+{
+    [JsonPropertyName("name")]
+    public string Name { get; set; } = "";
+
+    [JsonPropertyName("monsters")]
+    public List<GroupMonster> Monsters { get; set; } = new();
+
+    /// <summary>
+    /// Creates a placement from this template at the given position.
+    /// </summary>
+    public MonsterGroupPlacement CreatePlacement(int x, int z, int roomId = -1)
+    {
+        return new MonsterGroupPlacement
+        {
+            Id = System.Guid.NewGuid().ToString(),
+            Name = Name,
+            RoomId = roomId,
+            Center = new PositionData { X = x, Z = z },
+            Monsters = Monsters.ConvertAll(m => new GroupMonster
+            {
+                Type = m.Type,
+                OffsetX = m.OffsetX,
+                OffsetZ = m.OffsetZ,
+                Level = m.Level,
+                IsBoss = m.IsBoss
+            })
+        };
+    }
+}
+
+/// <summary>
+/// Default monster group templates available in the editor.
+/// </summary>
+public static class DefaultGroupTemplates
+{
+    public static List<MonsterGroupTemplate> GetDefaultTemplates()
+    {
+        return new List<MonsterGroupTemplate>
+        {
+            new MonsterGroupTemplate
+            {
+                Name = "Goblin Patrol",
+                Monsters = new List<GroupMonster>
+                {
+                    new() { Type = "goblin", OffsetX = -1.5f, OffsetZ = 0, Level = 1 },
+                    new() { Type = "goblin", OffsetX = 1.5f, OffsetZ = 0, Level = 1 },
+                    new() { Type = "goblin_shaman", OffsetX = 0, OffsetZ = 2, Level = 2 }
+                }
+            },
+            new MonsterGroupTemplate
+            {
+                Name = "Skeleton Guard",
+                Monsters = new List<GroupMonster>
+                {
+                    new() { Type = "skeleton", OffsetX = -2, OffsetZ = 0, Level = 2 },
+                    new() { Type = "skeleton", OffsetX = 2, OffsetZ = 0, Level = 2 },
+                    new() { Type = "skeleton_lord", OffsetX = 0, OffsetZ = 2, Level = 3, IsBoss = true }
+                }
+            },
+            new MonsterGroupTemplate
+            {
+                Name = "Spider Nest",
+                Monsters = new List<GroupMonster>
+                {
+                    new() { Type = "spider", OffsetX = -1, OffsetZ = -1, Level = 1 },
+                    new() { Type = "spider", OffsetX = 1, OffsetZ = -1, Level = 1 },
+                    new() { Type = "spider", OffsetX = -1, OffsetZ = 1, Level = 1 },
+                    new() { Type = "spider", OffsetX = 1, OffsetZ = 1, Level = 1 },
+                    new() { Type = "spider_queen", OffsetX = 0, OffsetZ = 0, Level = 3, IsBoss = true }
+                }
+            },
+            new MonsterGroupTemplate
+            {
+                Name = "Dragon Lair",
+                Monsters = new List<GroupMonster>
+                {
+                    new() { Type = "dragon_king", OffsetX = 0, OffsetZ = 0, Level = 5, IsBoss = true },
+                    new() { Type = "bat", OffsetX = -3, OffsetZ = -2, Level = 2 },
+                    new() { Type = "bat", OffsetX = 3, OffsetZ = -2, Level = 2 }
+                }
+            },
+            new MonsterGroupTemplate
+            {
+                Name = "Slime Colony",
+                Monsters = new List<GroupMonster>
+                {
+                    new() { Type = "slime", OffsetX = 0, OffsetZ = 0, Level = 1 },
+                    new() { Type = "slime", OffsetX = -1.5f, OffsetZ = 1, Level = 1 },
+                    new() { Type = "slime", OffsetX = 1.5f, OffsetZ = 1, Level = 1 },
+                    new() { Type = "slime", OffsetX = 0, OffsetZ = 2, Level = 2 }
+                }
+            },
+            new MonsterGroupTemplate
+            {
+                Name = "Goblin Thrower Squad",
+                Monsters = new List<GroupMonster>
+                {
+                    new() { Type = "goblin_thrower", OffsetX = -2, OffsetZ = 0, Level = 2 },
+                    new() { Type = "goblin_thrower", OffsetX = 2, OffsetZ = 0, Level = 2 },
+                    new() { Type = "goblin", OffsetX = 0, OffsetZ = -2, Level = 1 }
+                }
+            },
+            new MonsterGroupTemplate
+            {
+                Name = "Wolf Pack",
+                Monsters = new List<GroupMonster>
+                {
+                    new() { Type = "wolf", OffsetX = 0, OffsetZ = 0, Level = 2 },
+                    new() { Type = "wolf", OffsetX = -2, OffsetZ = 1, Level = 1 },
+                    new() { Type = "wolf", OffsetX = 2, OffsetZ = 1, Level = 1 }
+                }
+            },
+            new MonsterGroupTemplate
+            {
+                Name = "Mushroom Circle",
+                Monsters = new List<GroupMonster>
+                {
+                    new() { Type = "mushroom", OffsetX = 0, OffsetZ = -1.5f, Level = 1 },
+                    new() { Type = "mushroom", OffsetX = 1.3f, OffsetZ = 0.75f, Level = 1 },
+                    new() { Type = "mushroom", OffsetX = -1.3f, OffsetZ = 0.75f, Level = 1 }
+                }
+            }
+        };
+    }
+}

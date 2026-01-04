@@ -1,0 +1,19 @@
+[remap]
+
+importer="oggvorbisstr"
+type="AudioStreamOggVorbis"
+uid="uid://g54fsol7qf5m"
+path="res://.godot/imported/Trap Drum Loop-16.ogg-cfed612a063c538d4287169b2a5bc1fb.oggvorbisstr"
+
+[deps]
+
+source_file="res://Assets/Audio/Music/Trap Drum Loop-16.ogg"
+dest_files=["res://.godot/imported/Trap Drum Loop-16.ogg-cfed612a063c538d4287169b2a5bc1fb.oggvorbisstr"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4
