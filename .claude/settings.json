@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dotnet build:*)",
+      "Bash(dotnet test:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git checkout:*)",
+      "Bash(git branch:*)",
+      "Bash(git remote:*)",
+      "Bash(git config:*)"
+    ],
+    "deny": [
+      "Bash(rm -rf:*)",
+      "Bash(del /s:*)",
+      "Bash(format:*)",
+      "Read(.env)",
+      "Read(.env.*)",
+      "Edit(.git/**)"
+    ]
+  },
+  "env": {
+    "GODOT_PATH": "C:\\Godot\\Godot_v4.3-stable_mono_win64.exe",
+    "DOTNET_CLI_TELEMETRY_OPTOUT": "1"
+  }
+}
