@@ -119,6 +119,22 @@ public partial class EditorScreen3D : Control
     private Node3D? _statusEffectVisual;
     private StatusEffectType _currentStatusEffect = StatusEffectType.None;
 
+    // Top bar controls (for tab-specific visibility)
+    private HBoxContainer? _animationControlsContainer;
+    private HBoxContainer? _statusEffectContainer;
+    private CheckBox? _autoRotateCheckBox;
+
+    // Detail panel section containers (for tab-specific visibility)
+    private VBoxContainer? _monsterStatsSection;
+    private VBoxContainer? _abilityStatsSection;
+    private VBoxContainer? _cosmeticPropsSection;
+    private VBoxContainer? _weaponStatsSection;
+    private VBoxContainer? _npcStatsSection;
+
+    // NPC editor controls
+    private ColorPickerButton? _npcSkinColorPicker;
+    private SpinBox? _npcScaleSpinBox;
+
     // Close button
     private Button? _closeButton;
 
@@ -522,17 +538,21 @@ public partial class EditorScreen3D : Control
         spacer2.CustomMinimumSize = new Vector2(30, 0);
         topHBox.AddChild(spacer2);
 
+        // Animation controls container (visible only on Monsters tab)
+        _animationControlsContainer = new HBoxContainer();
+        topHBox.AddChild(_animationControlsContainer);
+
         // Auto-rotate toggle
-        var rotateCheck = new CheckBox();
-        rotateCheck.Text = "Auto-Rotate";
-        rotateCheck.ButtonPressed = _autoRotate;
-        rotateCheck.AddThemeFontSizeOverride("font_size", 16);
-        rotateCheck.Toggled += (pressed) => _autoRotate = pressed;
-        topHBox.AddChild(rotateCheck);
+        _autoRotateCheckBox = new CheckBox();
+        _autoRotateCheckBox.Text = "Auto-Rotate";
+        _autoRotateCheckBox.ButtonPressed = _autoRotate;
+        _autoRotateCheckBox.AddThemeFontSizeOverride("font_size", 16);
+        _autoRotateCheckBox.Toggled += (pressed) => _autoRotate = pressed;
+        _animationControlsContainer.AddChild(_autoRotateCheckBox);
 
         var spacer3 = new Control();
         spacer3.CustomMinimumSize = new Vector2(15, 0);
-        topHBox.AddChild(spacer3);
+        _animationControlsContainer.AddChild(spacer3);
 
         // Animation cycling toggle
         _cycleAnimationsCheckBox = new CheckBox();
@@ -540,11 +560,11 @@ public partial class EditorScreen3D : Control
         _cycleAnimationsCheckBox.ButtonPressed = _cycleAnimations;
         _cycleAnimationsCheckBox.AddThemeFontSizeOverride("font_size", 16);
         _cycleAnimationsCheckBox.Toggled += OnCycleAnimationsToggled;
-        topHBox.AddChild(_cycleAnimationsCheckBox);
+        _animationControlsContainer.AddChild(_cycleAnimationsCheckBox);
 
         var spacer3b = new Control();
         spacer3b.CustomMinimumSize = new Vector2(15, 0);
-        topHBox.AddChild(spacer3b);
+        _animationControlsContainer.AddChild(spacer3b);
 
         // Animation dropdown (18 animations: 6 types × 3 variants)
         _animationDropdown = new OptionButton();
@@ -559,32 +579,36 @@ public partial class EditorScreen3D : Control
         }
         _animationDropdown.Selected = 0;
         _animationDropdown.ItemSelected += OnAnimationSelected;
-        topHBox.AddChild(_animationDropdown);
+        _animationControlsContainer.AddChild(_animationDropdown);
 
         var spacer3c = new Control();
         spacer3c.CustomMinimumSize = new Vector2(10, 0);
-        topHBox.AddChild(spacer3c);
+        _animationControlsContainer.AddChild(spacer3c);
 
         // Animation label
         _animationLabel = new Label();
         _animationLabel.Text = "[Idle]";
         _animationLabel.AddThemeFontSizeOverride("font_size", 16);
         _animationLabel.AddThemeColorOverride("font_color", new Color(0.6f, 0.9f, 0.6f));
-        topHBox.AddChild(_animationLabel);
+        _animationControlsContainer.AddChild(_animationLabel);
 
         var spacer4 = new Control();
         spacer4.CustomMinimumSize = new Vector2(20, 0);
-        topHBox.AddChild(spacer4);
+        _animationControlsContainer.AddChild(spacer4);
+
+        // Status effect container (visible only on Monsters tab)
+        _statusEffectContainer = new HBoxContainer();
+        topHBox.AddChild(_statusEffectContainer);
 
         // Status effect label
         var statusLabel = new Label();
         statusLabel.Text = "Status:";
         statusLabel.AddThemeFontSizeOverride("font_size", 16);
-        topHBox.AddChild(statusLabel);
+        _statusEffectContainer.AddChild(statusLabel);
 
         var spacer4b = new Control();
         spacer4b.CustomMinimumSize = new Vector2(8, 0);
-        topHBox.AddChild(spacer4b);
+        _statusEffectContainer.AddChild(spacer4b);
 
         // Status effect dropdown
         _statusEffectDropdown = new OptionButton();
@@ -597,7 +621,7 @@ public partial class EditorScreen3D : Control
         }
         _statusEffectDropdown.Selected = 0;
         _statusEffectDropdown.ItemSelected += OnStatusEffectSelected;
-        topHBox.AddChild(_statusEffectDropdown);
+        _statusEffectContainer.AddChild(_statusEffectDropdown);
 
         var spacer5 = new Control();
         spacer5.CustomMinimumSize = new Vector2(20, 0);
@@ -779,13 +803,13 @@ public partial class EditorScreen3D : Control
         margin.AddChild(vbox);
 
         // Section: Monster Stats
-        var monsterSection = CreateSection("Monster Stats");
-        vbox.AddChild(monsterSection);
+        _monsterStatsSection = CreateSection("Monster Stats");
+        vbox.AddChild(_monsterStatsSection);
 
-        _monsterHealthSpinBox = CreateAttributeRow(monsterSection, "Max Health", 10, 500, 75);
-        _monsterDamageSpinBox = CreateAttributeRow(monsterSection, "Damage", 1, 100, 10);
-        _monsterSpeedSpinBox = CreateAttributeRow(monsterSection, "Move Speed", 0.5, 10, 3);
-        _monsterAggroSpinBox = CreateAttributeRow(monsterSection, "Aggro Range", 5, 50, 15);
+        _monsterHealthSpinBox = CreateAttributeRow(_monsterStatsSection, "Max Health", 10, 500, 75);
+        _monsterDamageSpinBox = CreateAttributeRow(_monsterStatsSection, "Damage", 1, 100, 10);
+        _monsterSpeedSpinBox = CreateAttributeRow(_monsterStatsSection, "Move Speed", 0.5, 10, 3);
+        _monsterAggroSpinBox = CreateAttributeRow(_monsterStatsSection, "Aggro Range", 5, 50, 15);
 
         var skinRow = new HBoxContainer();
         skinRow.AddThemeConstantOverride("separation", 10);
@@ -799,7 +823,7 @@ public partial class EditorScreen3D : Control
         _monsterSkinColorPicker.SizeFlagsHorizontal = SizeFlags.ExpandFill;
         _monsterSkinColorPicker.ColorChanged += OnMonsterColorChanged;
         skinRow.AddChild(_monsterSkinColorPicker);
-        monsterSection.AddChild(skinRow);
+        _monsterStatsSection.AddChild(skinRow);
 
         // Apply/Save button for monster changes
         var saveBtn = new Button();
@@ -815,7 +839,7 @@ public partial class EditorScreen3D : Control
         saveBtnHover.SetCornerRadiusAll(4);
         saveBtn.AddThemeStyleboxOverride("hover", saveBtnHover);
         saveBtn.Pressed += OnApplyChanges;
-        monsterSection.AddChild(saveBtn);
+        _monsterStatsSection.AddChild(saveBtn);
 
         // Section: Monster Sounds
         _soundSection = CreateSection("Monster Sounds");
@@ -885,28 +909,28 @@ public partial class EditorScreen3D : Control
         _soundSection.AddChild(playAllBtn);
 
         // Section: Ability Stats
-        var abilitySection = CreateSection("Ability Stats");
-        vbox.AddChild(abilitySection);
+        _abilityStatsSection = CreateSection("Ability Stats");
+        vbox.AddChild(_abilityStatsSection);
 
-        _abilityCooldownSpinBox = CreateAttributeRow(abilitySection, "Cooldown (s)", 0.5, 60, 5);
-        _abilityDamageSpinBox = CreateAttributeRow(abilitySection, "Damage", 0, 500, 50);
-        _abilityRadiusSpinBox = CreateAttributeRow(abilitySection, "Radius", 0.5, 20, 3);
-        _abilityDurationSpinBox = CreateAttributeRow(abilitySection, "Duration (s)", 0, 30, 5);
-        _abilityManaCostSpinBox = CreateAttributeRow(abilitySection, "Mana Cost", 0, 100, 20);
+        _abilityCooldownSpinBox = CreateAttributeRow(_abilityStatsSection, "Cooldown (s)", 0.5, 60, 5);
+        _abilityDamageSpinBox = CreateAttributeRow(_abilityStatsSection, "Damage", 0, 500, 50);
+        _abilityRadiusSpinBox = CreateAttributeRow(_abilityStatsSection, "Radius", 0.5, 20, 3);
+        _abilityDurationSpinBox = CreateAttributeRow(_abilityStatsSection, "Duration (s)", 0, 30, 5);
+        _abilityManaCostSpinBox = CreateAttributeRow(_abilityStatsSection, "Mana Cost", 0, 100, 20);
 
         // Section: Cosmetic Props
-        var cosmeticSection = CreateSection("Cosmetic Props");
-        vbox.AddChild(cosmeticSection);
+        _cosmeticPropsSection = CreateSection("Cosmetic Props");
+        vbox.AddChild(_cosmeticPropsSection);
 
-        _cosmeticScaleSpinBox = CreateAttributeRow(cosmeticSection, "Scale", 0.1, 5, 1);
+        _cosmeticScaleSpinBox = CreateAttributeRow(_cosmeticPropsSection, "Scale", 0.1, 5, 1);
 
         var lightRow = new HBoxContainer();
         _cosmeticHasLightCheckBox = new CheckBox { Text = "Has Light" };
         _cosmeticHasLightCheckBox.AddThemeFontSizeOverride("font_size", 14);
         lightRow.AddChild(_cosmeticHasLightCheckBox);
-        cosmeticSection.AddChild(lightRow);
+        _cosmeticPropsSection.AddChild(lightRow);
 
-        _cosmeticLightRadiusSpinBox = CreateAttributeRow(cosmeticSection, "Light Radius", 1, 20, 8);
+        _cosmeticLightRadiusSpinBox = CreateAttributeRow(_cosmeticPropsSection, "Light Radius", 1, 20, 8);
 
         var lightColorRow = new HBoxContainer();
         lightColorRow.AddThemeConstantOverride("separation", 10);
@@ -919,17 +943,17 @@ public partial class EditorScreen3D : Control
         _cosmeticLightColorPicker.CustomMinimumSize = new Vector2(80, 30);
         _cosmeticLightColorPicker.SizeFlagsHorizontal = SizeFlags.ExpandFill;
         lightColorRow.AddChild(_cosmeticLightColorPicker);
-        cosmeticSection.AddChild(lightColorRow);
+        _cosmeticPropsSection.AddChild(lightColorRow);
 
         // Section: Weapon Stats
-        var weaponSection = CreateSection("Weapon Stats");
-        vbox.AddChild(weaponSection);
+        _weaponStatsSection = CreateSection("Weapon Stats");
+        vbox.AddChild(_weaponStatsSection);
 
         // Weapon info labels (read-only display)
-        _weaponDamageLabel = CreateInfoRow(weaponSection, "Damage Bonus");
-        _weaponSpeedLabel = CreateInfoRow(weaponSection, "Speed Modifier");
-        _weaponRangeLabel = CreateInfoRow(weaponSection, "Attack Range");
-        _weaponHandedLabel = CreateInfoRow(weaponSection, "Grip Type");
+        _weaponDamageLabel = CreateInfoRow(_weaponStatsSection, "Damage Bonus");
+        _weaponSpeedLabel = CreateInfoRow(_weaponStatsSection, "Speed Modifier");
+        _weaponRangeLabel = CreateInfoRow(_weaponStatsSection, "Attack Range");
+        _weaponHandedLabel = CreateInfoRow(_weaponStatsSection, "Grip Type");
 
         // Attach to Monster dropdown
         var attachRow = new HBoxContainer();
@@ -952,7 +976,42 @@ public partial class EditorScreen3D : Control
         _attachMonsterDropdown.ItemSelected += OnAttachMonsterSelected;
         _attachMonsterDropdown.SizeFlagsHorizontal = SizeFlags.ExpandFill;
         attachRow.AddChild(_attachMonsterDropdown);
-        weaponSection.AddChild(attachRow);
+        _weaponStatsSection.AddChild(attachRow);
+
+        // Section: NPC Stats
+        _npcStatsSection = CreateSection("NPC Stats");
+        vbox.AddChild(_npcStatsSection);
+
+        _npcScaleSpinBox = CreateAttributeRow(_npcStatsSection, "Scale", 0.5, 3, 1);
+
+        var npcSkinRow = new HBoxContainer();
+        npcSkinRow.AddThemeConstantOverride("separation", 10);
+        var npcSkinLabel = new Label { Text = "Skin Color" };
+        npcSkinLabel.AddThemeFontSizeOverride("font_size", 14);
+        npcSkinLabel.CustomMinimumSize = new Vector2(100, 0);
+        npcSkinRow.AddChild(npcSkinLabel);
+        _npcSkinColorPicker = new ColorPickerButton();
+        _npcSkinColorPicker.Color = new Color(0.85f, 0.75f, 0.6f);
+        _npcSkinColorPicker.CustomMinimumSize = new Vector2(80, 30);
+        _npcSkinColorPicker.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        npcSkinRow.AddChild(_npcSkinColorPicker);
+        _npcStatsSection.AddChild(npcSkinRow);
+
+        // NPC Apply button
+        var npcApplyBtn = new Button();
+        npcApplyBtn.Text = "Apply Changes";
+        npcApplyBtn.CustomMinimumSize = new Vector2(0, 35);
+        npcApplyBtn.AddThemeFontSizeOverride("font_size", 14);
+        var npcApplyStyle = new StyleBoxFlat();
+        npcApplyStyle.BgColor = new Color(0.3f, 0.5f, 0.3f);
+        npcApplyStyle.SetCornerRadiusAll(4);
+        npcApplyBtn.AddThemeStyleboxOverride("normal", npcApplyStyle);
+        var npcApplyHover = new StyleBoxFlat();
+        npcApplyHover.BgColor = new Color(0.4f, 0.6f, 0.4f);
+        npcApplyHover.SetCornerRadiusAll(4);
+        npcApplyBtn.AddThemeStyleboxOverride("hover", npcApplyHover);
+        npcApplyBtn.Pressed += OnApplyChanges;
+        _npcStatsSection.AddChild(npcApplyBtn);
 
         // Apply button
         var applyBtn = new Button();
@@ -1442,8 +1501,9 @@ public partial class EditorScreen3D : Control
         if (_mainContentArea != null)
             _mainContentArea.Visible = !isMapTab;
 
-        // Update title based on active tab
+        // Update title and visibility based on active tab
         UpdateTitle();
+        UpdateTabVisibility();
 
         GD.Print($"[EditorScreen3D] Tab changed to {tab}, map editor visible: {isMapTab}");
     }
@@ -1478,6 +1538,63 @@ public partial class EditorScreen3D : Control
         return "MAP EDITOR";
     }
 
+    /// <summary>
+    /// Updates visibility of UI sections based on the active tab.
+    /// </summary>
+    private void UpdateTabVisibility()
+    {
+        bool isMonsters = _currentTab == 0;
+        bool isAbilities = _currentTab == 1;
+        bool isProps = _currentTab == 2;
+        bool isNpcs = _currentTab == 3;
+        bool isWeapons = _currentTab == 4;
+
+        // Top bar controls - only show on Monsters tab
+        if (_animationControlsContainer != null)
+            _animationControlsContainer.Visible = isMonsters;
+        if (_statusEffectContainer != null)
+            _statusEffectContainer.Visible = isMonsters;
+
+        // Detail panel sections - show only the relevant one
+        if (_monsterStatsSection != null)
+            _monsterStatsSection.Visible = isMonsters;
+        if (_soundSection != null)
+            _soundSection.Visible = isMonsters;
+        if (_abilityStatsSection != null)
+            _abilityStatsSection.Visible = isAbilities;
+        if (_cosmeticPropsSection != null)
+            _cosmeticPropsSection.Visible = isProps;
+        if (_npcStatsSection != null)
+            _npcStatsSection.Visible = isNpcs;
+        if (_weaponStatsSection != null)
+            _weaponStatsSection.Visible = isWeapons;
+
+        // Update viewport hint for context
+        UpdateViewportHint();
+    }
+
+    /// <summary>
+    /// Updates the viewport hint text based on active tab and selection state.
+    /// </summary>
+    private void UpdateViewportHint()
+    {
+        if (_viewportHintLabel == null) return;
+
+        string baseHint = "Drag to rotate | Scroll to zoom | Right-click to reset";
+
+        string contextHint = _currentTab switch
+        {
+            0 => _selectedMonsterId == null ? "Select a monster to preview" : baseHint,
+            1 => _selectedAbilityId == null ? "Select an ability to preview" : baseHint,
+            2 => _selectedCosmeticType == null ? "Select a prop to preview" : baseHint,
+            3 => _selectedNpcId == null ? "Select an NPC to preview" : baseHint,
+            4 => _selectedWeaponType == null ? "Select a weapon to preview" : baseHint,
+            _ => baseHint
+        };
+
+        _viewportHintLabel.Text = contextHint;
+    }
+
     private void SelectMonster(string monsterId)
     {
         _selectedMonsterId = monsterId;
@@ -1505,6 +1622,9 @@ public partial class EditorScreen3D : Control
 
         // Update sound controls
         UpdateSoundButtonsForMonster(monsterId);
+
+        // Update viewport hint
+        UpdateViewportHint();
 
         GD.Print($"[EditorScreen3D] Selected monster: {monsterId}");
     }
@@ -1541,6 +1661,9 @@ public partial class EditorScreen3D : Control
         // Create preview
         UpdatePreviewAbility(abilityId);
 
+        // Update viewport hint
+        UpdateViewportHint();
+
         GD.Print($"[EditorScreen3D] Selected ability: {abilityId}");
     }
 
@@ -1568,6 +1691,9 @@ public partial class EditorScreen3D : Control
 
         // Create preview
         UpdatePreviewCosmetic(cosmeticType);
+
+        // Update viewport hint
+        UpdateViewportHint();
 
         GD.Print($"[EditorScreen3D] Selected cosmetic: {cosmeticType}");
     }
@@ -1602,6 +1728,9 @@ public partial class EditorScreen3D : Control
 
         // Create preview
         UpdatePreviewNpc(npcId);
+
+        // Update viewport hint
+        UpdateViewportHint();
 
         GD.Print($"[EditorScreen3D] Selected NPC: {npcId}");
     }
@@ -1641,6 +1770,9 @@ public partial class EditorScreen3D : Control
 
         // Create preview
         UpdatePreviewWeapon(weaponName);
+
+        // Update viewport hint
+        UpdateViewportHint();
 
         GD.Print($"[EditorScreen3D] Selected weapon: {weaponName}");
     }
