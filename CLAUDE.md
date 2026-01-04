@@ -69,6 +69,7 @@ Follow this sequence for all code changes:
 2. **Build** - Compile and verify no errors
 3. **Unit Test** - Run automated tests, fix any failures (when available)
 4. **Present to User** - Launch game for manual testing/approval
+5. **Commit to Git** - After user approval, commit changes with descriptive message
 
 ```powershell
 # Step 2: Build game project
@@ -82,6 +83,84 @@ powershell -Command "Start-Process 'C:\Godot\Godot_v4.3-stable_mono_win64.exe' -
 ```
 
 **IMPORTANT**: The `dotnet build` command is the most reliable way to compile C# changes. Godot's `--build-solutions` can sometimes hang or fail silently. Always verify "Build succeeded" before launching.
+
+## Git Workflow
+
+**Repository:** https://github.com/gnoobs75/Saferoom3D
+
+### When to Commit
+- **After each completed feature** - Once user approves and build succeeds
+- **After bug fixes** - When a fix is verified working
+- **Before major refactors** - Create a checkpoint before risky changes
+- **End of session** - Commit work-in-progress if stopping mid-task
+
+### Commit Process
+After user approval of changes:
+
+```powershell
+# Check what's changed
+git status
+
+# Stage all changes (or specific files)
+git add -A
+
+# Commit with descriptive message
+git commit -m "Add feature X - brief description"
+
+# Push to GitHub
+git push
+```
+
+### Commit Message Format
+Use clear, descriptive messages:
+- `Add [feature]` - New functionality
+- `Fix [bug]` - Bug fixes
+- `Update [component]` - Enhancements to existing features
+- `Refactor [area]` - Code restructuring without behavior change
+- `Remove [feature]` - Deleted functionality
+
+**Examples:**
+```
+Add boss health bar with damage animation
+Fix player falling through floor at room edges
+Update minimap to show fog of war
+Refactor enemy AI state machine for clarity
+```
+
+### Branching (Optional)
+For larger features, use feature branches:
+```powershell
+# Create and switch to feature branch
+git checkout -b feature/new-ability-system
+
+# Work on feature, commit as needed...
+
+# When done, merge back to main
+git checkout main
+git merge feature/new-ability-system
+git push
+```
+
+### Recovery Commands
+```powershell
+# Undo uncommitted changes to a file
+git checkout -- path/to/file.cs
+
+# Undo last commit (keep changes staged)
+git reset --soft HEAD~1
+
+# View commit history
+git log --oneline -10
+
+# See what changed in a commit
+git show <commit-hash>
+```
+
+### What NOT to Commit
+The `.gitignore` excludes these automatically:
+- `.godot/` - Godot cache (regenerated on build)
+- `bin/`, `obj/` - C# build outputs
+- `*.user` files - Personal IDE settings
 
 ## Environment & Dependencies
 
