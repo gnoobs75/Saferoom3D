@@ -2,6 +2,7 @@ using Godot;
 using System.Collections.Generic;
 using SafeRoom3D.Core;
 using SafeRoom3D.Player;
+using SafeRoom3D.Enemies;
 using SafeRoom3D.Abilities;
 using SafeRoom3D.Broadcaster;
 
@@ -19,6 +20,7 @@ public partial class HUD3D : Control
     // UI Elements
     private ProgressBar? _healthBar;
     private ProgressBar? _manaBar;
+    private ColorRect? _playerPortrait;
     private ProgressBar? _expBar;
     private Label? _healthLabel;
     private Label? _manaLabel;
@@ -31,6 +33,8 @@ public partial class HUD3D : Control
     private Label? _targetingPrompt;
     private Control? _compassContainer;
     private Control? _shortcutIcons;
+    private HBoxContainer? _shortcutRow1;
+    private HBoxContainer? _shortcutRow2;
     private Control? _overviewMap;
     private bool _isOverviewMapVisible;
     private float _overviewMapZoom = 1f; // Zoom level for overview map (0.5 to 3.0)
@@ -101,6 +105,20 @@ public partial class HUD3D : Control
     private float _multiKillTimer;
     private const float MultiKillWindow = 2f; // Seconds to count as multi-kill
 
+    // Target Frame (shows current target to right of action bar)
+    private PanelContainer? _targetFrame;
+    private Label? _targetNameLabel;
+    private ProgressBar? _targetHealthBar;
+    private Label? _targetHealthLabel;
+    private ProgressBar? _targetManaBar;
+    private Label? _targetManaLabel;
+    private ColorRect? _targetPortrait;
+    private Node3D? _currentTarget;
+    private readonly List<Node3D> _visibleEnemies = new();
+    private int _targetIndex = -1;
+    private float _targetUpdateTimer;
+    private Node3D? _targetMarker3D;  // 3D marker that floats above targeted enemy
+
     public override void _Ready()
     {
         Instance = this;
@@ -115,6 +133,7 @@ public partial class HUD3D : Control
         CreateCompass();
         CreateTimer();
         CreateActionBars();
+        CreateTargetFrame();
         CreateShortcutIcons();
         CreateInteractPrompt();
         CreateTargetingPrompt();
@@ -127,7 +146,39 @@ public partial class HUD3D : Control
         ConnectGameManagerSignals();
         ConnectAbilityManagerSignals();
 
+        // Apply saved HUD positions (deferred to ensure elements are sized)
+        CallDeferred(nameof(ApplySavedHUDPositions));
+
         GD.Print("[HUD3D] Ready with 3 action bars, compass, chat window, and shortcut icons");
+    }
+
+    /// <summary>
+    /// Load and apply saved HUD positions from disk.
+    /// </summary>
+    private void ApplySavedHUDPositions()
+    {
+        ApplyPosition(_actionBarPanel, "HUD_ActionBarPanel");
+        ApplyPosition(_healthManaPanel, "HUD_HealthManaPanel");
+        ApplyPosition(_targetFrame, "HUD_TargetFrame");
+        ApplyPosition(_chatWindow, "HUD_ChatWindow");
+        ApplyPosition(_minimapPanel, "HUD_MinimapOuterFrame");
+        ApplyPosition(_compassContainer, "HUD_Compass");
+        ApplyPosition(_shortcutIcons, "HUD_ShortcutIcons");
+    }
+
+    private void ApplyPosition(Control? element, string elementName)
+    {
+        if (element == null) return;
+
+        var savedPos = WindowPositionManager.GetPosition(elementName);
+        if (savedPos != WindowPositionManager.CenterMarker)
+        {
+            // Apply saved position, clamped to viewport
+            var viewportSize = GetViewportRect().Size;
+            var clampedPos = WindowPositionManager.ClampToViewport(savedPos, viewportSize, element.Size);
+            element.Position = clampedPos;
+            GD.Print($"[HUD3D] Applied saved position for {elementName}: {clampedPos}");
+        }
     }
 
     private void CreateHealthManaPanel()
@@ -136,138 +187,194 @@ public partial class HUD3D : Control
         var panel = _healthManaPanel;
         panel.Name = "HealthManaPanel";
 
-        // Use fixed size and position - will be updated in _Process for screen size
+        // Match target frame size for visual symmetry (280x130)
         panel.CustomMinimumSize = new Vector2(280, 130);
         panel.Size = new Vector2(280, 130);
-
-        // Position will be set in _Process based on viewport size
-        // Initial fallback position
-        panel.Position = new Vector2(20, 500);
-
-        // Ensure panel is visible above other UI
+        panel.Position = new Vector2(20, 500);  // Will be updated by position method
         panel.ZIndex = 100;
 
-        // Add a visible background
+        // Style matching target frame (but with blue/player tint)
         var panelStyle = new StyleBoxFlat();
         panelStyle.BgColor = new Color(0.1f, 0.1f, 0.15f, 0.9f);
         panelStyle.SetBorderWidthAll(2);
-        panelStyle.BorderColor = new Color(0.5f, 0.5f, 0.6f, 0.9f);
+        panelStyle.BorderColor = new Color(0.4f, 0.5f, 0.7f, 0.9f);  // Blue-ish border for player
         panelStyle.SetCornerRadiusAll(8);
         panelStyle.SetContentMarginAll(10);
         panel.AddThemeStyleboxOverride("panel", panelStyle);
 
-        var vbox = new VBoxContainer();
-        vbox.AddThemeConstantOverride("separation", 8);
+        var hbox = new HBoxContainer();
+        hbox.AddThemeConstantOverride("separation", 10);
 
-        // Health bar
+        // Portrait (Crawler icon - colorful square)
+        _playerPortrait = new ColorRect();
+        _playerPortrait.CustomMinimumSize = new Vector2(80, 80);
+        _playerPortrait.Color = new Color(0.3f, 0.4f, 0.6f);  // Blue-ish for player
+        hbox.AddChild(_playerPortrait);
+
+        // Right side - name and bars
+        var vbox = new VBoxContainer();
+        vbox.AddThemeConstantOverride("separation", 4);
+        vbox.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+
+        // Player name label
+        var nameLabel = new Label { Text = "Crawler" };
+        nameLabel.AddThemeFontSizeOverride("font_size", 16);
+        nameLabel.AddThemeColorOverride("font_color", new Color(0.8f, 0.9f, 1f));
+        vbox.AddChild(nameLabel);
+
+        // Health bar row
         var healthRow = new HBoxContainer();
-        var healthIcon = new Label { Text = "♥", CustomMinimumSize = new Vector2(25, 0) };
+        var healthIcon = new Label { Text = "♥", CustomMinimumSize = new Vector2(20, 0) };
         healthIcon.AddThemeColorOverride("font_color", _healthColor);
-        healthIcon.AddThemeFontSizeOverride("font_size", 20);
+        healthIcon.AddThemeFontSizeOverride("font_size", 16);
         healthRow.AddChild(healthIcon);
 
         _healthBar = new ProgressBar();
-        _healthBar.CustomMinimumSize = new Vector2(180, 24);
+        _healthBar.CustomMinimumSize = new Vector2(100, 20);
         _healthBar.MaxValue = 100;
         _healthBar.Value = 100;
         _healthBar.ShowPercentage = false;
+        _healthBar.SizeFlagsHorizontal = SizeFlags.ExpandFill;
 
-        var healthStyle = new StyleBoxFlat();
-        healthStyle.BgColor = new Color(0.15f, 0.15f, 0.15f);
-        _healthBar.AddThemeStyleboxOverride("background", healthStyle);
+        var healthBgStyle = new StyleBoxFlat();
+        healthBgStyle.BgColor = new Color(0.15f, 0.15f, 0.15f);
+        _healthBar.AddThemeStyleboxOverride("background", healthBgStyle);
 
         var healthFill = new StyleBoxFlat();
         healthFill.BgColor = _healthColor;
         _healthBar.AddThemeStyleboxOverride("fill", healthFill);
-
         healthRow.AddChild(_healthBar);
 
         _healthLabel = new Label { Text = "100/100" };
-        _healthLabel.AddThemeFontSizeOverride("font_size", 14);
+        _healthLabel.AddThemeFontSizeOverride("font_size", 12);
+        _healthLabel.CustomMinimumSize = new Vector2(55, 0);
         healthRow.AddChild(_healthLabel);
-
         vbox.AddChild(healthRow);
 
-        // Mana bar
+        // Mana bar row
         var manaRow = new HBoxContainer();
-        var manaIcon = new Label { Text = "✦", CustomMinimumSize = new Vector2(25, 0) };
+        var manaIcon = new Label { Text = "✦", CustomMinimumSize = new Vector2(20, 0) };
         manaIcon.AddThemeColorOverride("font_color", _manaColor);
-        manaIcon.AddThemeFontSizeOverride("font_size", 20);
+        manaIcon.AddThemeFontSizeOverride("font_size", 16);
         manaRow.AddChild(manaIcon);
 
         _manaBar = new ProgressBar();
-        _manaBar.CustomMinimumSize = new Vector2(180, 24);
+        _manaBar.CustomMinimumSize = new Vector2(100, 18);
         _manaBar.MaxValue = 50;
         _manaBar.Value = 50;
         _manaBar.ShowPercentage = false;
+        _manaBar.SizeFlagsHorizontal = SizeFlags.ExpandFill;
 
-        var manaStyle = new StyleBoxFlat();
-        manaStyle.BgColor = new Color(0.15f, 0.15f, 0.15f);
-        _manaBar.AddThemeStyleboxOverride("background", manaStyle);
+        var manaBgStyle = new StyleBoxFlat();
+        manaBgStyle.BgColor = new Color(0.15f, 0.15f, 0.15f);
+        _manaBar.AddThemeStyleboxOverride("background", manaBgStyle);
 
         var manaFill = new StyleBoxFlat();
         manaFill.BgColor = _manaColor;
         _manaBar.AddThemeStyleboxOverride("fill", manaFill);
-
         manaRow.AddChild(_manaBar);
 
         _manaLabel = new Label { Text = "50/50" };
-        _manaLabel.AddThemeFontSizeOverride("font_size", 14);
+        _manaLabel.AddThemeFontSizeOverride("font_size", 12);
+        _manaLabel.CustomMinimumSize = new Vector2(55, 0);
         manaRow.AddChild(_manaLabel);
-
         vbox.AddChild(manaRow);
 
-        // Experience bar
+        // Experience bar row
         var expRow = new HBoxContainer();
-        var expIcon = new Label { Text = "★", CustomMinimumSize = new Vector2(25, 0) };
+        var expIcon = new Label { Text = "★", CustomMinimumSize = new Vector2(20, 0) };
         expIcon.AddThemeColorOverride("font_color", new Color(0.9f, 0.8f, 0.2f));
-        expIcon.AddThemeFontSizeOverride("font_size", 20);
+        expIcon.AddThemeFontSizeOverride("font_size", 16);
         expRow.AddChild(expIcon);
 
         _expBar = new ProgressBar();
-        _expBar.CustomMinimumSize = new Vector2(180, 20);
+        _expBar.CustomMinimumSize = new Vector2(100, 16);
         _expBar.MaxValue = 100;
-        _expBar.Value = 35; // Example XP progress
+        _expBar.Value = 35;
         _expBar.ShowPercentage = false;
+        _expBar.SizeFlagsHorizontal = SizeFlags.ExpandFill;
 
-        var expStyle = new StyleBoxFlat();
-        expStyle.BgColor = new Color(0.15f, 0.15f, 0.15f);
-        _expBar.AddThemeStyleboxOverride("background", expStyle);
+        var expBgStyle = new StyleBoxFlat();
+        expBgStyle.BgColor = new Color(0.15f, 0.15f, 0.15f);
+        _expBar.AddThemeStyleboxOverride("background", expBgStyle);
 
         var expFill = new StyleBoxFlat();
         expFill.BgColor = new Color(0.9f, 0.8f, 0.2f);
         _expBar.AddThemeStyleboxOverride("fill", expFill);
-
         expRow.AddChild(_expBar);
 
         _expLabel = new Label { Text = "Lv 1" };
-        _expLabel.AddThemeFontSizeOverride("font_size", 14);
+        _expLabel.AddThemeFontSizeOverride("font_size", 12);
         _expLabel.AddThemeColorOverride("font_color", new Color(0.9f, 0.8f, 0.2f));
+        _expLabel.CustomMinimumSize = new Vector2(55, 0);
         expRow.AddChild(_expLabel);
-
         vbox.AddChild(expRow);
 
-        panel.AddChild(vbox);
+        hbox.AddChild(vbox);
+        panel.AddChild(hbox);
         AddChild(panel);
 
-        GD.Print($"[HUD3D] Health/Mana panel created - visible: {panel.Visible}, size: {panel.Size}");
+        GD.Print($"[HUD3D] Health/Mana panel created with portrait - size: {panel.Size}");
     }
 
     private void UpdateLeftPanelsPosition()
     {
+        // Check if user has saved a custom position for chat window - if so, don't override
+        var savedPos = WindowPositionManager.GetPosition("HUD_ChatWindow");
+        if (savedPos != WindowPositionManager.CenterMarker)
+        {
+            return; // User has a saved position, don't override it
+        }
+
         var viewportSize = GetViewportRect().Size;
 
-        // Position health panel at bottom left
-        if (_healthManaPanel != null)
+        // Position chat window above the health panel (which is now left of action bar)
+        if (_chatWindow != null && _healthManaPanel != null)
         {
-            _healthManaPanel.Position = new Vector2(20, viewportSize.Y - 150);
+            // Chat window goes above health panel
+            _chatWindow.Position = new Vector2(
+                _healthManaPanel.Position.X,
+                _healthManaPanel.Position.Y - _chatWindow.Size.Y - 10
+            );
+        }
+        else if (_chatWindow != null)
+        {
+            // Fallback if health panel not positioned yet - position at bottom-left with 40px margin
+            _chatWindow.Position = new Vector2(20, viewportSize.Y - 440);
+        }
+    }
+
+    private void UpdateHealthPanelPosition()
+    {
+        if (_healthManaPanel == null) return;
+
+        // Check if user has saved a custom position - if so, use it
+        var savedPos = WindowPositionManager.GetPosition("HUD_HealthManaPanel");
+        if (savedPos != WindowPositionManager.CenterMarker)
+        {
+            return; // User has a saved position, don't override it
         }
 
-        // Position chat window above health panel
-        if (_chatWindow != null)
-        {
-            _chatWindow.Position = new Vector2(20, viewportSize.Y - 380);
-        }
+        var viewportSize = GetViewportRect().Size;
+        float healthPanelWidth = 280;
+        float healthPanelHeight = 130;
+        float gap = 20;  // Gap between health panel and action bar
+        float actionBarWidth = 720;
+        float actionBarHeight = 200;
+
+        // Calculate action bar position
+        float actionBarX = (viewportSize.X - actionBarWidth) / 2;
+        float actionBarY = viewportSize.Y - actionBarHeight - 40;
+
+        // Position health panel to the LEFT of action bar, bottom aligned
+        float healthX = actionBarX - healthPanelWidth - gap;
+        float healthY = actionBarY + (actionBarHeight - healthPanelHeight) / 2;
+
+        // Clamp to viewport bounds
+        healthX = Mathf.Max(healthX, 10);
+        healthY = Mathf.Clamp(healthY, 10, viewportSize.Y - healthPanelHeight - 10);
+
+        _healthManaPanel.Position = new Vector2(healthX, healthY);
     }
 
     private void CreateChatWindow()
@@ -276,10 +383,10 @@ public partial class HUD3D : Control
         _chatWindow = new PanelContainer();
         _chatWindow.Name = "ChatWindow";
 
-        // Use fixed size - position updated in UpdateLeftPanelsPosition
-        _chatWindow.CustomMinimumSize = new Vector2(300, 220);
-        _chatWindow.Size = new Vector2(300, 220);
-        _chatWindow.Position = new Vector2(20, 400);  // Initial position
+        // Match info panel dimensions (320x400) for visual symmetry
+        _chatWindow.CustomMinimumSize = new Vector2(320, 400);
+        _chatWindow.Size = new Vector2(320, 400);
+        _chatWindow.Position = new Vector2(20, 400);  // Initial position, updated in UpdateLeftPanelsPosition
         _chatWindow.ZIndex = 10;
 
         var panelStyle = new StyleBoxFlat();
@@ -820,6 +927,7 @@ public partial class HUD3D : Control
         panelStyle.SetCornerRadiusAll(10);
         panelStyle.SetContentMarginAll(10);
         actionBarPanel.AddThemeStyleboxOverride("panel", panelStyle);
+        actionBarPanel.ProcessMode = ProcessModeEnum.Always;  // Process while paused for hover
         AddChild(actionBarPanel);
 
         // Store reference to update position
@@ -939,7 +1047,545 @@ public partial class HUD3D : Control
 
         slot.Container.AddChild(stack);
 
+        // Enable mouse events for hover detection in inspect mode
+        slot.Container.MouseFilter = Control.MouseFilterEnum.Stop;
+        slot.Container.ProcessMode = ProcessModeEnum.Always;  // Process while paused
+        int capturedRow = rowIndex;
+        int capturedSlot = slotIndex;
+        slot.Container.MouseEntered += () => OnActionSlotHovered(capturedRow, capturedSlot);
+        slot.Container.MouseExited += () => OnActionSlotUnhovered();
+
         return slot;
+    }
+
+    /// <summary>
+    /// Called when mouse hovers over an action slot - shows info in inspect mode.
+    /// </summary>
+    private void OnActionSlotHovered(int row, int slot)
+    {
+        GD.Print($"[HUD3D] Slot hovered: row={row}, slot={slot}");
+
+        // Only show hover info during inspect mode
+        if (InspectMode3D.Instance == null)
+        {
+            GD.Print("[HUD3D] InspectMode3D.Instance is null");
+            return;
+        }
+
+        if (!InspectMode3D.Instance.IsActive)
+        {
+            GD.Print("[HUD3D] InspectMode not active, ignoring hover");
+            return;
+        }
+
+        if (row < 0 || row >= _actionBars.Count || slot < 0 || slot >= _actionBars[row].Slots.Count)
+        {
+            GD.Print($"[HUD3D] Invalid slot indices");
+            return;
+        }
+
+        var actionSlot = _actionBars[row].Slots[slot];
+        GD.Print($"[HUD3D] Slot has ability={actionSlot.AbilityId}, consumable={actionSlot.ConsumableId}");
+
+        // Show ability info if slot has an ability
+        if (!string.IsNullOrEmpty(actionSlot.AbilityId))
+        {
+            GD.Print($"[HUD3D] Showing ability info for: {actionSlot.AbilityId}");
+            InspectMode3D.Instance.ShowAbilityInfo(actionSlot.AbilityId);
+        }
+        // Show consumable info if slot has a consumable
+        else if (!string.IsNullOrEmpty(actionSlot.ConsumableId))
+        {
+            GD.Print($"[HUD3D] Showing item info for: {actionSlot.ConsumableId}");
+            InspectMode3D.Instance.ShowItemInfo(actionSlot.ConsumableId);
+        }
+        else
+        {
+            GD.Print("[HUD3D] Slot is empty");
+        }
+    }
+
+    /// <summary>
+    /// Called when mouse leaves an action slot.
+    /// </summary>
+    private void OnActionSlotUnhovered()
+    {
+        // Could clear info panel here, but let it stay so user can read it
+    }
+
+    /// <summary>
+    /// Get action slot info at a screen position. Used by InspectMode for hover detection.
+    /// Returns (row, slot, abilityId, consumableId) or null if no slot at position.
+    /// </summary>
+    public (int row, int slot, string? abilityId, string? consumableId)? GetSlotAtPosition(Vector2 screenPos)
+    {
+        if (_actionBarPanel == null) return null;
+
+        // Check if position is within action bar panel
+        var panelRect = new Rect2(_actionBarPanel.GlobalPosition, _actionBarPanel.Size);
+        if (!panelRect.HasPoint(screenPos))
+            return null;
+
+        // Check each slot
+        for (int row = 0; row < _actionBars.Count; row++)
+        {
+            for (int slotIdx = 0; slotIdx < _actionBars[row].Slots.Count; slotIdx++)
+            {
+                var slot = _actionBars[row].Slots[slotIdx];
+                if (slot.Container == null) continue;
+
+                var slotRect = new Rect2(slot.Container.GlobalPosition, slot.Container.Size);
+                if (slotRect.HasPoint(screenPos))
+                {
+                    return (row, slotIdx, slot.AbilityId, slot.ConsumableId);
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Create the target frame UI (positioned to right of action bar).
+    /// Shows targeted enemy's portrait, name, health, and mana.
+    /// </summary>
+    private void CreateTargetFrame()
+    {
+        _targetFrame = new PanelContainer();
+        _targetFrame.Name = "TargetFrame";
+
+        // Match player health panel dimensions and style
+        _targetFrame.CustomMinimumSize = new Vector2(280, 130);
+        _targetFrame.Size = new Vector2(280, 130);
+        _targetFrame.ZIndex = 100;
+
+        // Initially hidden until target is selected
+        _targetFrame.Visible = false;
+
+        // Match player health panel style
+        var panelStyle = new StyleBoxFlat();
+        panelStyle.BgColor = new Color(0.1f, 0.1f, 0.15f, 0.9f);
+        panelStyle.SetBorderWidthAll(2);
+        panelStyle.BorderColor = new Color(0.7f, 0.4f, 0.4f, 0.9f);  // Red-ish border for enemy
+        panelStyle.SetCornerRadiusAll(8);
+        panelStyle.SetContentMarginAll(10);
+        _targetFrame.AddThemeStyleboxOverride("panel", panelStyle);
+
+        var hbox = new HBoxContainer();
+        hbox.AddThemeConstantOverride("separation", 10);
+
+        // Portrait (colored square representing enemy type)
+        _targetPortrait = new ColorRect();
+        _targetPortrait.CustomMinimumSize = new Vector2(80, 80);
+        _targetPortrait.Color = new Color(0.5f, 0.3f, 0.3f);  // Default enemy color
+        hbox.AddChild(_targetPortrait);
+
+        // Right side - name and bars
+        var vbox = new VBoxContainer();
+        vbox.AddThemeConstantOverride("separation", 6);
+        vbox.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+
+        // Target name
+        _targetNameLabel = new Label();
+        _targetNameLabel.Text = "No Target";
+        _targetNameLabel.AddThemeFontSizeOverride("font_size", 16);
+        _targetNameLabel.AddThemeColorOverride("font_color", new Color(1f, 0.9f, 0.8f));
+        vbox.AddChild(_targetNameLabel);
+
+        // Health bar row
+        var healthRow = new HBoxContainer();
+        var healthIcon = new Label { Text = "♥", CustomMinimumSize = new Vector2(20, 0) };
+        healthIcon.AddThemeColorOverride("font_color", new Color(0.8f, 0.2f, 0.2f));
+        healthIcon.AddThemeFontSizeOverride("font_size", 16);
+        healthRow.AddChild(healthIcon);
+
+        _targetHealthBar = new ProgressBar();
+        _targetHealthBar.CustomMinimumSize = new Vector2(120, 20);
+        _targetHealthBar.MaxValue = 100;
+        _targetHealthBar.Value = 100;
+        _targetHealthBar.ShowPercentage = false;
+        _targetHealthBar.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+
+        var healthBgStyle = new StyleBoxFlat();
+        healthBgStyle.BgColor = new Color(0.15f, 0.15f, 0.15f);
+        _targetHealthBar.AddThemeStyleboxOverride("background", healthBgStyle);
+
+        var healthFillStyle = new StyleBoxFlat();
+        healthFillStyle.BgColor = new Color(0.8f, 0.2f, 0.2f);
+        _targetHealthBar.AddThemeStyleboxOverride("fill", healthFillStyle);
+
+        healthRow.AddChild(_targetHealthBar);
+
+        _targetHealthLabel = new Label { Text = "100/100" };
+        _targetHealthLabel.AddThemeFontSizeOverride("font_size", 12);
+        _targetHealthLabel.CustomMinimumSize = new Vector2(60, 0);
+        healthRow.AddChild(_targetHealthLabel);
+
+        vbox.AddChild(healthRow);
+
+        // Mana bar row (for enemies that have mana, like shamans)
+        var manaRow = new HBoxContainer();
+        var manaIcon = new Label { Text = "✦", CustomMinimumSize = new Vector2(20, 0) };
+        manaIcon.AddThemeColorOverride("font_color", new Color(0.2f, 0.4f, 0.9f));
+        manaIcon.AddThemeFontSizeOverride("font_size", 16);
+        manaRow.AddChild(manaIcon);
+
+        _targetManaBar = new ProgressBar();
+        _targetManaBar.CustomMinimumSize = new Vector2(120, 16);
+        _targetManaBar.MaxValue = 100;
+        _targetManaBar.Value = 0;
+        _targetManaBar.ShowPercentage = false;
+        _targetManaBar.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        _targetManaBar.Visible = false;  // Hidden by default, shown for caster enemies
+
+        var manaBgStyle = new StyleBoxFlat();
+        manaBgStyle.BgColor = new Color(0.15f, 0.15f, 0.15f);
+        _targetManaBar.AddThemeStyleboxOverride("background", manaBgStyle);
+
+        var manaFillStyle = new StyleBoxFlat();
+        manaFillStyle.BgColor = new Color(0.2f, 0.4f, 0.9f);
+        _targetManaBar.AddThemeStyleboxOverride("fill", manaFillStyle);
+
+        manaRow.AddChild(_targetManaBar);
+
+        _targetManaLabel = new Label { Text = "" };
+        _targetManaLabel.AddThemeFontSizeOverride("font_size", 12);
+        _targetManaLabel.CustomMinimumSize = new Vector2(60, 0);
+        _targetManaLabel.Visible = false;
+        manaRow.AddChild(_targetManaLabel);
+
+        vbox.AddChild(manaRow);
+
+        hbox.AddChild(vbox);
+        _targetFrame.AddChild(hbox);
+        AddChild(_targetFrame);
+
+        // Create 3D target marker
+        CreateTargetMarker3D();
+
+        GD.Print("[HUD3D] Target frame created");
+    }
+
+    /// <summary>
+    /// Create a 3D marker that floats above targeted enemies.
+    /// </summary>
+    private void CreateTargetMarker3D()
+    {
+        _targetMarker3D = new Node3D();
+        _targetMarker3D.Name = "TargetMarker3D";
+
+        // Create a downward-pointing arrow/chevron
+        var arrowMesh = new MeshInstance3D();
+        var coneMesh = new CylinderMesh();
+        coneMesh.TopRadius = 0f;
+        coneMesh.BottomRadius = 0.3f;
+        coneMesh.Height = 0.5f;
+        arrowMesh.Mesh = coneMesh;
+        arrowMesh.Rotation = new Vector3(Mathf.Pi, 0, 0);  // Point downward
+
+        var arrowMat = new StandardMaterial3D();
+        arrowMat.AlbedoColor = new Color(1f, 0.8f, 0.2f);  // Gold/yellow
+        arrowMat.EmissionEnabled = true;
+        arrowMat.Emission = new Color(1f, 0.6f, 0.1f);
+        arrowMat.EmissionEnergyMultiplier = 2f;
+        arrowMat.ShadingMode = BaseMaterial3D.ShadingModeEnum.Unshaded;
+        arrowMesh.MaterialOverride = arrowMat;
+
+        _targetMarker3D.AddChild(arrowMesh);
+
+        // Initially hidden
+        _targetMarker3D.Visible = false;
+
+        // Add to scene root immediately (like InspectMode3D does)
+        // Don't use CallDeferred as it can cause timing issues
+        GD.Print("[HUD3D] Creating 3D target marker");
+        GetTree().Root.AddChild(_targetMarker3D);
+    }
+
+    /// <summary>
+    /// Set the current target (called from FPSController on R key).
+    /// </summary>
+    public void SetTarget(Node3D? target)
+    {
+        _currentTarget = target;
+
+        if (target == null)
+        {
+            GD.Print("[HUD3D] SetTarget: Clearing target");
+            if (_targetFrame != null) _targetFrame.Visible = false;
+            if (_targetMarker3D != null) _targetMarker3D.Visible = false;
+            _targetIndex = -1;
+            return;
+        }
+
+        GD.Print($"[HUD3D] SetTarget: Setting target to {target.Name}");
+
+        // Show and position the 3D marker
+        if (_targetMarker3D != null)
+        {
+            _targetMarker3D.Visible = true;
+            UpdateTargetMarkerPosition();
+            GD.Print($"[HUD3D] 3D marker SHOWN at position: {_targetMarker3D.GlobalPosition}");
+        }
+        else
+        {
+            GD.PrintErr("[HUD3D] SetTarget: _targetMarker3D is NULL!");
+        }
+
+        // Show the target frame UI
+        if (_targetFrame != null)
+        {
+            _targetFrame.Visible = true;
+            // Ensure position is updated when showing
+            UpdateTargetFramePosition();
+            // Bring to front of UI
+            _targetFrame.MoveToFront();
+            GD.Print($"[HUD3D] Target frame SHOWN: visible={_targetFrame.Visible}, position={_targetFrame.Position}, size={_targetFrame.Size}, z_index={_targetFrame.ZIndex}");
+        }
+        else
+        {
+            GD.PrintErr("[HUD3D] SetTarget: _targetFrame is NULL!");
+        }
+        UpdateTargetFrame();
+    }
+
+    /// <summary>
+    /// Update the 3D target marker position to float above the current target.
+    /// </summary>
+    private void UpdateTargetMarkerPosition()
+    {
+        if (_targetMarker3D == null || _currentTarget == null || !IsInstanceValid(_currentTarget))
+            return;
+
+        // Position above the target (offset Y by ~3 units)
+        float heightOffset = 3f;
+        _targetMarker3D.GlobalPosition = _currentTarget.GlobalPosition + new Vector3(0, heightOffset, 0);
+
+        // Animate bobbing
+        float bob = Mathf.Sin((float)Time.GetTicksMsec() / 200f) * 0.15f;
+        _targetMarker3D.GlobalPosition += new Vector3(0, bob, 0);
+    }
+
+    /// <summary>
+    /// Get the current target.
+    /// </summary>
+    public Node3D? GetCurrentTarget() => _currentTarget;
+
+    /// <summary>
+    /// Cycle to the next visible enemy target.
+    /// </summary>
+    public void CycleNextTarget()
+    {
+        GD.Print("[HUD3D] CycleNextTarget called");
+        UpdateVisibleEnemies();
+
+        GD.Print($"[HUD3D] Found {_visibleEnemies.Count} visible enemies");
+        if (_visibleEnemies.Count == 0)
+        {
+            SetTarget(null);
+            return;
+        }
+
+        _targetIndex = (_targetIndex + 1) % _visibleEnemies.Count;
+        GD.Print($"[HUD3D] Setting target index to {_targetIndex}");
+        SetTarget(_visibleEnemies[_targetIndex]);
+    }
+
+    /// <summary>
+    /// Cycle to the previous visible enemy target.
+    /// </summary>
+    public void CyclePreviousTarget()
+    {
+        UpdateVisibleEnemies();
+
+        if (_visibleEnemies.Count == 0)
+        {
+            SetTarget(null);
+            return;
+        }
+
+        _targetIndex = _targetIndex <= 0 ? _visibleEnemies.Count - 1 : _targetIndex - 1;
+        SetTarget(_visibleEnemies[_targetIndex]);
+    }
+
+    /// <summary>
+    /// Clear the current target.
+    /// </summary>
+    public void ClearTarget()
+    {
+        SetTarget(null);
+    }
+
+    /// <summary>
+    /// Update list of visible enemies for targeting.
+    /// </summary>
+    private void UpdateVisibleEnemies()
+    {
+        _visibleEnemies.Clear();
+
+        var player = FPSController.Instance;
+        if (player == null) return;
+
+        var camera = player.GetViewport()?.GetCamera3D();
+        if (camera == null) return;
+
+        var enemies = GetTree().GetNodesInGroup("Enemies");
+        var playerPos = player.GlobalPosition;
+
+        foreach (var node in enemies)
+        {
+            if (node is not Node3D enemy3D) continue;
+            if (!IsInstanceValid(enemy3D)) continue;
+
+            // Check if alive (has CurrentHealth > 0)
+            if (enemy3D.HasMethod("get_CurrentHealth"))
+            {
+                var health = (int)enemy3D.Call("get_CurrentHealth");
+                if (health <= 0) continue;
+            }
+
+            // Check distance (within 60m)
+            float dist = playerPos.DistanceTo(enemy3D.GlobalPosition);
+            if (dist > 60f) continue;
+
+            // Check if on screen
+            if (!camera.IsPositionBehind(enemy3D.GlobalPosition))
+            {
+                var screenPos = camera.UnprojectPosition(enemy3D.GlobalPosition);
+                var viewportSize = GetViewportRect().Size;
+                if (screenPos.X >= 0 && screenPos.X <= viewportSize.X &&
+                    screenPos.Y >= 0 && screenPos.Y <= viewportSize.Y)
+                {
+                    _visibleEnemies.Add(enemy3D);
+                }
+            }
+        }
+
+        // Sort by distance
+        _visibleEnemies.Sort((a, b) =>
+            playerPos.DistanceTo(a.GlobalPosition).CompareTo(playerPos.DistanceTo(b.GlobalPosition)));
+
+        // Validate current target index
+        if (_currentTarget != null && _visibleEnemies.Contains(_currentTarget))
+        {
+            _targetIndex = _visibleEnemies.IndexOf(_currentTarget);
+        }
+        else if (_visibleEnemies.Count > 0 && _targetIndex >= _visibleEnemies.Count)
+        {
+            _targetIndex = 0;
+        }
+    }
+
+    /// <summary>
+    /// Update the target frame UI with current target's stats.
+    /// </summary>
+    private void UpdateTargetFrame()
+    {
+        if (_currentTarget == null || !IsInstanceValid(_currentTarget))
+        {
+            GD.Print("[HUD3D] UpdateTargetFrame: Target invalid, clearing");
+            SetTarget(null);
+            return;
+        }
+
+        // Get target info by casting to actual types (like InspectMode3D does)
+        string name = "Unknown";
+        int currentHealth = 0;
+        int maxHealth = 100;
+        bool hasMana = false;
+        int currentMana = 0;
+        int maxMana = 0;
+
+        if (_currentTarget is BasicEnemy3D enemy)
+        {
+            name = FormatMonsterName(enemy.MonsterType);
+            currentHealth = enemy.CurrentHealth;
+            maxHealth = enemy.MaxHealth;
+        }
+        else if (_currentTarget is BossEnemy3D boss)
+        {
+            name = boss.MonsterType;  // Boss names are already formatted
+            currentHealth = boss.CurrentHealth;
+            maxHealth = boss.MaxHealth;
+        }
+        else
+        {
+            GD.Print($"[HUD3D] UpdateTargetFrame: Unknown target type: {_currentTarget.GetType().Name}");
+        }
+
+        // Check if dead
+        if (currentHealth <= 0)
+        {
+            GD.Print($"[HUD3D] UpdateTargetFrame: Target {name} is dead (health={currentHealth}), clearing");
+            SetTarget(null);
+            return;
+        }
+
+        // Update UI
+        _targetNameLabel!.Text = name;
+        _targetHealthBar!.MaxValue = maxHealth;
+        _targetHealthBar.Value = currentHealth;
+        _targetHealthLabel!.Text = $"{currentHealth}/{maxHealth}";
+
+        // Update health bar color based on percentage
+        float healthPercent = (float)currentHealth / maxHealth;
+        var fillStyle = _targetHealthBar.GetThemeStylebox("fill") as StyleBoxFlat;
+        if (fillStyle != null)
+        {
+            Color healthColor = healthPercent > 0.6f
+                ? new Color(0.2f, 0.9f, 0.2f)    // Green
+                : healthPercent > 0.3f
+                ? new Color(0.9f, 0.9f, 0.2f)   // Yellow
+                : new Color(0.9f, 0.2f, 0.2f);  // Red
+            fillStyle.BgColor = healthColor;
+        }
+
+        // Mana (hide for most enemies)
+        _targetManaBar!.Visible = hasMana;
+        _targetManaLabel!.Visible = hasMana;
+
+        // Update portrait color based on enemy type
+        Color portraitColor = GetPortraitColorForEnemy(name);
+        _targetPortrait!.Color = portraitColor;
+    }
+
+    /// <summary>
+    /// Get portrait color based on enemy name.
+    /// </summary>
+    private Color GetPortraitColorForEnemy(string name)
+    {
+        string lower = name.ToLower();
+        if (lower.Contains("goblin")) return new Color(0.45f, 0.55f, 0.35f);
+        if (lower.Contains("skeleton")) return new Color(0.9f, 0.88f, 0.8f);
+        if (lower.Contains("slime")) return new Color(0.3f, 0.7f, 0.3f);
+        if (lower.Contains("spider")) return new Color(0.3f, 0.25f, 0.2f);
+        if (lower.Contains("dragon")) return new Color(0.7f, 0.2f, 0.15f);
+        if (lower.Contains("rat")) return new Color(0.35f, 0.3f, 0.28f);
+        if (lower.Contains("crawler")) return new Color(0.6f, 0.15f, 0.15f);
+        if (lower.Contains("shadow")) return new Color(0.1f, 0.1f, 0.15f);
+        if (lower.Contains("golem")) return new Color(0.6f, 0.45f, 0.4f);
+        if (lower.Contains("armor")) return new Color(0.4f, 0.4f, 0.45f);
+        if (lower.Contains("drone")) return new Color(0.7f, 0.7f, 0.75f);
+        if (lower.Contains("mimic")) return new Color(0.5f, 0.35f, 0.2f);
+        if (lower.Contains("mushroom")) return new Color(0.6f, 0.4f, 0.5f);
+        return new Color(0.5f, 0.3f, 0.3f);  // Default enemy red
+    }
+
+    /// <summary>
+    /// Format monster type name for display.
+    /// </summary>
+    private string FormatMonsterName(string monsterType)
+    {
+        // Convert "crawler_killer" to "Crawler Killer"
+        var words = monsterType.Split('_');
+        for (int i = 0; i < words.Length; i++)
+        {
+            if (words[i].Length > 0)
+            {
+                words[i] = char.ToUpper(words[i][0]) + words[i].Substring(1).ToLower();
+            }
+        }
+        return string.Join(" ", words);
     }
 
     /// <summary>
@@ -1354,6 +2000,13 @@ public partial class HUD3D : Control
     {
         if (_actionBarPanel == null) return;
 
+        // Check if user has saved a custom position - if so, use it
+        var savedPos = WindowPositionManager.GetPosition("HUD_ActionBarPanel");
+        if (savedPos != WindowPositionManager.CenterMarker)
+        {
+            return; // User has a saved position, don't override it
+        }
+
         var viewportSize = GetViewportRect().Size;
         float barWidth = 720;
         float barHeight = 200;
@@ -1365,10 +2018,71 @@ public partial class HUD3D : Control
         );
     }
 
+    private void UpdateTargetFramePosition()
+    {
+        if (_targetFrame == null)
+        {
+            GD.Print("[HUD3D] UpdateTargetFramePosition: Target frame is null!");
+            return;
+        }
+
+        // Check if user has saved a custom position - if so, use it
+        var savedPos = WindowPositionManager.GetPosition("HUD_TargetFrame");
+        if (savedPos != WindowPositionManager.CenterMarker)
+        {
+            // User has a saved position, don't override it
+            return;
+        }
+
+        var viewportSize = GetViewportRect().Size;
+        float targetFrameWidth = 280;
+        float targetFrameHeight = 130;
+        float gap = 20;  // Gap between action bar and target frame
+        float actionBarWidth = 720;
+
+        // Calculate position based on viewport and action bar layout
+        float actionBarX;
+        float actionBarY;
+        float actionBarHeight = 200;
+
+        if (_actionBarPanel != null && _actionBarPanel.Position.Y > 0)
+        {
+            // Use actual action bar position if valid
+            actionBarX = _actionBarPanel.Position.X;
+            actionBarY = _actionBarPanel.Position.Y;
+            actionBarHeight = _actionBarPanel.Size.Y;
+        }
+        else
+        {
+            // Calculate expected position (same formula as UpdateActionBarPosition)
+            actionBarX = (viewportSize.X - actionBarWidth) / 2;
+            actionBarY = viewportSize.Y - actionBarHeight - 40;
+        }
+
+        // Position target frame to the right of action bar, vertically centered
+        float targetX = actionBarX + actionBarWidth + gap;
+        float targetY = actionBarY + (actionBarHeight - targetFrameHeight) / 2;
+
+        // Clamp to viewport bounds
+        targetX = Mathf.Min(targetX, viewportSize.X - targetFrameWidth - 10);
+        targetY = Mathf.Clamp(targetY, 10, viewportSize.Y - targetFrameHeight - 10);
+
+        _targetFrame.Position = new Vector2(targetX, targetY);
+
+        GD.Print($"[HUD3D] Target frame positioned at ({targetX}, {targetY}) for viewport {viewportSize}");
+    }
+
     private void UpdateMinimapPosition()
     {
         if (_minimapPanel != null)
         {
+            // Check if user has saved a custom position - if so, use it
+            var savedPos = WindowPositionManager.GetPosition("HUD_MinimapOuterFrame");
+            if (savedPos != WindowPositionManager.CenterMarker)
+            {
+                return; // User has a saved position, don't override it
+            }
+
             var viewportSize = GetViewportRect().Size;
             // Account for outer frame size
             _minimapPanel.Position = new Vector2(viewportSize.X - MinimapSize - 36, 12);
@@ -1377,16 +2091,31 @@ public partial class HUD3D : Control
 
     private void UpdateShortcutIconsPosition()
     {
-        if (_shortcutIcons == null || _actionBarPanel == null) return;
+        if (_shortcutIcons == null) return;
+
+        // Check if user has saved a custom position - if so, use it
+        var savedPos = WindowPositionManager.GetPosition("HUD_ShortcutIcons");
+        if (savedPos != WindowPositionManager.CenterMarker)
+        {
+            return; // User has a saved position, don't override it
+        }
 
         var viewportSize = GetViewportRect().Size;
 
-        // Position to the right of the action bar
-        float actionBarRight = _actionBarPanel.Position.X + _actionBarPanel.Size.X;
-        _shortcutIcons.Position = new Vector2(
-            actionBarRight + 15,
-            viewportSize.Y - 90  // Align with bottom of action bar
-        );
+        // Position to the LEFT of the health panel
+        if (_healthManaPanel != null && _healthManaPanel.Position.X > 0)
+        {
+            float healthPanelLeft = _healthManaPanel.Position.X;
+            _shortcutIcons.Position = new Vector2(
+                healthPanelLeft - _shortcutIcons.Size.X - 15,
+                _healthManaPanel.Position.Y + (_healthManaPanel.Size.Y - _shortcutIcons.Size.Y) / 2
+            );
+        }
+        else
+        {
+            // Fallback - far left
+            _shortcutIcons.Position = new Vector2(10, viewportSize.Y - 90);
+        }
     }
 
     private void DrawMinimap()
@@ -1767,9 +2496,11 @@ public partial class HUD3D : Control
             var screenSize = GetViewportRect().Size;
             if (screenSize.X > 0 && screenSize.Y > 0)
             {
-                UpdateLeftPanelsPosition();
                 UpdateActionBarPosition();
+                UpdateHealthPanelPosition();
+                UpdateTargetFramePosition();
                 UpdateShortcutIconsPosition();
+                UpdateLeftPanelsPosition();
                 UpdateMinimapPosition();
                 UpdateCompassPosition();
                 _leftPanelsPositioned = true;
@@ -1797,10 +2528,26 @@ public partial class HUD3D : Control
         {
             _cachedViewportSize = currentViewportSize;
             UpdateActionBarPosition();
+            UpdateHealthPanelPosition();
+            UpdateTargetFramePosition();
             UpdateShortcutIconsPosition();
+            UpdateLeftPanelsPosition();
             UpdateMinimapPosition();
             UpdateCompassPosition();
-            UpdateLeftPanelsPosition();
+        }
+
+        // Update target frame health in real-time and marker position
+        _targetUpdateTimer -= dt;
+        if (_currentTarget != null)
+        {
+            // Update 3D marker position every frame for smooth bobbing
+            UpdateTargetMarkerPosition();
+
+            if (_targetUpdateTimer <= 0)
+            {
+                _targetUpdateTimer = 0.1f;  // Update health 10x per second
+                UpdateTargetFrame();
+            }
         }
 
         // Update minimap and fog of war when player moves
@@ -1907,6 +2654,13 @@ public partial class HUD3D : Control
     {
         if (_compassContainer != null)
         {
+            // Check if user has saved a custom position - if so, use it
+            var savedPos = WindowPositionManager.GetPosition("HUD_Compass");
+            if (savedPos != WindowPositionManager.CenterMarker)
+            {
+                return; // User has a saved position, don't override it
+            }
+
             var viewportSize = GetViewportRect().Size;
             _compassContainer.Position = new Vector2(
                 (viewportSize.X - 600) / 2,  // Center horizontally
@@ -2010,25 +2764,39 @@ public partial class HUD3D : Control
 
     private void CreateShortcutIcons()
     {
-        // Container for shortcut icons - positioned to the RIGHT of action bar at bottom
-        var shortcutContainer = new HBoxContainer();
+        // Container for shortcut icons - 2 rows of 3, positioned to the LEFT of health panel
+        var shortcutContainer = new VBoxContainer();
         shortcutContainer.Name = "ShortcutIcons";
 
-        // Use fixed position - will be updated in _Process relative to action bar
-        shortcutContainer.Position = new Vector2(1000, 900);  // Initial position, updated later
+        // Use fixed position - will be updated in _Process relative to health panel
+        shortcutContainer.Position = new Vector2(10, 900);  // Initial position, updated later
 
-        shortcutContainer.AddThemeConstantOverride("separation", 8);
+        shortcutContainer.AddThemeConstantOverride("separation", 4);
         AddChild(shortcutContainer);
 
         _shortcutIcons = shortcutContainer;
 
-        // Create shortcut icon buttons with actual keybinds from InputMap
-        CreateShortcutIcon(GetActionKeyDisplay("toggle_spellbook"), "Spellbook", new Color(0.4f, 0.5f, 0.9f));
-        CreateShortcutIcon(GetActionKeyDisplay("toggle_inventory"), "Inventory", new Color(0.5f, 0.7f, 0.4f));
-        CreateShortcutIcon(GetActionKeyDisplay("toggle_map"), "Map", new Color(0.7f, 0.6f, 0.4f));
-        CreateShortcutIcon(GetActionKeyDisplay("loot"), "Loot", new Color(0.9f, 0.7f, 0.3f));
-        CreateShortcutIcon(GetActionKeyDisplay("toggle_debug"), "Debug", new Color(0.3f, 0.8f, 0.4f));
-        CreateShortcutIcon(GetActionKeyDisplay("escape"), "Menu", new Color(0.7f, 0.4f, 0.4f));
+        // Row 1: Spellbook, Inventory, Map
+        var row1 = new HBoxContainer();
+        row1.AddThemeConstantOverride("separation", 6);
+        shortcutContainer.AddChild(row1);
+
+        // Row 2: Loot, Debug, Menu
+        var row2 = new HBoxContainer();
+        row2.AddThemeConstantOverride("separation", 6);
+        shortcutContainer.AddChild(row2);
+
+        // Store row references for adding icons
+        _shortcutRow1 = row1;
+        _shortcutRow2 = row2;
+
+        // Create shortcut icon buttons with actual keybinds from InputMap (3 per row)
+        CreateShortcutIcon(GetActionKeyDisplay("toggle_spellbook"), "Spellbook", new Color(0.4f, 0.5f, 0.9f), row1);
+        CreateShortcutIcon(GetActionKeyDisplay("toggle_inventory"), "Inventory", new Color(0.5f, 0.7f, 0.4f), row1);
+        CreateShortcutIcon(GetActionKeyDisplay("toggle_map"), "Map", new Color(0.7f, 0.6f, 0.4f), row1);
+        CreateShortcutIcon(GetActionKeyDisplay("loot"), "Loot", new Color(0.9f, 0.7f, 0.3f), row2);
+        CreateShortcutIcon(GetActionKeyDisplay("toggle_debug"), "Debug", new Color(0.3f, 0.8f, 0.4f), row2);
+        CreateShortcutIcon(GetActionKeyDisplay("escape"), "Menu", new Color(0.7f, 0.4f, 0.4f), row2);
     }
 
     private static string GetActionKeyDisplay(string actionName)
@@ -2097,14 +2865,14 @@ public partial class HUD3D : Control
         };
     }
 
-    private void CreateShortcutIcon(string key, string label, Color color)
+    private void CreateShortcutIcon(string key, string label, Color color, HBoxContainer parent)
     {
         var container = new VBoxContainer();
         container.AddThemeConstantOverride("separation", 2);
 
         // Key box
         var keyBox = new PanelContainer();
-        keyBox.CustomMinimumSize = new Vector2(45, 35);
+        keyBox.CustomMinimumSize = new Vector2(45, 32);
 
         var keyStyle = new StyleBoxFlat();
         keyStyle.BgColor = color.Darkened(0.5f);
@@ -2117,7 +2885,7 @@ public partial class HUD3D : Control
         keyLabel.Text = key;
         keyLabel.HorizontalAlignment = HorizontalAlignment.Center;
         keyLabel.VerticalAlignment = VerticalAlignment.Center;
-        keyLabel.AddThemeFontSizeOverride("font_size", 14);
+        keyLabel.AddThemeFontSizeOverride("font_size", 13);
         keyLabel.AddThemeColorOverride("font_color", color.Lightened(0.3f));
         keyBox.AddChild(keyLabel);
         container.AddChild(keyBox);
@@ -2126,11 +2894,11 @@ public partial class HUD3D : Control
         var descLabel = new Label();
         descLabel.Text = label;
         descLabel.HorizontalAlignment = HorizontalAlignment.Center;
-        descLabel.AddThemeFontSizeOverride("font_size", 10);
+        descLabel.AddThemeFontSizeOverride("font_size", 9);
         descLabel.AddThemeColorOverride("font_color", new Color(0.7f, 0.7f, 0.75f));
         container.AddChild(descLabel);
 
-        ((HBoxContainer)_shortcutIcons!).AddChild(container);
+        parent.AddChild(container);
     }
 
     private void CreateOverviewMap()

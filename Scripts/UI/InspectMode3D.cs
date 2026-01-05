@@ -5,6 +5,8 @@ using SafeRoom3D.Core;
 using SafeRoom3D.Player;
 using SafeRoom3D.Enemies;
 using SafeRoom3D.Pet;
+using SafeRoom3D.Abilities;
+using SafeRoom3D.Items;
 
 namespace SafeRoom3D.UI;
 
@@ -114,12 +116,16 @@ public partial class InspectMode3D : CanvasLayer
         _promptLabel.AddThemeColorOverride("font_color", new Color(1f, 0.9f, 0.5f));
         _overlay.AddChild(_promptLabel);
 
-        // Info panel (bottom-right corner, ALWAYS visible)
+        // Info panel (bottom-right corner, grows up and left)
+        // Hidden by default, shown only in inspect mode
         _infoPanel = new PanelContainer();
+        _infoPanel.Name = "DescriptionPanel";
         _infoPanel.SetAnchorsPreset(Control.LayoutPreset.BottomRight);
-        _infoPanel.Position = new Vector2(-340, -420);
+        // Position: same 40px margin from bottom as action bar, 20px from right edge
+        // Panel grows up/left from anchor point
+        _infoPanel.Position = new Vector2(-340, -440);  // 400 height + 40px bottom margin
         _infoPanel.CustomMinimumSize = new Vector2(320, 400);
-        _infoPanel.Visible = true; // Always visible now
+        _infoPanel.Visible = false;  // Hidden by default, shown in inspect mode
 
         var panelStyle = new StyleBoxFlat();
         panelStyle.BgColor = new Color(0.08f, 0.08f, 0.12f, 0.95f);
@@ -219,6 +225,13 @@ public partial class InspectMode3D : CanvasLayer
         vbox.AddChild(_descriptionLabel);
 
         AddChild(_infoPanel);
+
+        // Apply saved position if exists
+        var savedPos = WindowPositionManager.GetPosition("HUD_DescriptionPanel");
+        if (savedPos != WindowPositionManager.CenterMarker)
+        {
+            _infoPanel.Position = savedPos;
+        }
     }
 
     private void CreateTargetMarker()
@@ -274,11 +287,68 @@ public partial class InspectMode3D : CanvasLayer
             // Update target marker position/rotation when in inspect mode
             UpdateTargetMarker((float)delta);
 
-            // Update info for targeted entity (it may have taken damage)
-            UpdateCurrentTargetInfo();
+            // Check for UI hover (action bar slots)
+            CheckUIHover();
 
-            // Allow camera look in inspect mode
-            ProcessCameraLook();
+            // Update info for targeted entity (it may have taken damage)
+            // Only if we're not hovering over a UI element
+            if (!_isHoveringUI)
+            {
+                UpdateCurrentTargetInfo();
+            }
+
+            // Camera look is disabled in inspect mode (cursor is visible)
+        }
+    }
+
+    private bool _isHoveringUI = false;
+    private string? _lastHoveredSlotKey = null;
+
+    /// <summary>
+    /// Check if mouse is hovering over UI elements like action bar slots.
+    /// </summary>
+    private void CheckUIHover()
+    {
+        var mousePos = GetViewport().GetMousePosition();
+
+        // Check HUD3D action bar slots
+        var hud = HUD3D.Instance;
+        if (hud == null) return;
+
+        // Get hovered slot info from HUD
+        var slotInfo = hud.GetSlotAtPosition(mousePos);
+
+        if (slotInfo.HasValue)
+        {
+            var (row, slot, abilityId, consumableId) = slotInfo.Value;
+            string slotKey = $"{row}_{slot}";
+
+            // Only update if hovering a different slot
+            if (slotKey != _lastHoveredSlotKey)
+            {
+                _lastHoveredSlotKey = slotKey;
+                _isHoveringUI = true;
+
+                if (!string.IsNullOrEmpty(abilityId))
+                {
+                    GD.Print($"[InspectMode3D] Hovering ability slot: {abilityId}");
+                    ShowAbilityInfo(abilityId);
+                }
+                else if (!string.IsNullOrEmpty(consumableId))
+                {
+                    GD.Print($"[InspectMode3D] Hovering consumable slot: {consumableId}");
+                    ShowItemInfo(consumableId);
+                }
+            }
+        }
+        else
+        {
+            if (_isHoveringUI)
+            {
+                // Just stopped hovering UI, go back to showing target
+                _isHoveringUI = false;
+                _lastHoveredSlotKey = null;
+            }
         }
     }
 
@@ -410,16 +480,17 @@ public partial class InspectMode3D : CanvasLayer
 
         IsActive = true;
 
-        // Pause game logic but allow player to look around
-        // We use a custom pause approach - freeze enemies but not camera
+        // Pause the game tree (enemies, physics, etc.)
+        GetTree().Paused = true;
+
+        // Also freeze enemies explicitly for any that ignore pause
         FreezeEnemies(true);
 
-        // Show mouse briefly for UI, but keep captured for camera look
-        // Actually, keep mouse captured so player can look around
-        Input.MouseMode = Input.MouseModeEnum.Captured;
+        // Show mouse cursor - no camera movement during inspect mode
+        Input.MouseMode = Input.MouseModeEnum.Visible;
 
         if (_overlay != null) _overlay.Visible = true;
-        // Info panel is already always visible, no need to show/hide
+        if (_infoPanel != null) _infoPanel.Visible = true;  // Show info panel in inspect mode
 
         // Gather visible targets
         UpdateVisibleTargets();
@@ -451,13 +522,17 @@ public partial class InspectMode3D : CanvasLayer
 
         IsActive = false;
 
+        // Unpause the game tree
+        GetTree().Paused = false;
+
         // Unfreeze enemies
         FreezeEnemies(false);
 
+        // Capture mouse for FPS camera control
         Input.MouseMode = Input.MouseModeEnum.Captured;
 
         if (_overlay != null) _overlay.Visible = false;
-        // Info panel stays visible - it's always on
+        if (_infoPanel != null) _infoPanel.Visible = false;  // Hide info panel outside inspect mode
 
         // Hide target marker
         if (_targetMarker != null)
@@ -748,6 +823,12 @@ public partial class InspectMode3D : CanvasLayer
             "dragon" => new Color(0.7f, 0.2f, 0.15f),
             "badlama" => new Color(0.55f, 0.4f, 0.25f), // Brown llama
             "steve" => new Color(0.8f, 0.65f, 0.45f), // Tan chihuahua
+            "ability" => new Color(0.3f, 0.4f, 0.7f), // Blue for abilities
+            "common" => new Color(0.6f, 0.6f, 0.6f),  // Gray for common items
+            "uncommon" => new Color(0.3f, 0.7f, 0.3f), // Green for uncommon
+            "rare" => new Color(0.3f, 0.5f, 0.9f),    // Blue for rare
+            "epic" => new Color(0.6f, 0.3f, 0.8f),    // Purple for epic
+            "legendary" => new Color(0.9f, 0.6f, 0.2f), // Orange for legendary
             "none" => new Color(0.2f, 0.2f, 0.25f),
             _ => new Color(0.5f, 0.5f, 0.5f)
         };
@@ -849,5 +930,119 @@ public partial class InspectMode3D : CanvasLayer
         {
             _infoPanel.Visible = true;
         }
+    }
+
+    /// <summary>
+    /// Show ability info in the inspect panel (called when hovering over action bar slots)
+    /// </summary>
+    public void ShowAbilityInfo(string abilityId)
+    {
+        if (_infoPanel == null) return;
+
+        var ability = AbilityManager3D.Instance?.GetAbility(abilityId);
+        if (ability == null)
+        {
+            GD.Print($"[InspectMode3D] Ability not found: {abilityId}");
+            return;
+        }
+
+        // Name
+        if (_nameLabel != null) _nameLabel.Text = ability.AbilityName;
+
+        // Type as "level"
+        if (_levelLabel != null) _levelLabel.Text = $"{ability.Type} Ability";
+
+        // Show mana cost in health bar area (repurposed)
+        if (_healthBar != null)
+        {
+            _healthBar.MaxValue = 100;
+            _healthBar.Value = 100;
+            // Change color to blue for mana
+            var fillStyle = _healthBar.GetThemeStylebox("fill") as StyleBoxFlat;
+            if (fillStyle != null) fillStyle.BgColor = new Color(0.2f, 0.4f, 0.9f);
+        }
+        if (_healthLabel != null) _healthLabel.Text = $"Mana: {ability.ManaCost}";
+
+        // Stats
+        if (_statsLabel != null)
+        {
+            string cooldownText = ability.Cooldown > 0 ? $"{ability.Cooldown:F1}s" : "None";
+            _statsLabel.Text = $"Cooldown: {cooldownText}\n" +
+                              $"Mana Cost: {ability.ManaCost}";
+        }
+
+        // Description
+        if (_descriptionLabel != null) _descriptionLabel.Text = ability.Description;
+
+        // Update portrait to ability-themed color
+        UpdatePortrait("ability", false);
+    }
+
+    /// <summary>
+    /// Show item/consumable info in the inspect panel
+    /// </summary>
+    public void ShowItemInfo(string itemId)
+    {
+        if (_infoPanel == null) return;
+
+        // Try to find item in inventory
+        InventoryItem? item = null;
+        var inventory = Inventory3D.Instance;
+        if (inventory != null)
+        {
+            foreach (var (_, invItem) in inventory.GetAllItems())
+            {
+                if (invItem.Id == itemId)
+                {
+                    item = invItem;
+                    break;
+                }
+            }
+        }
+
+        // Format display name from ID
+        string displayName = itemId.Replace("_", " ");
+        displayName = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(displayName);
+
+        // Name
+        if (_nameLabel != null) _nameLabel.Text = item?.Name ?? displayName;
+
+        // Type as "level"
+        if (_levelLabel != null) _levelLabel.Text = item != null ? $"{item.Type} Item" : "Consumable";
+
+        // Show health bar for consumables (mana/health restore)
+        if (_healthBar != null)
+        {
+            _healthBar.Visible = true;
+            _healthBar.MaxValue = 100;
+            _healthBar.Value = 100;
+            // Green for consumables
+            var fillStyle = _healthBar.GetThemeStylebox("fill") as StyleBoxFlat;
+            if (fillStyle != null) fillStyle.BgColor = new Color(0.3f, 0.7f, 0.3f);
+        }
+        if (_healthLabel != null) _healthLabel.Text = "";
+
+        // Stats
+        if (_statsLabel != null)
+        {
+            if (item != null)
+            {
+                _statsLabel.Text = $"Type: {item.Type}\n" +
+                                  $"Stack: {item.StackCount}/{item.MaxStackSize}";
+            }
+            else
+            {
+                _statsLabel.Text = "Type: Consumable";
+            }
+        }
+
+        // Description
+        if (_descriptionLabel != null)
+        {
+            _descriptionLabel.Text = item?.Description ?? "A useful item from your inventory.";
+        }
+
+        // Update portrait color
+        UpdatePortrait("common", false);
     }
 }

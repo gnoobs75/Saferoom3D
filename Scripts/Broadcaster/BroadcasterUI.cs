@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using SafeRoom3D.UI;
 
 namespace SafeRoom3D.Broadcaster;
 
@@ -50,6 +51,9 @@ public partial class BroadcasterUI : Control
     private List<NotificationItem> _lootNotifications = new();
     private List<NotificationItem> _achievementNotifications = new();
 
+    // Draggable overlay for UI edit mode
+    private DraggableHUDOverlay? _dragOverlay;
+
     // State
     private bool _isMuted = false;
     private bool _isMinimized = false;
@@ -68,12 +72,12 @@ public partial class BroadcasterUI : Control
     private float _ratingDecayTimer = 0f;
     private bool _isInCombat = false;
 
-    // Configuration
-    private const float PanelWidth = 260f;
-    private const float PanelHeight = 180f;
+    // Configuration - sized to match minimap (180x180 inner, 196x220 outer)
+    private const float PanelWidth = 196f;
+    private const float PanelHeight = 196f;
     private const float MinimizedWidth = 50f;
     private const float MinimizedHeight = 50f;
-    private const float AvatarHeight = 100f;
+    private const float AvatarHeight = 90f;  // Reduced to fit smaller panel
     private const float Margin = 10f;
     private const float SlideSpeed = 0.3f;
     private const float NotificationColumnWidth = 200f;
@@ -85,11 +89,49 @@ public partial class BroadcasterUI : Control
     {
         MouseFilter = MouseFilterEnum.Ignore;
         SetAnchorsPreset(LayoutPreset.FullRect);
+        ProcessMode = ProcessModeEnum.Always; // Process during pause for edit mode
 
         BuildUI();
         BuildNotificationColumns();
         BuildMetricsPanel();
+        InitializeDraggable();
         PositionPanel(false);
+    }
+
+    private void InitializeDraggable()
+    {
+        if (_mainPanel == null) return;
+
+        // Add draggable overlay
+        _dragOverlay = new DraggableHUDOverlay(_mainPanel, "HUD_AIBroadcaster");
+        _mainPanel.AddChild(_dragOverlay);
+
+        // Apply saved position if exists (deferred to ensure panel is sized)
+        CallDeferred(nameof(ApplySavedPosition));
+    }
+
+    private void ApplySavedPosition()
+    {
+        if (_mainPanel == null) return;
+
+        var savedPos = WindowPositionManager.GetPosition("HUD_AIBroadcaster");
+        if (savedPos != WindowPositionManager.CenterMarker)
+        {
+            var viewportSize = GetViewportRect().Size;
+            var clampedPos = WindowPositionManager.ClampToViewport(savedPos, viewportSize, _mainPanel.Size);
+            _mainPanel.Position = clampedPos;
+            GD.Print($"[BroadcasterUI] Applied saved position: {clampedPos}");
+        }
+    }
+
+    /// <summary>
+    /// Set UI edit mode for the broadcaster panel.
+    /// Called from HUD3D when entering/exiting UI edit mode.
+    /// </summary>
+    public void SetUIEditMode(bool editing)
+    {
+        _dragOverlay?.SetEditMode(editing);
+        _dragOverlay?.QueueRedraw();
     }
 
     public override void _Process(double delta)
@@ -279,10 +321,17 @@ public partial class BroadcasterUI : Control
         // Small metrics panel below the main broadcaster panel
         _metricsPanel = new PanelContainer
         {
-            Name = "MetricsPanel",
+            Name = "ViewCounterPanel",
             CustomMinimumSize = new Vector2(PanelWidth, 65),
         };
         AddChild(_metricsPanel);
+
+        // Apply saved position if exists
+        var savedPos = WindowPositionManager.GetPosition("HUD_ViewCounterPanel");
+        if (savedPos != WindowPositionManager.CenterMarker)
+        {
+            _metricsPanel.Position = savedPos;
+        }
 
         var metricsStyle = new StyleBoxFlat
         {
@@ -387,18 +436,22 @@ public partial class BroadcasterUI : Control
     {
         if (_mainPanel == null) return;
 
-        // Position in TOP-LEFT corner
+        // Check if user has a saved position - if so, don't override (except for size changes)
+        var savedPos = WindowPositionManager.GetPosition("HUD_AIBroadcaster");
+        bool hasSavedPosition = savedPos != WindowPositionManager.CenterMarker;
+
+        // Position in TOP-LEFT corner (default)
         Vector2 targetPos;
         Vector2 targetSize;
 
         if (_isMinimized)
         {
-            targetPos = new Vector2(Margin, Margin);
+            targetPos = hasSavedPosition ? _mainPanel.Position : new Vector2(Margin, Margin);
             targetSize = new Vector2(MinimizedWidth, MinimizedHeight);
         }
         else
         {
-            targetPos = new Vector2(Margin, Margin);
+            targetPos = hasSavedPosition ? _mainPanel.Position : new Vector2(Margin, Margin);
             targetSize = new Vector2(PanelWidth, PanelHeight);
         }
 
@@ -408,20 +461,30 @@ public partial class BroadcasterUI : Control
             _slideTween = CreateTween();
             _slideTween.SetEase(Tween.EaseType.Out);
             _slideTween.SetTrans(Tween.TransitionType.Back);
-            _slideTween.TweenProperty(_mainPanel, "position", targetPos, SlideSpeed);
+            if (!hasSavedPosition)
+            {
+                _slideTween.TweenProperty(_mainPanel, "position", targetPos, SlideSpeed);
+            }
             _slideTween.Parallel().TweenProperty(_mainPanel, "custom_minimum_size", targetSize, SlideSpeed);
         }
         else
         {
-            _mainPanel.Position = targetPos;
+            if (!hasSavedPosition)
+            {
+                _mainPanel.Position = targetPos;
+            }
             _mainPanel.CustomMinimumSize = targetSize;
         }
 
-        // Update metrics panel position
+        // Update metrics panel position (only if no saved position)
         if (_metricsPanel != null)
         {
             _metricsPanel.Visible = !_isMinimized;
-            _metricsPanel.Position = new Vector2(Margin, PanelHeight + Margin + 5);
+            var metricsSavedPos = WindowPositionManager.GetPosition("HUD_ViewCounterPanel");
+            if (metricsSavedPos == WindowPositionManager.CenterMarker)
+            {
+                _metricsPanel.Position = new Vector2(Margin, PanelHeight + Margin + 5);
+            }
         }
 
         // Update notification columns visibility
