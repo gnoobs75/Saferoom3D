@@ -100,6 +100,24 @@ var factoryType = MapToFactoryWeaponType(equipmentWeaponType);
 var weaponMesh = WeaponFactory.CreateWeapon(factoryType, scale);
 ```
 
+### Input Handling for CanvasLayer UIs
+CanvasLayer-based UIs (EscapeMenu, UIEditorMode) require manual visibility checks:
+
+```csharp
+public override void _Input(InputEvent @event)
+{
+    // CRITICAL: CanvasLayer doesn't auto-block input when hidden
+    if (!Visible) return;
+
+    // Also check if modal UIs should block this handler
+    if (EscapeMenu3D.Instance?.Visible == true) return;
+
+    // Process input...
+}
+```
+
+**Layer priorities:** EscapeMenu (200) > UIEditorMode (150) > Broadcaster (50)
+
 ---
 
 ## Controls
@@ -113,8 +131,8 @@ var weaponMesh = WeaponFactory.CreateWeapon(factoryType, scale);
 | LMB | Melee | M | Map |
 | RMB | Ranged | Esc | Menu |
 | E | Interact | F3 | Performance |
-| T | Loot | F5 | Panic (reset UI) |
-| N | Toggle nameplates | | |
+| T | Loot | F5 | **Panic key** (force reset all UI/input) |
+| N | Toggle nameplates | C | Character Sheet |
 
 ### UI Editor Mode
 
@@ -130,6 +148,25 @@ Customize HUD layout by repositioning elements:
 - Positions persist between sessions (saved to `user://ui_positions.json`)
 
 **Draggable Elements (10):** Action Bar, Health/Mana, Target Frame, Combat Log, Minimap, Compass, Shortcuts, AI Broadcaster, View Counter, Description Panel
+
+### Character Sheet Tooltips
+
+Hover over stats in the Character Sheet (C) to see formulas:
+
+**Attributes:**
+- Strength: +2% Physical Damage per point
+- Dexterity: +1% Attack Speed, +0.5% Crit, +0.5% Dodge per point
+- Vitality: +10 Health, +0.5 HP Regen per point
+- Energy: +5 Mana, +0.2 MP Regen per point
+
+**Combat Stats** show full formula breakdowns on hover.
+
+### Inventory Weapon Comparison
+
+Hover over weapons in Inventory (I) to see comparison vs equipped:
+- **▲ +X** (green) = better stat
+- **▼ -X** (red) = worse stat
+- **=** (gray) = equal
 
 ---
 
