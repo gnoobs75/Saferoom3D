@@ -26,8 +26,13 @@ public partial class MapEditorTab : Control
     private Button? _loadButton;
     private Button? _saveButton;
     private Button? _newMapButton;
+    private Button? _deleteMapButton;
     private Button? _playButton;
     private Button? _clearButton;
+
+    // Delete confirmation dialog
+    private Control? _deleteConfirmDialog;
+    private string? _mapPathToDelete;
 
     // Map file paths (indexed same as _savedMapsList)
     private List<string> _mapFilePaths = new();
@@ -354,6 +359,10 @@ public partial class MapEditorTab : Control
         _loadButton = CreateButton("Load Map");
         _loadButton.Pressed += OnLoadMapPressed;
         vbox.AddChild(_loadButton);
+
+        _deleteMapButton = CreateButton("Delete Map");
+        _deleteMapButton.Pressed += OnDeleteMapPressed;
+        vbox.AddChild(_deleteMapButton);
 
         _newMapButton = CreateButton("New Map...");
         _newMapButton.Pressed += ShowNewMapDialog;
@@ -1112,6 +1121,168 @@ public partial class MapEditorTab : Control
         LoadMapFromPath(path);
     }
 
+    private void OnDeleteMapPressed()
+    {
+        if (_savedMapsList == null) return;
+
+        var selected = _savedMapsList.GetSelectedItems();
+        if (selected.Length == 0)
+        {
+            GD.Print("[MapEditorTab] No map selected to delete");
+            return;
+        }
+
+        int selectedIndex = selected[0];
+        if (selectedIndex < 0 || selectedIndex >= _mapFilePaths.Count)
+        {
+            GD.Print($"[MapEditorTab] Invalid selection index: {selectedIndex}");
+            return;
+        }
+
+        string path = _mapFilePaths[selectedIndex];
+        string mapName = _savedMapsList.GetItemText(selectedIndex);
+
+        // Don't allow deleting bundled maps
+        if (path.StartsWith("res://"))
+        {
+            GD.Print("[MapEditorTab] Cannot delete bundled maps");
+            return;
+        }
+
+        // Show confirmation dialog
+        _mapPathToDelete = path;
+        ShowDeleteConfirmDialog(mapName);
+    }
+
+    private void ShowDeleteConfirmDialog(string mapName)
+    {
+        // Create dialog if it doesn't exist
+        if (_deleteConfirmDialog == null)
+        {
+            CreateDeleteConfirmDialog();
+        }
+
+        // Update the message
+        var messageLabel = _deleteConfirmDialog?.GetNode<Label>("Panel/VBox/Message");
+        if (messageLabel != null)
+        {
+            messageLabel.Text = $"Are you sure you want to delete\n\"{mapName}\"?\n\nThis cannot be undone.";
+        }
+
+        _deleteConfirmDialog!.Visible = true;
+    }
+
+    private void CreateDeleteConfirmDialog()
+    {
+        _deleteConfirmDialog = new Control();
+        _deleteConfirmDialog.SetAnchorsPreset(Control.LayoutPreset.FullRect);
+        _deleteConfirmDialog.Visible = false;
+        AddChild(_deleteConfirmDialog);
+
+        // Semi-transparent background
+        var bg = new ColorRect();
+        bg.SetAnchorsPreset(Control.LayoutPreset.FullRect);
+        bg.Color = new Color(0, 0, 0, 0.7f);
+        _deleteConfirmDialog.AddChild(bg);
+
+        // Dialog panel
+        var panel = new PanelContainer();
+        panel.Name = "Panel";
+        panel.SetAnchorsPreset(Control.LayoutPreset.Center);
+        panel.Size = new Vector2(350, 180);
+        panel.Position = new Vector2(-175, -90);
+
+        var style = new StyleBoxFlat();
+        style.BgColor = new Color(0.15f, 0.15f, 0.2f);
+        style.BorderColor = new Color(0.8f, 0.3f, 0.3f);
+        style.SetBorderWidthAll(2);
+        style.SetCornerRadiusAll(8);
+        panel.AddThemeStyleboxOverride("panel", style);
+        _deleteConfirmDialog.AddChild(panel);
+
+        var vbox = new VBoxContainer();
+        vbox.Name = "VBox";
+        vbox.AddThemeConstantOverride("separation", 15);
+        vbox.SetAnchorsPreset(Control.LayoutPreset.FullRect);
+        vbox.OffsetLeft = 20;
+        vbox.OffsetRight = -20;
+        vbox.OffsetTop = 20;
+        vbox.OffsetBottom = -20;
+        panel.AddChild(vbox);
+
+        // Title
+        var title = new Label();
+        title.Text = "Delete Map?";
+        title.HorizontalAlignment = HorizontalAlignment.Center;
+        title.AddThemeFontSizeOverride("font_size", 18);
+        title.AddThemeColorOverride("font_color", new Color(1f, 0.4f, 0.4f));
+        vbox.AddChild(title);
+
+        // Message
+        var message = new Label();
+        message.Name = "Message";
+        message.Text = "Are you sure?";
+        message.HorizontalAlignment = HorizontalAlignment.Center;
+        message.AddThemeFontSizeOverride("font_size", 14);
+        vbox.AddChild(message);
+
+        // Spacer
+        vbox.AddChild(new Control { CustomMinimumSize = new Vector2(0, 10) });
+
+        // Buttons
+        var btnBox = new HBoxContainer();
+        btnBox.AddThemeConstantOverride("separation", 20);
+        btnBox.Alignment = BoxContainer.AlignmentMode.Center;
+        vbox.AddChild(btnBox);
+
+        var yesBtn = new Button();
+        yesBtn.Text = "Yes, Delete";
+        yesBtn.CustomMinimumSize = new Vector2(100, 35);
+        yesBtn.AddThemeFontSizeOverride("font_size", 14);
+        yesBtn.Pressed += OnDeleteConfirmed;
+        btnBox.AddChild(yesBtn);
+
+        var noBtn = new Button();
+        noBtn.Text = "No, Cancel";
+        noBtn.CustomMinimumSize = new Vector2(100, 35);
+        noBtn.AddThemeFontSizeOverride("font_size", 14);
+        noBtn.Pressed += OnDeleteCancelled;
+        btnBox.AddChild(noBtn);
+    }
+
+    private void OnDeleteConfirmed()
+    {
+        if (_mapPathToDelete != null)
+        {
+            bool success = MapDefinition.DeleteMap(_mapPathToDelete);
+            if (success)
+            {
+                // If we deleted the currently loaded map, clear it
+                if (_currentMapPath == _mapPathToDelete)
+                {
+                    _currentMap = null;
+                    _currentMapPath = null;
+                    _tileGrid = null;
+                    if (_mapNameInput != null) _mapNameInput.Text = "";
+                    _mapDrawArea?.QueueRedraw();
+                    UpdateMapInfo();
+                }
+
+                RefreshSavedMapsList();
+                GD.Print($"[MapEditorTab] Deleted map: {_mapPathToDelete}");
+            }
+        }
+
+        _mapPathToDelete = null;
+        _deleteConfirmDialog!.Visible = false;
+    }
+
+    private void OnDeleteCancelled()
+    {
+        _mapPathToDelete = null;
+        _deleteConfirmDialog!.Visible = false;
+    }
+
     /// <summary>
     /// Public method to reload/refresh the map editor with a specific map file.
     /// Used by InMapEditor when returning to the editor after editing in 3D.
@@ -1247,18 +1418,24 @@ public partial class MapEditorTab : Control
 
     private void OnSaveMapPressed()
     {
+        GD.Print("[MapEditorTab] === SAVE MAP PRESSED ===");
+
         if (_currentMap == null)
         {
-            GD.PrintErr("[MapEditorTab] No map to save");
+            GD.PrintErr("[MapEditorTab] No map to save - _currentMap is null");
             return;
         }
 
         string name = _mapNameInput?.Text ?? "Unnamed";
+        GD.Print($"[MapEditorTab] Map name from input: '{name}'");
+
         if (string.IsNullOrWhiteSpace(name))
             name = "Unnamed";
 
         _currentMap.Name = name;
         _currentMap.Version = "1.1";
+
+        GD.Print($"[MapEditorTab] Saving map: Name='{name}', Mode='{_currentMap.Mode}', IsTileMode={_currentMap.IsTileMode}, Size={_currentMap.Width}x{_currentMap.Depth}");
 
         // Handle tile-mode maps
         if (_currentMap.IsTileMode && _tileGrid != null)
@@ -1321,12 +1498,21 @@ public partial class MapEditorTab : Control
         }
 
         string path = $"user://maps/{name}.json";
+        GD.Print($"[MapEditorTab] Attempting to save to path: {path}");
 
-        if (_currentMap.SaveToJson(path))
+        bool saveResult = _currentMap.SaveToJson(path);
+        GD.Print($"[MapEditorTab] SaveToJson returned: {saveResult}");
+
+        if (saveResult)
         {
             _currentMapPath = path;
+            GD.Print($"[MapEditorTab] Calling RefreshSavedMapsList...");
             RefreshSavedMapsList();
             GD.Print($"[MapEditorTab] Saved map to: {path}");
+        }
+        else
+        {
+            GD.PrintErr($"[MapEditorTab] FAILED to save map to: {path}");
         }
     }
 

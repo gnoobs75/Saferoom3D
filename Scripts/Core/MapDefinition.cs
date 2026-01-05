@@ -160,28 +160,35 @@ public class MapDefinition
             };
 
             string jsonContent = JsonSerializer.Serialize(this, options);
+            GD.Print($"[MapDefinition] Serialized map '{Name}', JSON length: {jsonContent.Length}");
 
-            // Handle user:// paths
+            // Handle user:// paths - convert to actual filesystem path
             if (path.StartsWith("user://"))
             {
-                // Ensure the maps directory exists
-                var dir = DirAccess.Open("user://");
-                if (dir != null && !dir.DirExists("maps"))
+                // Get the actual filesystem path for user://
+                string userDataPath = OS.GetUserDataDir();
+                string relativePath = path.Replace("user://", "");
+                string fullPath = System.IO.Path.Combine(userDataPath, relativePath);
+                string directory = System.IO.Path.GetDirectoryName(fullPath)!;
+
+                GD.Print($"[MapDefinition] user:// path: {path}");
+                GD.Print($"[MapDefinition] UserDataDir: {userDataPath}");
+                GD.Print($"[MapDefinition] Full path: {fullPath}");
+
+                // Ensure directory exists
+                if (!System.IO.Directory.Exists(directory))
                 {
-                    dir.MakeDir("maps");
+                    System.IO.Directory.CreateDirectory(directory);
+                    GD.Print($"[MapDefinition] Created directory: {directory}");
                 }
 
-                using var file = FileAccess.Open(path, FileAccess.ModeFlags.Write);
-                if (file == null)
-                {
-                    GD.PrintErr($"[MapDefinition] Failed to create file: {path}");
-                    return false;
-                }
-                file.StoreString(jsonContent);
+                // Write using .NET file I/O
+                System.IO.File.WriteAllText(fullPath, jsonContent);
+                GD.Print($"[MapDefinition] File written: {fullPath}");
             }
             else
             {
-                // System path
+                // System path - use directly
                 System.IO.File.WriteAllText(path, jsonContent);
             }
 
@@ -191,6 +198,58 @@ public class MapDefinition
         catch (System.Exception ex)
         {
             GD.PrintErr($"[MapDefinition] Error saving map to {path}: {ex.Message}");
+            GD.PrintErr($"[MapDefinition] Stack trace: {ex.StackTrace}");
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Deletes a map file from disk.
+    /// </summary>
+    public static bool DeleteMap(string path)
+    {
+        try
+        {
+            if (path.StartsWith("user://"))
+            {
+                var dir = DirAccess.Open("user://maps");
+                if (dir == null)
+                {
+                    GD.PrintErr($"[MapDefinition] Cannot open user://maps directory");
+                    return false;
+                }
+
+                // Extract just the filename from the path
+                string fileName = path.Replace("user://maps/", "");
+                var err = dir.Remove(fileName);
+                if (err != Error.Ok)
+                {
+                    GD.PrintErr($"[MapDefinition] Failed to delete {path}: {err}");
+                    return false;
+                }
+                GD.Print($"[MapDefinition] Deleted map: {path}");
+                return true;
+            }
+            else if (path.StartsWith("res://"))
+            {
+                GD.PrintErr("[MapDefinition] Cannot delete bundled maps in res://");
+                return false;
+            }
+            else
+            {
+                // System path
+                if (System.IO.File.Exists(path))
+                {
+                    System.IO.File.Delete(path);
+                    GD.Print($"[MapDefinition] Deleted map: {path}");
+                    return true;
+                }
+                return false;
+            }
+        }
+        catch (System.Exception ex)
+        {
+            GD.PrintErr($"[MapDefinition] Error deleting map {path}: {ex.Message}");
             return false;
         }
     }
@@ -217,31 +276,27 @@ public class MapDefinition
         var maps = new List<(string Name, string Path)>();
         GD.Print("[MapDefinition] GetSavedMapFilesWithPaths() called");
 
-        // Check user://maps/ first (user-created maps)
-        var userDir = DirAccess.Open("user://maps");
-        if (userDir == null)
+        // Check user://maps/ first (user-created maps) - use .NET file I/O
+        string userDataPath = OS.GetUserDataDir();
+        string userMapsPath = System.IO.Path.Combine(userDataPath, "maps");
+        GD.Print($"[MapDefinition] User maps path: {userMapsPath}");
+
+        if (!System.IO.Directory.Exists(userMapsPath))
         {
             GD.Print("[MapDefinition] user://maps/ does not exist, creating...");
-            // Try to create the directory
-            var baseDir = DirAccess.Open("user://");
-            baseDir?.MakeDir("maps");
+            System.IO.Directory.CreateDirectory(userMapsPath);
         }
-        else
+
+        if (System.IO.Directory.Exists(userMapsPath))
         {
-            GD.Print("[MapDefinition] Scanning user://maps/");
-            userDir.ListDirBegin();
-            string fileName = userDir.GetNext();
-            while (!string.IsNullOrEmpty(fileName))
+            GD.Print("[MapDefinition] Scanning user://maps/ via .NET");
+            foreach (var filePath in System.IO.Directory.GetFiles(userMapsPath, "*.json"))
             {
-                GD.Print($"[MapDefinition] Found file in user://maps/: {fileName}");
-                if (!userDir.CurrentIsDir() && fileName.EndsWith(".json"))
-                {
-                    string displayName = fileName.Replace(".json", "");
-                    maps.Add((displayName, $"user://maps/{fileName}"));
-                }
-                fileName = userDir.GetNext();
+                string fileName = System.IO.Path.GetFileName(filePath);
+                string displayName = System.IO.Path.GetFileNameWithoutExtension(filePath);
+                GD.Print($"[MapDefinition] Found user map: {fileName}");
+                maps.Add((displayName, $"user://maps/{fileName}"));
             }
-            userDir.ListDirEnd();
         }
 
         // Check res://maps/ (bundled maps)

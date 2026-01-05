@@ -5,8 +5,8 @@
 | Command | Purpose |
 |---------|---------|
 | `dotnet build "C:\Claude\SafeRoom3D\SafeRoom3D.csproj"` | Build project |
-| `Start-Process 'C:\Godot\Godot_v4.3-stable_mono_win64.exe' -ArgumentList '--path','C:\Claude\SafeRoom3D'` | Launch game |
-| `Start-Process 'C:\Godot\Godot_v4.3-stable_mono_win64.exe' -ArgumentList '--editor','--path','C:\Claude\SafeRoom3D'` | Open editor |
+| `Start-Process 'C:\Godot\Godot_v4.5.1-stable_mono_win64.exe' -ArgumentList '--path','C:\Claude\SafeRoom3D'` | Launch game |
+| `Start-Process 'C:\Godot\Godot_v4.5.1-stable_mono_win64.exe' -ArgumentList '--editor','--path','C:\Claude\SafeRoom3D'` | Open editor |
 
 **Repository:** https://github.com/gnoobs75/Saferoom3D
 
