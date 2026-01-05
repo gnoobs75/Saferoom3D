@@ -2401,13 +2401,23 @@ public partial class Cosmetic3D : StaticBody3D
             Vector3 v3 = end + offset2;
             Vector3 v4 = end + offset1;
 
+            // Calculate normals (pointing outward radially) - Godot 4.5 requirement
+            Vector3 n1 = offset1.Normalized();
+            Vector3 n2 = offset2.Normalized();
+
             // Two triangles for the quad
+            st.SetNormal(n1);
             st.AddVertex(v1);
+            st.SetNormal(n2);
             st.AddVertex(v2);
+            st.SetNormal(n2);
             st.AddVertex(v3);
 
+            st.SetNormal(n1);
             st.AddVertex(v1);
+            st.SetNormal(n2);
             st.AddVertex(v3);
+            st.SetNormal(n1);
             st.AddVertex(v4);
         }
     }
@@ -2434,13 +2444,23 @@ public partial class Cosmetic3D : StaticBody3D
             Vector3 v3 = end + offsetTop2;
             Vector3 v4 = end + offsetTop1;
 
+            // Calculate normals (pointing outward radially) - Godot 4.5 requirement
+            Vector3 n1 = new Vector3(Mathf.Cos(angle1), 0, Mathf.Sin(angle1));
+            Vector3 n2 = new Vector3(Mathf.Cos(angle2), 0, Mathf.Sin(angle2));
+
             // Two triangles for the quad
+            st.SetNormal(n1);
             st.AddVertex(v1);
+            st.SetNormal(n2);
             st.AddVertex(v2);
+            st.SetNormal(n2);
             st.AddVertex(v3);
 
+            st.SetNormal(n1);
             st.AddVertex(v1);
+            st.SetNormal(n2);
             st.AddVertex(v3);
+            st.SetNormal(n1);
             st.AddVertex(v4);
         }
     }
@@ -2590,20 +2610,21 @@ public partial class Cosmetic3D : StaticBody3D
             center + new Vector3(-half.X, half.Y, half.Z),
         };
 
-        // Define the 6 faces (2 triangles each)
-        int[][] faces = {
-            new[] {0, 1, 2, 0, 2, 3}, // front
-            new[] {5, 4, 7, 5, 7, 6}, // back
-            new[] {4, 0, 3, 4, 3, 7}, // left
-            new[] {1, 5, 6, 1, 6, 2}, // right
-            new[] {3, 2, 6, 3, 6, 7}, // top
-            new[] {4, 5, 1, 4, 1, 0}, // bottom
+        // Define the 6 faces (2 triangles each) with normals - Godot 4.5 requirement
+        (int[], Vector3)[] facesWithNormals = {
+            (new[] {0, 1, 2, 0, 2, 3}, new Vector3(0, 0, -1)), // front
+            (new[] {5, 4, 7, 5, 7, 6}, new Vector3(0, 0, 1)),  // back
+            (new[] {4, 0, 3, 4, 3, 7}, new Vector3(-1, 0, 0)), // left
+            (new[] {1, 5, 6, 1, 6, 2}, new Vector3(1, 0, 0)),  // right
+            (new[] {3, 2, 6, 3, 6, 7}, new Vector3(0, 1, 0)),  // top
+            (new[] {4, 5, 1, 4, 1, 0}, new Vector3(0, -1, 0)), // bottom
         };
 
-        foreach (var face in faces)
+        foreach (var (face, normal) in facesWithNormals)
         {
             foreach (var idx in face)
             {
+                st.SetNormal(normal);
                 st.AddVertex(verts[idx]);
             }
         }
@@ -2637,20 +2658,24 @@ public partial class Cosmetic3D : StaticBody3D
             verts[i] = center + new Vector3(rotX, localVerts[i].Y, rotZ);
         }
 
-        // Define the 6 faces (2 triangles each)
-        int[][] faces = {
-            new[] {0, 1, 2, 0, 2, 3}, // front
-            new[] {5, 4, 7, 5, 7, 6}, // back
-            new[] {4, 0, 3, 4, 3, 7}, // left
-            new[] {1, 5, 6, 1, 6, 2}, // right
-            new[] {3, 2, 6, 3, 6, 7}, // top
-            new[] {4, 5, 1, 4, 1, 0}, // bottom
+        // Define the 6 faces with normals (rotated) - Godot 4.5 requirement
+        // Rotate normals around Y axis
+        Vector3 RotateNormal(Vector3 n) => new Vector3(n.X * cos - n.Z * sin, n.Y, n.X * sin + n.Z * cos);
+
+        (int[], Vector3)[] facesWithNormals = {
+            (new[] {0, 1, 2, 0, 2, 3}, RotateNormal(new Vector3(0, 0, -1))), // front
+            (new[] {5, 4, 7, 5, 7, 6}, RotateNormal(new Vector3(0, 0, 1))),  // back
+            (new[] {4, 0, 3, 4, 3, 7}, RotateNormal(new Vector3(-1, 0, 0))), // left
+            (new[] {1, 5, 6, 1, 6, 2}, RotateNormal(new Vector3(1, 0, 0))),  // right
+            (new[] {3, 2, 6, 3, 6, 7}, new Vector3(0, 1, 0)),  // top (unchanged)
+            (new[] {4, 5, 1, 4, 1, 0}, new Vector3(0, -1, 0)), // bottom (unchanged)
         };
 
-        foreach (var face in faces)
+        foreach (var (face, normal) in facesWithNormals)
         {
             foreach (var idx in face)
             {
+                st.SetNormal(normal);
                 st.AddVertex(verts[idx]);
             }
         }
@@ -2689,13 +2714,19 @@ public partial class Cosmetic3D : StaticBody3D
                     radius * Mathf.Cos(theta2),
                     radius * Mathf.Sin(theta2) * Mathf.Sin(phi1));
 
-                // Two triangles for the quad
+                // Two triangles for the quad - set normals before each vertex (Godot 4.5 requirement)
+                st.SetNormal((v1 - center).Normalized());
                 st.AddVertex(v1);
+                st.SetNormal((v2 - center).Normalized());
                 st.AddVertex(v2);
+                st.SetNormal((v3 - center).Normalized());
                 st.AddVertex(v3);
 
+                st.SetNormal((v1 - center).Normalized());
                 st.AddVertex(v1);
+                st.SetNormal((v3 - center).Normalized());
                 st.AddVertex(v3);
+                st.SetNormal((v4 - center).Normalized());
                 st.AddVertex(v4);
             }
         }

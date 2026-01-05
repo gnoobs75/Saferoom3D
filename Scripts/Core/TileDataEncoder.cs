@@ -151,19 +151,20 @@ public static class TileDataEncoder
     /// <summary>
     /// Writes a run to the output list.
     /// Format:
-    /// - If count <= 127: [value | (count << 1)]  (single byte)
-    /// - If count > 127: [value | 0x80, count_low, count_high] (3 bytes)
+    /// - If count <= 63: [value | (count << 1)]  (single byte, bits 1-6 = count, bit 0 = value, bit 7 = 0)
+    /// - If count > 63: [0x80 | value, count_low, count_high] (3 bytes, bit 7 = 1 marks multi-byte)
     /// </summary>
     private static void WriteRun(List<byte> output, int value, int count)
     {
-        if (count <= 127)
+        // BUG FIX: count << 1 must not set bit 7, so max single-byte count is 63 (63 << 1 = 126)
+        if (count <= 63)
         {
-            // Single byte: bit 0 = value, bits 1-7 = count
+            // Single byte: bit 0 = value, bits 1-6 = count, bit 7 = 0
             output.Add((byte)((count << 1) | value));
         }
         else
         {
-            // Multi-byte: marker byte + 2-byte count
+            // Multi-byte: marker byte (bit 7 = 1) + 2-byte count
             output.Add((byte)(0x80 | value)); // Marker with value in bit 0
             output.Add((byte)(count & 0xFF));
             output.Add((byte)((count >> 8) & 0xFF));

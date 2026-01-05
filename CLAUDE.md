@@ -5,8 +5,10 @@
 | Command | Purpose |
 |---------|---------|
 | `dotnet build "C:\Claude\SafeRoom3D\SafeRoom3D.csproj"` | Build project |
-| `Start-Process 'C:\Godot\Godot_v4.5.1-stable_mono_win64.exe' -ArgumentList '--path','C:\Claude\SafeRoom3D'` | Launch game |
-| `Start-Process 'C:\Godot\Godot_v4.5.1-stable_mono_win64.exe' -ArgumentList '--editor','--path','C:\Claude\SafeRoom3D'` | Open editor |
+| `.\launch_game.bat` | Launch game (auto-detects GPU) |
+| `.\launch_editor.bat` | Open editor (auto-detects GPU) |
+
+**GPU-Aware Launchers:** The `.bat` files automatically use Vulkan for NVIDIA GPUs and OpenGL for Intel/AMD integrated graphics.
 
 **Repository:** https://github.com/gnoobs75/Saferoom3D
 
@@ -14,7 +16,7 @@
 
 ## Project Overview
 
-First-person dungeon crawler built with **Godot 4.3 (.NET)** and **C# (.NET 8.0)**. Set in the "Dungeon Crawler Carl" universe with procedurally generated dungeons, 28 monster types, 8 bosses, 14 abilities, and combat systems.
+First-person dungeon crawler built with **Godot 4.5 (.NET)** and **C# (.NET 8.0)**. Set in the "Dungeon Crawler Carl" universe with procedurally generated dungeons, 28 monster types, 8 bosses, 14 abilities, and combat systems.
 
 ---
 
@@ -66,6 +68,21 @@ Idle → Patrol → Tracking → Aggro → Attack → Dead
 - `LimbNodes` for animation references
 - Always set `SphereMesh.Height = 2 × Radius`
 - Eyes must protrude (Z >= headRadius × 0.75)
+
+### SurfaceTool (Godot 4.5)
+**CRITICAL:** Godot 4.5 requires normals for ALL vertices if any vertex has a normal set.
+```csharp
+// CORRECT - Set normal before every AddVertex
+st.SetNormal(normal);
+st.AddVertex(v1);
+st.SetNormal(normal);
+st.AddVertex(v2);
+
+// WRONG - Will crash in Godot 4.5
+st.SetNormal(normal);
+st.AddVertex(v1);
+st.AddVertex(v2);  // Missing SetNormal!
+```
 
 ### Performance Critical
 - **Occlusion culling**: Call `AddBoxOccluder()` for walls
@@ -254,7 +271,7 @@ For detailed information on monsters, abilities, weapons, cosmetics, and porting
 ## Skills
 
 Custom skills for specialized capabilities (auto-loaded in Claude Code sessions):
-- `.claude/skills/godot-3d-dev.md` - Godot 4.3 C# development workflow
+- `.claude/skills/godot-3d-dev.md` - Godot 4.5 C# development workflow
 - `.claude/skills/procedural-3d-artist.md` - Procedural 3D mesh creation for monsters & props
 - `.claude/skills/dungeon-architect.md` - Procedural dungeon generation, room layouts, spawn systems
 - `.claude/skills/combat-designer.md` - Ability systems, damage formulas, status effects, enemy AI
@@ -267,3 +284,9 @@ Custom skills for specialized capabilities (auto-loaded in Claude Code sessions)
 1. No save/load system yet
 2. No victory/death screens
 3. Debug logging throughout (appropriate for dev)
+
+## Recent Fixes (v4.5 Upgrade)
+
+1. **SurfaceTool Compatibility** - Fixed `Cosmetic3D.cs` to set normals before every vertex (Godot 4.5 requirement)
+2. **RLE Encoding Bug** - Fixed `TileDataEncoder.cs` map corruption when tile runs >= 64 consecutive tiles
+3. **GPU Compatibility** - Added GPU-aware launchers that use OpenGL for Intel/AMD integrated graphics

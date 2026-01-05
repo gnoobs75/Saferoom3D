@@ -1327,19 +1327,23 @@ public partial class MapEditorTab : Control
             GD.Print($"[MapEditorTab] LOAD: Grid size {w}x{d}");
             GD.Print($"[MapEditorTab] LOAD: Corner tiles: (0,0)={_tileGrid[0, 0]}, ({w - 1},0)={_tileGrid[w - 1, 0]}, (0,{d - 1})={_tileGrid[0, d - 1]}, ({w - 1},{d - 1})={_tileGrid[w - 1, d - 1]}");
 
-            // Find first floor tile for reference
-            for (int z = 0; z < d && z < 20; z++)
+            // Debug: Find bounds of floor tiles after loading
+            int minX = int.MaxValue, maxX = int.MinValue, minZ = int.MaxValue, maxZ = int.MinValue;
+            for (int x = 0; x < w; x++)
             {
-                for (int x = 0; x < w && x < 20; x++)
+                for (int z = 0; z < d; z++)
                 {
                     if (_tileGrid[x, z] == 1)
                     {
-                        GD.Print($"[MapEditorTab] LOAD: First floor tile at ({x},{z})");
-                        goto DoneSearchingLoad;
+                        minX = Mathf.Min(minX, x);
+                        maxX = Mathf.Max(maxX, x);
+                        minZ = Mathf.Min(minZ, z);
+                        maxZ = Mathf.Max(maxZ, z);
                     }
                 }
             }
-            DoneSearchingLoad:;
+            if (floorCount > 0)
+                GD.Print($"[MapEditorTab] LOAD: Floor tile bounds: X=[{minX}..{maxX}], Z=[{minZ}..{maxZ}]");
         }
         else
         {
@@ -1478,7 +1482,26 @@ public partial class MapEditorTab : Control
             _currentMap.Corridors.Clear();
             _currentMap.CustomTiles.Clear();
 
-            GD.Print($"[MapEditorTab] Encoded {TileDataEncoder.CountFloorTiles(_tileGrid)} floor tiles");
+            int floorCount = TileDataEncoder.CountFloorTiles(_tileGrid);
+            GD.Print($"[MapEditorTab] Encoded {floorCount} floor tiles");
+
+            // Debug: Find bounds of floor tiles
+            int minX = int.MaxValue, maxX = int.MinValue, minZ = int.MaxValue, maxZ = int.MinValue;
+            for (int x = 0; x < _currentMap.Width; x++)
+            {
+                for (int z = 0; z < _currentMap.Depth; z++)
+                {
+                    if (_tileGrid[x, z] == 1)
+                    {
+                        minX = Mathf.Min(minX, x);
+                        maxX = Mathf.Max(maxX, x);
+                        minZ = Mathf.Min(minZ, z);
+                        maxZ = Mathf.Max(maxZ, z);
+                    }
+                }
+            }
+            if (floorCount > 0)
+                GD.Print($"[MapEditorTab] SAVE: Floor tile bounds: X=[{minX}..{maxX}], Z=[{minZ}..{maxZ}]");
         }
         else if (_tileGrid != null)
         {
@@ -1793,15 +1816,26 @@ public partial class MapEditorTab : Control
     {
         if (_currentMap == null || _mapViewport == null) return;
 
+        var viewSize = _mapViewport.Size;
+
+        // Don't center if viewport hasn't been laid out yet - defer to next frame
+        if (viewSize.X <= 0 || viewSize.Y <= 0)
+        {
+            GD.Print($"[MapEditorTab] CenterView deferred - viewport size is {viewSize}");
+            CallDeferred(nameof(CenterView));
+            return;
+        }
+
         // Center the view on the map
         float mapCenterX = _currentMap.Width / 2f;
         float mapCenterZ = _currentMap.Depth / 2f;
 
-        var viewSize = _mapViewport.Size;
         _viewOffset = new Vector2(
             viewSize.X / 2f - mapCenterX * _viewScale,
             viewSize.Y / 2f - mapCenterZ * _viewScale
         );
+
+        GD.Print($"[MapEditorTab] CenterView: viewport={viewSize}, mapCenter=({mapCenterX},{mapCenterZ}), offset={_viewOffset}");
     }
 
     private void OnMapInput(InputEvent @event)
@@ -1860,7 +1894,11 @@ public partial class MapEditorTab : Control
         if (_currentMap == null || _tileGrid == null) return;
 
         var tile = ScreenToTile(mouseButton.Position);
-        GD.Print($"[MapEditorTab] Click at screen ({mouseButton.Position.X:F0},{mouseButton.Position.Y:F0}) -> tile ({tile.X},{tile.Y})");
+        GD.Print($"[MapEditorTab] Click at screen ({mouseButton.Position.X:F0},{mouseButton.Position.Y:F0}) -> tile ({tile.X},{tile.Y}) [viewOffset={_viewOffset}, scale={_viewScale}]");
+
+        // Debug: Also show where origin (0,0) is on screen
+        var originScreen = TileToScreen(0, 0);
+        GD.Print($"[MapEditorTab] DEBUG: Origin (0,0) is at screen ({originScreen.X:F0},{originScreen.Y:F0})");
 
         if (mouseButton.Pressed)
         {
