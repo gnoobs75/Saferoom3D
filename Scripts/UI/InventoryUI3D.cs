@@ -20,9 +20,7 @@ public partial class InventoryUI3D : Control
     private Label? _titleLabel;
     private Button? _closeButton;
     private PanelContainer? _tooltipPanel;
-    private Label? _tooltipName;
-    private Label? _tooltipDesc;
-    private Label? _tooltipCount;
+    private VBoxContainer? _tooltipContent;
 
     // Item slots
     private readonly List<ItemSlot> _slots = new();
@@ -203,7 +201,7 @@ public partial class InventoryUI3D : Control
     private void CreateTooltip()
     {
         _tooltipPanel = new PanelContainer();
-        _tooltipPanel.CustomMinimumSize = new Vector2(200, 80);
+        _tooltipPanel.CustomMinimumSize = new Vector2(250, 80);
         _tooltipPanel.Visible = false;
         _tooltipPanel.ZIndex = 10;
         _tooltipPanel.MouseFilter = MouseFilterEnum.Ignore;
@@ -216,31 +214,11 @@ public partial class InventoryUI3D : Control
         tooltipStyle.SetContentMarginAll(10);
         _tooltipPanel.AddThemeStyleboxOverride("panel", tooltipStyle);
 
-        var tooltipContent = new VBoxContainer();
-        tooltipContent.AddThemeConstantOverride("separation", 4);
-        tooltipContent.MouseFilter = MouseFilterEnum.Ignore;
+        _tooltipContent = new VBoxContainer();
+        _tooltipContent.AddThemeConstantOverride("separation", 4);
+        _tooltipContent.MouseFilter = MouseFilterEnum.Ignore;
+        _tooltipPanel.AddChild(_tooltipContent);
 
-        _tooltipName = new Label();
-        _tooltipName.AddThemeFontSizeOverride("font_size", 14);
-        _tooltipName.AddThemeColorOverride("font_color", new Color(1f, 0.95f, 0.85f));
-        _tooltipName.MouseFilter = MouseFilterEnum.Ignore;
-        tooltipContent.AddChild(_tooltipName);
-
-        _tooltipDesc = new Label();
-        _tooltipDesc.AddThemeFontSizeOverride("font_size", 11);
-        _tooltipDesc.AddThemeColorOverride("font_color", new Color(0.75f, 0.7f, 0.85f));
-        _tooltipDesc.AutowrapMode = TextServer.AutowrapMode.WordSmart;
-        _tooltipDesc.CustomMinimumSize = new Vector2(180, 0);
-        _tooltipDesc.MouseFilter = MouseFilterEnum.Ignore;
-        tooltipContent.AddChild(_tooltipDesc);
-
-        _tooltipCount = new Label();
-        _tooltipCount.AddThemeFontSizeOverride("font_size", 11);
-        _tooltipCount.AddThemeColorOverride("font_color", new Color(0.6f, 0.8f, 0.6f));
-        _tooltipCount.MouseFilter = MouseFilterEnum.Ignore;
-        tooltipContent.AddChild(_tooltipCount);
-
-        _tooltipPanel.AddChild(tooltipContent);
         AddChild(_tooltipPanel);
     }
 
@@ -516,17 +494,255 @@ public partial class InventoryUI3D : Control
 
     private void ShowTooltip(ItemSlot slot, InventoryItem item)
     {
-        if (_tooltipPanel == null) return;
+        if (_tooltipPanel == null || _tooltipContent == null) return;
 
-        _tooltipName!.Text = item.Name;
-        _tooltipDesc!.Text = item.Description;
-        _tooltipCount!.Text = $"Count: {item.StackCount}/{item.MaxStackSize}";
+        // Clear previous content
+        foreach (var child in _tooltipContent.GetChildren())
+            child.QueueFree();
+
+        // Item name with rarity color
+        var nameLabel = new Label();
+        nameLabel.Text = item.Name;
+        nameLabel.AddThemeFontSizeOverride("font_size", 14);
+        nameLabel.AddThemeColorOverride("font_color", item.GetRarityColor());
+        nameLabel.MouseFilter = MouseFilterEnum.Ignore;
+        _tooltipContent.AddChild(nameLabel);
+
+        // For equipment, show detailed info
+        if (item.Equipment != null)
+        {
+            var equip = item.Equipment;
+
+            // Item type and level
+            var typeLabel = new Label();
+            typeLabel.Text = $"{equip.Slot} - Item Level {equip.ItemLevel}";
+            typeLabel.AddThemeFontSizeOverride("font_size", 10);
+            typeLabel.AddThemeColorOverride("font_color", new Color(0.6f, 0.55f, 0.7f));
+            typeLabel.MouseFilter = MouseFilterEnum.Ignore;
+            _tooltipContent.AddChild(typeLabel);
+
+            _tooltipContent.AddChild(new HSeparator());
+
+            // Get equipped item for comparison (if this is a weapon)
+            EquipmentItem? equippedWeapon = null;
+            if (equip.Slot == EquipmentSlot.MainHand || equip.Slot == EquipmentSlot.OffHand)
+            {
+                var player = FPSController.Instance;
+                equippedWeapon = player?.Equipment.GetEquippedItem(equip.Slot);
+            }
+
+            // Show weapon stats with comparison
+            if (equip.MinDamage > 0 || equip.MaxDamage > 0)
+            {
+                if (equippedWeapon != null)
+                {
+                    // Show comparison
+                    AddComparisonStat("Damage",
+                        $"{equip.MinDamage}-{equip.MaxDamage}",
+                        $"{equippedWeapon.MinDamage}-{equippedWeapon.MaxDamage}",
+                        (equip.MinDamage + equip.MaxDamage) / 2f,
+                        (equippedWeapon.MinDamage + equippedWeapon.MaxDamage) / 2f);
+                    AddComparisonStat("Attack Speed",
+                        $"{equip.AttackSpeed:F2}",
+                        $"{equippedWeapon.AttackSpeed:F2}",
+                        equip.AttackSpeed,
+                        equippedWeapon.AttackSpeed);
+                }
+                else
+                {
+                    // No equipped weapon, just show stats
+                    AddStatLabel($"Damage: {equip.MinDamage}-{equip.MaxDamage}");
+                    AddStatLabel($"Attack Speed: {equip.AttackSpeed:F2}");
+                }
+            }
+
+            // Armor with comparison
+            if (equip.Armor > 0)
+            {
+                EquipmentItem? equippedArmor = null;
+                if (equip.Slot != EquipmentSlot.MainHand && equip.Slot != EquipmentSlot.OffHand)
+                {
+                    var player = FPSController.Instance;
+                    equippedArmor = player?.Equipment.GetEquippedItem(equip.Slot);
+                }
+
+                if (equippedArmor != null && equippedArmor.Armor > 0)
+                {
+                    AddComparisonStat("Armor",
+                        equip.Armor.ToString(),
+                        equippedArmor.Armor.ToString(),
+                        equip.Armor,
+                        equippedArmor.Armor);
+                }
+                else
+                {
+                    AddStatLabel($"Armor: {equip.Armor}");
+                }
+            }
+
+            // Block chance
+            if (equip.BlockChance > 0)
+            {
+                AddStatLabel($"Block Chance: {equip.BlockChance}%");
+            }
+
+            // Affixes
+            if (equip.Affixes.Count > 0)
+            {
+                _tooltipContent.AddChild(new HSeparator());
+                foreach (var affix in equip.Affixes)
+                {
+                    var affixLabel = new Label();
+                    affixLabel.Text = $"+{affix.CurrentValue:F0} {FormatAffixName(affix.Type)}";
+                    affixLabel.AddThemeFontSizeOverride("font_size", 11);
+                    affixLabel.AddThemeColorOverride("font_color", new Color(0.4f, 0.7f, 1f));
+                    affixLabel.MouseFilter = MouseFilterEnum.Ignore;
+                    _tooltipContent.AddChild(affixLabel);
+                }
+            }
+
+            // Show comparison header if we have an equipped weapon
+            if (equippedWeapon != null)
+            {
+                _tooltipContent.AddChild(new HSeparator());
+                var compareLabel = new Label();
+                compareLabel.Text = $"vs Equipped: {equippedWeapon.Name}";
+                compareLabel.AddThemeFontSizeOverride("font_size", 9);
+                compareLabel.AddThemeColorOverride("font_color", new Color(0.7f, 0.65f, 0.8f));
+                compareLabel.MouseFilter = MouseFilterEnum.Ignore;
+                _tooltipContent.AddChild(compareLabel);
+            }
+
+            // Required level
+            if (equip.RequiredLevel > 1)
+            {
+                var reqLabel = new Label();
+                reqLabel.Text = $"Required Level: {equip.RequiredLevel}";
+                reqLabel.AddThemeFontSizeOverride("font_size", 10);
+                reqLabel.AddThemeColorOverride("font_color", new Color(0.7f, 0.6f, 0.6f));
+                reqLabel.MouseFilter = MouseFilterEnum.Ignore;
+                _tooltipContent.AddChild(reqLabel);
+            }
+        }
+        else
+        {
+            // Non-equipment items
+            var descLabel = new Label();
+            descLabel.Text = item.Description;
+            descLabel.AddThemeFontSizeOverride("font_size", 11);
+            descLabel.AddThemeColorOverride("font_color", new Color(0.75f, 0.7f, 0.85f));
+            descLabel.AutowrapMode = TextServer.AutowrapMode.WordSmart;
+            descLabel.CustomMinimumSize = new Vector2(200, 0);
+            descLabel.MouseFilter = MouseFilterEnum.Ignore;
+            _tooltipContent.AddChild(descLabel);
+
+            // Stack count
+            if (item.MaxStackSize > 1)
+            {
+                var countLabel = new Label();
+                countLabel.Text = $"Count: {item.StackCount}/{item.MaxStackSize}";
+                countLabel.AddThemeFontSizeOverride("font_size", 11);
+                countLabel.AddThemeColorOverride("font_color", new Color(0.6f, 0.8f, 0.6f));
+                countLabel.MouseFilter = MouseFilterEnum.Ignore;
+                _tooltipContent.AddChild(countLabel);
+            }
+        }
 
         _tooltipPanel.Visible = true;
 
         // Position tooltip near the slot
         var slotPos = slot.Container!.GlobalPosition;
         _tooltipPanel.GlobalPosition = new Vector2(slotPos.X + SlotSize + 10, slotPos.Y);
+    }
+
+    /// <summary>
+    /// Add a simple stat label to the tooltip.
+    /// </summary>
+    private void AddStatLabel(string text)
+    {
+        var label = new Label();
+        label.Text = text;
+        label.AddThemeFontSizeOverride("font_size", 12);
+        label.AddThemeColorOverride("font_color", new Color(0.9f, 0.85f, 0.8f));
+        label.MouseFilter = MouseFilterEnum.Ignore;
+        _tooltipContent?.AddChild(label);
+    }
+
+    /// <summary>
+    /// Add a stat comparison row showing the difference between item and equipped.
+    /// </summary>
+    private void AddComparisonStat(string statName, string newValue, string oldValue, float newNum, float oldNum)
+    {
+        var row = new HBoxContainer();
+        row.AddThemeConstantOverride("separation", 8);
+        row.MouseFilter = MouseFilterEnum.Ignore;
+
+        // Stat name and new value
+        var statLabel = new Label();
+        statLabel.Text = $"{statName}: {newValue}";
+        statLabel.AddThemeFontSizeOverride("font_size", 12);
+        statLabel.AddThemeColorOverride("font_color", new Color(0.9f, 0.85f, 0.8f));
+        statLabel.MouseFilter = MouseFilterEnum.Ignore;
+        row.AddChild(statLabel);
+
+        // Comparison indicator
+        float diff = newNum - oldNum;
+        if (Mathf.Abs(diff) > 0.01f)
+        {
+            var diffLabel = new Label();
+            bool isBetter = diff > 0;
+
+            // For attack speed, higher is better
+            // For damage, higher is better
+            string arrow = isBetter ? "▲" : "▼";
+            string diffText = isBetter ? $"+{diff:F1}" : $"{diff:F1}";
+
+            diffLabel.Text = $"{arrow} {diffText}";
+            diffLabel.AddThemeFontSizeOverride("font_size", 11);
+            diffLabel.AddThemeColorOverride("font_color", isBetter ? new Color(0.3f, 1f, 0.3f) : new Color(1f, 0.3f, 0.3f));
+            diffLabel.MouseFilter = MouseFilterEnum.Ignore;
+            row.AddChild(diffLabel);
+        }
+        else
+        {
+            var sameLabel = new Label();
+            sameLabel.Text = "=";
+            sameLabel.AddThemeFontSizeOverride("font_size", 11);
+            sameLabel.AddThemeColorOverride("font_color", new Color(0.7f, 0.7f, 0.7f));
+            sameLabel.MouseFilter = MouseFilterEnum.Ignore;
+            row.AddChild(sameLabel);
+        }
+
+        _tooltipContent?.AddChild(row);
+    }
+
+    /// <summary>
+    /// Format affix type name for display.
+    /// </summary>
+    private static string FormatAffixName(AffixType type)
+    {
+        return type switch
+        {
+            AffixType.Strength => "Strength",
+            AffixType.Dexterity => "Dexterity",
+            AffixType.Vitality => "Vitality",
+            AffixType.Energy => "Energy",
+            AffixType.FlatDamage => "Damage",
+            AffixType.DamagePercent => "% Damage",
+            AffixType.FlatHealth => "Health",
+            AffixType.HealthPercent => "% Health",
+            AffixType.FlatMana => "Mana",
+            AffixType.ManaPercent => "% Mana",
+            AffixType.FlatArmor => "Armor",
+            AffixType.ArmorPercent => "% Armor",
+            AffixType.CriticalChance => "% Crit Chance",
+            AffixType.CriticalDamage => "% Crit Damage",
+            AffixType.AttackSpeed => "% Attack Speed",
+            AffixType.MovementSpeed => "% Move Speed",
+            AffixType.DodgeChance => "% Dodge",
+            AffixType.BlockChance => "% Block",
+            _ => type.ToString()
+        };
     }
 
     private void HideTooltip()
