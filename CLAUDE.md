@@ -104,6 +104,21 @@ Rotation = new Vector3(0, targetAngle, 0);
 | T | Loot | F5 | Panic (reset UI) |
 | N | Toggle nameplates | | |
 
+### UI Editor Mode
+
+Customize HUD layout by repositioning elements:
+
+| Key | Action |
+|-----|--------|
+| X | Enter/exit UI editor mode (saves on exit) |
+| Shift+X | Reset all positions to defaults |
+
+**In Editor Mode:**
+- Drag any HUD element to reposition it
+- Positions persist between sessions (saved to `user://ui_positions.json`)
+
+**Draggable Elements (10):** Action Bar, Health/Mana, Target Frame, Combat Log, Minimap, Compass, Shortcuts, AI Broadcaster, View Counter, Description Panel
+
 ---
 
 ## Anti-Patterns to Avoid
