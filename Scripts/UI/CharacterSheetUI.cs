@@ -559,11 +559,19 @@ public partial class CharacterSheetUI : Control
 
         parent.AddChild(new HSeparator());
 
-        // Primary attributes with + buttons
-        CreateAttributeRow(parent, "Strength", out _strengthLabel, out _strButton, "str");
-        CreateAttributeRow(parent, "Dexterity", out _dexterityLabel, out _dexButton, "dex");
-        CreateAttributeRow(parent, "Vitality", out _vitalityLabel, out _vitButton, "vit");
-        CreateAttributeRow(parent, "Energy", out _energyLabel, out _eneButton, "ene");
+        // Primary attributes with + buttons and tooltips
+        CreateAttributeRow(parent, "Strength", out _strengthLabel, out _strButton, "str",
+            "STRENGTH",
+            "+2% Physical Damage per point\nIncreases melee attack power");
+        CreateAttributeRow(parent, "Dexterity", out _dexterityLabel, out _dexButton, "dex",
+            "DEXTERITY",
+            "+1% Attack Speed per point\n+0.5% Critical Chance per point\n+0.5% Dodge Chance per point");
+        CreateAttributeRow(parent, "Vitality", out _vitalityLabel, out _vitButton, "vit",
+            "VITALITY",
+            "+10 Max Health per point\n+0.5 Health Regen/sec per point");
+        CreateAttributeRow(parent, "Energy", out _energyLabel, out _eneButton, "ene",
+            "ENERGY",
+            "+5 Max Mana per point\n+0.2 Mana Regen/sec per point");
 
         parent.AddChild(new HSeparator());
 
@@ -574,14 +582,14 @@ public partial class CharacterSheetUI : Control
         derivedTitle.AddThemeColorOverride("font_color", new Color(0.9f, 0.8f, 0.6f));
         parent.AddChild(derivedTitle);
 
-        // Derived stats
-        _healthLabel = CreateStatLabel(parent, "Health: 100/100", new Color(0.9f, 0.3f, 0.3f));
-        _manaLabel = CreateStatLabel(parent, "Mana: 50/50", new Color(0.3f, 0.5f, 0.9f));
-        _damageLabel = CreateStatLabel(parent, "Damage: 10-20");
-        _armorLabel = CreateStatLabel(parent, "Armor: 0");
-        _critLabel = CreateStatLabel(parent, "Crit Chance: 5%", new Color(1f, 0.8f, 0.3f));
-        _blockLabel = CreateStatLabel(parent, "Block Chance: 0%");
-        _dodgeLabel = CreateStatLabel(parent, "Dodge Chance: 0%");
+        // Derived stats with formula tooltips
+        _healthLabel = CreateCombatStatLabel(parent, "Health: 100/100", "health", new Color(0.9f, 0.3f, 0.3f));
+        _manaLabel = CreateCombatStatLabel(parent, "Mana: 50/50", "mana", new Color(0.3f, 0.5f, 0.9f));
+        _damageLabel = CreateCombatStatLabel(parent, "Damage: 10-20", "damage");
+        _armorLabel = CreateCombatStatLabel(parent, "Armor: 0", "armor");
+        _critLabel = CreateCombatStatLabel(parent, "Crit Chance: 5%", "crit", new Color(1f, 0.8f, 0.3f));
+        _blockLabel = CreateCombatStatLabel(parent, "Block Chance: 0%", "block");
+        _dodgeLabel = CreateCombatStatLabel(parent, "Dodge Chance: 0%", "dodge");
     }
 
     private Label CreateStatLabel(VBoxContainer parent, string text, Color? color = null)
@@ -594,16 +602,26 @@ public partial class CharacterSheetUI : Control
         return label;
     }
 
-    private void CreateAttributeRow(VBoxContainer parent, string name, out Label valueLabel, out Button plusButton, string attrKey)
+    private void CreateAttributeRow(VBoxContainer parent, string name, out Label valueLabel, out Button plusButton, string attrKey,
+        string tooltipTitle = "", string tooltipDesc = "")
     {
         var row = new HBoxContainer();
         row.AddThemeConstantOverride("separation", 8);
+        row.MouseFilter = MouseFilterEnum.Stop;
+
+        // Add mouse enter/exit for tooltip
+        if (!string.IsNullOrEmpty(tooltipTitle))
+        {
+            row.MouseEntered += () => ShowTextTooltip(row, tooltipTitle, tooltipDesc, new Color(0.9f, 0.8f, 0.5f));
+            row.MouseExited += () => HideTooltip();
+        }
 
         var nameLabel = new Label();
         nameLabel.Text = $"{name}:";
         nameLabel.CustomMinimumSize = new Vector2(80, 0);
         nameLabel.AddThemeFontSizeOverride("font_size", 13);
         nameLabel.AddThemeColorOverride("font_color", new Color(0.85f, 0.82f, 0.9f));
+        nameLabel.MouseFilter = MouseFilterEnum.Ignore;
         row.AddChild(nameLabel);
 
         valueLabel = new Label();
@@ -611,6 +629,7 @@ public partial class CharacterSheetUI : Control
         valueLabel.CustomMinimumSize = new Vector2(40, 0);
         valueLabel.AddThemeFontSizeOverride("font_size", 14);
         valueLabel.AddThemeColorOverride("font_color", new Color(1f, 1f, 1f));
+        valueLabel.MouseFilter = MouseFilterEnum.Ignore;
         row.AddChild(valueLabel);
 
         plusButton = new Button();
@@ -621,6 +640,161 @@ public partial class CharacterSheetUI : Control
         row.AddChild(plusButton);
 
         parent.AddChild(row);
+    }
+
+    /// <summary>
+    /// Create a combat stat label with formula tooltip on hover.
+    /// </summary>
+    private Label CreateCombatStatLabel(VBoxContainer parent, string text, string statKey, Color? color = null)
+    {
+        var container = new Control();
+        container.CustomMinimumSize = new Vector2(0, 20);
+        container.MouseFilter = MouseFilterEnum.Stop;
+        container.MouseEntered += () => ShowStatFormulaTooltip(container, statKey);
+        container.MouseExited += () => HideTooltip();
+
+        var label = new Label();
+        label.Text = text;
+        label.AddThemeFontSizeOverride("font_size", 13);
+        label.AddThemeColorOverride("font_color", color ?? new Color(0.85f, 0.82f, 0.9f));
+        label.MouseFilter = MouseFilterEnum.Ignore;
+        container.AddChild(label);
+
+        parent.AddChild(container);
+        return label;
+    }
+
+    /// <summary>
+    /// Show a simple text tooltip with title and description.
+    /// </summary>
+    private void ShowTextTooltip(Control source, string title, string description, Color titleColor)
+    {
+        if (_tooltipPanel == null || _tooltipContent == null) return;
+
+        foreach (var child in _tooltipContent.GetChildren())
+            child.QueueFree();
+
+        var titleLabel = new Label();
+        titleLabel.Text = title;
+        titleLabel.AddThemeFontSizeOverride("font_size", 14);
+        titleLabel.AddThemeColorOverride("font_color", titleColor);
+        _tooltipContent.AddChild(titleLabel);
+
+        _tooltipContent.AddChild(new HSeparator());
+
+        var descLabel = new Label();
+        descLabel.Text = description;
+        descLabel.AddThemeFontSizeOverride("font_size", 11);
+        descLabel.AddThemeColorOverride("font_color", new Color(0.75f, 0.9f, 0.75f));
+        descLabel.AutowrapMode = TextServer.AutowrapMode.WordSmart;
+        descLabel.CustomMinimumSize = new Vector2(200, 0);
+        _tooltipContent.AddChild(descLabel);
+
+        _tooltipPanel.Visible = true;
+        _tooltipPanel.GlobalPosition = source.GlobalPosition + new Vector2(source.Size.X + 10, 0);
+    }
+
+    /// <summary>
+    /// Show a combat stat formula tooltip with breakdown.
+    /// </summary>
+    private void ShowStatFormulaTooltip(Control source, string statKey)
+    {
+        var player = FPSController.Instance;
+        if (player == null || _tooltipPanel == null || _tooltipContent == null) return;
+
+        var stats = player.Stats;
+        if (stats == null) return;
+
+        foreach (var child in _tooltipContent.GetChildren())
+            child.QueueFree();
+
+        string title = "";
+        string formula = "";
+        string breakdown = "";
+
+        switch (statKey)
+        {
+            case "health":
+                title = "MAX HEALTH";
+                formula = "Base + (VIT × 10) + (Level × 15) + Flat + %Bonus";
+                int baseHp = 100 + (stats.Vitality * 10) + (stats.Level * 15);
+                breakdown = $"100 (base)\n+ {stats.Vitality * 10} (VIT {stats.Vitality} × 10)\n+ {stats.Level * 15} (Level {stats.Level} × 15)\n= {stats.MaxHealth}";
+                break;
+
+            case "mana":
+                title = "MAX MANA";
+                formula = "Base + (ENE × 5) + (Level × 5) + Flat + %Bonus";
+                int baseMp = 50 + (stats.Energy * 5) + (stats.Level * 5);
+                breakdown = $"50 (base)\n+ {stats.Energy * 5} (ENE {stats.Energy} × 5)\n+ {stats.Level * 5} (Level {stats.Level} × 5)\n= {stats.MaxMana}";
+                break;
+
+            case "damage":
+                title = "PHYSICAL DAMAGE";
+                formula = "(Weapon + Flat) × STR Bonus × %Bonus";
+                float strBonus = 1f + (stats.Strength * 0.02f);
+                var weapon = player.Equipment.GetEquippedItem(EquipmentSlot.MainHand);
+                int wepMin = weapon?.MinDamage ?? 1;
+                int wepMax = weapon?.MaxDamage ?? 5;
+                breakdown = $"Weapon: {wepMin}-{wepMax}\n× {strBonus:F2} (STR {stats.Strength} × 2%)\n= {stats.MinDamage}-{stats.MaxDamage}";
+                break;
+
+            case "armor":
+                title = "ARMOR & DAMAGE REDUCTION";
+                formula = "Reduction = Armor ÷ (Armor + 100 + Level × 10)";
+                float divisor = stats.Armor + 100f + (stats.Level * 10f);
+                breakdown = $"Armor: {stats.Armor}\nDivisor: {stats.Armor} + 100 + {stats.Level * 10}\n= {stats.DamageReduction:P1} reduction\n(Capped at 75%)";
+                break;
+
+            case "crit":
+                title = "CRITICAL STRIKE";
+                formula = "Base 5% + (DEX × 0.5%) + Equipment";
+                float dexCrit = stats.Dexterity * 0.5f;
+                breakdown = $"5% (base)\n+ {dexCrit:F1}% (DEX {stats.Dexterity} × 0.5%)\n= {stats.CriticalChance:P1}\n\nCrit Damage: {stats.CriticalDamage:P0}";
+                break;
+
+            case "block":
+                title = "BLOCK CHANCE";
+                formula = "Shield Block% (Capped at 50%)";
+                breakdown = $"From shield: {stats.BlockChance:P1}\nBlock Amount: {stats.BlockAmount}\n\nBlocking reduces damage by 50%\nafter subtracting Block Amount";
+                break;
+
+            case "dodge":
+                title = "DODGE CHANCE";
+                formula = "DEX × 0.5% + Equipment (Capped at 30%)";
+                float dexDodge = stats.Dexterity * 0.5f;
+                breakdown = $"{dexDodge:F1}% (DEX {stats.Dexterity} × 0.5%)\n= {stats.DodgeChance:P1}\n\nDodge completely avoids damage";
+                break;
+        }
+
+        // Title
+        var titleLabel = new Label();
+        titleLabel.Text = title;
+        titleLabel.AddThemeFontSizeOverride("font_size", 14);
+        titleLabel.AddThemeColorOverride("font_color", new Color(1f, 0.9f, 0.6f));
+        _tooltipContent.AddChild(titleLabel);
+
+        // Formula
+        var formulaLabel = new Label();
+        formulaLabel.Text = formula;
+        formulaLabel.AddThemeFontSizeOverride("font_size", 10);
+        formulaLabel.AddThemeColorOverride("font_color", new Color(0.6f, 0.8f, 1f));
+        formulaLabel.AutowrapMode = TextServer.AutowrapMode.WordSmart;
+        formulaLabel.CustomMinimumSize = new Vector2(220, 0);
+        _tooltipContent.AddChild(formulaLabel);
+
+        _tooltipContent.AddChild(new HSeparator());
+
+        // Breakdown
+        var breakdownLabel = new Label();
+        breakdownLabel.Text = breakdown;
+        breakdownLabel.AddThemeFontSizeOverride("font_size", 11);
+        breakdownLabel.AddThemeColorOverride("font_color", new Color(0.85f, 0.95f, 0.85f));
+        breakdownLabel.AutowrapMode = TextServer.AutowrapMode.WordSmart;
+        breakdownLabel.CustomMinimumSize = new Vector2(220, 0);
+        _tooltipContent.AddChild(breakdownLabel);
+
+        _tooltipPanel.Visible = true;
+        _tooltipPanel.GlobalPosition = source.GlobalPosition + new Vector2(source.Size.X + 10, 0);
     }
 
     private void OnAttributeButtonPressed(string attr)

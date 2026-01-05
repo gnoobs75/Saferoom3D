@@ -247,6 +247,7 @@ public partial class BasicEnemy3D : CharacterBody3D
                 Damage = 22f;
                 AttackRange = 2.5f;
                 AggroRange = 20f;
+                MinStopDistance = 2.0f;  // Robot assassin gets close
                 _baseColor = new Color(0.6f, 0.15f, 0.15f); // Dark red mechanical
                 break;
             case "shadow_stalker":
@@ -2340,7 +2341,13 @@ public partial class BasicEnemy3D : CharacterBody3D
         }
     }
 
-    public void TakeDamage(float damage, Vector3 fromPosition, string source = "Unknown", bool isCrit = false)
+    // Overload for Godot's Call() which doesn't support C# optional parameters
+    public void TakeDamage(float damage, Vector3 fromPosition, string source)
+    {
+        TakeDamage(damage, fromPosition, source, false);
+    }
+
+    public void TakeDamage(float damage, Vector3 fromPosition, string source, bool isCrit)
     {
         if (CurrentState == State.Dead) return;
 
