@@ -73,6 +73,9 @@ public partial class SplashScreen3D : Control
         GetTree().Paused = false;
         Input.MouseMode = Input.MouseModeEnum.Visible;
 
+        // Start splash music (create singleton if needed, deferred to ensure tree is ready)
+        CallDeferred(nameof(StartSplashMusic));
+
         // Check if we need to return to the editor (from InMapEditor)
         if (ReturnToEditorAfterPlay)
         {
@@ -168,18 +171,10 @@ public partial class SplashScreen3D : Control
         // Load animation frames
         LoadAnimationFrames();
 
-        // Start background music
-        CallDeferred(nameof(StartMusic));
-
         // Show mouse cursor on splash screen
         Input.MouseMode = Input.MouseModeEnum.Visible;
 
         GD.Print($"[SplashScreen3D] Ready - click 'Enter Dungeon' or 'Test Dungeon' to start");
-    }
-
-    private void StartMusic()
-    {
-        SoundManager3D.Instance?.StartRandomMusic();
     }
 
     private void LoadAnimationFrames()
@@ -551,13 +546,30 @@ public partial class SplashScreen3D : Control
 
     private void OnMusicButtonPressed()
     {
-        SoundManager3D.Instance?.ToggleMusic();
+        // Toggle music directly via AudioConfig (SoundManager3D isn't available on splash screen)
+        AudioConfig.ToggleMusic();
+
+        // Start or stop splash music based on new setting
+        if (AudioConfig.IsMusicEnabled)
+        {
+            SplashMusic.Instance?.Play();
+        }
+        else
+        {
+            SplashMusic.Instance?.Stop();
+        }
+
+        // Update button label
+        UpdateAudioButtonLabels();
+
         GD.Print($"[SplashScreen3D] Music toggled: {AudioConfig.IsMusicEnabled}");
     }
 
     private void OnSoundButtonPressed()
     {
-        SoundManager3D.Instance?.ToggleSound();
+        // Toggle sound directly via AudioConfig (SoundManager3D isn't available on splash screen)
+        AudioConfig.ToggleSound();
+        UpdateAudioButtonLabels();
         GD.Print($"[SplashScreen3D] Sound toggled: {AudioConfig.IsSoundEnabled}");
     }
 
@@ -639,6 +651,31 @@ public partial class SplashScreen3D : Control
         }
 
         GD.Print($"[SplashScreen3D] Opened editor with map: {mapPath}");
+    }
+
+    private void StartSplashMusic()
+    {
+        GD.Print("[SplashScreen3D] StartSplashMusic called");
+
+        if (SplashMusic.Instance == null)
+        {
+            var splashMusic = new SplashMusic();
+            splashMusic.Name = "SplashMusic";
+            // Add to Root so it persists across scene changes
+            GetTree().Root.AddChild(splashMusic);
+            GD.Print("[SplashScreen3D] Created SplashMusic singleton");
+        }
+
+        // Play immediately - _Ready() runs synchronously when node is added
+        if (SplashMusic.Instance != null)
+        {
+            SplashMusic.Instance.Play();
+            GD.Print("[SplashScreen3D] SplashMusic started playing");
+        }
+        else
+        {
+            GD.PrintErr("[SplashScreen3D] SplashMusic.Instance is null after creation!");
+        }
     }
 
     public override void _ExitTree()

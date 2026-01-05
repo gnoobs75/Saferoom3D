@@ -34,18 +34,19 @@ Never auto-commit without explicit user approval.
 
 ```
 Scripts/
-├── Core/           # GameManager3D, DungeonGenerator3D, SoundManager3D, Constants
+├── Core/           # GameManager3D, DungeonGenerator3D, SoundManager3D, SplashMusic, Constants
 ├── Player/         # FPSController (movement, combat, camera)
 ├── Enemies/        # BasicEnemy3D, BossEnemy3D, MonsterMeshFactory, GoblinShaman/Thrower
 ├── Abilities/      # AbilityManager3D, 14 ability effects in Effects/
 ├── Items/          # Inventory3D, ItemDatabase, LootBag, ConsumableItems3D
-├── UI/             # HUD3D, SpellBook3D, InventoryUI3D, EscapeMenu3D, EditorScreen3D
+├── UI/             # HUD3D, SpellBook3D, InventoryUI3D, DungeonRadio, EscapeMenu3D
+├── Broadcaster/    # AIBroadcaster, BroadcasterUI, CommentaryDatabase
 ├── Combat/         # Projectile3D, ThrownProjectile3D, MeleeSlashEffect3D
 ├── Environment/    # Cosmetic3D (40+ prop types), WaterEffects3D
 └── Pet/            # Steve companion (WIP)
 ```
 
-**Singletons:** `GameManager3D`, `SoundManager3D`, `FPSController`, `AbilityManager3D`, `Inventory3D`, `HUD3D`
+**Singletons:** `GameManager3D`, `SoundManager3D`, `FPSController`, `AbilityManager3D`, `Inventory3D`, `HUD3D`, `DungeonRadio`, `SplashMusic`, `AIBroadcaster`
 
 **Namespaces:** `SafeRoom3D.Core`, `.Player`, `.Enemies`, `.Abilities`, `.Items`, `.UI`, `.Combat`, `.Environment`
 
@@ -133,6 +134,7 @@ public override void _Input(InputEvent @event)
 | E | Interact | F3 | Performance |
 | T | Loot | F5 | **Panic key** (force reset all UI/input) |
 | N | Toggle nameplates | C | Character Sheet |
+| Y | Dungeon Radio | | |
 
 ### UI Editor Mode
 
@@ -147,7 +149,7 @@ Customize HUD layout by repositioning elements:
 - Drag any HUD element to reposition it
 - Positions persist between sessions (saved to `user://ui_positions.json`)
 
-**Draggable Elements (10):** Action Bar, Health/Mana, Target Frame, Combat Log, Minimap, Compass, Shortcuts, AI Broadcaster, View Counter, Description Panel
+**Draggable Elements (11):** Action Bar, Health/Mana, Target Frame, Combat Log, Minimap, Compass, Shortcuts, AI Broadcaster, View Counter, Description Panel, Dungeon Radio
 
 ### Character Sheet Tooltips
 
@@ -167,6 +169,52 @@ Hover over weapons in Inventory (I) to see comparison vs equipped:
 - **▲ +X** (green) = better stat
 - **▼ -X** (red) = worse stat
 - **=** (gray) = equal
+
+### Dungeon Radio (Y key)
+
+Winamp-style music player with cheesy dungeon theme:
+- **Play/Pause/Stop** - Control playback
+- **Prev/Next** - Navigate playlist
+- **Volume slider** - Adjust music volume
+- **Progress bar** - Seek within track
+- **LCD display** - Scrolling track info
+- **Visualizer** - Animated spectrum bars
+
+**Features:**
+- Loads all MP3 files from `Assets/Audio/Music/`
+- Auto-shuffles playlist on startup
+- Auto-advances to next track
+- **Audio ducking** - Volume reduces when AI Broadcaster speaks
+- Draggable with X key (UI Editor Mode)
+
+---
+
+## Audio Systems
+
+### Music Flow
+
+```
+Splash Screen → SplashMusic (splash.mp3 loop)
+                     ↓ (fade out on game start)
+In-Game → DungeonRadio (MP3 playlist, starts after welcome sounds)
+```
+
+### SplashMusic (`Scripts/Core/SplashMusic.cs`)
+- Singleton persists across scene changes (added to Root)
+- Plays `splash.mp3` on loop during menus/editor
+- Fades out (3 sec) when game starts
+- Respects `AudioConfig.IsMusicEnabled`
+
+### DungeonRadio (`Scripts/UI/DungeonRadio.cs`)
+- Manages playlist of all MP3s in music folder
+- Audio ducking when AI speaks (reduces to 25% volume)
+- DungeonRadioUI provides Winamp-style interface
+
+### AudioConfig
+Static class managing audio state (not persisted between sessions):
+- `IsMusicEnabled` / `IsSoundEnabled` - Toggle flags
+- `MusicVolume` / `SoundVolume` - Volume levels (0-1)
+- `ConfigChanged` event - Notify listeners of changes
 
 ---
 

@@ -253,8 +253,8 @@ public partial class FloorSelector3D : Control
         _isVisible = false;
         Hide();
 
-        // Resume game and capture mouse
-        Engine.TimeScale = 1;
+        // Resume game at configured speed and capture mouse
+        GameConfig.ResumeToNormalSpeed();
         Input.MouseMode = Input.MouseModeEnum.Captured;
 
         GD.Print("[FloorSelector] Closed floor selector");

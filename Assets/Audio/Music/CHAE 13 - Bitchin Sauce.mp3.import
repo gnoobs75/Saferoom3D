@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://dumoc8kexelsj"
+path="res://.godot/imported/CHAE 13 - Bitchin Sauce.mp3-7d71a19a9fcdc323c1b2388b30c8d7f8.mp3str"
+
+[deps]
+
+source_file="res://Assets/Audio/Music/CHAE 13 - Bitchin Sauce.mp3"
+dest_files=["res://.godot/imported/CHAE 13 - Bitchin Sauce.mp3-7d71a19a9fcdc323c1b2388b30c8d7f8.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

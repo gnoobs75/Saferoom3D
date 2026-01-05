@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://cxudv8j64rrhf"
+path="res://.godot/imported/Art1fact - Devotion.mp3-be5c81e865784478fe3131912e3c1023.mp3str"
+
+[deps]
+
+source_file="res://Assets/Audio/Music/Art1fact - Devotion.mp3"
+dest_files=["res://.godot/imported/Art1fact - Devotion.mp3-be5c81e865784478fe3131912e3c1023.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

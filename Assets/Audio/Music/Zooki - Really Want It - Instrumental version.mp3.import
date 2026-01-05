@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://b6hfthstoakt4"
+path="res://.godot/imported/Zooki - Really Want It - Instrumental version.mp3-12c41422b1265075f26a12ce0c2b419b.mp3str"
+
+[deps]
+
+source_file="res://Assets/Audio/Music/Zooki - Really Want It - Instrumental version.mp3"
+dest_files=["res://.godot/imported/Zooki - Really Want It - Instrumental version.mp3-12c41422b1265075f26a12ce0c2b419b.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

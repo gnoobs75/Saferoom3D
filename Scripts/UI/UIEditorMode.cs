@@ -183,6 +183,21 @@ public partial class UIEditorMode : CanvasLayer
             }
         }
 
+        // Get Dungeon Radio Panel
+        var radio = DungeonRadio.Instance;
+        if (radio != null)
+        {
+            var radioPanel = radio.FindChild("RadioPanel", true, false) as Control;
+            if (radioPanel != null)
+            {
+                // Make it visible temporarily so it can be dragged
+                radioPanel.Visible = true;
+                var handle = new DragHandle(radioPanel, "HUD_DungeonRadio", "Dungeon Radio");
+                AddChild(handle);
+                _dragHandles.Add(handle);
+            }
+        }
+
         GD.Print($"[UIEditorMode] Created {_dragHandles.Count} drag handles");
     }
 

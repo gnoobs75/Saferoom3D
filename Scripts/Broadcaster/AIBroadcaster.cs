@@ -60,6 +60,9 @@ public partial class AIBroadcaster : Control
     private bool _isMuted = false;
     private bool _isMinimized = false;
     private bool _isSpeaking = false;
+
+    // Public accessor for audio ducking
+    public bool IsSpeaking => _isSpeaking;
     private float _lastCommentaryTime = 0f;
     private float _gameTime = 0f;
     private int _killsSinceLastComment = 0;

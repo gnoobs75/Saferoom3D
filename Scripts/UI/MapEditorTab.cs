@@ -51,8 +51,8 @@ public partial class MapEditorTab : Control
     private enum PaintTool { Floor, Erase, Room, Spawn, Monster }
     private PaintTool _currentTool = PaintTool.Floor;
 
-    // Brush sizes (1x1, 3x3, 5x5, 10x10)
-    private static readonly int[] BrushSizes = { 1, 3, 5, 10 };
+    // Brush sizes (1x1, 3x3, 5x5, 10x10, 20x20)
+    private static readonly int[] BrushSizes = { 1, 3, 5, 10, 20 };
     private int _currentBrushIndex = 1; // Default to 3x3
     private int CurrentBrushSize => BrushSizes[_currentBrushIndex];
 
@@ -66,6 +66,7 @@ public partial class MapEditorTab : Control
     private Button? _brushSize3Button;
     private Button? _brushSize5Button;
     private Button? _brushSize10Button;
+    private Button? _brushSize20Button;
 
     // Room tool state (click-drag to define rectangle)
     private bool _isDrawingRoom = false;
@@ -284,7 +285,7 @@ public partial class MapEditorTab : Control
         vbox.AddChild(_brushSizeLabel);
 
         var brushGrid = new GridContainer();
-        brushGrid.Columns = 4;
+        brushGrid.Columns = 5;
         brushGrid.AddThemeConstantOverride("h_separation", 4);
         vbox.AddChild(brushGrid);
 
@@ -303,6 +304,10 @@ public partial class MapEditorTab : Control
         _brushSize10Button = CreateBrushButton("10", false);
         _brushSize10Button.Pressed += () => SetBrushSize(3);
         brushGrid.AddChild(_brushSize10Button);
+
+        _brushSize20Button = CreateBrushButton("20", false);
+        _brushSize20Button.Pressed += () => SetBrushSize(4);
+        brushGrid.AddChild(_brushSize20Button);
 
         // Undo/Redo buttons
         var undoRedoBox = new HBoxContainer();
@@ -521,11 +526,13 @@ public partial class MapEditorTab : Control
         _brushSize3Button!.ButtonPressed = index == 1;
         _brushSize5Button!.ButtonPressed = index == 2;
         _brushSize10Button!.ButtonPressed = index == 3;
+        _brushSize20Button!.ButtonPressed = index == 4;
 
         SetButtonColor(_brushSize1Button, index == 0 ? new Color(0.2f, 0.4f, 0.2f) : new Color(0.2f, 0.2f, 0.25f));
         SetButtonColor(_brushSize3Button, index == 1 ? new Color(0.2f, 0.4f, 0.2f) : new Color(0.2f, 0.2f, 0.25f));
         SetButtonColor(_brushSize5Button, index == 2 ? new Color(0.2f, 0.4f, 0.2f) : new Color(0.2f, 0.2f, 0.25f));
         SetButtonColor(_brushSize10Button, index == 3 ? new Color(0.2f, 0.4f, 0.2f) : new Color(0.2f, 0.2f, 0.25f));
+        SetButtonColor(_brushSize20Button, index == 4 ? new Color(0.2f, 0.4f, 0.2f) : new Color(0.2f, 0.2f, 0.25f));
 
         _brushSizeLabel!.Text = $"Brush: {CurrentBrushSize}x{CurrentBrushSize}";
         _mapDrawArea?.QueueRedraw();
@@ -2600,6 +2607,9 @@ public partial class MapEditorTab : Control
                         break;
                     case Key.Key4:
                         SetBrushSize(3);
+                        break;
+                    case Key.Key5:
+                        SetBrushSize(4);
                         break;
                 }
             }

@@ -102,8 +102,8 @@ public partial class GameManager3D : Node
         gameStats.Name = "GameStats";
         AddChild(gameStats);
 
-        // Start background music
-        _soundManager.StartRandomMusic();
+        // Fade out splash music - DungeonRadio will start after welcome sounds
+        SplashMusic.Instance?.FadeOut(3.0f);
 
         // Create dungeon generator
         _dungeonGenerator = new DungeonGenerator3D();
@@ -165,6 +165,9 @@ public partial class GameManager3D : Node
         // Create InspectMode
         CreateInspectMode();
 
+        // Create Dungeon Radio
+        CreateDungeonRadio();
+
         // Check for In-Map Edit Mode (from Map Editor)
         if (UI.SplashScreen3D.EnterEditModeAfterLoad)
         {
@@ -195,6 +198,14 @@ public partial class GameManager3D : Node
             {
                 SoundManager3D.Instance?.PlayDungeonStartSound();
                 GD.Print("[GameManager3D] Dungeon start sound played");
+
+                // Start Dungeon Radio after kill sound finishes (~4 more seconds)
+                var radioTimer = GetTree().CreateTimer(4.0);
+                radioTimer.Timeout += () =>
+                {
+                    UI.DungeonRadio.Instance?.Play();
+                    GD.Print("[GameManager3D] Dungeon Radio started");
+                };
             };
         };
     }
@@ -290,39 +301,70 @@ public partial class GameManager3D : Node
         broadcaster.Name = "AIBroadcaster";
         hudLayer.AddChild(broadcaster);
 
+        // Create UI Editor Mode (press X to edit HUD layout)
+        var uiEditor = new UIEditorMode();
+        uiEditor.Name = "UIEditorMode";
+        hudLayer.AddChild(uiEditor);
+
         GD.Print("[GameManager3D] UI created");
     }
 
     private void CreateEnvironment()
     {
-        // Create WorldEnvironment for atmosphere
+        // Create WorldEnvironment for atmospheric dungeon feel
         var worldEnv = new WorldEnvironment();
         var env = new Godot.Environment();
 
-        // Dark ambient
+        // Very dark ambient - torches should be the primary light source
         env.AmbientLightSource = Godot.Environment.AmbientSource.Color;
-        env.AmbientLightColor = new Color(0.05f, 0.04f, 0.06f);
-        env.AmbientLightEnergy = 0.3f;
+        env.AmbientLightColor = new Color(0.04f, 0.03f, 0.05f); // Near-black with slight purple
+        env.AmbientLightEnergy = 0.15f; // Very dim - let torches dominate
 
-        // Fog for atmosphere (cheap effect)
+        // Atmospheric fog - warm brown/amber to match torchlight
         env.FogEnabled = true;
-        env.FogLightColor = new Color(0.08f, 0.06f, 0.1f);
-        env.FogDensity = 0.02f;
+        env.FogLightColor = new Color(0.12f, 0.08f, 0.05f); // Warm brown fog
+        env.FogDensity = 0.025f; // Slightly denser for atmosphere
+        env.FogAerialPerspective = 0.3f; // Add depth haze
+
+        // Background color (visible through fog at distance)
+        env.BackgroundMode = Godot.Environment.BGMode.Color;
+        env.BackgroundColor = new Color(0.02f, 0.015f, 0.025f); // Very dark purple-black
+
+        // Volumetric fog for dramatic light shafts (if performance allows)
+        env.VolumetricFogEnabled = true;
+        env.VolumetricFogDensity = 0.02f;
+        env.VolumetricFogAlbedo = new Color(0.9f, 0.85f, 0.7f); // Warm scatter color
+        env.VolumetricFogEmission = new Color(0f, 0f, 0f);
+        env.VolumetricFogEmissionEnergy = 0f;
+        env.VolumetricFogAnisotropy = 0.6f; // Forward scattering for light shafts
+        env.VolumetricFogLength = 50f;
 
         // PERFORMANCE: SSAO disabled - very expensive effect
         env.SsaoEnabled = false;
 
-        // PERFORMANCE: Glow disabled for better FPS
-        env.GlowEnabled = false;
+        // Enable subtle glow for torch flames and magic effects
+        env.GlowEnabled = true;
+        env.GlowIntensity = 0.8f;
+        env.GlowStrength = 0.8f;
+        env.GlowBloom = 0.1f;
+        env.GlowBlendMode = Godot.Environment.GlowBlendModeEnum.Softlight;
+        env.GlowHdrThreshold = 1.2f; // Only very bright things glow
 
-        // Tonemap for Diablo-like muted colors
+        // Tonemap for cinematic dungeon look
         env.TonemapMode = Godot.Environment.ToneMapper.Filmic;
-        env.TonemapExposure = 1f;
+        env.TonemapExposure = 0.9f; // Slightly darker
+        env.TonemapWhite = 2.0f; // Preserve highlights
+
+        // Adjustments for darker shadows and richer colors
+        env.AdjustmentEnabled = true;
+        env.AdjustmentBrightness = 0.95f;
+        env.AdjustmentContrast = 1.1f; // Boost contrast for drama
+        env.AdjustmentSaturation = 0.9f; // Slightly desaturated for grim dungeon
 
         worldEnv.Environment = env;
         AddChild(worldEnv);
 
-        GD.Print("[GameManager3D] Environment created");
+        GD.Print("[GameManager3D] Atmospheric dungeon environment created");
     }
 
     private void CreateSteve()
@@ -354,6 +396,16 @@ public partial class GameManager3D : Node
         hudLayer.AddChild(_inspectMode);
 
         GD.Print("[GameManager3D] InspectMode created");
+    }
+
+    private void CreateDungeonRadio()
+    {
+        // DungeonRadio is a standalone Node (not CanvasLayer child)
+        var radio = new UI.DungeonRadio();
+        radio.Name = "DungeonRadio";
+        AddChild(radio);
+
+        GD.Print("[GameManager3D] DungeonRadio created - Press Y to toggle");
     }
 
     private void CreateInMapEditor()
@@ -476,6 +528,9 @@ public partial class GameManager3D : Node
 
     private void HandleEscapeKey()
     {
+        // InspectMode handles its own Escape key to deactivate
+        if (InspectMode3D.Instance?.IsActive == true) return;
+
         // Close loot UI first if open
         if (LootUI3D.Instance != null && LootUI3D.Instance.Visible)
         {
@@ -510,6 +565,9 @@ public partial class GameManager3D : Node
 
     private void HandleSpellbookToggle()
     {
+        // Block during inspect mode
+        if (InspectMode3D.Instance?.IsActive == true) return;
+
         if (SpellBook3D.Instance != null &&
             (EscapeMenu3D.Instance == null || !EscapeMenu3D.Instance.Visible) &&
             (EditorScreen3D.Instance == null || !EditorScreen3D.Instance.Visible) &&
@@ -523,6 +581,9 @@ public partial class GameManager3D : Node
 
     private void HandleInventoryToggle()
     {
+        // Block during inspect mode
+        if (InspectMode3D.Instance?.IsActive == true) return;
+
         // Allow Inventory to open alongside CharacterSheet (for equipping items)
         if (InventoryUI3D.Instance != null &&
             (EscapeMenu3D.Instance == null || !EscapeMenu3D.Instance.Visible) &&
@@ -537,6 +598,9 @@ public partial class GameManager3D : Node
 
     private void HandleCharacterSheetToggle()
     {
+        // Block during inspect mode
+        if (InspectMode3D.Instance?.IsActive == true) return;
+
         // Allow CharacterSheet to open alongside Inventory (for equipping items)
         if (CharacterSheetUI.Instance != null &&
             (EscapeMenu3D.Instance == null || !EscapeMenu3D.Instance.Visible) &&

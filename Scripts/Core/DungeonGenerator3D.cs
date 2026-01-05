@@ -126,40 +126,41 @@ public partial class DungeonGenerator3D : Node3D
 
     private void CreateMaterials()
     {
-        // Floor: stone tiles with procedural texture and normal map for depth
+        // Floor: worn stone tiles - warm brown/gray tones like ancient dungeon flagstones
         _floorMaterial = new StandardMaterial3D();
-        _floorMaterial.AlbedoColor = new Color(0.3f, 0.28f, 0.26f); // Slightly lighter for visibility
-        _floorMaterial.Roughness = 0.7f; // Less rough = more specular = normals more visible
-        _floorMaterial.Metallic = 0.1f; // Slight metallic for better light response
+        _floorMaterial.AlbedoColor = new Color(0.35f, 0.30f, 0.25f); // Warm brown-gray stone
+        _floorMaterial.Roughness = 0.92f; // Very rough, matte stone - no shine
+        _floorMaterial.Metallic = 0f; // Stone is NOT metallic
         _floorMaterial.CullMode = BaseMaterial3D.CullModeEnum.Disabled;
         _floorMaterial.AlbedoTexture = CreateStoneFloorTexture();
         _floorMaterial.Uv1Scale = new Vector3(0.25f, 0.25f, 1f); // Tile the texture
         _floorMaterial.NormalEnabled = true;
         _floorMaterial.NormalTexture = CreateStoneFloorNormalMap();
-        _floorMaterial.NormalScale = 3.0f; // Very strong depth for visibility
+        _floorMaterial.NormalScale = 1.8f; // Moderate depth - visible but not overdone
 
-        // Walls: brick/stone wall texture with normal map for depth
+        // Walls: ancient brick/stone blocks - darker with moss undertones
         _wallMaterial = new StandardMaterial3D();
-        _wallMaterial.AlbedoColor = new Color(0.4f, 0.36f, 0.33f); // Slightly lighter
-        _wallMaterial.Roughness = 0.7f; // Less rough for better specular
-        _wallMaterial.Metallic = 0.1f;
+        _wallMaterial.AlbedoColor = new Color(0.38f, 0.33f, 0.28f); // Warm gray-brown brick
+        _wallMaterial.Roughness = 0.88f; // Rough old brick
+        _wallMaterial.Metallic = 0f; // Stone is NOT metallic
         _wallMaterial.CullMode = BaseMaterial3D.CullModeEnum.Disabled;
         _wallMaterial.AlbedoTexture = CreateBrickWallTexture();
         _wallMaterial.Uv1Scale = new Vector3(0.5f, 0.15f, 1f); // Stretch for wall height
         _wallMaterial.NormalEnabled = true;
         _wallMaterial.NormalTexture = CreateBrickWallNormalMap();
-        _wallMaterial.NormalScale = 3.0f; // Very strong brick depth
+        _wallMaterial.NormalScale = 2.0f; // Good brick depth
 
-        // Ceiling: dark cave-like stone with normal map
+        // Ceiling: dark rough stone - like natural cave or ancient masonry
         _ceilingMaterial = new StandardMaterial3D();
-        _ceilingMaterial.AlbedoColor = new Color(0.22f, 0.2f, 0.18f); // Slightly lighter
-        _ceilingMaterial.Roughness = 0.8f;
+        _ceilingMaterial.AlbedoColor = new Color(0.25f, 0.22f, 0.18f); // Dark warm brown
+        _ceilingMaterial.Roughness = 0.95f; // Very rough ceiling
+        _ceilingMaterial.Metallic = 0f; // Stone is NOT metallic
         _ceilingMaterial.CullMode = BaseMaterial3D.CullModeEnum.Disabled;
         _ceilingMaterial.AlbedoTexture = CreateStoneCeilingTexture();
         _ceilingMaterial.Uv1Scale = new Vector3(0.25f, 0.25f, 1f);
         _ceilingMaterial.NormalEnabled = true;
         _ceilingMaterial.NormalTexture = CreateCeilingNormalMap();
-        _ceilingMaterial.NormalScale = 3.0f; // Strong cave-like texture
+        _ceilingMaterial.NormalScale = 1.5f; // Subtle cave-like texture
     }
 
     private ImageTexture CreateStoneFloorTexture()
@@ -167,10 +168,10 @@ public partial class DungeonGenerator3D : Node3D
         int size = 256;
         var image = Image.CreateEmpty(size, size, false, Image.Format.Rgba8);
 
-        // Create stone tile pattern
+        // Create stone tile pattern - warm brown/tan flagstones
         int tileSize = 64;
-        var baseColor = new Color(0.25f, 0.23f, 0.22f);
-        var mortarColor = new Color(0.15f, 0.14f, 0.12f);
+        var baseColor = new Color(0.32f, 0.27f, 0.22f);    // Warm brown-tan stone
+        var mortarColor = new Color(0.18f, 0.14f, 0.10f);  // Dark brown mortar
 
         for (int y = 0; y < size; y++)
         {
@@ -275,50 +276,146 @@ public partial class DungeonGenerator3D : Node3D
 
     private ImageTexture CreateBrickWallTexture()
     {
-        int size = 256;
+        int size = 512; // Higher resolution for more detail
         var image = Image.CreateEmpty(size, size, false, Image.Format.Rgba8);
 
-        // Create brick pattern
-        int brickWidth = 48;
-        int brickHeight = 24;
-        int mortarWidth = 3;
+        // Varied stone block sizes for ancient dungeon look
+        int[] blockWidths = { 48, 64, 56, 40, 72 };
+        int[] blockHeights = { 24, 32, 28, 20 };
+        int mortarWidth = 4;
 
-        var brickColor = new Color(0.35f, 0.28f, 0.24f);
-        var mortarColor = new Color(0.2f, 0.18f, 0.15f);
-        var darkBrickColor = new Color(0.28f, 0.22f, 0.2f);
+        // Color palette for varied stones
+        var stoneColors = new Color[] {
+            new Color(0.38f, 0.30f, 0.22f),  // Warm sandstone
+            new Color(0.32f, 0.26f, 0.20f),  // Darker stone
+            new Color(0.42f, 0.34f, 0.26f),  // Lighter stone
+            new Color(0.35f, 0.28f, 0.22f),  // Medium brown
+            new Color(0.28f, 0.24f, 0.20f),  // Dark weathered
+            new Color(0.40f, 0.32f, 0.24f),  // Tan stone
+        };
+        var mortarColor = new Color(0.18f, 0.14f, 0.10f);
+        var mossColor = new Color(0.15f, 0.22f, 0.12f);  // Dark green moss
+        var wetColor = new Color(0.20f, 0.18f, 0.16f);   // Wet/damp stone
+        var crackColor = new Color(0.10f, 0.08f, 0.06f); // Dark cracks
+
+        // Pre-calculate block layout with varied sizes
+        var rng = new RandomNumberGenerator();
+        rng.Seed = 12345; // Consistent pattern
 
         for (int y = 0; y < size; y++)
         {
             for (int x = 0; x < size; x++)
             {
-                int row = y / (brickHeight + mortarWidth);
-                int yInBrick = y % (brickHeight + mortarWidth);
+                // Determine which block we're in using varied sizes
+                int blockRow = 0;
+                int yAccum = 0;
+                int currentBlockHeight = blockHeights[0];
+                while (yAccum + currentBlockHeight + mortarWidth <= y && blockRow < 20)
+                {
+                    yAccum += currentBlockHeight + mortarWidth;
+                    blockRow++;
+                    currentBlockHeight = blockHeights[(blockRow * 7) % blockHeights.Length];
+                }
+                int yInBlock = y - yAccum;
+                bool onHorizontalMortar = yInBlock >= currentBlockHeight;
 
-                // Offset every other row by half brick width
-                int xOffset = (row % 2 == 0) ? 0 : brickWidth / 2;
-                int xInBrick = (x + xOffset) % (brickWidth + mortarWidth);
+                // Varied offset per row
+                int rowOffset = (blockRow % 2 == 0) ? 0 : blockWidths[(blockRow * 3) % blockWidths.Length] / 2;
+                rowOffset += (blockRow * 17) % 20; // Extra randomness
 
-                // Check if on mortar
-                bool onMortar = (xInBrick >= brickWidth) || (yInBrick >= brickHeight);
+                int blockCol = 0;
+                int xAccum = -rowOffset;
+                int currentBlockWidth = blockWidths[(blockRow + blockCol) % blockWidths.Length];
+                while (xAccum + currentBlockWidth + mortarWidth <= x && blockCol < 20)
+                {
+                    xAccum += currentBlockWidth + mortarWidth;
+                    blockCol++;
+                    currentBlockWidth = blockWidths[(blockRow + blockCol * 5) % blockWidths.Length];
+                }
+                int xInBlock = x - xAccum;
+                bool onVerticalMortar = xInBlock >= currentBlockWidth || xInBlock < 0;
+
+                bool onMortar = onHorizontalMortar || onVerticalMortar;
 
                 Color pixelColor;
                 if (onMortar)
                 {
-                    pixelColor = mortarColor;
+                    // Mortar with slight variation
+                    float mortarNoise = (float)GD.RandRange(-0.02, 0.02);
+                    pixelColor = new Color(
+                        mortarColor.R + mortarNoise,
+                        mortarColor.G + mortarNoise,
+                        mortarColor.B + mortarNoise
+                    );
                 }
                 else
                 {
-                    // Alternate brick colors for variety
-                    int brickIndex = ((x + xOffset) / (brickWidth + mortarWidth) + row) % 3;
-                    Color baseBrick = brickIndex == 0 ? brickColor : (brickIndex == 1 ? darkBrickColor : brickColor.Lightened(0.05f));
+                    // Select stone color based on block position
+                    int stoneIndex = ((blockRow * 7 + blockCol * 11) % stoneColors.Length);
+                    Color baseStone = stoneColors[stoneIndex];
 
-                    // Add noise
-                    float noise = (float)GD.RandRange(-0.04, 0.04);
-                    pixelColor = new Color(
-                        Mathf.Clamp(baseBrick.R + noise, 0, 1),
-                        Mathf.Clamp(baseBrick.G + noise, 0, 1),
-                        Mathf.Clamp(baseBrick.B + noise, 0, 1)
+                    // Add per-pixel noise for texture
+                    float noise = (float)GD.RandRange(-0.03, 0.03);
+
+                    // Large-scale variation within blocks (weathering patterns)
+                    float weathering = Mathf.Sin(xInBlock * 0.15f) * Mathf.Cos(yInBlock * 0.12f) * 0.04f;
+
+                    // Edge darkening (wear on block edges)
+                    float edgeDist = Mathf.Min(
+                        Mathf.Min(xInBlock, currentBlockWidth - xInBlock),
+                        Mathf.Min(yInBlock, currentBlockHeight - yInBlock)
                     );
+                    float edgeDarken = edgeDist < 4 ? -0.03f * (4 - edgeDist) / 4f : 0f;
+
+                    // Random cracks (thin dark lines)
+                    bool isCrack = false;
+                    int crackSeed = (blockRow * 100 + blockCol) % 17;
+                    if (crackSeed < 3) // 3 in 17 blocks have cracks
+                    {
+                        // Diagonal crack pattern
+                        int crackX = (xInBlock + yInBlock * 2 + crackSeed * 7) % currentBlockWidth;
+                        if (crackX >= 0 && crackX < 2)
+                            isCrack = true;
+                    }
+
+                    // Moss patches (bottom of some blocks, damp areas)
+                    bool hasMoss = false;
+                    int mossSeed = (blockRow * 31 + blockCol * 13) % 11;
+                    if (mossSeed < 2) // Some blocks have moss
+                    {
+                        // Moss grows on lower parts and edges
+                        if (yInBlock > currentBlockHeight * 0.6f ||
+                            (xInBlock < 8 && yInBlock > currentBlockHeight * 0.3f))
+                            hasMoss = GD.Randf() > 0.4f;
+                    }
+
+                    // Wet/damp patches
+                    bool isWet = false;
+                    if ((x + y * 3) % 97 < 5)
+                        isWet = true;
+
+                    // Combine effects
+                    if (isCrack)
+                    {
+                        pixelColor = crackColor;
+                    }
+                    else if (hasMoss)
+                    {
+                        float mossBlend = 0.5f + (float)GD.RandRange(0, 0.3);
+                        pixelColor = baseStone.Lerp(mossColor, mossBlend);
+                    }
+                    else if (isWet)
+                    {
+                        pixelColor = baseStone.Lerp(wetColor, 0.4f);
+                    }
+                    else
+                    {
+                        pixelColor = new Color(
+                            Mathf.Clamp(baseStone.R + noise + weathering + edgeDarken, 0, 1),
+                            Mathf.Clamp(baseStone.G + noise + weathering + edgeDarken, 0, 1),
+                            Mathf.Clamp(baseStone.B + noise + weathering + edgeDarken, 0, 1)
+                        );
+                    }
                 }
 
                 image.SetPixel(x, y, pixelColor);
@@ -331,68 +428,105 @@ public partial class DungeonGenerator3D : Node3D
 
     private ImageTexture CreateBrickWallNormalMap()
     {
-        int size = 256;
+        int size = 512; // Match texture resolution
         var image = Image.CreateEmpty(size, size, false, Image.Format.Rgba8);
 
-        int brickWidth = 48;
-        int brickHeight = 24;
-        int mortarWidth = 3;
+        // Match the varied block sizes from texture
+        int[] blockWidths = { 48, 64, 56, 40, 72 };
+        int[] blockHeights = { 24, 32, 28, 20 };
+        int mortarWidth = 4;
 
         for (int y = 0; y < size; y++)
         {
             for (int x = 0; x < size; x++)
             {
-                int row = y / (brickHeight + mortarWidth);
-                int yInBrick = y % (brickHeight + mortarWidth);
+                // Calculate block position (same algorithm as texture)
+                int blockRow = 0;
+                int yAccum = 0;
+                int currentBlockHeight = blockHeights[0];
+                while (yAccum + currentBlockHeight + mortarWidth <= y && blockRow < 20)
+                {
+                    yAccum += currentBlockHeight + mortarWidth;
+                    blockRow++;
+                    currentBlockHeight = blockHeights[(blockRow * 7) % blockHeights.Length];
+                }
+                int yInBlock = y - yAccum;
+                bool onHorizontalMortar = yInBlock >= currentBlockHeight;
 
-                // Offset every other row by half brick width
-                int xOffset = (row % 2 == 0) ? 0 : brickWidth / 2;
-                int xInBrick = (x + xOffset) % (brickWidth + mortarWidth);
+                int rowOffset = (blockRow % 2 == 0) ? 0 : blockWidths[(blockRow * 3) % blockWidths.Length] / 2;
+                rowOffset += (blockRow * 17) % 20;
 
-                // Check if on mortar
-                bool onVerticalMortar = (xInBrick >= brickWidth);
-                bool onHorizontalMortar = (yInBrick >= brickHeight);
-                bool nearVerticalMortar = (xInBrick >= brickWidth - 2) || (xInBrick < 2);
-                bool nearHorizontalMortar = (yInBrick >= brickHeight - 2) || (yInBrick < 2);
+                int blockCol = 0;
+                int xAccum = -rowOffset;
+                int currentBlockWidth = blockWidths[(blockRow + blockCol) % blockWidths.Length];
+                while (xAccum + currentBlockWidth + mortarWidth <= x && blockCol < 20)
+                {
+                    xAccum += currentBlockWidth + mortarWidth;
+                    blockCol++;
+                    currentBlockWidth = blockWidths[(blockRow + blockCol * 5) % blockWidths.Length];
+                }
+                int xInBlock = x - xAccum;
+                bool onVerticalMortar = xInBlock >= currentBlockWidth || xInBlock < 0;
+
+                bool nearVerticalMortar = xInBlock >= currentBlockWidth - 3 || xInBlock < 3;
+                bool nearHorizontalMortar = yInBlock >= currentBlockHeight - 3 || yInBlock < 3;
 
                 Vector3 normal;
 
                 if (onVerticalMortar && onHorizontalMortar)
                 {
-                    // Corner of mortar - deep groove
-                    normal = new Vector3(0.2f, 0.2f, 0.95f).Normalized();
+                    normal = new Vector3(0.25f, 0.25f, 0.93f).Normalized();
                 }
                 else if (onVerticalMortar)
                 {
-                    // Vertical mortar groove
                     normal = new Vector3(0.5f, 0f, 0.87f).Normalized();
                 }
                 else if (onHorizontalMortar)
                 {
-                    // Horizontal mortar groove
                     normal = new Vector3(0f, 0.5f, 0.87f).Normalized();
+                }
+                else if (nearVerticalMortar && nearHorizontalMortar)
+                {
+                    // Corner bevels
+                    float sx = (xInBlock < 3) ? -0.15f : 0.15f;
+                    float sy = (yInBlock < 3) ? -0.15f : 0.15f;
+                    normal = new Vector3(sx, sy, 0.97f).Normalized();
                 }
                 else if (nearVerticalMortar)
                 {
-                    // Brick edge near vertical mortar
-                    float slopeDir = (xInBrick < 2) ? -0.2f : 0.2f;
-                    normal = new Vector3(slopeDir, 0f, 0.98f).Normalized();
+                    float slopeDir = (xInBlock < 3) ? -0.25f : 0.25f;
+                    normal = new Vector3(slopeDir, 0f, 0.97f).Normalized();
                 }
                 else if (nearHorizontalMortar)
                 {
-                    // Brick edge near horizontal mortar
-                    float slopeDir = (yInBrick < 2) ? -0.2f : 0.2f;
-                    normal = new Vector3(0f, slopeDir, 0.98f).Normalized();
+                    float slopeDir = (yInBlock < 3) ? -0.25f : 0.25f;
+                    normal = new Vector3(0f, slopeDir, 0.97f).Normalized();
                 }
                 else
                 {
-                    // Brick surface with subtle variation
-                    float noiseX = (float)GD.RandRange(-0.06, 0.06);
-                    float noiseY = (float)GD.RandRange(-0.06, 0.06);
-                    normal = new Vector3(noiseX, noiseY, 1f).Normalized();
+                    // Stone surface with weathering bumps
+                    // Multi-scale noise for realistic stone
+                    float largeNoise = Mathf.Sin(x * 0.08f + blockRow) * Mathf.Cos(y * 0.06f + blockCol) * 0.08f;
+                    float medNoise = Mathf.Sin(x * 0.2f) * Mathf.Cos(y * 0.25f) * 0.04f;
+                    float fineNoise = (float)GD.RandRange(-0.05, 0.05);
+
+                    // Chisel marks / tool marks on some blocks
+                    int toolMarkSeed = (blockRow * 7 + blockCol * 13) % 5;
+                    float toolMark = 0f;
+                    if (toolMarkSeed == 0)
+                    {
+                        toolMark = Mathf.Sin(xInBlock * 0.4f) * 0.06f;
+                    }
+                    else if (toolMarkSeed == 1)
+                    {
+                        toolMark = Mathf.Sin(yInBlock * 0.5f) * 0.05f;
+                    }
+
+                    float nx = largeNoise + medNoise * 0.5f + fineNoise + toolMark;
+                    float ny = largeNoise * 0.7f + medNoise + fineNoise;
+                    normal = new Vector3(nx, ny, 1f).Normalized();
                 }
 
-                // Convert normal to color
                 image.SetPixel(x, y, new Color(
                     normal.X * 0.5f + 0.5f,
                     normal.Y * 0.5f + 0.5f,
@@ -409,8 +543,8 @@ public partial class DungeonGenerator3D : Node3D
         int size = 256;
         var image = Image.CreateEmpty(size, size, false, Image.Format.Rgba8);
 
-        // Create rough stone texture
-        var baseColor = new Color(0.18f, 0.16f, 0.15f);
+        // Create rough stone texture - dark cave ceiling with warm undertones
+        var baseColor = new Color(0.22f, 0.18f, 0.14f); // Dark warm brown
 
         for (int y = 0; y < size; y++)
         {
@@ -2104,15 +2238,15 @@ public partial class DungeonGenerator3D : Node3D
 
     private void AddLargeDungeonAtmosphere()
     {
-        // Ambient directional light
+        // Ambient directional light - warm dim glow like distant torches
         var ambient = new DirectionalLight3D();
-        ambient.LightColor = new Color(0.1f, 0.08f, 0.12f);
-        ambient.LightEnergy = 0.08f;
+        ambient.LightColor = new Color(0.15f, 0.10f, 0.06f); // Warm amber ambient
+        ambient.LightEnergy = 0.12f;
         ambient.Rotation = new Vector3(Mathf.DegToRad(-60), Mathf.DegToRad(30), 0);
         ambient.ShadowEnabled = false;
         _lightContainer?.AddChild(ambient);
 
-        // Add blue ambient lights in corridors for atmosphere
+        // Add warm torchlight ambient in corridors - like flickering wall sconces
         // Sample random corridor positions
         int lightCount = 0;
         for (int attempts = 0; attempts < 200 && lightCount < 50; attempts++)
@@ -2136,11 +2270,15 @@ public partial class DungeonGenerator3D : Node3D
 
                 if (!inRoom && _rng.Randf() > 0.7f)
                 {
+                    // Warm torchlight colors - vary between orange and yellow-orange
+                    float warmth = _rng.Randf() * 0.15f;
+                    var torchColor = new Color(0.95f, 0.6f + warmth, 0.25f + warmth * 0.5f);
+
                     var light = CreateOptimizedLight(
-                        new Vector3(x * TileSize, WallHeight * 0.4f, z * TileSize),
-                        new Color(0.3f, 0.5f, 0.8f),
-                        0.4f,
-                        8f,
+                        new Vector3(x * TileSize, WallHeight * 0.5f, z * TileSize),
+                        torchColor,
+                        0.5f, // Slightly brighter
+                        10f,  // Slightly larger range
                         enableShadow: false
                     );
                     _lightContainer?.AddChild(light);
@@ -2150,6 +2288,347 @@ public partial class DungeonGenerator3D : Node3D
         }
 
         GD.Print($"[DungeonGenerator3D] Added {lightCount} atmospheric corridor lights");
+
+        // Add wall-mounted torches for dramatic lighting
+        AddWallTorches();
+
+        // Add dramatic shadow-casting lights at key intersections
+        AddDramaticLighting();
+    }
+
+    /// <summary>
+    /// Places wall-mounted torches along corridor walls at regular intervals.
+    /// Creates pools of warm light with dark spaces between for atmosphere.
+    /// </summary>
+    private void AddWallTorches()
+    {
+        int torchCount = 0;
+        int torchSpacing = 8; // Place torches every 8 tiles for good light pooling
+
+        // Find wall-adjacent corridor tiles for torch placement
+        for (int x = 1; x < LargeDungeonWidth - 1; x++)
+        {
+            for (int z = 1; z < LargeDungeonDepth - 1; z++)
+            {
+                // Skip if not a floor tile
+                if (_mapData![x, 0, z] != 1) continue;
+
+                // Check if we're at a torch spacing interval
+                if ((x + z) % torchSpacing != 0) continue;
+
+                // Skip if inside a room (rooms get their own lighting)
+                bool inRoom = false;
+                foreach (var room in Rooms)
+                {
+                    if (x >= room.Position.X && x < room.Position.X + room.Size.X &&
+                        z >= room.Position.Z && z < room.Position.Z + room.Size.Z)
+                    {
+                        inRoom = true;
+                        break;
+                    }
+                }
+                if (inRoom) continue;
+
+                // Check adjacent walls and place torch on wall
+                Vector3? torchPos = null;
+                float torchRotation = 0f;
+
+                // Check each direction for a wall
+                if (_mapData[x - 1, 0, z] == 0) // Wall to west
+                {
+                    torchPos = new Vector3((x - 0.4f) * TileSize, WallHeight * 0.45f, z * TileSize);
+                    torchRotation = Mathf.Pi * 0.5f; // Face east
+                }
+                else if (_mapData[x + 1, 0, z] == 0) // Wall to east
+                {
+                    torchPos = new Vector3((x + 0.4f) * TileSize, WallHeight * 0.45f, z * TileSize);
+                    torchRotation = -Mathf.Pi * 0.5f; // Face west
+                }
+                else if (_mapData[x, 0, z - 1] == 0) // Wall to north
+                {
+                    torchPos = new Vector3(x * TileSize, WallHeight * 0.45f, (z - 0.4f) * TileSize);
+                    torchRotation = 0f; // Face south
+                }
+                else if (_mapData[x, 0, z + 1] == 0) // Wall to south
+                {
+                    torchPos = new Vector3(x * TileSize, WallHeight * 0.45f, (z + 0.4f) * TileSize);
+                    torchRotation = Mathf.Pi; // Face north
+                }
+
+                if (torchPos.HasValue)
+                {
+                    // Create flickering torch light
+                    var flickerLight = new FlickeringTorchLight();
+                    flickerLight.Position = torchPos.Value;
+
+                    // Vary torch color slightly for realism
+                    float warmth = _rng.Randf() * 0.1f;
+                    flickerLight.BaseColor = new Color(1f, 0.65f + warmth, 0.3f + warmth * 0.5f);
+                    flickerLight.BaseEnergy = 1.8f + _rng.Randf() * 0.4f;
+                    flickerLight.LightRange = 12f;
+
+                    // Every 4th torch gets shadows for dramatic effect
+                    flickerLight.EnableShadows = (torchCount % 4 == 0) && _shadowLightCount < MaxShadowLights;
+                    if (flickerLight.EnableShadows) _shadowLightCount++;
+
+                    _lightContainer?.AddChild(flickerLight);
+                    torchCount++;
+
+                    // Add a simple torch mesh (bracket + flame glow)
+                    var torchMesh = CreateSimpleTorchMesh();
+                    torchMesh.Position = torchPos.Value - new Vector3(0, 0.3f, 0);
+                    torchMesh.Rotation = new Vector3(0, torchRotation, 0);
+                    _propContainer?.AddChild(torchMesh);
+                }
+            }
+        }
+
+        GD.Print($"[DungeonGenerator3D] Added {torchCount} wall torches");
+    }
+
+    /// <summary>
+    /// Creates a simple torch mesh with bracket and flame effect.
+    /// </summary>
+    private Node3D CreateSimpleTorchMesh()
+    {
+        var torch = new Node3D();
+
+        // Iron bracket
+        var bracketMesh = new MeshInstance3D();
+        var bracket = new BoxMesh();
+        bracket.Size = new Vector3(0.08f, 0.3f, 0.15f);
+        bracketMesh.Mesh = bracket;
+        bracketMesh.Position = new Vector3(0, 0, 0.1f);
+
+        var bracketMat = new StandardMaterial3D();
+        bracketMat.AlbedoColor = new Color(0.15f, 0.12f, 0.1f);
+        bracketMat.Roughness = 0.7f;
+        bracketMat.Metallic = 0.3f;
+        bracketMesh.MaterialOverride = bracketMat;
+        torch.AddChild(bracketMesh);
+
+        // Torch handle
+        var handleMesh = new MeshInstance3D();
+        var handle = new CylinderMesh();
+        handle.TopRadius = 0.03f;
+        handle.BottomRadius = 0.04f;
+        handle.Height = 0.4f;
+        handleMesh.Mesh = handle;
+        handleMesh.Position = new Vector3(0, 0.05f, 0);
+        handleMesh.Rotation = new Vector3(Mathf.Pi * 0.15f, 0, 0); // Angle outward
+
+        var handleMat = new StandardMaterial3D();
+        handleMat.AlbedoColor = new Color(0.25f, 0.18f, 0.1f);
+        handleMat.Roughness = 0.9f;
+        handleMesh.MaterialOverride = handleMat;
+        torch.AddChild(handleMesh);
+
+        // Flame glow (emissive sphere)
+        var flameMesh = new MeshInstance3D();
+        var flame = new SphereMesh();
+        flame.Radius = 0.12f;
+        flame.Height = 0.24f;
+        flameMesh.Mesh = flame;
+        flameMesh.Position = new Vector3(0, 0.35f, -0.15f);
+
+        var flameMat = new StandardMaterial3D();
+        flameMat.AlbedoColor = new Color(1f, 0.6f, 0.1f);
+        flameMat.EmissionEnabled = true;
+        flameMat.Emission = new Color(1f, 0.5f, 0.1f);
+        flameMat.EmissionEnergyMultiplier = 3f;
+        flameMat.Transparency = BaseMaterial3D.TransparencyEnum.Alpha;
+        flameMat.AlbedoColor = new Color(1f, 0.7f, 0.2f, 0.7f);
+        flameMesh.MaterialOverride = flameMat;
+        torch.AddChild(flameMesh);
+
+        return torch;
+    }
+
+    /// <summary>
+    /// Adds dramatic shadow-casting lights at corridor intersections and key points.
+    /// </summary>
+    private void AddDramaticLighting()
+    {
+        int dramaticLightCount = 0;
+
+        // Find corridor intersections (tiles with 3+ open neighbors)
+        for (int x = 2; x < LargeDungeonWidth - 2; x += 6) // Check every 6 tiles
+        {
+            for (int z = 2; z < LargeDungeonDepth - 2; z += 6)
+            {
+                if (_mapData![x, 0, z] != 1) continue;
+
+                // Count open neighbors
+                int openNeighbors = 0;
+                if (_mapData[x - 1, 0, z] == 1) openNeighbors++;
+                if (_mapData[x + 1, 0, z] == 1) openNeighbors++;
+                if (_mapData[x, 0, z - 1] == 1) openNeighbors++;
+                if (_mapData[x, 0, z + 1] == 1) openNeighbors++;
+
+                // Intersections get dramatic overhead lights
+                if (openNeighbors >= 3 && _shadowLightCount < MaxShadowLights)
+                {
+                    var light = new OmniLight3D();
+                    light.Position = new Vector3(x * TileSize, WallHeight * 0.7f, z * TileSize);
+                    light.LightColor = new Color(1f, 0.75f, 0.4f); // Warm orange
+                    light.LightEnergy = 2.5f;
+                    light.OmniRange = 15f;
+                    light.OmniAttenuation = 1.2f;
+                    light.ShadowEnabled = true;
+                    light.DistanceFadeEnabled = true;
+                    light.DistanceFadeBegin = 40f;
+                    light.DistanceFadeLength = 20f;
+
+                    _lightContainer?.AddChild(light);
+                    _shadowLightCount++;
+                    dramaticLightCount++;
+                }
+            }
+        }
+
+        // Add subtle blue-ish rim lights near ceiling for depth
+        for (int i = 0; i < 20; i++)
+        {
+            int x = _rng.RandiRange(5, LargeDungeonWidth - 5);
+            int z = _rng.RandiRange(5, LargeDungeonDepth - 5);
+
+            if (_mapData![x, 0, z] == 1)
+            {
+                var rimLight = CreateOptimizedLight(
+                    new Vector3(x * TileSize, WallHeight * 0.9f, z * TileSize),
+                    new Color(0.4f, 0.5f, 0.7f), // Cool blue for contrast
+                    0.3f, // Very subtle
+                    6f,
+                    enableShadow: false
+                );
+                _lightContainer?.AddChild(rimLight);
+            }
+        }
+
+        GD.Print($"[DungeonGenerator3D] Added {dramaticLightCount} dramatic shadow lights + 20 rim lights");
+
+        // Add recessed ceiling lights
+        AddRecessedCeilingLights();
+    }
+
+    /// <summary>
+    /// Adds recessed light fixtures in the ceiling that shine downward.
+    /// Creates dramatic pools of light on the floor.
+    /// </summary>
+    private void AddRecessedCeilingLights()
+    {
+        int lightCount = 0;
+        int spacing = 12; // Every 12 tiles
+
+        for (int x = spacing / 2; x < LargeDungeonWidth; x += spacing)
+        {
+            for (int z = spacing / 2; z < LargeDungeonDepth; z += spacing)
+            {
+                if (_mapData![x, 0, z] != 1) continue;
+
+                // Skip if in a room (rooms have their own lighting)
+                bool inRoom = false;
+                foreach (var room in Rooms)
+                {
+                    if (x >= room.Position.X && x < room.Position.X + room.Size.X &&
+                        z >= room.Position.Z && z < room.Position.Z + room.Size.Z)
+                    {
+                        inRoom = true;
+                        break;
+                    }
+                }
+                if (inRoom) continue;
+
+                // Create recessed light fixture
+                var fixture = CreateRecessedLightFixture();
+                fixture.Position = new Vector3(x * TileSize, WallHeight - 0.1f, z * TileSize);
+                _propContainer?.AddChild(fixture);
+
+                // Create downward-facing spot light
+                var spotLight = new SpotLight3D();
+                spotLight.Position = new Vector3(x * TileSize, WallHeight - 0.2f, z * TileSize);
+                spotLight.Rotation = new Vector3(Mathf.Pi / 2f, 0, 0); // Point straight down
+
+                // Warm light color with slight variation
+                float warmth = _rng.Randf() * 0.1f;
+                spotLight.LightColor = new Color(1f, 0.8f + warmth, 0.5f + warmth);
+                spotLight.LightEnergy = 1.5f + _rng.Randf() * 0.5f;
+                spotLight.SpotRange = 15f;
+                spotLight.SpotAngle = 35f; // Focused cone
+                spotLight.SpotAttenuation = 0.8f;
+
+                // Performance settings
+                spotLight.DistanceFadeEnabled = true;
+                spotLight.DistanceFadeBegin = 30f;
+                spotLight.DistanceFadeLength = 15f;
+                spotLight.ShadowEnabled = false; // Performance
+
+                _lightContainer?.AddChild(spotLight);
+                lightCount++;
+            }
+        }
+
+        GD.Print($"[DungeonGenerator3D] Added {lightCount} recessed ceiling lights");
+    }
+
+    /// <summary>
+    /// Creates a recessed light fixture mesh for the ceiling.
+    /// </summary>
+    private Node3D CreateRecessedLightFixture()
+    {
+        var fixture = new Node3D();
+
+        // Recessed housing (dark metal ring)
+        var housingMesh = new MeshInstance3D();
+        var housing = new TorusMesh();
+        housing.InnerRadius = 0.25f;
+        housing.OuterRadius = 0.4f;
+        housing.Rings = 16;
+        housing.RingSegments = 12;
+        housingMesh.Mesh = housing;
+        housingMesh.Rotation = new Vector3(Mathf.Pi / 2f, 0, 0); // Horizontal
+
+        var housingMat = new StandardMaterial3D();
+        housingMat.AlbedoColor = new Color(0.12f, 0.10f, 0.08f);
+        housingMat.Roughness = 0.6f;
+        housingMat.Metallic = 0.4f;
+        housingMesh.MaterialOverride = housingMat;
+        fixture.AddChild(housingMesh);
+
+        // Inner reflector (brighter metal)
+        var reflectorMesh = new MeshInstance3D();
+        var reflector = new CylinderMesh();
+        reflector.TopRadius = 0.3f;
+        reflector.BottomRadius = 0.2f;
+        reflector.Height = 0.15f;
+        reflectorMesh.Mesh = reflector;
+        reflectorMesh.Position = new Vector3(0, 0.08f, 0);
+
+        var reflectorMat = new StandardMaterial3D();
+        reflectorMat.AlbedoColor = new Color(0.5f, 0.45f, 0.35f);
+        reflectorMat.Roughness = 0.3f;
+        reflectorMat.Metallic = 0.6f;
+        reflectorMesh.MaterialOverride = reflectorMat;
+        fixture.AddChild(reflectorMesh);
+
+        // Glowing center (emissive)
+        var glowMesh = new MeshInstance3D();
+        var glow = new SphereMesh();
+        glow.Radius = 0.12f;
+        glow.Height = 0.24f;
+        glowMesh.Mesh = glow;
+        glowMesh.Position = new Vector3(0, 0.05f, 0);
+
+        var glowMat = new StandardMaterial3D();
+        glowMat.AlbedoColor = new Color(1f, 0.9f, 0.7f, 0.9f);
+        glowMat.EmissionEnabled = true;
+        glowMat.Emission = new Color(1f, 0.85f, 0.5f);
+        glowMat.EmissionEnergyMultiplier = 2f;
+        glowMat.Transparency = BaseMaterial3D.TransparencyEnum.Alpha;
+        glowMesh.MaterialOverride = glowMat;
+        fixture.AddChild(glowMesh);
+
+        return fixture;
     }
 
     private void ClearDungeon()
@@ -2982,5 +3461,67 @@ public partial class DungeonGenerator3D : Node3D
         }
 
         return (alive, dead, bosses);
+    }
+}
+
+/// <summary>
+/// A flickering torch light that animates like a real flame.
+/// Uses multiple sine waves for organic, natural-looking flicker.
+/// </summary>
+public partial class FlickeringTorchLight : OmniLight3D
+{
+    public Color BaseColor { get; set; } = new Color(1f, 0.7f, 0.35f);
+    public float BaseEnergy { get; set; } = 2f;
+    public float LightRange { get; set; } = 10f;
+    public bool EnableShadows { get; set; } = false;
+
+    private float _flickerTime = 0f;
+    private float _flickerOffset;
+
+    public override void _Ready()
+    {
+        // Randomize flicker offset so torches don't sync
+        _flickerOffset = GD.Randf() * 100f;
+
+        LightColor = BaseColor;
+        LightEnergy = BaseEnergy;
+        OmniRange = LightRange;
+        OmniAttenuation = 1.3f;
+        ShadowEnabled = EnableShadows;
+
+        // Performance: distance fade
+        DistanceFadeEnabled = true;
+        DistanceFadeBegin = 35f;
+        DistanceFadeLength = 15f;
+        DistanceFadeShadow = 25f;
+    }
+
+    public override void _Process(double delta)
+    {
+        _flickerTime += (float)delta * 8f;
+        float t = _flickerTime + _flickerOffset;
+
+        // Multi-frequency flicker for organic flame effect
+        // Primary flicker (slow wave)
+        float flicker1 = Mathf.Sin(t * 1.0f) * 0.08f;
+        // Secondary flicker (faster)
+        float flicker2 = Mathf.Sin(t * 2.7f) * 0.05f;
+        // Tertiary flicker (fastest, small amplitude)
+        float flicker3 = Mathf.Sin(t * 5.3f) * 0.03f;
+        // Random noise for natural variation
+        float noise = (float)GD.RandRange(-0.02, 0.02);
+
+        float totalFlicker = 1f + flicker1 + flicker2 + flicker3 + noise;
+
+        // Apply energy flicker
+        LightEnergy = BaseEnergy * totalFlicker;
+
+        // Subtle color temperature shift (warmer when brighter)
+        float warmth = 0.02f * (totalFlicker - 1f);
+        LightColor = new Color(
+            Mathf.Clamp(BaseColor.R, 0, 1),
+            Mathf.Clamp(BaseColor.G + warmth, 0, 1),
+            Mathf.Clamp(BaseColor.B + warmth * 0.5f, 0, 1)
+        );
     }
 }

@@ -357,32 +357,11 @@ public partial class SoundManager3D : Node
 
     private void LoadMusicTracks()
     {
-        // Try to load music from SafeRoom's audio folder
-        string basePath = "res://Assets/Audio/Music/";
-
-        var dir = DirAccess.Open(basePath);
-        if (dir != null)
-        {
-            dir.ListDirBegin();
-            string fileName = dir.GetNext();
-
-            while (!string.IsNullOrEmpty(fileName))
-            {
-                if (fileName.EndsWith(".ogg") && !fileName.EndsWith(".ogg.import"))
-                {
-                    string fullPath = basePath + fileName;
-                    var stream = GD.Load<AudioStream>(fullPath);
-                    if (stream != null)
-                    {
-                        _musicTracks.Add(stream);
-                    }
-                }
-                fileName = dir.GetNext();
-            }
-            dir.ListDirEnd();
-        }
-
-        GD.Print($"[SoundManager3D] Loaded {_musicTracks.Count} music tracks");
+        // Music is now handled by:
+        // - SplashMusic: plays splash.mp3 during menus/editor
+        // - DungeonRadio: plays MP3 playlist during gameplay
+        // The old .ogg loop system has been removed.
+        GD.Print("[SoundManager3D] Music handled by SplashMusic and DungeonRadio");
     }
 
     private void LoadEventSounds()

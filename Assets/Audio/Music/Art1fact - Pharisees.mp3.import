@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://dg7vhgbargig"
+path="res://.godot/imported/Art1fact - Pharisees.mp3-4f1879b1cff9d83c6affb338184a6f48.mp3str"
+
+[deps]
+
+source_file="res://Assets/Audio/Music/Art1fact - Pharisees.mp3"
+dest_files=["res://.godot/imported/Art1fact - Pharisees.mp3-4f1879b1cff9d83c6affb338184a6f48.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4

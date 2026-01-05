@@ -711,6 +711,14 @@ public partial class FPSController : CharacterBody3D
                 GetViewport().SetInputAsHandled();
             }
         }
+
+        // Y key toggles Dungeon Radio
+        if (@event is InputEventKey yKey && yKey.Pressed && !yKey.Echo &&
+            (yKey.Keycode == Key.Y || yKey.PhysicalKeycode == Key.Y))
+        {
+            DungeonRadio.Instance?.ToggleUI();
+            GetViewport().SetInputAsHandled();
+        }
     }
 
     /// <summary>
@@ -776,6 +784,12 @@ public partial class FPSController : CharacterBody3D
         if (UIEditorMode.Instance?.IsActive == true)
         {
             UIEditorMode.Instance.Deactivate();
+        }
+
+        // Close dungeon radio
+        if (DungeonRadio.Instance?.IsVisible == true)
+        {
+            DungeonRadio.Instance.ToggleUI();
         }
 
         // Force unpause
@@ -1111,6 +1125,7 @@ public partial class FPSController : CharacterBody3D
         if (EscapeMenu3D.Instance?.Visible == true) return true;
         if (EditorScreen3D.Instance?.Visible == true) return true;
         if (FloorSelector3D.Instance?.IsOpen == true) return true;
+        if (DungeonRadio.Instance?.IsVisible == true) return true;
 
         // In-Map Editor selector pane (Z-key menu)
         if (InMapEditor.Instance?.IsSelectorPaneOpen == true) return true;

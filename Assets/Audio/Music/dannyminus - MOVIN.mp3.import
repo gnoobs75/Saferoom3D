@@ -1,0 +1,19 @@
+[remap]
+
+importer="mp3"
+type="AudioStreamMP3"
+uid="uid://dnoeynp6yq150"
+path="res://.godot/imported/dannyminus - MOVIN.mp3-69be09dcec4aea8ba5c88604f4a9e0e2.mp3str"
+
+[deps]
+
+source_file="res://Assets/Audio/Music/dannyminus - MOVIN.mp3"
+dest_files=["res://.godot/imported/dannyminus - MOVIN.mp3-69be09dcec4aea8ba5c88604f4a9e0e2.mp3str"]
+
+[params]
+
+loop=false
+loop_offset=0
+bpm=0
+beat_count=0
+bar_beats=4
