@@ -181,6 +181,16 @@ public partial class AbilityManager3D : Node
         }
 
         // Handle hotbar input (number keys 1-0)
+        // Skip if modal UIs are open (these block gameplay input)
+        bool modalUIOpen = EscapeMenu3D.Instance?.Visible == true ||
+                           SpellBook3D.Instance?.Visible == true ||
+                           InventoryUI3D.Instance?.Visible == true ||
+                           CharacterSheetUI.Instance?.Visible == true ||
+                           EditorScreen3D.Instance?.Visible == true ||
+                           FloorSelector3D.Instance?.IsOpen == true;
+
+        if (modalUIOpen) return;
+
         // Check modifiers from the current event to avoid stuck modifier keys after alt-tab
         if (@event is InputEventKey keyEvent && keyEvent.Pressed && !keyEvent.Echo)
         {

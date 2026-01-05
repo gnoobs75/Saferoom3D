@@ -494,9 +494,10 @@ public partial class EscapeMenu3D : CanvasLayer
 
     public override void _Input(InputEvent @event)
     {
+        // CanvasLayer visibility check - critical for input isolation
         if (!Visible) return;
 
-        // Handle key rebinding
+        // Handle key rebinding (must be first to capture all keys)
         if (_waitingForKeyButton != null && _waitingForAction != null)
         {
             if (@event is InputEventKey keyEvent && keyEvent.Pressed)

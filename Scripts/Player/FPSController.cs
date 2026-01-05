@@ -766,6 +766,18 @@ public partial class FPSController : CharacterBody3D
             Abilities.AbilityManager3D.Instance.CancelTargeting();
         }
 
+        // Deactivate inspect mode
+        if (InspectMode3D.Instance?.IsActive == true)
+        {
+            InspectMode3D.Instance.Deactivate();
+        }
+
+        // Deactivate UI editor mode
+        if (UIEditorMode.Instance?.IsActive == true)
+        {
+            UIEditorMode.Instance.Deactivate();
+        }
+
         // Force unpause
         GetTree().Paused = false;
 

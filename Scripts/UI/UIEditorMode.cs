@@ -54,7 +54,14 @@ public partial class UIEditorMode : CanvasLayer
 
     public override void _Input(InputEvent @event)
     {
-        if (@event is InputEventKey keyEvent && keyEvent.Pressed)
+        // Don't process input when not visible (CanvasLayer visibility check)
+        if (!Visible) return;
+
+        // Only process X key when no other modal UIs are open
+        if (EscapeMenu3D.Instance?.Visible == true) return;
+        if (EditorScreen3D.Instance?.Visible == true) return;
+
+        if (@event is InputEventKey keyEvent && keyEvent.Pressed && !keyEvent.Echo)
         {
             if (keyEvent.Keycode == Key.X || keyEvent.PhysicalKeycode == Key.X)
             {
