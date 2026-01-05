@@ -7,10 +7,14 @@ namespace SafeRoom3D.UI;
 
 /// <summary>
 /// Escape menu with game options, restart, and editor access.
+/// Uses CanvasLayer to ensure it's always on top of other UI.
 /// </summary>
-public partial class EscapeMenu3D : Control
+public partial class EscapeMenu3D : CanvasLayer
 {
     public static EscapeMenu3D? Instance { get; private set; }
+
+    // Root control for all UI
+    private Control? _rootControl;
 
     // UI Elements
     private PanelContainer? _menuPanel;
@@ -30,6 +34,8 @@ public partial class EscapeMenu3D : Control
     private CheckBox? _soundToggle;
     private HSlider? _sensitivitySlider;
     private OptionButton? _lodDropdown;
+    private HSlider? _gameSpeedSlider;
+    private Label? _gameSpeedValueLabel;
     private Button? _optionsBackButton;
 
     // Keybindings panel
@@ -45,9 +51,8 @@ public partial class EscapeMenu3D : Control
     public override void _Ready()
     {
         Instance = this;
-        SetAnchorsPreset(LayoutPreset.FullRect);
+        Layer = 200;  // Very high layer to be on top of everything (Broadcaster is 50)
         ProcessMode = ProcessModeEnum.Always;
-        MouseFilter = MouseFilterEnum.Stop;
 
         BuildUI();
 
@@ -57,16 +62,22 @@ public partial class EscapeMenu3D : Control
 
     private void BuildUI()
     {
+        // Root control to hold all UI (CanvasLayer needs a Control child for anchors)
+        _rootControl = new Control();
+        _rootControl.SetAnchorsPreset(Control.LayoutPreset.FullRect);
+        _rootControl.MouseFilter = Control.MouseFilterEnum.Stop;
+        AddChild(_rootControl);
+
         // Semi-transparent background
         var bg = new ColorRect();
-        bg.SetAnchorsPreset(LayoutPreset.FullRect);
+        bg.SetAnchorsPreset(Control.LayoutPreset.FullRect);
         bg.Color = new Color(0f, 0f, 0f, 0.7f);
-        AddChild(bg);
+        _rootControl.AddChild(bg);
 
         // Center container
         var centerContainer = new CenterContainer();
-        centerContainer.SetAnchorsPreset(LayoutPreset.FullRect);
-        AddChild(centerContainer);
+        centerContainer.SetAnchorsPreset(Control.LayoutPreset.FullRect);
+        _rootControl.AddChild(centerContainer);
 
         // Main menu panel
         _menuPanel = new PanelContainer();
@@ -278,6 +289,25 @@ public partial class EscapeMenu3D : Control
         _lodDropdown.ItemSelected += (index) => GraphicsConfig.SetLODFromIndex((int)index);
         lodRow.AddChild(_lodDropdown);
         vbox.AddChild(lodRow);
+
+        // Game speed slider
+        var speedRow = new HBoxContainer();
+        var speedLabel = new Label { Text = "Game Speed", CustomMinimumSize = new Vector2(120, 0) };
+        speedLabel.AddThemeFontSizeOverride("font_size", 18);
+        speedRow.AddChild(speedLabel);
+        _gameSpeedSlider = new HSlider();
+        _gameSpeedSlider.MinValue = 50;
+        _gameSpeedSlider.MaxValue = 125;
+        _gameSpeedSlider.Step = 5;
+        _gameSpeedSlider.Value = GameConfig.GameSpeedPercent;
+        _gameSpeedSlider.CustomMinimumSize = new Vector2(150, 0);
+        _gameSpeedSlider.ValueChanged += OnGameSpeedChanged;
+        speedRow.AddChild(_gameSpeedSlider);
+        _gameSpeedValueLabel = new Label { Text = $"{GameConfig.GameSpeedPercent}%" };
+        _gameSpeedValueLabel.AddThemeFontSizeOverride("font_size", 16);
+        _gameSpeedValueLabel.CustomMinimumSize = new Vector2(50, 0);
+        speedRow.AddChild(_gameSpeedValueLabel);
+        vbox.AddChild(speedRow);
 
         // Back button
         _optionsBackButton = CreateMenuButton("Back", new Color(0.4f, 0.3f, 0.3f));
@@ -594,6 +624,13 @@ public partial class EscapeMenu3D : Control
         _showingOptions = true;
         _menuPanel!.Visible = false;
         _optionsPanel!.Visible = true;
+    }
+
+    private void OnGameSpeedChanged(double value)
+    {
+        GameConfig.GameSpeedPercent = (int)value;
+        if (_gameSpeedValueLabel != null)
+            _gameSpeedValueLabel.Text = $"{(int)value}%";
     }
 
     private void OnOptionsBackPressed()
