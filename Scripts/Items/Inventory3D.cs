@@ -156,7 +156,216 @@ public partial class Inventory3D : Node
         musk.StackCount = 3;
         AddItem(musk);
 
+        // Add one of each weapon type for testing
+        AddStarterWeapons();
+
         GD.Print("[Inventory3D] Starting items added");
+    }
+
+    /// <summary>
+    /// Add one of each weapon type to inventory for testing weapon switching.
+    /// </summary>
+    private void AddStarterWeapons()
+    {
+        // Dagger
+        AddItem(InventoryItem.FromEquipment(new EquipmentItem
+        {
+            Id = Guid.NewGuid().ToString(),
+            Name = "Test Dagger",
+            Description = "A quick stabbing weapon.",
+            Slot = EquipmentSlot.MainHand,
+            Rarity = ItemRarity.Magic,
+            WeaponType = WeaponType.Dagger,
+            ItemLevel = 5,
+            RequiredLevel = 1,
+            MinDamage = 4,
+            MaxDamage = 8,
+            AttackSpeed = 1.4f,
+            WeaponRange = 1.5f,
+            IsTwoHanded = false
+        }));
+
+        // Long Sword
+        AddItem(InventoryItem.FromEquipment(new EquipmentItem
+        {
+            Id = Guid.NewGuid().ToString(),
+            Name = "Test Long Sword",
+            Description = "A balanced one-handed sword.",
+            Slot = EquipmentSlot.MainHand,
+            Rarity = ItemRarity.Magic,
+            WeaponType = WeaponType.LongSword,
+            ItemLevel = 5,
+            RequiredLevel = 1,
+            MinDamage = 8,
+            MaxDamage = 14,
+            AttackSpeed = 1.0f,
+            WeaponRange = 2.5f,
+            IsTwoHanded = false
+        }));
+
+        // Axe
+        AddItem(InventoryItem.FromEquipment(new EquipmentItem
+        {
+            Id = Guid.NewGuid().ToString(),
+            Name = "Test Axe",
+            Description = "A brutal chopping weapon.",
+            Slot = EquipmentSlot.MainHand,
+            Rarity = ItemRarity.Magic,
+            WeaponType = WeaponType.Axe,
+            ItemLevel = 5,
+            RequiredLevel = 1,
+            MinDamage = 10,
+            MaxDamage = 16,
+            AttackSpeed = 0.9f,
+            WeaponRange = 2.0f,
+            IsTwoHanded = false
+        }));
+
+        // Mace
+        AddItem(InventoryItem.FromEquipment(new EquipmentItem
+        {
+            Id = Guid.NewGuid().ToString(),
+            Name = "Test Mace",
+            Description = "A crushing bludgeon.",
+            Slot = EquipmentSlot.MainHand,
+            Rarity = ItemRarity.Magic,
+            WeaponType = WeaponType.Mace,
+            ItemLevel = 5,
+            RequiredLevel = 1,
+            MinDamage = 9,
+            MaxDamage = 15,
+            AttackSpeed = 0.95f,
+            WeaponRange = 2.0f,
+            IsTwoHanded = false
+        }));
+
+        // Club
+        AddItem(InventoryItem.FromEquipment(new EquipmentItem
+        {
+            Id = Guid.NewGuid().ToString(),
+            Name = "Test Club",
+            Description = "A primitive but effective weapon.",
+            Slot = EquipmentSlot.MainHand,
+            Rarity = ItemRarity.Magic,
+            WeaponType = WeaponType.Club,
+            ItemLevel = 5,
+            RequiredLevel = 1,
+            MinDamage = 6,
+            MaxDamage = 12,
+            AttackSpeed = 1.0f,
+            WeaponRange = 1.8f,
+            IsTwoHanded = false
+        }));
+
+        // Battle Axe (2H)
+        AddItem(InventoryItem.FromEquipment(new EquipmentItem
+        {
+            Id = Guid.NewGuid().ToString(),
+            Name = "Test Battle Axe",
+            Description = "A massive two-handed axe.",
+            Slot = EquipmentSlot.MainHand,
+            Rarity = ItemRarity.Rare,
+            WeaponType = WeaponType.BattleAxe,
+            ItemLevel = 8,
+            RequiredLevel = 1,
+            MinDamage = 18,
+            MaxDamage = 28,
+            AttackSpeed = 0.7f,
+            WeaponRange = 3.0f,
+            IsTwoHanded = true
+        }));
+
+        // Spear (2H)
+        AddItem(InventoryItem.FromEquipment(new EquipmentItem
+        {
+            Id = Guid.NewGuid().ToString(),
+            Name = "Test Spear",
+            Description = "A long thrusting weapon.",
+            Slot = EquipmentSlot.MainHand,
+            Rarity = ItemRarity.Rare,
+            WeaponType = WeaponType.Spear,
+            ItemLevel = 8,
+            RequiredLevel = 1,
+            MinDamage = 14,
+            MaxDamage = 22,
+            AttackSpeed = 0.85f,
+            WeaponRange = 4.0f,
+            IsTwoHanded = true
+        }));
+
+        // War Hammer (2H)
+        AddItem(InventoryItem.FromEquipment(new EquipmentItem
+        {
+            Id = Guid.NewGuid().ToString(),
+            Name = "Test War Hammer",
+            Description = "A devastating two-handed hammer.",
+            Slot = EquipmentSlot.MainHand,
+            Rarity = ItemRarity.Rare,
+            WeaponType = WeaponType.WarHammer,
+            ItemLevel = 8,
+            RequiredLevel = 1,
+            MinDamage = 20,
+            MaxDamage = 32,
+            AttackSpeed = 0.6f,
+            WeaponRange = 2.5f,
+            IsTwoHanded = true
+        }));
+
+        // Staff (2H)
+        AddItem(InventoryItem.FromEquipment(new EquipmentItem
+        {
+            Id = Guid.NewGuid().ToString(),
+            Name = "Test Staff",
+            Description = "A magical staff.",
+            Slot = EquipmentSlot.MainHand,
+            Rarity = ItemRarity.Rare,
+            WeaponType = WeaponType.Staff,
+            ItemLevel = 8,
+            RequiredLevel = 1,
+            MinDamage = 10,
+            MaxDamage = 18,
+            AttackSpeed = 0.9f,
+            WeaponRange = 3.0f,
+            IsTwoHanded = true
+        }));
+
+        // Bow (2H)
+        AddItem(InventoryItem.FromEquipment(new EquipmentItem
+        {
+            Id = Guid.NewGuid().ToString(),
+            Name = "Test Bow",
+            Description = "A ranged weapon.",
+            Slot = EquipmentSlot.MainHand,
+            Rarity = ItemRarity.Rare,
+            WeaponType = WeaponType.Bow,
+            ItemLevel = 8,
+            RequiredLevel = 1,
+            MinDamage = 12,
+            MaxDamage = 20,
+            AttackSpeed = 0.8f,
+            WeaponRange = 30f,
+            IsTwoHanded = true
+        }));
+
+        // Scythe (2H)
+        AddItem(InventoryItem.FromEquipment(new EquipmentItem
+        {
+            Id = Guid.NewGuid().ToString(),
+            Name = "Test Scythe",
+            Description = "A deadly reaping weapon.",
+            Slot = EquipmentSlot.MainHand,
+            Rarity = ItemRarity.Rare,
+            WeaponType = WeaponType.Scythe,
+            ItemLevel = 8,
+            RequiredLevel = 1,
+            MinDamage = 16,
+            MaxDamage = 26,
+            AttackSpeed = 0.75f,
+            WeaponRange = 3.5f,
+            IsTwoHanded = true
+        }));
+
+        GD.Print("[Inventory3D] 11 test weapons added (one of each type except ShortSword which is starter)");
     }
 
     /// <summary>

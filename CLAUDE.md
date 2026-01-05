@@ -88,6 +88,18 @@ float targetAngle = Mathf.Atan2(direction.X, direction.Z);
 Rotation = new Vector3(0, targetAngle, 0);
 ```
 
+### First-Person Weapon System
+- Weapons dynamically switch based on equipped MainHand item
+- Uses `WeaponFactory.CreateWeapon()` for procedural meshes
+- Each weapon type has unique positioning, rotation, and scale for FPS view
+- `OnEquipmentChanged` event triggers weapon rebuild automatically
+
+```csharp
+// Map equipment type to factory type
+var factoryType = MapToFactoryWeaponType(equipmentWeaponType);
+var weaponMesh = WeaponFactory.CreateWeapon(factoryType, scale);
+```
+
 ---
 
 ## Controls

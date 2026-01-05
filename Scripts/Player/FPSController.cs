@@ -5,6 +5,7 @@ using SafeRoom3D.Abilities;
 using SafeRoom3D.Items;
 using SafeRoom3D.UI;
 using SafeRoom3D.Broadcaster;
+using SafeRoom3D.Enemies;
 
 namespace SafeRoom3D.Player;
 
@@ -26,14 +27,15 @@ public partial class FPSController : CharacterBody3D
 
     // First-person weapon display
     private Node3D? _torchNode;      // Torch in left hand
-    private Node3D? _swordNode;      // Sword in right hand
+    private Node3D? _weaponNode;     // Weapon in right hand (dynamic based on equipment)
     private OmniLight3D? _torchLight;
     private float _torchFlickerTimer;
-    private float _swordSwingAngle;  // Current swing angle for attack animation
-    private bool _isSwordSwinging;   // Whether sword is mid-swing
-    private float _swordSwingTimer;
-    private Vector3 _swordRestPos;
-    private Vector3 _swordSwingPos;
+    private float _weaponSwingAngle;  // Current swing angle for attack animation
+    private bool _isWeaponSwinging;   // Whether weapon is mid-swing
+    private float _weaponSwingTimer;
+    private Vector3 _weaponRestPos;
+    private Vector3 _weaponSwingPos;
+    private Core.WeaponType _currentWeaponType = Core.WeaponType.None;  // Track current weapon to avoid unnecessary rebuilds
 
     // Movement state
     private Vector3 _velocity;
@@ -187,8 +189,8 @@ public partial class FPSController : CharacterBody3D
         // Create first-person torch (left hand)
         CreateFirstPersonTorch();
 
-        // Create first-person sword (right hand)
-        CreateFirstPersonSword();
+        // Create first-person weapon (right hand) based on equipped item
+        CreateFirstPersonWeapon();
 
         // Create collision shape (capsule for player body)
         // Larger radius to keep enemies from clipping into player
@@ -367,91 +369,170 @@ public partial class FPSController : CharacterBody3D
         GD.Print("[FPSController] First-person torch with fire/smoke particles created");
     }
 
-    private void CreateFirstPersonSword()
+    /// <summary>
+    /// Create the first-person weapon based on currently equipped MainHand item.
+    /// Uses WeaponFactory for procedural weapon meshes.
+    /// </summary>
+    private void CreateFirstPersonWeapon()
     {
-        // Sword in right hand - positioned more to the right, diagonal angle
-        _swordNode = new Node3D();
-        _swordNode.Name = "FirstPersonSword";
-        // Rest position: far right, blade angled diagonally toward top-left
-        _swordRestPos = new Vector3(0.75f, -0.2f, -0.35f); // Further right, raised slightly
-        // Mid-swing position: sword slashes across to the left
-        _swordSwingPos = new Vector3(-0.2f, 0.0f, -0.5f); // Swing across to left
-        _swordNode.Position = _swordRestPos;
+        // Get equipped weapon
+        var mainHand = Equipment.GetEquippedItem(EquipmentSlot.MainHand);
+        var weaponType = mainHand?.WeaponType ?? Core.WeaponType.ShortSword;
 
-        // Sword blade
-        var blade = new MeshInstance3D();
-        var bladeMesh = new BoxMesh();
-        bladeMesh.Size = new Vector3(0.04f, 0.55f, 0.015f);
-        blade.Mesh = bladeMesh;
-        blade.Name = "Blade";
-        var bladeMat = new StandardMaterial3D();
-        bladeMat.AlbedoColor = new Color(0.75f, 0.78f, 0.8f);
-        bladeMat.Metallic = 0.9f;
-        bladeMat.Roughness = 0.2f;
-        blade.MaterialOverride = bladeMat;
-        blade.Position = new Vector3(0, 0.35f, 0);
-        _swordNode.AddChild(blade);
+        // Skip if same weapon type already equipped
+        if (weaponType == _currentWeaponType && _weaponNode != null)
+            return;
 
-        // Blade edge highlight (thin strip)
-        var edge = new MeshInstance3D();
-        var edgeMesh = new BoxMesh();
-        edgeMesh.Size = new Vector3(0.005f, 0.5f, 0.018f);
-        edge.Mesh = edgeMesh;
-        var edgeMat = new StandardMaterial3D();
-        edgeMat.AlbedoColor = new Color(0.9f, 0.92f, 0.95f);
-        edgeMat.Metallic = 1f;
-        edgeMat.Roughness = 0.1f;
-        edge.MaterialOverride = edgeMat;
-        edge.Position = new Vector3(0.02f, 0.35f, 0);
-        _swordNode.AddChild(edge);
+        // Remove old weapon if exists
+        if (_weaponNode != null)
+        {
+            _weaponNode.QueueFree();
+            _weaponNode = null;
+        }
 
-        // Cross guard
-        var guard = new MeshInstance3D();
-        var guardMesh = new BoxMesh();
-        guardMesh.Size = new Vector3(0.12f, 0.025f, 0.03f);
-        guard.Mesh = guardMesh;
-        var guardMat = new StandardMaterial3D();
-        guardMat.AlbedoColor = new Color(0.5f, 0.45f, 0.35f);
-        guardMat.Metallic = 0.7f;
-        guardMat.Roughness = 0.4f;
-        guard.MaterialOverride = guardMat;
-        guard.Position = new Vector3(0, 0.05f, 0);
-        _swordNode.AddChild(guard);
+        _currentWeaponType = weaponType;
 
-        // Handle/grip
-        var handle = new MeshInstance3D();
-        var handleMesh = new CylinderMesh();
-        handleMesh.TopRadius = 0.018f;
-        handleMesh.BottomRadius = 0.02f;
-        handleMesh.Height = 0.12f;
-        handle.Mesh = handleMesh;
-        var handleMat = new StandardMaterial3D();
-        handleMat.AlbedoColor = new Color(0.35f, 0.2f, 0.1f); // Leather wrap
-        handleMat.Roughness = 0.9f;
-        handle.MaterialOverride = handleMat;
-        handle.Position = new Vector3(0, -0.02f, 0);
-        _swordNode.AddChild(handle);
+        // Map Core.WeaponType to WeaponFactory.WeaponType
+        var factoryType = MapToFactoryWeaponType(weaponType);
 
-        // Pommel
-        var pommel = new MeshInstance3D();
-        var pommelMesh = new SphereMesh();
-        pommelMesh.Radius = 0.025f;
-        pommel.Mesh = pommelMesh;
-        var pommelMat = new StandardMaterial3D();
-        pommelMat.AlbedoColor = new Color(0.55f, 0.5f, 0.4f);
-        pommelMat.Metallic = 0.8f;
-        pommelMat.Roughness = 0.3f;
-        pommel.MaterialOverride = pommelMat;
-        pommel.Position = new Vector3(0, -0.1f, 0);
-        _swordNode.AddChild(pommel);
+        // Get positioning data for this weapon type
+        var (restPos, swingPos, restRotation, scale) = GetWeaponPositioning(weaponType);
+        _weaponRestPos = restPos;
+        _weaponSwingPos = swingPos;
 
-        // Set initial rotation - sword angled diagonally, blade pointing toward top-left
-        // X: tilt forward, Y: rotate blade face, Z: diagonal angle
-        _swordNode.RotationDegrees = new Vector3(-35, 25, 55); // Strong diagonal, blade toward top-left
+        // Create weapon container
+        _weaponNode = new Node3D();
+        _weaponNode.Name = "FirstPersonWeapon";
+        _weaponNode.Position = _weaponRestPos;
+        _weaponNode.RotationDegrees = restRotation;
 
-        _weaponHolder?.AddChild(_swordNode);
+        // Create weapon mesh from factory
+        var weaponMesh = WeaponFactory.CreateWeapon(factoryType, scale);
+        weaponMesh.Name = "WeaponMesh";
 
-        GD.Print("[FPSController] First-person sword created");
+        // Rotate to convert from WeaponFactory's +Z forward to first-person view orientation
+        // WeaponFactory weapons point along +Z, we need them pointing up (+Y) in rest pose
+        weaponMesh.RotationDegrees = new Vector3(-90, 0, 0);
+
+        _weaponNode.AddChild(weaponMesh);
+        _weaponHolder?.AddChild(_weaponNode);
+
+        GD.Print($"[FPSController] First-person weapon created: {weaponType}");
+    }
+
+    /// <summary>
+    /// Map Core.WeaponType to WeaponFactory.WeaponType
+    /// </summary>
+    private static WeaponFactory.WeaponType MapToFactoryWeaponType(Core.WeaponType coreType)
+    {
+        return coreType switch
+        {
+            Core.WeaponType.Dagger => WeaponFactory.WeaponType.Dagger,
+            Core.WeaponType.ShortSword => WeaponFactory.WeaponType.ShortSword,
+            Core.WeaponType.LongSword => WeaponFactory.WeaponType.LongSword,
+            Core.WeaponType.Axe => WeaponFactory.WeaponType.Axe,
+            Core.WeaponType.BattleAxe => WeaponFactory.WeaponType.BattleAxe,
+            Core.WeaponType.Spear => WeaponFactory.WeaponType.Spear,
+            Core.WeaponType.Mace => WeaponFactory.WeaponType.Mace,
+            Core.WeaponType.WarHammer => WeaponFactory.WeaponType.WarHammer,
+            Core.WeaponType.Staff => WeaponFactory.WeaponType.Staff,
+            Core.WeaponType.Bow => WeaponFactory.WeaponType.Bow,
+            Core.WeaponType.Club => WeaponFactory.WeaponType.Club,
+            Core.WeaponType.Scythe => WeaponFactory.WeaponType.Scythe,
+            _ => WeaponFactory.WeaponType.ShortSword
+        };
+    }
+
+    /// <summary>
+    /// Get positioning data for each weapon type in first-person view.
+    /// Returns: (restPosition, swingPosition, restRotation, scale)
+    /// </summary>
+    private static (Vector3 restPos, Vector3 swingPos, Vector3 restRotation, float scale) GetWeaponPositioning(Core.WeaponType type)
+    {
+        return type switch
+        {
+            // One-handed weapons - right side, diagonal hold
+            Core.WeaponType.Dagger => (
+                new Vector3(0.55f, -0.25f, -0.3f),   // Rest: closer in, lower
+                new Vector3(-0.15f, 0.0f, -0.45f),  // Swing: quick jab motion
+                new Vector3(-25, 30, 45),           // More compact angle
+                0.8f                                 // Smaller scale for dagger
+            ),
+            Core.WeaponType.ShortSword => (
+                new Vector3(0.65f, -0.2f, -0.35f),  // Rest
+                new Vector3(-0.2f, 0.0f, -0.5f),   // Swing
+                new Vector3(-35, 25, 55),          // Classic sword angle
+                0.9f
+            ),
+            Core.WeaponType.LongSword => (
+                new Vector3(0.7f, -0.15f, -0.4f),   // Rest: slightly further out
+                new Vector3(-0.25f, 0.05f, -0.55f), // Swing: wider arc
+                new Vector3(-30, 20, 50),
+                1.0f
+            ),
+            Core.WeaponType.Axe => (
+                new Vector3(0.6f, -0.25f, -0.35f),  // Rest
+                new Vector3(-0.3f, 0.1f, -0.5f),   // Swing: chopping motion
+                new Vector3(-40, 35, 60),          // More angled for chopping
+                0.9f
+            ),
+            // Two-handed weapons - more centered, both hands
+            Core.WeaponType.BattleAxe => (
+                new Vector3(0.35f, -0.3f, -0.5f),   // Rest: centered
+                new Vector3(-0.1f, 0.15f, -0.65f), // Swing: overhead chop
+                new Vector3(-45, 15, 35),          // More vertical
+                1.1f
+            ),
+            Core.WeaponType.Spear => (
+                new Vector3(0.3f, -0.15f, -0.6f),   // Rest: centered, forward
+                new Vector3(0.3f, 0.0f, -0.9f),    // Swing: thrust forward
+                new Vector3(-15, 0, 15),           // More horizontal/thrust ready
+                1.0f
+            ),
+            Core.WeaponType.Mace => (
+                new Vector3(0.6f, -0.25f, -0.35f),  // Similar to axe
+                new Vector3(-0.25f, 0.1f, -0.5f),
+                new Vector3(-40, 30, 55),
+                0.9f
+            ),
+            Core.WeaponType.WarHammer => (
+                new Vector3(0.4f, -0.3f, -0.45f),   // Centered, heavy
+                new Vector3(-0.15f, 0.2f, -0.6f),  // Overhead swing
+                new Vector3(-50, 20, 40),          // More overhead angle
+                1.0f
+            ),
+            Core.WeaponType.Staff => (
+                new Vector3(0.25f, -0.2f, -0.55f),  // Centered
+                new Vector3(0.2f, 0.1f, -0.7f),    // Thrust/swing
+                new Vector3(-20, 5, 20),           // Mostly vertical
+                0.9f
+            ),
+            Core.WeaponType.Bow => (
+                new Vector3(0.4f, -0.1f, -0.5f),    // Left-center (held sideways)
+                new Vector3(0.4f, 0.0f, -0.6f),    // Draw back slightly
+                new Vector3(0, 0, 90),             // Held vertically
+                0.85f
+            ),
+            Core.WeaponType.Club => (
+                new Vector3(0.6f, -0.3f, -0.35f),   // Similar to mace
+                new Vector3(-0.25f, 0.05f, -0.5f),
+                new Vector3(-35, 30, 50),
+                0.85f
+            ),
+            Core.WeaponType.Scythe => (
+                new Vector3(0.3f, -0.25f, -0.5f),   // Centered, two-handed
+                new Vector3(-0.2f, 0.1f, -0.65f),  // Sweeping motion
+                new Vector3(-35, 25, 30),
+                1.0f
+            ),
+            // Default fallback
+            _ => (
+                new Vector3(0.65f, -0.2f, -0.35f),
+                new Vector3(-0.2f, 0.0f, -0.5f),
+                new Vector3(-35, 25, 55),
+                0.9f
+            )
+        };
     }
 
     private void UpdateFirstPersonWeapons(float delta)
@@ -469,75 +550,83 @@ public partial class FPSController : CharacterBody3D
             _torchLight.LightColor = new Color(1f, warmth, 0.35f);
         }
 
-        // Update sword swing animation - slash from right to left across body
-        if (_isSwordSwinging && _swordNode != null)
+        // Update weapon swing animation - slash from right to left across body
+        if (_isWeaponSwinging && _weaponNode != null)
         {
-            _swordSwingTimer += delta;
+            _weaponSwingTimer += delta;
+
+            // Get rest rotation for current weapon type
+            var (_, _, restRotation, _) = GetWeaponPositioning(_currentWeaponType);
 
             // Swing animation: reach out and slash left to right (from player's right to left)
             float swingDuration = 0.2f;   // Quick slash
             float returnDuration = 0.25f; // Slower return
             float totalDuration = swingDuration + returnDuration;
 
-            if (_swordSwingTimer < swingDuration)
+            if (_weaponSwingTimer < swingDuration)
             {
-                // Swing phase: sword moves from right side across body to left
-                float t = _swordSwingTimer / swingDuration;
+                // Swing phase: weapon moves from right side across body to left
+                float t = _weaponSwingTimer / swingDuration;
                 t = Mathf.Sin(t * Mathf.Pi / 2); // Ease out for snappy feel
-                _swordNode.Position = _swordRestPos.Lerp(_swordSwingPos, t);
+                _weaponNode.Position = _weaponRestPos.Lerp(_weaponSwingPos, t);
                 // Rotate to show slash motion across body
-                _swordNode.RotationDegrees = new Vector3(
-                    Mathf.Lerp(-20, -10, t),    // Slightly level out
-                    Mathf.Lerp(35, -45, t),     // Rotate from angled right to angled left
-                    Mathf.Lerp(25, -15, t)      // Roll during slash
+                _weaponNode.RotationDegrees = new Vector3(
+                    Mathf.Lerp(restRotation.X, restRotation.X + 10, t),    // Slightly level out
+                    Mathf.Lerp(restRotation.Y, restRotation.Y - 70, t),    // Rotate across body
+                    Mathf.Lerp(restRotation.Z, restRotation.Z - 40, t)     // Roll during slash
                 );
             }
-            else if (_swordSwingTimer < totalDuration)
+            else if (_weaponSwingTimer < totalDuration)
             {
-                // Return phase: bring sword back to rest position
-                float t = (_swordSwingTimer - swingDuration) / returnDuration;
+                // Return phase: bring weapon back to rest position
+                float t = (_weaponSwingTimer - swingDuration) / returnDuration;
                 t = t * t; // Ease in for smooth return
-                _swordNode.Position = _swordSwingPos.Lerp(_swordRestPos, t);
-                _swordNode.RotationDegrees = new Vector3(
-                    Mathf.Lerp(-10, -20, t),
-                    Mathf.Lerp(-45, 35, t),
-                    Mathf.Lerp(-15, 25, t)
+                _weaponNode.Position = _weaponSwingPos.Lerp(_weaponRestPos, t);
+                _weaponNode.RotationDegrees = new Vector3(
+                    Mathf.Lerp(restRotation.X + 10, restRotation.X, t),
+                    Mathf.Lerp(restRotation.Y - 70, restRotation.Y, t),
+                    Mathf.Lerp(restRotation.Z - 40, restRotation.Z, t)
                 );
             }
             else
             {
                 // Animation complete
-                _isSwordSwinging = false;
-                _swordSwingTimer = 0;
-                _swordNode.Position = _swordRestPos;
-                _swordNode.RotationDegrees = new Vector3(-20, 35, 25);
+                _isWeaponSwinging = false;
+                _weaponSwingTimer = 0;
+                _weaponNode.Position = _weaponRestPos;
+                _weaponNode.RotationDegrees = restRotation;
             }
         }
 
         // Subtle weapon sway when walking
-        if (_torchNode != null && !_isSwordSwinging)
+        if (_torchNode != null && !_isWeaponSwinging)
         {
             float sway = Mathf.Sin(_headBobTime * 2f) * 0.01f;
             _torchNode.Position = new Vector3(-0.55f + sway, -0.35f, -0.45f); // Match new torch position
         }
-        if (_swordNode != null && !_isSwordSwinging)
+        if (_weaponNode != null && !_isWeaponSwinging)
         {
             float sway = Mathf.Sin(_headBobTime * 2f + 1f) * 0.008f;
-            _swordNode.Position = _swordRestPos + new Vector3(sway, sway * 0.5f, 0);
+            _weaponNode.Position = _weaponRestPos + new Vector3(sway, sway * 0.5f, 0);
         }
     }
 
     /// <summary>
-    /// Trigger sword swing animation
+    /// Trigger weapon swing animation
     /// </summary>
-    public void SwingSword()
+    public void SwingWeapon()
     {
-        if (!_isSwordSwinging)
+        if (!_isWeaponSwinging)
         {
-            _isSwordSwinging = true;
-            _swordSwingTimer = 0;
+            _isWeaponSwinging = true;
+            _weaponSwingTimer = 0;
         }
     }
+
+    /// <summary>
+    /// Legacy method for backwards compatibility
+    /// </summary>
+    public void SwingSword() => SwingWeapon();
 
     public override void _Input(InputEvent @event)
     {
@@ -588,6 +677,29 @@ public partial class FPSController : CharacterBody3D
 
         // Escape key is handled by GameManager3D for menu
         // Don't handle it here to avoid conflicts
+
+        // R key for target cycling (works outside inspection mode)
+        if (@event is InputEventKey rKey && rKey.Pressed && !rKey.Echo &&
+            (rKey.Keycode == Key.R || rKey.PhysicalKeycode == Key.R))
+        {
+            // Don't handle if any UI is open
+            bool uiOpen = IsAnyUIOpen();
+            GD.Print($"[FPSController] R key pressed - UI open: {uiOpen}");
+            if (!uiOpen)
+            {
+                if (rKey.ShiftPressed)
+                {
+                    GD.Print("[FPSController] Cycling to previous target");
+                    HUD3D.Instance?.CyclePreviousTarget();
+                }
+                else
+                {
+                    GD.Print("[FPSController] Cycling to next target");
+                    HUD3D.Instance?.CycleNextTarget();
+                }
+                GetViewport().SetInputAsHandled();
+            }
+        }
 
         // Enter key opens floor selector
         if (@event is InputEventKey enterKey && enterKey.Pressed && !enterKey.Echo && enterKey.Keycode == Key.Enter)
@@ -942,7 +1054,8 @@ public partial class FPSController : CharacterBody3D
         }
 
         // If game is paused but no pause-requiring UI is open, unpause
-        bool shouldBePaused = mapOpen || escapeOpen;
+        bool inspectModeActive = InspectMode3D.Instance?.IsActive == true;
+        bool shouldBePaused = mapOpen || escapeOpen || inspectModeActive;
         if (GetTree().Paused && !shouldBePaused)
         {
             GD.Print("[FPSController] Health check: Game paused without UI - unpausing");
@@ -992,6 +1105,9 @@ public partial class FPSController : CharacterBody3D
 
         // Overview map (world map screen)
         if (HUD3D.Instance?.IsOverviewMapVisible == true) return true;
+
+        // Inspect mode (paused for target inspection)
+        if (InspectMode3D.Instance?.IsActive == true) return true;
 
         // Game state
         if (GameManager3D.Instance?.IsGameOver == true) return true;
@@ -1708,13 +1824,17 @@ public partial class FPSController : CharacterBody3D
     public bool IsEditMode => _isEditMode;
 
     /// <summary>
-    /// Called when equipment changes - update HUD etc.
+    /// Called when equipment changes - update HUD and first-person weapon.
     /// </summary>
     private void OnEquipmentChanged()
     {
         // Emit signals to update HUD
         EmitSignal(SignalName.HealthChanged, CurrentHealth, MaxHealth);
         EmitSignal(SignalName.ManaChanged, CurrentMana, MaxMana);
+
+        // Update first-person weapon to match equipped weapon
+        CreateFirstPersonWeapon();
+
         GD.Print($"[FPSController] Equipment changed. Stats: {Stats.GetStatsSummary()}");
     }
 
