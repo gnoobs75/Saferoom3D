@@ -1235,10 +1235,11 @@ public partial class FPSController : CharacterBody3D
             if (node is Node3D enemy3D)
             {
                 Vector3 toEnemy = enemy3D.GlobalPosition - attackOrigin;
-                float distance = toEnemy.Length();
+                // Use horizontal distance (XZ plane) for melee range - ignore height difference
+                float horizontalDistance = new Vector2(toEnemy.X, toEnemy.Z).Length();
 
-                // Check if within range
-                if (distance > Constants.AttackRange + 1f) continue;
+                // Check if within range (using horizontal distance for fairness)
+                if (horizontalDistance > Constants.AttackRange + 1.5f) continue;
 
                 // Check if roughly in front (dot product > 0.5 means within ~60 degree cone)
                 float dot = toEnemy.Normalized().Dot(attackDir);
@@ -1324,10 +1325,11 @@ public partial class FPSController : CharacterBody3D
             if (node is Node3D enemy3D)
             {
                 Vector3 toEnemy = enemy3D.GlobalPosition - attackOrigin;
-                float distance = toEnemy.Length();
+                // Use horizontal distance (XZ plane) for melee range - ignore height difference
+                float horizontalDistance = new Vector2(toEnemy.X, toEnemy.Z).Length();
 
                 // Check if within range (slightly extended for strong attack)
-                if (distance > Constants.AttackRange + 1.5f) continue;
+                if (horizontalDistance > Constants.AttackRange + 2f) continue;
 
                 // Check if roughly in front - wider cone for strong attack
                 float dot = toEnemy.Normalized().Dot(attackDir);

@@ -4050,7 +4050,7 @@ public static class MonsterMeshFactory
         // Counter-rotate the head to face forward despite neck curvature
         // The neck segments accumulate forward tilt, so we need to tilt the head back
         // to make the dragon look forward/slightly up instead of at the ground
-        float headCounterRotation = -60f - (neckSegments * 12f); // Increased tilt-back for better forward gaze
+        float headCounterRotation = -75f - (neckSegments * 15f); // More aggressive tilt-back for proper forward gaze
         headNode.RotationDegrees = new Vector3(headCounterRotation, 0, 0);
         previousNeckSegment.AddChild(headNode);
         limbs.Head = headNode;

@@ -911,6 +911,9 @@ public partial class CharacterSheetUI : Control
         // Click handler
         slotUI.Container.GuiInput += (e) => OnEquipmentSlotInput(e, slotUI);
 
+        // Hide tooltip when mouse exits the slot
+        slotUI.Container.MouseExited += () => HideTooltip();
+
         parent.AddChild(slotUI.Container);
         _equipmentSlots[slot] = slotUI;
     }

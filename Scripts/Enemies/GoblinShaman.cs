@@ -1034,6 +1034,11 @@ public partial class GoblinShaman : CharacterBody3D
 
     public void TakeDamage(float damage, Vector3 fromPosition, string source = "Unknown")
     {
+        TakeDamage(damage, fromPosition, source, false);
+    }
+
+    public void TakeDamage(float damage, Vector3 fromPosition, string source, bool isCrit)
+    {
         if (CurrentState == State.Dead) return;
 
         int intDamage = (int)damage;
@@ -1049,7 +1054,7 @@ public partial class GoblinShaman : CharacterBody3D
 
         EmitSignal(SignalName.Damaged, intDamage, CurrentHealth);
 
-        SpawnFloatingDamageText(intDamage);
+        SpawnFloatingDamageText(intDamage, isCrit);
 
         // Flee when hit!
         if (CurrentState != State.Dead && CurrentHealth > 0)
@@ -1065,17 +1070,17 @@ public partial class GoblinShaman : CharacterBody3D
         GD.Print($"[GoblinShaman] Took {intDamage} damage from {source}. Health: {CurrentHealth}/{MaxHealth}");
     }
 
-    private void SpawnFloatingDamageText(int damage)
+    private void SpawnFloatingDamageText(int damage, bool isCrit = false)
     {
         var textContainer = new Node3D();
         textContainer.GlobalPosition = GlobalPosition + new Vector3(0, 2.2f, 0);
         GetTree().Root.AddChild(textContainer);
 
         var label = new Label3D();
-        label.Text = damage.ToString();
-        label.FontSize = 64;
-        label.OutlineSize = 8;
-        label.Modulate = new Color(0.8f, 0.4f, 1f); // Purple damage numbers
+        label.Text = isCrit ? $"!{damage}!" : damage.ToString();
+        label.FontSize = isCrit ? 96 : 64;
+        label.OutlineSize = isCrit ? 12 : 8;
+        label.Modulate = isCrit ? new Color(1f, 0.85f, 0.2f) : new Color(0.8f, 0.4f, 1f); // Gold for crit, purple otherwise
         label.Billboard = BaseMaterial3D.BillboardModeEnum.Enabled;
         label.NoDepthTest = true;
         textContainer.AddChild(label);

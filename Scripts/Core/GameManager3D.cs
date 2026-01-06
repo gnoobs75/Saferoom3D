@@ -475,6 +475,9 @@ public partial class GameManager3D : Node
                 TriggerGameOver("Time's up!");
             }
         }
+
+        // Update deferred enemy spawning
+        _dungeonGenerator?.UpdateDeferredSpawning(dt);
     }
 
     /// <summary>

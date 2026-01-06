@@ -1,5 +1,6 @@
 using Godot;
 using System.Collections.Generic;
+using System.Linq;
 using SafeRoom3D.Enemies;
 
 namespace SafeRoom3D.Core;
@@ -53,6 +54,14 @@ public partial class DungeonGenerator3D
 {
     // Flag to indicate we're using a custom map
     private MapDefinition? _customMapDefinition;
+
+    // Deferred enemy spawning system
+    private const float DeferredSpawnRadius = 60f;  // Spawn enemies within 60m of player
+    private const float DeferredCheckInterval = 0.5f;  // Check every 0.5 seconds
+    private float _deferredSpawnTimer = 0f;
+    private List<EnemyPlacement>? _pendingEnemies;
+    private List<(Vector3 Center, List<GroupMonster> Monsters, int RoomId)>? _pendingGroups;
+    private HashSet<string>? _spawnedEnemyIds;
 
     /// <summary>
     /// Generates a dungeon from a map definition instead of procedurally.
@@ -361,35 +370,17 @@ public partial class DungeonGenerator3D
     }
 
     /// <summary>
-    /// Spawns enemies from the map definition's placement data.
+    /// Spawns enemies from the map definition's placement data using deferred spawning.
+    /// Only enemies within DeferredSpawnRadius of the spawn point are created initially.
     /// </summary>
     private void SpawnEnemiesFromDefinition(MapDefinition map)
     {
-        int spawnedCount = 0;
+        // Initialize deferred spawning
+        _pendingEnemies = new List<EnemyPlacement>(map.Enemies);
+        _pendingGroups = new List<(Vector3, List<GroupMonster>, int)>();
+        _spawnedEnemyIds = new HashSet<string>();
 
-        // Spawn individual enemies
-        foreach (var enemy in map.Enemies)
-        {
-            Vector3 position = new Vector3(
-                enemy.Position.X * TileSize + TileSize / 2f,
-                0,
-                enemy.Position.Z * TileSize + TileSize / 2f
-            );
-
-            var spawnedEnemy = SpawnEnemyFromPlacement(enemy.Type, position, enemy.Level, enemy.IsBoss, enemy.RotationY);
-            if (spawnedEnemy != null)
-            {
-                spawnedCount++;
-
-                // Add to room if specified
-                if (enemy.RoomId >= 0 && enemy.RoomId < Rooms.Count)
-                {
-                    Rooms[enemy.RoomId].Enemies.Add(spawnedEnemy);
-                }
-            }
-        }
-
-        // Spawn monster groups
+        // Convert monster groups to pending list
         foreach (var group in map.MonsterGroups)
         {
             Vector3 groupCenter = new Vector3(
@@ -397,25 +388,167 @@ public partial class DungeonGenerator3D
                 0,
                 group.Center.Z * TileSize + TileSize / 2f
             );
+            _pendingGroups.Add((groupCenter, group.Monsters, group.RoomId));
+        }
 
-            foreach (var monster in group.Monsters)
+        // Get spawn position for initial radius check
+        Vector3 spawnPos = GetSpawnPosition();
+
+        int spawnedCount = 0;
+        int deferredCount = 0;
+
+        // Spawn enemies within initial radius
+        for (int i = _pendingEnemies.Count - 1; i >= 0; i--)
+        {
+            var enemy = _pendingEnemies[i];
+            Vector3 position = new Vector3(
+                enemy.Position.X * TileSize + TileSize / 2f,
+                0,
+                enemy.Position.Z * TileSize + TileSize / 2f
+            );
+
+            float distance = position.DistanceTo(spawnPos);
+            if (distance <= DeferredSpawnRadius)
             {
-                Vector3 position = groupCenter + new Vector3(monster.OffsetX, 0, monster.OffsetZ);
-                var spawnedEnemy = SpawnEnemyFromPlacement(monster.Type, position, monster.Level, monster.IsBoss);
+                var spawnedEnemy = SpawnEnemyFromPlacement(enemy.Type, position, enemy.Level, enemy.IsBoss, enemy.RotationY);
                 if (spawnedEnemy != null)
                 {
                     spawnedCount++;
-
-                    // Add to room if specified
-                    if (group.RoomId >= 0 && group.RoomId < Rooms.Count)
+                    _spawnedEnemyIds.Add(enemy.PlacementId);
+                    if (enemy.RoomId >= 0 && enemy.RoomId < Rooms.Count)
                     {
-                        Rooms[group.RoomId].Enemies.Add(spawnedEnemy);
+                        Rooms[enemy.RoomId].Enemies.Add(spawnedEnemy);
                     }
+                }
+                _pendingEnemies.RemoveAt(i);
+            }
+            else
+            {
+                deferredCount++;
+            }
+        }
+
+        // Spawn groups within initial radius
+        for (int i = _pendingGroups.Count - 1; i >= 0; i--)
+        {
+            var (groupCenter, monsters, roomId) = _pendingGroups[i];
+            float distance = groupCenter.DistanceTo(spawnPos);
+
+            if (distance <= DeferredSpawnRadius)
+            {
+                foreach (var monster in monsters)
+                {
+                    Vector3 position = groupCenter + new Vector3(monster.OffsetX, 0, monster.OffsetZ);
+                    var spawnedEnemy = SpawnEnemyFromPlacement(monster.Type, position, monster.Level, monster.IsBoss);
+                    if (spawnedEnemy != null)
+                    {
+                        spawnedCount++;
+                        if (roomId >= 0 && roomId < Rooms.Count)
+                        {
+                            Rooms[roomId].Enemies.Add(spawnedEnemy);
+                        }
+                    }
+                }
+                _pendingGroups.RemoveAt(i);
+            }
+            else
+            {
+                deferredCount += monsters.Count;
+            }
+        }
+
+        GD.Print($"[DungeonGenerator3D] Spawned {spawnedCount} enemies initially, {deferredCount} deferred for later");
+    }
+
+    /// <summary>
+    /// Updates deferred enemy spawning based on player position.
+    /// Call this from _Process in GameManager3D.
+    /// </summary>
+    public void UpdateDeferredSpawning(float delta)
+    {
+        if (_pendingEnemies == null && _pendingGroups == null) return;
+        if ((_pendingEnemies?.Count ?? 0) == 0 && (_pendingGroups?.Count ?? 0) == 0)
+        {
+            // All enemies spawned, clear lists
+            _pendingEnemies = null;
+            _pendingGroups = null;
+            return;
+        }
+
+        _deferredSpawnTimer += delta;
+        if (_deferredSpawnTimer < DeferredCheckInterval) return;
+        _deferredSpawnTimer = 0f;
+
+        // Get player position
+        var player = Player.FPSController.Instance;
+        if (player == null) return;
+        Vector3 playerPos = player.GlobalPosition;
+
+        int spawnedThisFrame = 0;
+        const int maxSpawnsPerFrame = 10;  // Limit spawns per check to avoid hitches
+
+        // Check pending individual enemies
+        if (_pendingEnemies != null)
+        {
+            for (int i = _pendingEnemies.Count - 1; i >= 0 && spawnedThisFrame < maxSpawnsPerFrame; i--)
+            {
+                var enemy = _pendingEnemies[i];
+                Vector3 position = new Vector3(
+                    enemy.Position.X * TileSize + TileSize / 2f,
+                    0,
+                    enemy.Position.Z * TileSize + TileSize / 2f
+                );
+
+                float distance = position.DistanceTo(playerPos);
+                if (distance <= DeferredSpawnRadius)
+                {
+                    var spawnedEnemy = SpawnEnemyFromPlacement(enemy.Type, position, enemy.Level, enemy.IsBoss, enemy.RotationY);
+                    if (spawnedEnemy != null)
+                    {
+                        spawnedThisFrame++;
+                        if (enemy.RoomId >= 0 && enemy.RoomId < Rooms.Count)
+                        {
+                            Rooms[enemy.RoomId].Enemies.Add(spawnedEnemy);
+                        }
+                    }
+                    _pendingEnemies.RemoveAt(i);
                 }
             }
         }
 
-        GD.Print($"[DungeonGenerator3D] Spawned {spawnedCount} enemies from map definition");
+        // Check pending groups
+        if (_pendingGroups != null)
+        {
+            for (int i = _pendingGroups.Count - 1; i >= 0 && spawnedThisFrame < maxSpawnsPerFrame; i--)
+            {
+                var (groupCenter, monsters, roomId) = _pendingGroups[i];
+                float distance = groupCenter.DistanceTo(playerPos);
+
+                if (distance <= DeferredSpawnRadius)
+                {
+                    foreach (var monster in monsters)
+                    {
+                        Vector3 position = groupCenter + new Vector3(monster.OffsetX, 0, monster.OffsetZ);
+                        var spawnedEnemy = SpawnEnemyFromPlacement(monster.Type, position, monster.Level, monster.IsBoss);
+                        if (spawnedEnemy != null)
+                        {
+                            spawnedThisFrame++;
+                            if (roomId >= 0 && roomId < Rooms.Count)
+                            {
+                                Rooms[roomId].Enemies.Add(spawnedEnemy);
+                            }
+                        }
+                    }
+                    _pendingGroups.RemoveAt(i);
+                }
+            }
+        }
+
+        if (spawnedThisFrame > 0)
+        {
+            int remaining = (_pendingEnemies?.Count ?? 0) + (_pendingGroups?.Sum(g => g.Monsters.Count) ?? 0);
+            GD.Print($"[DungeonGenerator3D] Deferred spawn: {spawnedThisFrame} enemies, {remaining} remaining");
+        }
     }
 
     /// <summary>
