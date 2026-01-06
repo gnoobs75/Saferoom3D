@@ -1032,7 +1032,7 @@ public partial class GoblinShaman : CharacterBody3D
         GD.Print($"[GoblinShaman] Exited stasis");
     }
 
-    public void TakeDamage(float damage, Vector3 fromPosition, string source = "Unknown")
+    public void TakeDamage(float damage, Vector3 fromPosition, string source)
     {
         TakeDamage(damage, fromPosition, source, false);
     }

@@ -1194,7 +1194,7 @@ public partial class GoblinThrower : CharacterBody3D
         GD.Print($"[GoblinThrower] Exited stasis");
     }
 
-    public void TakeDamage(float damage, Vector3 fromPosition, string source = "Unknown")
+    public void TakeDamage(float damage, Vector3 fromPosition, string source)
     {
         TakeDamage(damage, fromPosition, source, false);
     }
