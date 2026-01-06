@@ -1,4 +1,5 @@
 using Godot;
+using System;
 using SafeRoom3D.Core;
 
 namespace SafeRoom3D.UI;
@@ -45,8 +46,24 @@ public partial class EscapeMenu3D : CanvasLayer
     private Button? _waitingForKeyButton;
     private string? _waitingForAction;
 
+    // Advanced settings panel
+    private PanelContainer? _advancedPanel;
+    private HSlider? _tileRadiusSlider;
+    private HSlider? _propRadiusSlider;
+    private HSlider? _enemyRadiusSlider;
+    private HSlider? _tilesPerFrameSlider;
+    private HSlider? _propsPerFrameSlider;
+    private HSlider? _enemiesPerFrameSlider;
+    private Label? _tileRadiusValue;
+    private Label? _propRadiusValue;
+    private Label? _enemyRadiusValue;
+    private Label? _tilesPerFrameValue;
+    private Label? _propsPerFrameValue;
+    private Label? _enemiesPerFrameValue;
+
     private bool _showingOptions = false;
     private bool _showingKeybindings = false;
+    private bool _showingAdvanced = false;
 
     public override void _Ready()
     {
@@ -139,6 +156,11 @@ public partial class EscapeMenu3D : CanvasLayer
         debugButton.Pressed += OnDebugPressed;
         _buttonContainer.AddChild(debugButton);
 
+        // Advanced settings button
+        var advancedButton = CreateMenuButton("Advanced", new Color(0.45f, 0.35f, 0.5f));
+        advancedButton.Pressed += OnAdvancedPressed;
+        _buttonContainer.AddChild(advancedButton);
+
         // Return to Menu button
         _returnToMenuButton = CreateMenuButton("Return to Menu", new Color(0.4f, 0.35f, 0.5f));
         _returnToMenuButton.Pressed += OnReturnToMenuPressed;
@@ -154,6 +176,9 @@ public partial class EscapeMenu3D : CanvasLayer
 
         // Create keybindings panel (hidden initially)
         CreateKeybindingsPanel(centerContainer);
+
+        // Create advanced settings panel (hidden initially)
+        CreateAdvancedPanel(centerContainer);
     }
 
     private Button CreateMenuButton(string text, Color bgColor)
@@ -378,6 +403,139 @@ public partial class EscapeMenu3D : CanvasLayer
         mainVBox.AddChild(_keybindingsBackButton);
     }
 
+    private void CreateAdvancedPanel(CenterContainer parent)
+    {
+        // Load saved settings before creating sliders
+        DungeonGenerator3D.LoadStreamingSettings();
+
+        _advancedPanel = new PanelContainer();
+        _advancedPanel.CustomMinimumSize = new Vector2(500, 550);
+        _advancedPanel.Visible = false;
+
+        var panelStyle = new StyleBoxFlat();
+        panelStyle.BgColor = new Color(0.1f, 0.1f, 0.15f, 0.95f);
+        panelStyle.SetBorderWidthAll(3);
+        panelStyle.BorderColor = new Color(0.5f, 0.35f, 0.5f);  // Purple tint
+        panelStyle.SetCornerRadiusAll(15);
+        panelStyle.SetContentMarginAll(25);
+        _advancedPanel.AddThemeStyleboxOverride("panel", panelStyle);
+        parent.AddChild(_advancedPanel);
+
+        var vbox = new VBoxContainer();
+        vbox.AddThemeConstantOverride("separation", 15);
+        _advancedPanel.AddChild(vbox);
+
+        // Title
+        var title = new Label();
+        title.Text = "ADVANCED SETTINGS";
+        title.HorizontalAlignment = HorizontalAlignment.Center;
+        title.AddThemeFontSizeOverride("font_size", 24);
+        title.AddThemeColorOverride("font_color", new Color(0.9f, 0.7f, 1f));
+        vbox.AddChild(title);
+
+        // Description
+        var desc = new Label();
+        desc.Text = "Adjust streaming/loading distances for large maps.\nHigher = smoother but slower load. Lower = faster load but more pop-in.";
+        desc.HorizontalAlignment = HorizontalAlignment.Center;
+        desc.AddThemeFontSizeOverride("font_size", 12);
+        desc.AddThemeColorOverride("font_color", new Color(0.7f, 0.7f, 0.7f));
+        vbox.AddChild(desc);
+
+        // --- Draw Distances Section ---
+        var distHeader = new Label { Text = "Draw Distances (meters)" };
+        distHeader.AddThemeFontSizeOverride("font_size", 16);
+        distHeader.AddThemeColorOverride("font_color", new Color(1f, 0.85f, 0.4f));
+        vbox.AddChild(distHeader);
+
+        // Tile radius
+        (_tileRadiusSlider, _tileRadiusValue) = CreateAdvancedSliderRow(vbox, "Tiles", 40, 200, DungeonGenerator3D.DeferredTileRadius, (val) => {
+            DungeonGenerator3D.DeferredTileRadius = (float)val;
+            _tileRadiusValue!.Text = $"{val:F0}m";
+        });
+
+        // Prop radius
+        (_propRadiusSlider, _propRadiusValue) = CreateAdvancedSliderRow(vbox, "Props", 20, 150, DungeonGenerator3D.DeferredPropRadius, (val) => {
+            DungeonGenerator3D.DeferredPropRadius = (float)val;
+            _propRadiusValue!.Text = $"{val:F0}m";
+        });
+
+        // Enemy radius
+        (_enemyRadiusSlider, _enemyRadiusValue) = CreateAdvancedSliderRow(vbox, "Enemies", 20, 150, DungeonGenerator3D.DeferredEnemyRadius, (val) => {
+            DungeonGenerator3D.DeferredEnemyRadius = (float)val;
+            _enemyRadiusValue!.Text = $"{val:F0}m";
+        });
+
+        // --- Per-Frame Limits Section ---
+        var frameHeader = new Label { Text = "Per-Frame Limits (higher = less pop-in, more hitches)" };
+        frameHeader.AddThemeFontSizeOverride("font_size", 16);
+        frameHeader.AddThemeColorOverride("font_color", new Color(1f, 0.85f, 0.4f));
+        vbox.AddChild(frameHeader);
+
+        // Tiles per frame
+        (_tilesPerFrameSlider, _tilesPerFrameValue) = CreateAdvancedSliderRow(vbox, "Tiles/Frame", 10, 300, DungeonGenerator3D.MaxTilesPerFrame, (val) => {
+            DungeonGenerator3D.MaxTilesPerFrame = (int)val;
+            _tilesPerFrameValue!.Text = $"{val:F0}";
+        });
+
+        // Props per frame
+        (_propsPerFrameSlider, _propsPerFrameValue) = CreateAdvancedSliderRow(vbox, "Props/Frame", 1, 30, DungeonGenerator3D.MaxPropsPerFrame, (val) => {
+            DungeonGenerator3D.MaxPropsPerFrame = (int)val;
+            _propsPerFrameValue!.Text = $"{val:F0}";
+        });
+
+        // Enemies per frame
+        (_enemiesPerFrameSlider, _enemiesPerFrameValue) = CreateAdvancedSliderRow(vbox, "Enemies/Frame", 1, 30, DungeonGenerator3D.MaxEnemiesPerFrame, (val) => {
+            DungeonGenerator3D.MaxEnemiesPerFrame = (int)val;
+            _enemiesPerFrameValue!.Text = $"{val:F0}";
+        });
+
+        // Back button
+        var backButton = CreateMenuButton("Back", new Color(0.4f, 0.3f, 0.3f));
+        backButton.Pressed += OnAdvancedBackPressed;
+        vbox.AddChild(backButton);
+    }
+
+    private (HSlider, Label) CreateAdvancedSliderRow(VBoxContainer parent, string labelText, float min, float max, float current, Godot.Range.ValueChangedEventHandler onChange)
+    {
+        var row = new HBoxContainer();
+        row.AddThemeConstantOverride("separation", 10);
+
+        var label = new Label { Text = labelText, CustomMinimumSize = new Vector2(100, 0) };
+        label.AddThemeFontSizeOverride("font_size", 14);
+        row.AddChild(label);
+
+        var slider = new HSlider();
+        slider.MinValue = min;
+        slider.MaxValue = max;
+        slider.Step = 1;
+        slider.Value = current;
+        slider.CustomMinimumSize = new Vector2(200, 0);
+        slider.ValueChanged += onChange;
+        row.AddChild(slider);
+
+        var valueLabel = new Label { Text = labelText.Contains("Frame") ? $"{current:F0}" : $"{current:F0}m" };
+        valueLabel.AddThemeFontSizeOverride("font_size", 14);
+        valueLabel.CustomMinimumSize = new Vector2(60, 0);
+        row.AddChild(valueLabel);
+
+        parent.AddChild(row);
+        return (slider, valueLabel);
+    }
+
+    private void OnAdvancedPressed()
+    {
+        _showingAdvanced = true;
+        _menuPanel!.Visible = false;
+        _advancedPanel!.Visible = true;
+    }
+
+    private void OnAdvancedBackPressed()
+    {
+        _showingAdvanced = false;
+        _menuPanel!.Visible = true;
+        _advancedPanel!.Visible = false;
+    }
+
     private void AddKeybindingRow(string action, string label, string defaultKey)
     {
         if (_keybindingsContainer == null) return;
@@ -533,6 +691,10 @@ public partial class EscapeMenu3D : CanvasLayer
             else if (_showingKeybindings)
             {
                 OnKeybindingsBackPressed();
+            }
+            else if (_showingAdvanced)
+            {
+                OnAdvancedBackPressed();
             }
             else
             {

@@ -1,6 +1,7 @@
 using Godot;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using SafeRoom3D.Enemies;
 
 namespace SafeRoom3D.Core;
@@ -56,12 +57,118 @@ public partial class DungeonGenerator3D
     private MapDefinition? _customMapDefinition;
 
     // Deferred enemy spawning system
-    private const float DeferredSpawnRadius = 60f;  // Spawn enemies within 60m of player
+    private static float _deferredEnemyRadius = 100f;  // Spawn enemies within this radius
     private const float DeferredCheckInterval = 0.5f;  // Check every 0.5 seconds
+    private static int _maxEnemiesPerFrame = 15;
     private float _deferredSpawnTimer = 0f;
     private List<EnemyPlacement>? _pendingEnemies;
     private List<(Vector3 Center, List<GroupMonster> Monsters, int RoomId)>? _pendingGroups;
     private HashSet<string>? _spawnedEnemyIds;
+
+    // Deferred tile building system (for large maps)
+    private static float _deferredTileRadius = 120f;  // Build tiles within this radius
+    private static int _maxTilesPerFrame = 100;  // Build max tiles per frame
+    private HashSet<(int x, int z)>? _builtTiles;
+    private bool _useDeferredTileBuilding = false;
+    private Vector3 _lastTileBuildPosition = Vector3.Zero;
+
+    // Deferred prop spawning system (for large maps with many props)
+    private static float _deferredPropRadius = 80f;  // Spawn props within this radius
+    private static int _maxPropsPerFrame = 10;  // Limit props per frame (they're expensive!)
+    private List<PropPlacement>? _pendingProps;
+    private HashSet<int>? _spawnedPropIds;
+
+    // Public accessors for settings UI (auto-save on change)
+    public static float DeferredEnemyRadius { get => _deferredEnemyRadius; set { _deferredEnemyRadius = Mathf.Max(20f, value); SaveStreamingSettings(); } }
+    public static float DeferredTileRadius { get => _deferredTileRadius; set { _deferredTileRadius = Mathf.Max(40f, value); SaveStreamingSettings(); } }
+    public static float DeferredPropRadius { get => _deferredPropRadius; set { _deferredPropRadius = Mathf.Max(20f, value); SaveStreamingSettings(); } }
+    public static int MaxEnemiesPerFrame { get => _maxEnemiesPerFrame; set { _maxEnemiesPerFrame = Mathf.Clamp(value, 1, 50); SaveStreamingSettings(); } }
+    public static int MaxTilesPerFrame { get => _maxTilesPerFrame; set { _maxTilesPerFrame = Mathf.Clamp(value, 10, 500); SaveStreamingSettings(); } }
+    public static int MaxPropsPerFrame { get => _maxPropsPerFrame; set { _maxPropsPerFrame = Mathf.Clamp(value, 1, 50); SaveStreamingSettings(); } }
+
+    // Settings persistence
+    private const string StreamingSettingsPath = "user://streaming_settings.json";
+    private static bool _settingsLoaded = false;
+
+    /// <summary>
+    /// Load streaming settings from disk. Called automatically on first access.
+    /// </summary>
+    public static void LoadStreamingSettings()
+    {
+        if (_settingsLoaded) return;
+        _settingsLoaded = true;
+
+        if (!FileAccess.FileExists(StreamingSettingsPath))
+        {
+            GD.Print("[MapBuilder] No saved streaming settings found, using defaults");
+            return;
+        }
+
+        try
+        {
+            using var file = FileAccess.Open(StreamingSettingsPath, FileAccess.ModeFlags.Read);
+            if (file == null) return;
+
+            string json = file.GetAsText();
+            var data = JsonSerializer.Deserialize<Dictionary<string, float>>(json);
+
+            if (data != null)
+            {
+                if (data.TryGetValue("EnemyRadius", out float enemyRadius))
+                    _deferredEnemyRadius = Mathf.Max(20f, enemyRadius);
+                if (data.TryGetValue("TileRadius", out float tileRadius))
+                    _deferredTileRadius = Mathf.Max(40f, tileRadius);
+                if (data.TryGetValue("PropRadius", out float propRadius))
+                    _deferredPropRadius = Mathf.Max(20f, propRadius);
+                if (data.TryGetValue("EnemiesPerFrame", out float enemiesPerFrame))
+                    _maxEnemiesPerFrame = Mathf.Clamp((int)enemiesPerFrame, 1, 50);
+                if (data.TryGetValue("TilesPerFrame", out float tilesPerFrame))
+                    _maxTilesPerFrame = Mathf.Clamp((int)tilesPerFrame, 10, 500);
+                if (data.TryGetValue("PropsPerFrame", out float propsPerFrame))
+                    _maxPropsPerFrame = Mathf.Clamp((int)propsPerFrame, 1, 50);
+
+                GD.Print($"[MapBuilder] Loaded streaming settings: Enemy={_deferredEnemyRadius}m, Tile={_deferredTileRadius}m, Prop={_deferredPropRadius}m");
+            }
+        }
+        catch (System.Exception ex)
+        {
+            GD.PrintErr($"[MapBuilder] Failed to load streaming settings: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Save streaming settings to disk.
+    /// </summary>
+    public static void SaveStreamingSettings()
+    {
+        if (!_settingsLoaded) return;  // Don't save during initial load
+
+        try
+        {
+            var data = new Dictionary<string, float>
+            {
+                ["EnemyRadius"] = _deferredEnemyRadius,
+                ["TileRadius"] = _deferredTileRadius,
+                ["PropRadius"] = _deferredPropRadius,
+                ["EnemiesPerFrame"] = _maxEnemiesPerFrame,
+                ["TilesPerFrame"] = _maxTilesPerFrame,
+                ["PropsPerFrame"] = _maxPropsPerFrame
+            };
+
+            string json = JsonSerializer.Serialize(data, new JsonSerializerOptions { WriteIndented = true });
+
+            using var file = FileAccess.Open(StreamingSettingsPath, FileAccess.ModeFlags.Write);
+            if (file != null)
+            {
+                file.StoreString(json);
+                GD.Print("[MapBuilder] Saved streaming settings");
+            }
+        }
+        catch (System.Exception ex)
+        {
+            GD.PrintErr($"[MapBuilder] Failed to save streaming settings: {ex.Message}");
+        }
+    }
 
     /// <summary>
     /// Generates a dungeon from a map definition instead of procedurally.
@@ -69,6 +176,9 @@ public partial class DungeonGenerator3D
     /// </summary>
     public void GenerateFromMapDefinition(MapDefinition map)
     {
+        // Load streaming settings if not already loaded
+        LoadStreamingSettings();
+
         _customMapDefinition = map;
 
         GD.Print($"[DungeonGenerator3D] Generating from map definition: {map.Name} (mode={map.Mode})");
@@ -89,10 +199,13 @@ public partial class DungeonGenerator3D
     /// </summary>
     private void GenerateFromTileData(MapDefinition map)
     {
+        var stopwatch = new System.Diagnostics.Stopwatch();
+        stopwatch.Start();
         GD.Print($"[DungeonGenerator3D] Generating from tile data: {map.Width}x{map.Depth}");
 
         // Clear existing dungeon
         ClearDungeon();
+        GD.Print($"[TIMING] ClearDungeon: {stopwatch.ElapsedMilliseconds}ms");
 
         // Override dimensions
         DungeonWidth = map.Width;
@@ -100,6 +213,7 @@ public partial class DungeonGenerator3D
 
         // Decode tile data directly into map data
         var tiles = TileDataEncoder.Decode(map.TileData!, map.Width, map.Depth);
+        GD.Print($"[TIMING] Decode: {stopwatch.ElapsedMilliseconds}ms");
 
         // Initialize 3D map data from 2D tiles
         _mapData = new int[DungeonWidth, 2, DungeonDepth];
@@ -113,6 +227,15 @@ public partial class DungeonGenerator3D
             }
         }
         GD.Print($"[DungeonGenerator3D] Loaded {floorCount} floor tiles from tile data");
+        GD.Print($"[TIMING] MapData init: {stopwatch.ElapsedMilliseconds}ms");
+
+        // For large maps (>100x100), use deferred tile building for faster load
+        _useDeferredTileBuilding = (map.Width > 100 || map.Depth > 100);
+        if (_useDeferredTileBuilding)
+        {
+            _builtTiles = new HashSet<(int x, int z)>();
+            GD.Print($"[DungeonGenerator3D] Using deferred tile building (map size: {map.Width}x{map.Depth})");
+        }
 
         // Create rooms from definition (optional for tile-mode, used for prop placement)
         Rooms.Clear();
@@ -162,19 +285,25 @@ public partial class DungeonGenerator3D
         }
 
         // Build 3D geometry
+        GD.Print($"[TIMING] Before BuildGeometry: {stopwatch.ElapsedMilliseconds}ms");
         BuildGeometry();
+        GD.Print($"[TIMING] After BuildGeometry: {stopwatch.ElapsedMilliseconds}ms");
 
         // Populate with props and lights
         PopulateRooms();
+        GD.Print($"[TIMING] After PopulateRooms: {stopwatch.ElapsedMilliseconds}ms");
 
         // Spawn enemies from placements
         SpawnEnemiesFromDefinition(map);
+        GD.Print($"[TIMING] After SpawnEnemies: {stopwatch.ElapsedMilliseconds}ms");
 
         // Spawn placed props from map definition
         SpawnPropsFromDefinition(map);
+        GD.Print($"[TIMING] After SpawnProps: {stopwatch.ElapsedMilliseconds}ms");
 
         // Add ambient lighting
         AddAmbientLighting();
+        GD.Print($"[TIMING] TOTAL: {stopwatch.ElapsedMilliseconds}ms");
 
         GD.Print($"[DungeonGenerator3D] Tile-mode map built: {Rooms.Count} rooms, {map.Enemies.Count + CountGroupMonsters(map)} enemies, {map.PlacedProps.Count} placed props");
         EmitSignal(SignalName.GenerationComplete);
@@ -371,7 +500,7 @@ public partial class DungeonGenerator3D
 
     /// <summary>
     /// Spawns enemies from the map definition's placement data using deferred spawning.
-    /// Only enemies within DeferredSpawnRadius of the spawn point are created initially.
+    /// Only enemies within _deferredEnemyRadius of the spawn point are created initially.
     /// </summary>
     private void SpawnEnemiesFromDefinition(MapDefinition map)
     {
@@ -408,7 +537,7 @@ public partial class DungeonGenerator3D
             );
 
             float distance = position.DistanceTo(spawnPos);
-            if (distance <= DeferredSpawnRadius)
+            if (distance <= _deferredEnemyRadius)
             {
                 var spawnedEnemy = SpawnEnemyFromPlacement(enemy.Type, position, enemy.Level, enemy.IsBoss, enemy.RotationY);
                 if (spawnedEnemy != null)
@@ -434,7 +563,7 @@ public partial class DungeonGenerator3D
             var (groupCenter, monsters, roomId) = _pendingGroups[i];
             float distance = groupCenter.DistanceTo(spawnPos);
 
-            if (distance <= DeferredSpawnRadius)
+            if (distance <= _deferredEnemyRadius)
             {
                 foreach (var monster in monsters)
                 {
@@ -466,8 +595,18 @@ public partial class DungeonGenerator3D
     /// </summary>
     public void UpdateDeferredSpawning(float delta)
     {
-        if (_pendingEnemies == null && _pendingGroups == null) return;
-        if ((_pendingEnemies?.Count ?? 0) == 0 && (_pendingGroups?.Count ?? 0) == 0)
+        // Get player position (needed for both enemy spawning and tile building)
+        var player = Player.FPSController.Instance;
+        if (player == null) return;
+        Vector3 playerPos = player.GlobalPosition;
+
+        // Always update deferred systems, even if no pending enemies
+        UpdateDeferredTileBuilding(playerPos);
+        UpdateDeferredPropSpawning(playerPos);
+
+        // Check if any enemies need spawning
+        bool hasEnemies = (_pendingEnemies?.Count ?? 0) > 0 || (_pendingGroups?.Count ?? 0) > 0;
+        if (!hasEnemies)
         {
             // All enemies spawned, clear lists
             _pendingEnemies = null;
@@ -479,18 +618,12 @@ public partial class DungeonGenerator3D
         if (_deferredSpawnTimer < DeferredCheckInterval) return;
         _deferredSpawnTimer = 0f;
 
-        // Get player position
-        var player = Player.FPSController.Instance;
-        if (player == null) return;
-        Vector3 playerPos = player.GlobalPosition;
-
         int spawnedThisFrame = 0;
-        const int maxSpawnsPerFrame = 10;  // Limit spawns per check to avoid hitches
 
         // Check pending individual enemies
         if (_pendingEnemies != null)
         {
-            for (int i = _pendingEnemies.Count - 1; i >= 0 && spawnedThisFrame < maxSpawnsPerFrame; i--)
+            for (int i = _pendingEnemies.Count - 1; i >= 0 && spawnedThisFrame < _maxEnemiesPerFrame; i--)
             {
                 var enemy = _pendingEnemies[i];
                 Vector3 position = new Vector3(
@@ -500,7 +633,7 @@ public partial class DungeonGenerator3D
                 );
 
                 float distance = position.DistanceTo(playerPos);
-                if (distance <= DeferredSpawnRadius)
+                if (distance <= _deferredEnemyRadius)
                 {
                     var spawnedEnemy = SpawnEnemyFromPlacement(enemy.Type, position, enemy.Level, enemy.IsBoss, enemy.RotationY);
                     if (spawnedEnemy != null)
@@ -519,12 +652,12 @@ public partial class DungeonGenerator3D
         // Check pending groups
         if (_pendingGroups != null)
         {
-            for (int i = _pendingGroups.Count - 1; i >= 0 && spawnedThisFrame < maxSpawnsPerFrame; i--)
+            for (int i = _pendingGroups.Count - 1; i >= 0 && spawnedThisFrame < _maxEnemiesPerFrame; i--)
             {
                 var (groupCenter, monsters, roomId) = _pendingGroups[i];
                 float distance = groupCenter.DistanceTo(playerPos);
 
-                if (distance <= DeferredSpawnRadius)
+                if (distance <= _deferredEnemyRadius)
                 {
                     foreach (var monster in monsters)
                     {
@@ -548,6 +681,57 @@ public partial class DungeonGenerator3D
         {
             int remaining = (_pendingEnemies?.Count ?? 0) + (_pendingGroups?.Sum(g => g.Monsters.Count) ?? 0);
             GD.Print($"[DungeonGenerator3D] Deferred spawn: {spawnedThisFrame} enemies, {remaining} remaining");
+        }
+    }
+
+    /// <summary>
+    /// Progressively builds tiles as the player explores large maps.
+    /// </summary>
+    private void UpdateDeferredTileBuilding(Vector3 playerPos)
+    {
+        if (!_useDeferredTileBuilding || _builtTiles == null || _mapData == null) return;
+
+        // Only update if player has moved significantly
+        float distanceMoved = playerPos.DistanceTo(_lastTileBuildPosition);
+        if (distanceMoved < TileSize * 5) return;  // Wait until moved 5 tiles
+
+        _lastTileBuildPosition = playerPos;
+
+        int playerTileX = (int)(playerPos.X / TileSize);
+        int playerTileZ = (int)(playerPos.Z / TileSize);
+        int tileRadius = (int)(_deferredTileRadius / TileSize);
+
+        int tilesBuiltThisFrame = 0;
+
+        // Build tiles in a spiral pattern from player position
+        for (int radius = 1; radius <= tileRadius && tilesBuiltThisFrame < _maxTilesPerFrame; radius++)
+        {
+            for (int dx = -radius; dx <= radius && tilesBuiltThisFrame < _maxTilesPerFrame; dx++)
+            {
+                for (int dz = -radius; dz <= radius && tilesBuiltThisFrame < _maxTilesPerFrame; dz++)
+                {
+                    // Only process the outer ring of this radius
+                    if (Mathf.Abs(dx) != radius && Mathf.Abs(dz) != radius) continue;
+
+                    int x = playerTileX + dx;
+                    int z = playerTileZ + dz;
+
+                    // Bounds check
+                    if (x < 0 || x >= DungeonWidth || z < 0 || z >= DungeonDepth) continue;
+
+                    // Skip if already built or not a floor tile
+                    if (_builtTiles.Contains((x, z))) continue;
+                    if (_mapData[x, 0, z] != 1) continue;
+
+                    BuildTileAt(x, z);
+                    tilesBuiltThisFrame++;
+                }
+            }
+        }
+
+        if (tilesBuiltThisFrame > 0)
+        {
+            GD.Print($"[DungeonGenerator3D] Deferred tile build: {tilesBuiltThisFrame} tiles, {_builtTiles.Count} total");
         }
     }
 
@@ -608,6 +792,7 @@ public partial class DungeonGenerator3D
 
     /// <summary>
     /// Spawns props from the map definition's PlacedProps data.
+    /// Uses deferred spawning for large prop counts.
     /// </summary>
     private void SpawnPropsFromDefinition(MapDefinition map)
     {
@@ -616,31 +801,106 @@ public partial class DungeonGenerator3D
             return;
         }
 
-        int spawnedCount = 0;
-        foreach (var propData in map.PlacedProps)
+        // For large prop counts, use deferred spawning
+        bool useDeferredProps = map.PlacedProps.Count > 50;
+        if (useDeferredProps)
         {
-            var position = new Vector3(propData.X, propData.Y, propData.Z);
+            _pendingProps = new List<PropPlacement>(map.PlacedProps);
+            _spawnedPropIds = new HashSet<int>();
 
-            // Create the prop using Cosmetic3D
-            var prop = SafeRoom3D.Environment.Cosmetic3D.Create(
-                propData.Type,
-                new Color(0.6f, 0.4f, 0.3f),  // Default primary color
-                new Color(0.4f, 0.3f, 0.2f),  // Default secondary color
-                new Color(0.5f, 0.5f, 0.5f),  // Default accent color
-                0f,
-                propData.Scale,
-                true  // Enable light
-            );
+            // Get spawn position for initial radius check
+            Vector3 spawnPos = GetSpawnPosition();
 
-            if (prop != null)
+            int spawnedCount = 0;
+            for (int i = _pendingProps.Count - 1; i >= 0; i--)
             {
-                prop.Position = position;
-                prop.Rotation = new Vector3(0, propData.RotationY, 0);
-                _propContainer.AddChild(prop);
-                spawnedCount++;
+                var propData = _pendingProps[i];
+                var position = new Vector3(propData.X, propData.Y, propData.Z);
+                float distance = position.DistanceTo(spawnPos);
+
+                if (distance <= _deferredPropRadius)
+                {
+                    SpawnSingleProp(propData, i);
+                    _pendingProps.RemoveAt(i);
+                    spawnedCount++;
+                }
+            }
+
+            GD.Print($"[DungeonGenerator3D] Spawned {spawnedCount} props near spawn, {_pendingProps.Count} deferred for later");
+            return;
+        }
+
+        // Small prop count - spawn all immediately
+        int totalSpawned = 0;
+        for (int i = 0; i < map.PlacedProps.Count; i++)
+        {
+            var propData = map.PlacedProps[i];
+            SpawnSingleProp(propData, i);
+            totalSpawned++;
+        }
+
+        GD.Print($"[DungeonGenerator3D] Spawned {totalSpawned} placed props from map definition");
+    }
+
+    /// <summary>
+    /// Spawns a single prop from placement data.
+    /// </summary>
+    private void SpawnSingleProp(PropPlacement propData, int propId)
+    {
+        if (_propContainer == null) return;
+
+        // Track spawned props to avoid duplicates
+        if (_spawnedPropIds != null && _spawnedPropIds.Contains(propId)) return;
+        _spawnedPropIds?.Add(propId);
+
+        var position = new Vector3(propData.X, propData.Y, propData.Z);
+
+        // Create the prop using Cosmetic3D
+        var prop = SafeRoom3D.Environment.Cosmetic3D.Create(
+            propData.Type,
+            new Color(0.6f, 0.4f, 0.3f),  // Default primary color
+            new Color(0.4f, 0.3f, 0.2f),  // Default secondary color
+            new Color(0.5f, 0.5f, 0.5f),  // Default accent color
+            0f,
+            propData.Scale,
+            true  // Enable light
+        );
+
+        if (prop != null)
+        {
+            prop.Position = position;
+            prop.Rotation = new Vector3(0, propData.RotationY, 0);
+            _propContainer.AddChild(prop);
+        }
+    }
+
+    /// <summary>
+    /// Updates deferred prop spawning based on player position.
+    /// Called from UpdateDeferredTileBuilding.
+    /// </summary>
+    private void UpdateDeferredPropSpawning(Vector3 playerPos)
+    {
+        if (_pendingProps == null || _pendingProps.Count == 0) return;
+
+        int spawnedThisFrame = 0;
+
+        for (int i = _pendingProps.Count - 1; i >= 0 && spawnedThisFrame < _maxPropsPerFrame; i--)
+        {
+            var propData = _pendingProps[i];
+            var position = new Vector3(propData.X, propData.Y, propData.Z);
+            float distance = position.DistanceTo(playerPos);
+
+            if (distance <= _deferredPropRadius)
+            {
+                SpawnSingleProp(propData, i);
+                _pendingProps.RemoveAt(i);
+                spawnedThisFrame++;
             }
         }
 
-        GD.Print($"[DungeonGenerator3D] Spawned {spawnedCount} placed props from map definition");
+        if (spawnedThisFrame > 0)
+        {
+            GD.Print($"[DungeonGenerator3D] Deferred prop spawn: {spawnedThisFrame} props, {_pendingProps.Count} remaining");
+        }
     }
 }

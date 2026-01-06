@@ -1680,13 +1680,31 @@ public partial class FPSController : CharacterBody3D
     /// </summary>
     private string GetEnemyDisplayName(Node3D enemy)
     {
-        // Try to get monster type property first
-        if (enemy.HasMethod("Get") && enemy.Get("MonsterType").VariantType == Variant.Type.String)
+        // Check specific enemy types directly (more reliable than Godot reflection)
+        if (enemy is SafeRoom3D.Enemies.BasicEnemy3D basicEnemy)
         {
-            string monsterType = enemy.Get("MonsterType").AsString();
+            return FormatMonsterName(basicEnemy.MonsterType);
+        }
+        if (enemy is SafeRoom3D.Enemies.GoblinShaman)
+        {
+            return "Goblin Shaman";
+        }
+        if (enemy is SafeRoom3D.Enemies.GoblinThrower)
+        {
+            return "Goblin Thrower";
+        }
+        if (enemy is SafeRoom3D.Enemies.BossEnemy3D bossEnemy)
+        {
+            return bossEnemy.BossName;
+        }
+
+        // Try to get monster type property via Godot reflection (fallback)
+        var monsterTypeVar = enemy.Get("MonsterType");
+        if (monsterTypeVar.VariantType == Variant.Type.String)
+        {
+            string monsterType = monsterTypeVar.AsString();
             if (!string.IsNullOrEmpty(monsterType))
             {
-                // Convert camelCase to Title Case with spaces
                 return FormatMonsterName(monsterType);
             }
         }

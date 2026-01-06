@@ -1215,6 +1215,10 @@ public partial class GoblinThrower : CharacterBody3D
         }
 
         EmitSignal(SignalName.Damaged, intDamage, CurrentHealth);
+
+        // Update health bar visuals
+        UpdateHealthBarVisuals();
+
         SpawnFloatingDamageText(intDamage, isCrit);
 
         // Flee when hit!

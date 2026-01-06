@@ -2762,41 +2762,43 @@ public partial class DungeonGenerator3D : Node3D
 
     private void BuildGeometry()
     {
-        // Build floors and walls based on map data
+        // For deferred tile building, only build near spawn initially
+        if (_useDeferredTileBuilding && _spawnRoom != null)
+        {
+            Vector3 spawnPos = GetSpawnPosition();
+            int spawnTileX = (int)(spawnPos.X / TileSize);
+            int spawnTileZ = (int)(spawnPos.Z / TileSize);
+            int tileRadius = (int)(_deferredTileRadius / TileSize);
+
+            int tilesBuilt = 0;
+            for (int x = Mathf.Max(0, spawnTileX - tileRadius); x < Mathf.Min(DungeonWidth, spawnTileX + tileRadius); x++)
+            {
+                for (int z = Mathf.Max(0, spawnTileZ - tileRadius); z < Mathf.Min(DungeonDepth, spawnTileZ + tileRadius); z++)
+                {
+                    if (_mapData[x, 0, z] == 1)
+                    {
+                        BuildTileAt(x, z);
+                        tilesBuilt++;
+                    }
+                }
+            }
+            _lastTileBuildPosition = spawnPos;
+            GD.Print($"[DungeonGenerator3D] Built {tilesBuilt} tiles near spawn (deferred mode)");
+
+            // Create ceiling and occluder
+            CreateCeiling();
+            BuildOccluder();
+            return;
+        }
+
+        // Build floors and walls based on map data (full build for small maps)
         for (int x = 0; x < DungeonWidth; x++)
         {
             for (int z = 0; z < DungeonDepth; z++)
             {
                 if (_mapData[x, 0, z] == 1) // Floor tile
                 {
-                    CreateFloorTile(x, z);
-
-                    // Check for walls (adjacent void tiles)
-                    bool needsLeft = x > 0 && _mapData[x - 1, 0, z] == 0;
-                    bool needsRight = x < DungeonWidth - 1 && _mapData[x + 1, 0, z] == 0;
-                    bool needsBack = z > 0 && _mapData[x, 0, z - 1] == 0;
-                    bool needsFront = z < DungeonDepth - 1 && _mapData[x, 0, z + 1] == 0;
-
-                    if (needsLeft) CreateWall(x, z, Vector3.Left);
-                    if (needsRight) CreateWall(x, z, Vector3.Right);
-                    if (needsBack) CreateWall(x, z, Vector3.Back);
-                    if (needsFront) CreateWall(x, z, Vector3.Forward);
-
-                    // Create corner pillars to fill gaps where walls meet
-                    bool voidTopLeft = (x > 0 && z > 0) && _mapData[x - 1, 0, z - 1] == 0;
-                    bool voidTopRight = (x < DungeonWidth - 1 && z > 0) && _mapData[x + 1, 0, z - 1] == 0;
-                    bool voidBottomLeft = (x > 0 && z < DungeonDepth - 1) && _mapData[x - 1, 0, z + 1] == 0;
-                    bool voidBottomRight = (x < DungeonWidth - 1 && z < DungeonDepth - 1) && _mapData[x + 1, 0, z + 1] == 0;
-
-                    // Corner pillar needed when diagonal is void and at least one adjacent edge needs wall
-                    if (voidTopLeft && (needsLeft || needsBack))
-                        CreateCornerPillar(x, z, -1, -1);
-                    if (voidTopRight && (needsRight || needsBack))
-                        CreateCornerPillar(x, z, 1, -1);
-                    if (voidBottomLeft && (needsLeft || needsFront))
-                        CreateCornerPillar(x, z, -1, 1);
-                    if (voidBottomRight && (needsRight || needsFront))
-                        CreateCornerPillar(x, z, 1, 1);
+                    BuildTileAt(x, z);
                 }
             }
         }
@@ -2806,6 +2808,49 @@ public partial class DungeonGenerator3D : Node3D
 
         // PERF: Build occlusion culling mesh from collected wall geometry
         BuildOccluder();
+    }
+
+    /// <summary>
+    /// Build geometry for a single tile (floor, walls, corner pillars).
+    /// Used by both full build and deferred building.
+    /// </summary>
+    private void BuildTileAt(int x, int z)
+    {
+        // Skip if already built (for deferred building)
+        if (_builtTiles != null)
+        {
+            if (_builtTiles.Contains((x, z))) return;
+            _builtTiles.Add((x, z));
+        }
+
+        CreateFloorTile(x, z);
+
+        // Check for walls (adjacent void tiles)
+        bool needsLeft = x > 0 && _mapData[x - 1, 0, z] == 0;
+        bool needsRight = x < DungeonWidth - 1 && _mapData[x + 1, 0, z] == 0;
+        bool needsBack = z > 0 && _mapData[x, 0, z - 1] == 0;
+        bool needsFront = z < DungeonDepth - 1 && _mapData[x, 0, z + 1] == 0;
+
+        if (needsLeft) CreateWall(x, z, Vector3.Left);
+        if (needsRight) CreateWall(x, z, Vector3.Right);
+        if (needsBack) CreateWall(x, z, Vector3.Back);
+        if (needsFront) CreateWall(x, z, Vector3.Forward);
+
+        // Create corner pillars to fill gaps where walls meet
+        bool voidTopLeft = (x > 0 && z > 0) && _mapData[x - 1, 0, z - 1] == 0;
+        bool voidTopRight = (x < DungeonWidth - 1 && z > 0) && _mapData[x + 1, 0, z - 1] == 0;
+        bool voidBottomLeft = (x > 0 && z < DungeonDepth - 1) && _mapData[x - 1, 0, z + 1] == 0;
+        bool voidBottomRight = (x < DungeonWidth - 1 && z < DungeonDepth - 1) && _mapData[x + 1, 0, z + 1] == 0;
+
+        // Corner pillar needed when diagonal is void and at least one adjacent edge needs wall
+        if (voidTopLeft && (needsLeft || needsBack))
+            CreateCornerPillar(x, z, -1, -1);
+        if (voidTopRight && (needsRight || needsBack))
+            CreateCornerPillar(x, z, 1, -1);
+        if (voidBottomLeft && (needsLeft || needsFront))
+            CreateCornerPillar(x, z, -1, 1);
+        if (voidBottomRight && (needsRight || needsFront))
+            CreateCornerPillar(x, z, 1, 1);
     }
 
     /// <summary>
