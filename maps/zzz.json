@@ -1,0 +1,21 @@
+{
+  "version": "1.1",
+  "name": "zzz",
+  "mode": "tiles",
+  "width": 200,
+  "depth": 200,
+  "spawnRoom": 0,
+  "spawnPosition": {
+    "x": 42,
+    "z": 98
+  },
+  "tileData": "H4sIAAAAAAAACjvBwMBwgoGBoSHa3rVhMUNyw1SG8oYehs6GJobp3xa/Wfls473tt/ZeOXzu6JnTx84eubzn5o67Wx5ueLzu6ZrXy14v\u002B7jg65yfM35Pa2xgmNDYyNDX2MTQ09jM0NXYwtDR2MrQ1tjG0ALG7QxNjR0MDWDcyVDX2MVQA8bdDFVg3MNQgYSR\u002BRB5VIyqF8bvYqgDmw3BELsguAlsP6UY4pc2sL9AGORHCO4C\u002BxuB\u002B8DhgYT/T/k75e\u002B039N\u002Bz/i54f622wfOHzl9ae\u002B96IYidgAg3R4SgQEAAA==",
+  "rooms": [],
+  "corridors": [],
+  "enemies": [],
+  "monsterGroups": [],
+  "groupTemplates": [],
+  "customTiles": [],
+  "placedProps": [],
+  "useProceduralProps": true
+}

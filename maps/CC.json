@@ -1,0 +1,21 @@
+{
+  "version": "1.1",
+  "name": "CC",
+  "mode": "tiles",
+  "width": 200,
+  "depth": 200,
+  "spawnRoom": 0,
+  "spawnPosition": {
+    "x": 56,
+    "z": 165
+  },
+  "tileData": "H4sIAAAAAAAACjvBwMBwgoGBoWEfZ3NDO0PrkrcTGhsYUHEjQx8YNzN0kYKl\u002BW4fuHhv8z/NAOl/mg1bGKiDtzKoo\u002BANDIYNGxg870gHeV7T9PK8ZGwVfMHaJPiMs0HoCU\u002Bd0BPeWqHHAtVCj4QrhR6JlQk9lMsXeqCUI/TAxX03t921Ug/5yOUc0jiPAYSDGucjsKZYYwM\u002BcjZTKogUCQaRDupYyJt4cCNLqINqSC1HqINqWCkfiCwUApG5YqEOqhHpUiAyWQ5ExiuFOqhGRaqFOqjGBHtIxqnH\u002BHtJxqnHeQaIx6knOIeIx6lnmEeIx6l/w4K/SIJwjCZOLB2FFX\u002BTjFL/gYZ/iVOGZ5Uj8LRqCJ5S29DFAMGdDPUk4W4GwwZHYQB7jFoRvwIAAA==",
+  "rooms": [],
+  "corridors": [],
+  "enemies": [],
+  "monsterGroups": [],
+  "groupTemplates": [],
+  "customTiles": [],
+  "placedProps": [],
+  "useProceduralProps": true
+}

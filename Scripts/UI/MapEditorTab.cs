@@ -1520,7 +1520,7 @@ public partial class MapEditorTab : Control
             }
         }
 
-        string path = $"user://maps/{name}.json";
+        string path = $"res://maps/{name}.json";
         GD.Print($"[MapEditorTab] Attempting to save to path: {path}");
 
         bool saveResult = _currentMap.SaveToJson(path);

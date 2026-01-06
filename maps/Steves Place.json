@@ -1,0 +1,3755 @@
+{
+  "version": "1.1",
+  "name": "Steves Place",
+  "mode": "tiles",
+  "width": 420,
+  "depth": 420,
+  "spawnRoom": 0,
+  "spawnPosition": {
+    "x": 22,
+    "z": 351
+  },
+  "tileData": "H4sIAAAAAAAAClvCyMCwhJGBoeH/fxAy1Alt8GIM5xqKZON8Rqrj0AZvxtBBS\u002B5nAQClsO3ovwEAAA==",
+  "rooms": [],
+  "corridors": [],
+  "enemies": [
+    {
+      "type": "goblin",
+      "roomId": -1,
+      "position": {
+        "x": 62,
+        "z": 374
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0
+    },
+    {
+      "type": "goblin",
+      "roomId": -1,
+      "position": {
+        "x": 62,
+        "z": 386
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0
+    },
+    {
+      "type": "goblin_shaman",
+      "roomId": -1,
+      "position": {
+        "x": 70,
+        "z": 380
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0
+    },
+    {
+      "type": "goblin_thrower",
+      "roomId": -1,
+      "position": {
+        "x": 78,
+        "z": 380
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0
+    },
+    {
+      "type": "slime",
+      "roomId": -1,
+      "position": {
+        "x": 100,
+        "z": 372
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0
+    },
+    {
+      "type": "slime",
+      "roomId": -1,
+      "position": {
+        "x": 100,
+        "z": 378
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0
+    },
+    {
+      "type": "slime",
+      "roomId": -1,
+      "position": {
+        "x": 100,
+        "z": 387
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0
+    },
+    {
+      "type": "slime",
+      "roomId": -1,
+      "position": {
+        "x": 100,
+        "z": 382
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0
+    },
+    {
+      "type": "wolf",
+      "roomId": -1,
+      "position": {
+        "x": 128,
+        "z": 372
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0
+    },
+    {
+      "type": "wolf",
+      "roomId": -1,
+      "position": {
+        "x": 128,
+        "z": 387
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0
+    },
+    {
+      "type": "wolf",
+      "roomId": -1,
+      "position": {
+        "x": 128,
+        "z": 379
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0
+    },
+    {
+      "type": "dragon",
+      "roomId": -1,
+      "position": {
+        "x": 352,
+        "z": 374
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0
+    },
+    {
+      "type": "dragon",
+      "roomId": -1,
+      "position": {
+        "x": 352,
+        "z": 386
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0
+    },
+    {
+      "type": "living_armor",
+      "roomId": -1,
+      "position": {
+        "x": 152,
+        "z": 379
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0
+    },
+    {
+      "type": "shock_drone",
+      "roomId": -1,
+      "position": {
+        "x": 38,
+        "z": 412
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0
+    },
+    {
+      "type": "shock_drone",
+      "roomId": -1,
+      "position": {
+        "x": 32,
+        "z": 412
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0
+    },
+    {
+      "type": "shock_drone",
+      "roomId": -1,
+      "position": {
+        "x": 25,
+        "z": 412
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0
+    },
+    {
+      "type": "shock_drone",
+      "roomId": -1,
+      "position": {
+        "x": 18,
+        "z": 412
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0
+    },
+    {
+      "type": "shock_drone",
+      "roomId": -1,
+      "position": {
+        "x": 10,
+        "z": 412
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0
+    },
+    {
+      "type": "skeleton",
+      "roomId": -1,
+      "position": {
+        "x": 260,
+        "z": 373
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0
+    },
+    {
+      "type": "skeleton",
+      "roomId": -1,
+      "position": {
+        "x": 260,
+        "z": 385
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0
+    },
+    {
+      "type": "skeleton",
+      "roomId": -1,
+      "position": {
+        "x": 264,
+        "z": 376
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0
+    },
+    {
+      "type": "skeleton",
+      "roomId": -1,
+      "position": {
+        "x": 264,
+        "z": 382
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0
+    },
+    {
+      "type": "skeleton",
+      "roomId": -1,
+      "position": {
+        "x": 269,
+        "z": 379
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0
+    },
+    {
+      "type": "spider_queen",
+      "roomId": -1,
+      "position": {
+        "x": 395,
+        "z": 354
+      },
+      "level": 1,
+      "isBoss": true,
+      "rotationY": 0
+    },
+    {
+      "type": "dragon_king",
+      "roomId": -1,
+      "position": {
+        "x": 395,
+        "z": 403
+      },
+      "level": 1,
+      "isBoss": true,
+      "rotationY": 0
+    }
+  ],
+  "monsterGroups": [
+    {
+      "id": "23bfd8ef-fadc-491e-9443-ac98d4894647",
+      "name": "Mushroom Circle",
+      "roomId": -1,
+      "center": {
+        "x": 170,
+        "z": 379
+      },
+      "monsters": [
+        {
+          "type": "mushroom",
+          "offsetX": 0,
+          "offsetZ": -1.5,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "mushroom",
+          "offsetX": 1.3,
+          "offsetZ": 0.75,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "mushroom",
+          "offsetX": -1.3,
+          "offsetZ": 0.75,
+          "level": 1,
+          "isBoss": false
+        }
+      ]
+    },
+    {
+      "id": "4a86d997-8ad2-48d8-bcd6-3cfcb861311b",
+      "name": "Slime Colony",
+      "roomId": -1,
+      "center": {
+        "x": 188,
+        "z": 379
+      },
+      "monsters": [
+        {
+          "type": "slime",
+          "offsetX": 0,
+          "offsetZ": 0,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "slime",
+          "offsetX": -1.5,
+          "offsetZ": 1,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "slime",
+          "offsetX": 1.5,
+          "offsetZ": 1,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "slime",
+          "offsetX": 0,
+          "offsetZ": 2,
+          "level": 2,
+          "isBoss": false
+        }
+      ]
+    },
+    {
+      "id": "23318165-241a-414b-9ac0-0b8eeabd28d7",
+      "name": "Spider Nest",
+      "roomId": -1,
+      "center": {
+        "x": 211,
+        "z": 379
+      },
+      "monsters": [
+        {
+          "type": "spider",
+          "offsetX": -1,
+          "offsetZ": -1,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "spider",
+          "offsetX": 1,
+          "offsetZ": -1,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "spider",
+          "offsetX": -1,
+          "offsetZ": 1,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "spider",
+          "offsetX": 1,
+          "offsetZ": 1,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "spider_queen",
+          "offsetX": 0,
+          "offsetZ": 0,
+          "level": 3,
+          "isBoss": true
+        }
+      ]
+    },
+    {
+      "id": "197daad2-5ad0-4ffb-a4d6-15074b78bf08",
+      "name": "Goblin Thrower Squad",
+      "roomId": -1,
+      "center": {
+        "x": 236,
+        "z": 379
+      },
+      "monsters": [
+        {
+          "type": "goblin_thrower",
+          "offsetX": -2,
+          "offsetZ": 0,
+          "level": 2,
+          "isBoss": false
+        },
+        {
+          "type": "goblin_thrower",
+          "offsetX": 2,
+          "offsetZ": 0,
+          "level": 2,
+          "isBoss": false
+        },
+        {
+          "type": "goblin",
+          "offsetX": 0,
+          "offsetZ": -2,
+          "level": 1,
+          "isBoss": false
+        }
+      ]
+    }
+  ],
+  "groupTemplates": [],
+  "customTiles": [],
+  "placedProps": [
+    {
+      "type": "bone_pile",
+      "x": 61.122215,
+      "y": 0,
+      "z": 386.5078,
+      "rotationY": -5.960465E-08,
+      "scale": 1
+    },
+    {
+      "type": "bone_pile",
+      "x": 62.244087,
+      "y": 0,
+      "z": 387.50992,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "bone_pile",
+      "x": 62.2493,
+      "y": 0,
+      "z": 385.44797,
+      "rotationY": -0.78539824,
+      "scale": 1
+    },
+    {
+      "type": "bone_pile",
+      "x": 62.08414,
+      "y": 0,
+      "z": 375.66797,
+      "rotationY": 0.78539807,
+      "scale": 1
+    },
+    {
+      "type": "bone_pile",
+      "x": 61.324974,
+      "y": 0,
+      "z": 374.58765,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "bone_pile",
+      "x": 62.29364,
+      "y": 0,
+      "z": 373.47308,
+      "rotationY": -0.785398,
+      "scale": 1
+    },
+    {
+      "type": "bone_pile",
+      "x": 78.21321,
+      "y": 0,
+      "z": 372.52927,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "bone_pile",
+      "x": 78.15666,
+      "y": 0,
+      "z": 388.39395,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "bone_pile",
+      "x": 101.29242,
+      "y": 0,
+      "z": 372.65192,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "bone_pile",
+      "x": 101.47559,
+      "y": 0,
+      "z": 378.385,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "bone_pile",
+      "x": 101.40966,
+      "y": 0,
+      "z": 382.44202,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "bone_pile",
+      "x": 101.39769,
+      "y": 0,
+      "z": 387.38,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "bone_pile",
+      "x": 128.36145,
+      "y": 0,
+      "z": 388.4699,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "bone_pile",
+      "x": 128.43558,
+      "y": 0,
+      "z": 380.70895,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "bone_pile",
+      "x": 128.51694,
+      "y": 0,
+      "z": 373.75833,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 63.545937,
+      "y": 0,
+      "z": 388.44574,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 76.50472,
+      "y": 0,
+      "z": 388.45596,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 95.58907,
+      "y": 0,
+      "z": 388.46777,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 111.53887,
+      "y": 0,
+      "z": 388.51825,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 131.63681,
+      "y": 0,
+      "z": 388.54016,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 146.49808,
+      "y": 0,
+      "z": 388.53738,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 162.58522,
+      "y": 0,
+      "z": 388.60446,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 181.5154,
+      "y": 0,
+      "z": 388.5369,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 202.58424,
+      "y": 0,
+      "z": 388.51215,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 218.5225,
+      "y": 0,
+      "z": 388.47675,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 239.50667,
+      "y": 0,
+      "z": 388.45538,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 259.60928,
+      "y": 0,
+      "z": 388.52823,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 283.59592,
+      "y": 0,
+      "z": 388.64368,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 308.45914,
+      "y": 0,
+      "z": 388.4637,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 331.39227,
+      "y": 0,
+      "z": 388.4478,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 354.52167,
+      "y": 0,
+      "z": 388.47598,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 375.54337,
+      "y": 0,
+      "z": 388.628,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 374.61734,
+      "y": 0,
+      "z": 372.5632,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 355.45013,
+      "y": 0,
+      "z": 372.50607,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 331.4592,
+      "y": 0,
+      "z": 372.47604,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 308.42816,
+      "y": 0,
+      "z": 372.54633,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 283.40952,
+      "y": 0,
+      "z": 372.46823,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 259.43677,
+      "y": 0,
+      "z": 372.5236,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 239.50487,
+      "y": 0,
+      "z": 372.55048,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 218.45201,
+      "y": 0,
+      "z": 372.46222,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 202.36044,
+      "y": 0,
+      "z": 372.49634,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 180.55296,
+      "y": 0,
+      "z": 372.49637,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 162.43794,
+      "y": 0,
+      "z": 372.49512,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 146.4182,
+      "y": 0,
+      "z": 372.58167,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 131.49033,
+      "y": 0,
+      "z": 372.52133,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 111.46159,
+      "y": 0,
+      "z": 372.50595,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 95.38715,
+      "y": 0,
+      "z": 372.47296,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 76.495026,
+      "y": 0,
+      "z": 372.42435,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 63.393658,
+      "y": 0,
+      "z": 372.55362,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 45.367825,
+      "y": 0,
+      "z": 372.4236,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 45.464943,
+      "y": 0,
+      "z": 388.58212,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 44.51546,
+      "y": 0,
+      "z": 415.49014,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 3.5382464,
+      "y": 0,
+      "z": 415.47995,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "crate",
+      "x": 5.5047765,
+      "y": 0,
+      "z": 415.50052,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "crate",
+      "x": 7.534828,
+      "y": 0,
+      "z": 415.55685,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "crate",
+      "x": 6.525955,
+      "y": 0,
+      "z": 415.5751,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "crate",
+      "x": 41.516205,
+      "y": 0,
+      "z": 415.5282,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "crate",
+      "x": 40.519646,
+      "y": 0,
+      "z": 415.57278,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "crate",
+      "x": 42.509125,
+      "y": 0,
+      "z": 415.62042,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "crystal",
+      "x": 37.51387,
+      "y": 0,
+      "z": 415.26492,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "crystal",
+      "x": 10.473204,
+      "y": 0,
+      "z": 415.1586,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "crystal",
+      "x": 26.443275,
+      "y": 0,
+      "z": 415.33542,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "crystal",
+      "x": 17.467121,
+      "y": 0,
+      "z": 415.12183,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 45.538048,
+      "y": 0,
+      "z": 378.54663,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 45.44417,
+      "y": 0,
+      "z": 382.5502,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 47.595245,
+      "y": 0,
+      "z": 382.53152,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 49.53255,
+      "y": 0,
+      "z": 382.51486,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 51.572876,
+      "y": 0,
+      "z": 382.53705,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 53.45787,
+      "y": 0,
+      "z": 382.53952,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 55.456356,
+      "y": 0,
+      "z": 382.5635,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 57.486057,
+      "y": 0,
+      "z": 382.56906,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 59.517803,
+      "y": 0,
+      "z": 382.5265,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 61.49917,
+      "y": 0,
+      "z": 382.55746,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 63.488106,
+      "y": 0,
+      "z": 382.57968,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 65.508255,
+      "y": 0,
+      "z": 382.58853,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 67.443054,
+      "y": 0,
+      "z": 382.5592,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 69.46695,
+      "y": 0,
+      "z": 382.5573,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 71.65698,
+      "y": 0,
+      "z": 382.54037,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 73.50309,
+      "y": 0,
+      "z": 382.53424,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 75.48363,
+      "y": 0,
+      "z": 382.54385,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 77.45214,
+      "y": 0,
+      "z": 382.53418,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 79.475845,
+      "y": 0,
+      "z": 382.56723,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 81.52835,
+      "y": 0,
+      "z": 382.54068,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 83.50486,
+      "y": 0,
+      "z": 382.55627,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 85.53898,
+      "y": 0,
+      "z": 382.53503,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 87.50782,
+      "y": 0,
+      "z": 382.55093,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 89.52716,
+      "y": 0,
+      "z": 382.53464,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 91.4661,
+      "y": 0,
+      "z": 382.51447,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 93.53705,
+      "y": 0,
+      "z": 382.5297,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 95.43172,
+      "y": 0,
+      "z": 382.55276,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 97.504105,
+      "y": 0,
+      "z": 382.5476,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 99.492905,
+      "y": 0,
+      "z": 382.55783,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 101.53259,
+      "y": 0,
+      "z": 382.5006,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 103.45339,
+      "y": 0,
+      "z": 382.57043,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 105.48664,
+      "y": 0,
+      "z": 382.51068,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 107.48665,
+      "y": 0,
+      "z": 382.50534,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 109.5165,
+      "y": 0,
+      "z": 382.5176,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 111.46303,
+      "y": 0,
+      "z": 382.54175,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 113.46493,
+      "y": 0,
+      "z": 382.5667,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 115.549385,
+      "y": 0,
+      "z": 382.5682,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 117.44716,
+      "y": 0,
+      "z": 382.5552,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 119.500145,
+      "y": 0,
+      "z": 382.54126,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 121.50172,
+      "y": 0,
+      "z": 382.53333,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 123.56402,
+      "y": 0,
+      "z": 382.53513,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 125.43378,
+      "y": 0,
+      "z": 382.57074,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 127.44703,
+      "y": 0,
+      "z": 382.5449,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 129.50513,
+      "y": 0,
+      "z": 382.57623,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 131.54042,
+      "y": 0,
+      "z": 382.51904,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 133.4669,
+      "y": 0,
+      "z": 382.5534,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 135.58493,
+      "y": 0,
+      "z": 382.52673,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 137.51303,
+      "y": 0,
+      "z": 382.55734,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 139.54121,
+      "y": 0,
+      "z": 382.55252,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 141.35625,
+      "y": 0,
+      "z": 382.57544,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 143.38686,
+      "y": 0,
+      "z": 382.56735,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 145.54546,
+      "y": 0,
+      "z": 382.5594,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 147.55095,
+      "y": 0,
+      "z": 382.55103,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 149.40578,
+      "y": 0,
+      "z": 382.5423,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 151.50908,
+      "y": 0,
+      "z": 382.55795,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 153.62822,
+      "y": 0,
+      "z": 382.56815,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 155.45312,
+      "y": 0,
+      "z": 382.53708,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 157.42297,
+      "y": 0,
+      "z": 382.54242,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 159.56053,
+      "y": 0,
+      "z": 382.52835,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 161.43803,
+      "y": 0,
+      "z": 382.55414,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 163.56168,
+      "y": 0,
+      "z": 382.5685,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 165.46152,
+      "y": 0,
+      "z": 382.56598,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 167.59009,
+      "y": 0,
+      "z": 382.51437,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 169.55675,
+      "y": 0,
+      "z": 382.53207,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 171.51227,
+      "y": 0,
+      "z": 382.5455,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 173.53825,
+      "y": 0,
+      "z": 382.53455,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 175.54488,
+      "y": 0,
+      "z": 382.569,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 177.6506,
+      "y": 0,
+      "z": 382.57327,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 179.44022,
+      "y": 0,
+      "z": 382.53583,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 181.55869,
+      "y": 0,
+      "z": 382.52115,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 183.51933,
+      "y": 0,
+      "z": 382.55038,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 185.49376,
+      "y": 0,
+      "z": 382.58975,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 187.57635,
+      "y": 0,
+      "z": 382.5745,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 189.62225,
+      "y": 0,
+      "z": 382.59872,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 191.3768,
+      "y": 0,
+      "z": 382.56592,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 193.57658,
+      "y": 0,
+      "z": 382.5529,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 195.60243,
+      "y": 0,
+      "z": 382.54932,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 198.48837,
+      "y": 0,
+      "z": 382.52292,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 200.55826,
+      "y": 0,
+      "z": 382.56516,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 197.50368,
+      "y": 0,
+      "z": 382.51828,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 199.5199,
+      "y": 0,
+      "z": 382.55603,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 201.52408,
+      "y": 0,
+      "z": 382.58594,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 203.49918,
+      "y": 0,
+      "z": 382.57693,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 205.49855,
+      "y": 0,
+      "z": 382.55994,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 207.56555,
+      "y": 0,
+      "z": 382.54398,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 209.4697,
+      "y": 0,
+      "z": 382.5406,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 211.51237,
+      "y": 0,
+      "z": 382.57965,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 213.5763,
+      "y": 0,
+      "z": 382.6079,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 215.4848,
+      "y": 0,
+      "z": 382.53195,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 217.5447,
+      "y": 0,
+      "z": 382.49918,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 219.55089,
+      "y": 0,
+      "z": 382.54938,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 221.40768,
+      "y": 0,
+      "z": 382.515,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 223.51883,
+      "y": 0,
+      "z": 382.55838,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 225.484,
+      "y": 0,
+      "z": 382.53406,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 227.52429,
+      "y": 0,
+      "z": 382.50458,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 229.5486,
+      "y": 0,
+      "z": 382.52225,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 231.45035,
+      "y": 0,
+      "z": 382.4989,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 233.55943,
+      "y": 0,
+      "z": 382.49762,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 235.57417,
+      "y": 0,
+      "z": 382.50992,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 237.48763,
+      "y": 0,
+      "z": 382.52658,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 239.41882,
+      "y": 0,
+      "z": 382.52856,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 241.57207,
+      "y": 0,
+      "z": 382.5197,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 243.51787,
+      "y": 0,
+      "z": 382.51895,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 245.54448,
+      "y": 0,
+      "z": 382.50946,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 247.46086,
+      "y": 0,
+      "z": 382.49716,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 249.53665,
+      "y": 0,
+      "z": 382.5239,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 251.52151,
+      "y": 0,
+      "z": 382.50623,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 253.44002,
+      "y": 0,
+      "z": 382.52753,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 255.41614,
+      "y": 0,
+      "z": 382.52875,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 257.53723,
+      "y": 0,
+      "z": 382.52744,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 259.41412,
+      "y": 0,
+      "z": 382.55505,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 261.40994,
+      "y": 0,
+      "z": 382.53064,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 263.51602,
+      "y": 0,
+      "z": 382.552,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 265.5611,
+      "y": 0,
+      "z": 382.55368,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 267.42496,
+      "y": 0,
+      "z": 382.5294,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 269.519,
+      "y": 0,
+      "z": 382.54013,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 271.40417,
+      "y": 0,
+      "z": 382.5368,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 273.4252,
+      "y": 0,
+      "z": 382.5305,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 275.5455,
+      "y": 0,
+      "z": 382.519,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 277.36154,
+      "y": 0,
+      "z": 382.5455,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 279.48334,
+      "y": 0,
+      "z": 382.56265,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 281.51447,
+      "y": 0,
+      "z": 382.56064,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 283.49402,
+      "y": 0,
+      "z": 382.51218,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 285.64276,
+      "y": 0,
+      "z": 382.54373,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 287.3904,
+      "y": 0,
+      "z": 382.52652,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 289.37164,
+      "y": 0,
+      "z": 382.5309,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 291.51175,
+      "y": 0,
+      "z": 382.53552,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 293.69263,
+      "y": 0,
+      "z": 382.55865,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 295.45215,
+      "y": 0,
+      "z": 382.53397,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 297.60593,
+      "y": 0,
+      "z": 382.54688,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 299.49362,
+      "y": 0,
+      "z": 382.58582,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 301.46466,
+      "y": 0,
+      "z": 382.5734,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 303.52646,
+      "y": 0,
+      "z": 382.5487,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 305.50757,
+      "y": 0,
+      "z": 382.57077,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 307.4974,
+      "y": 0,
+      "z": 382.5668,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 309.53238,
+      "y": 0,
+      "z": 382.5294,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 311.5365,
+      "y": 0,
+      "z": 382.5207,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 313.5387,
+      "y": 0,
+      "z": 382.53912,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 315.47366,
+      "y": 0,
+      "z": 382.5431,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 317.44498,
+      "y": 0,
+      "z": 382.549,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 319.5095,
+      "y": 0,
+      "z": 382.5182,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 321.53964,
+      "y": 0,
+      "z": 382.54248,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 323.6869,
+      "y": 0,
+      "z": 382.53323,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 325.4255,
+      "y": 0,
+      "z": 382.53745,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 327.42377,
+      "y": 0,
+      "z": 382.56772,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 329.59747,
+      "y": 0,
+      "z": 382.56305,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 331.40305,
+      "y": 0,
+      "z": 382.51694,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 333.39093,
+      "y": 0,
+      "z": 382.59363,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 335.56818,
+      "y": 0,
+      "z": 382.60367,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 337.53336,
+      "y": 0,
+      "z": 382.589,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 339.49896,
+      "y": 0,
+      "z": 382.5595,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 341.4581,
+      "y": 0,
+      "z": 382.59204,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 343.6191,
+      "y": 0,
+      "z": 382.54623,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 345.51376,
+      "y": 0,
+      "z": 382.5488,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 347.48383,
+      "y": 0,
+      "z": 382.5362,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 349.5429,
+      "y": 0,
+      "z": 382.54926,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 351.48315,
+      "y": 0,
+      "z": 382.5329,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 353.48132,
+      "y": 0,
+      "z": 382.54352,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 355.60507,
+      "y": 0,
+      "z": 382.5468,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 357.43948,
+      "y": 0,
+      "z": 382.52896,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 359.42093,
+      "y": 0,
+      "z": 382.57544,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 361.5923,
+      "y": 0,
+      "z": 382.58478,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 363.57297,
+      "y": 0,
+      "z": 382.5851,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 365.51645,
+      "y": 0,
+      "z": 382.5762,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 367.4537,
+      "y": 0,
+      "z": 382.56235,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 369.49292,
+      "y": 0,
+      "z": 382.56625,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 371.53027,
+      "y": 0,
+      "z": 382.56787,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 373.50122,
+      "y": 0,
+      "z": 382.55978,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 375.46262,
+      "y": 0,
+      "z": 382.5335,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 47.48131,
+      "y": 0,
+      "z": 378.5206,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 49.489574,
+      "y": 0,
+      "z": 378.542,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 51.518234,
+      "y": 0,
+      "z": 378.552,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 53.529938,
+      "y": 0,
+      "z": 378.5351,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 55.477875,
+      "y": 0,
+      "z": 378.53256,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 57.49116,
+      "y": 0,
+      "z": 378.49878,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 59.53629,
+      "y": 0,
+      "z": 378.49402,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 61.477825,
+      "y": 0,
+      "z": 378.47485,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 63.49614,
+      "y": 0,
+      "z": 378.4911,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 65.49859,
+      "y": 0,
+      "z": 378.536,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 67.50841,
+      "y": 0,
+      "z": 378.5034,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 69.474686,
+      "y": 0,
+      "z": 378.49426,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 71.45336,
+      "y": 0,
+      "z": 378.5134,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 73.60244,
+      "y": 0,
+      "z": 378.5832,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 75.352486,
+      "y": 0,
+      "z": 378.49222,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 77.39294,
+      "y": 0,
+      "z": 378.5356,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 79.48779,
+      "y": 0,
+      "z": 378.49918,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 81.44565,
+      "y": 0,
+      "z": 378.54733,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 83.52483,
+      "y": 0,
+      "z": 378.51984,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 85.47588,
+      "y": 0,
+      "z": 378.40002,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 87.47187,
+      "y": 0,
+      "z": 378.49893,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 89.58276,
+      "y": 0,
+      "z": 378.58536,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 91.46628,
+      "y": 0,
+      "z": 378.56137,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 93.49432,
+      "y": 0,
+      "z": 378.52878,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 95.44646,
+      "y": 0,
+      "z": 378.5335,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 97.5146,
+      "y": 0,
+      "z": 378.518,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 99.68446,
+      "y": 0,
+      "z": 378.5432,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 101.516975,
+      "y": 0,
+      "z": 378.5201,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 103.51694,
+      "y": 0,
+      "z": 378.5635,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 105.50188,
+      "y": 0,
+      "z": 378.57263,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 107.49639,
+      "y": 0,
+      "z": 378.5381,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 109.58225,
+      "y": 0,
+      "z": 378.5437,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 111.38349,
+      "y": 0,
+      "z": 378.55627,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 113.50548,
+      "y": 0,
+      "z": 378.54602,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 115.61095,
+      "y": 0,
+      "z": 378.5564,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 117.62464,
+      "y": 0,
+      "z": 378.55353,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 119.54142,
+      "y": 0,
+      "z": 378.57755,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 121.56058,
+      "y": 0,
+      "z": 378.58112,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 123.39754,
+      "y": 0,
+      "z": 378.50632,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 125.44352,
+      "y": 0,
+      "z": 378.5523,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 127.44086,
+      "y": 0,
+      "z": 378.56595,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 129.49162,
+      "y": 0,
+      "z": 378.56882,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 131.4475,
+      "y": 0,
+      "z": 378.54483,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 133.49641,
+      "y": 0,
+      "z": 378.55737,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 135.49916,
+      "y": 0,
+      "z": 378.5554,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 137.32697,
+      "y": 0,
+      "z": 378.54523,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 139.49762,
+      "y": 0,
+      "z": 378.60175,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 141.47696,
+      "y": 0,
+      "z": 378.5421,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 143.5191,
+      "y": 0,
+      "z": 378.51758,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 145.61496,
+      "y": 0,
+      "z": 378.53177,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 147.50337,
+      "y": 0,
+      "z": 378.5215,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 149.52629,
+      "y": 0,
+      "z": 378.53992,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 151.51308,
+      "y": 0,
+      "z": 378.5406,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 153.60406,
+      "y": 0,
+      "z": 378.5137,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 155.53908,
+      "y": 0,
+      "z": 378.56906,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 157.57729,
+      "y": 0,
+      "z": 378.55988,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 159.51111,
+      "y": 0,
+      "z": 378.55832,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 161.4257,
+      "y": 0,
+      "z": 378.55624,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 163.38391,
+      "y": 0,
+      "z": 378.59433,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 165.54768,
+      "y": 0,
+      "z": 378.57663,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 167.41928,
+      "y": 0,
+      "z": 378.49353,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 169.56314,
+      "y": 0,
+      "z": 378.58243,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 171.51765,
+      "y": 0,
+      "z": 378.57758,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 173.51848,
+      "y": 0,
+      "z": 378.5696,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 175.46938,
+      "y": 0,
+      "z": 378.57858,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 177.69318,
+      "y": 0,
+      "z": 378.58643,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 179.36661,
+      "y": 0,
+      "z": 378.57224,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 181.41782,
+      "y": 0,
+      "z": 378.56415,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 183.42815,
+      "y": 0,
+      "z": 378.55612,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 185.62292,
+      "y": 0,
+      "z": 378.55316,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 187.54308,
+      "y": 0,
+      "z": 378.5264,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 189.55093,
+      "y": 0,
+      "z": 378.5103,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 191.39322,
+      "y": 0,
+      "z": 378.49582,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 193.36748,
+      "y": 0,
+      "z": 378.48624,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 195.42905,
+      "y": 0,
+      "z": 378.50388,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 197.47844,
+      "y": 0,
+      "z": 378.48047,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 198.59747,
+      "y": 0,
+      "z": 378.53006,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 199.61755,
+      "y": 0,
+      "z": 378.51068,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 200.64911,
+      "y": 0,
+      "z": 378.5453,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 201.67108,
+      "y": 0,
+      "z": 378.5493,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 203.51114,
+      "y": 0,
+      "z": 378.52515,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 205.57617,
+      "y": 0,
+      "z": 378.5569,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 207.41003,
+      "y": 0,
+      "z": 378.51456,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 209.46864,
+      "y": 0,
+      "z": 378.51926,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 211.48769,
+      "y": 0,
+      "z": 378.53998,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 213.51616,
+      "y": 0,
+      "z": 378.5215,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 215.50966,
+      "y": 0,
+      "z": 378.53784,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 217.45538,
+      "y": 0,
+      "z": 378.5427,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 219.48843,
+      "y": 0,
+      "z": 378.5344,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 221.44489,
+      "y": 0,
+      "z": 378.59424,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 223.52238,
+      "y": 0,
+      "z": 378.60312,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 225.45114,
+      "y": 0,
+      "z": 378.55667,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 227.44035,
+      "y": 0,
+      "z": 378.56186,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 229.47368,
+      "y": 0,
+      "z": 378.53653,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 231.59532,
+      "y": 0,
+      "z": 378.54718,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 233.47095,
+      "y": 0,
+      "z": 378.5492,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 235.46736,
+      "y": 0,
+      "z": 378.52484,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 237.50304,
+      "y": 0,
+      "z": 378.5394,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 239.54044,
+      "y": 0,
+      "z": 378.56223,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 241.4744,
+      "y": 0,
+      "z": 378.54813,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 243.44064,
+      "y": 0,
+      "z": 378.5351,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 245.51633,
+      "y": 0,
+      "z": 378.55475,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 247.53082,
+      "y": 0,
+      "z": 378.5386,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 249.4106,
+      "y": 0,
+      "z": 378.53815,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 251.43672,
+      "y": 0,
+      "z": 378.51047,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 253.46349,
+      "y": 0,
+      "z": 378.51694,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 255.5096,
+      "y": 0,
+      "z": 378.53613,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 257.47446,
+      "y": 0,
+      "z": 378.524,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 259.60022,
+      "y": 0,
+      "z": 378.55505,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 261.42258,
+      "y": 0,
+      "z": 378.5543,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 263.60226,
+      "y": 0,
+      "z": 378.5416,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 265.48294,
+      "y": 0,
+      "z": 378.52502,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 267.39212,
+      "y": 0,
+      "z": 378.5393,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 269.40515,
+      "y": 0,
+      "z": 378.54184,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 271.47168,
+      "y": 0,
+      "z": 378.54114,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 273.48093,
+      "y": 0,
+      "z": 378.53168,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 275.4915,
+      "y": 0,
+      "z": 378.54593,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 277.51773,
+      "y": 0,
+      "z": 378.55472,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 279.54132,
+      "y": 0,
+      "z": 378.5481,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 281.54294,
+      "y": 0,
+      "z": 378.55264,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 283.6552,
+      "y": 0,
+      "z": 378.55203,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 285.44778,
+      "y": 0,
+      "z": 378.56635,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 287.47906,
+      "y": 0,
+      "z": 378.5237,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 289.56152,
+      "y": 0,
+      "z": 378.55157,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 291.51276,
+      "y": 0,
+      "z": 378.58737,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 293.58566,
+      "y": 0,
+      "z": 378.56125,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 295.38144,
+      "y": 0,
+      "z": 378.54764,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 297.40195,
+      "y": 0,
+      "z": 378.5461,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 299.48557,
+      "y": 0,
+      "z": 378.5266,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 301.5141,
+      "y": 0,
+      "z": 378.52448,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 303.56247,
+      "y": 0,
+      "z": 378.57742,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 305.49255,
+      "y": 0,
+      "z": 378.54395,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 307.38574,
+      "y": 0,
+      "z": 378.59543,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 309.57233,
+      "y": 0,
+      "z": 378.60693,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 311.60718,
+      "y": 0,
+      "z": 378.56604,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 313.44183,
+      "y": 0,
+      "z": 378.53043,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 315.4837,
+      "y": 0,
+      "z": 378.49976,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 317.45956,
+      "y": 0,
+      "z": 378.48474,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 319.48297,
+      "y": 0,
+      "z": 378.4638,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 321.52005,
+      "y": 0,
+      "z": 378.44168,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 323.66354,
+      "y": 0,
+      "z": 378.52817,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 325.32333,
+      "y": 0,
+      "z": 378.54126,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 327.40698,
+      "y": 0,
+      "z": 378.5767,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 329.43307,
+      "y": 0,
+      "z": 378.58075,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 331.53137,
+      "y": 0,
+      "z": 378.6008,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 333.57074,
+      "y": 0,
+      "z": 378.5581,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 335.5065,
+      "y": 0,
+      "z": 378.54425,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 337.51837,
+      "y": 0,
+      "z": 378.52463,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 339.4179,
+      "y": 0,
+      "z": 378.51538,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 341.40323,
+      "y": 0,
+      "z": 378.50964,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 343.58444,
+      "y": 0,
+      "z": 378.53033,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 345.36346,
+      "y": 0,
+      "z": 378.5331,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 347.5616,
+      "y": 0,
+      "z": 378.50443,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 349.60934,
+      "y": 0,
+      "z": 378.4881,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 351.54117,
+      "y": 0,
+      "z": 378.52808,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 353.76773,
+      "y": 0,
+      "z": 378.54272,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 355.5122,
+      "y": 0,
+      "z": 378.58344,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 357.51248,
+      "y": 0,
+      "z": 378.56573,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 359.465,
+      "y": 0,
+      "z": 378.5675,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 361.6084,
+      "y": 0,
+      "z": 378.55112,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 363.50656,
+      "y": 0,
+      "z": 378.53812,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 365.72147,
+      "y": 0,
+      "z": 378.52664,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 367.37686,
+      "y": 0,
+      "z": 378.52863,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 369.50754,
+      "y": 0,
+      "z": 378.52353,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 371.57916,
+      "y": 0,
+      "z": 378.5148,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 373.49628,
+      "y": 0,
+      "z": 378.51086,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 375.51462,
+      "y": 0,
+      "z": 378.52414,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "forgotten_shield",
+      "x": 356.5232,
+      "y": 0,
+      "z": 372.5888,
+      "rotationY": -0.785398,
+      "scale": 1
+    },
+    {
+      "type": "forgotten_shield",
+      "x": 356.49136,
+      "y": 0,
+      "z": 388.43988,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "rat_nest",
+      "x": 351.27884,
+      "y": 0,
+      "z": 388.26154,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "rat_nest",
+      "x": 352.26413,
+      "y": 0,
+      "z": 388.32303,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "rat_nest",
+      "x": 350.3897,
+      "y": 0,
+      "z": 388.307,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "rat_nest",
+      "x": 349.5007,
+      "y": 0,
+      "z": 372.73425,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "rat_nest",
+      "x": 350.30548,
+      "y": 0,
+      "z": 372.71887,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "rat_nest",
+      "x": 351.27356,
+      "y": 0,
+      "z": 372.73462,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "spike_trap",
+      "x": 308.5601,
+      "y": 0,
+      "z": 386.71957,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "spike_trap",
+      "x": 308.5747,
+      "y": 0,
+      "z": 374.31955,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "table",
+      "x": 281.108,
+      "y": 0,
+      "z": 373.32526,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "table",
+      "x": 278.9725,
+      "y": 0,
+      "z": 373.3567,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "table",
+      "x": 275.91425,
+      "y": 0,
+      "z": 373.30734,
+      "rotationY": 0,
+      "scale": 1
+    }
+  ],
+  "useProceduralProps": false
+}

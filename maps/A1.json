@@ -1,0 +1,3229 @@
+{
+  "version": "1.1",
+  "name": "A1",
+  "mode": "tiles",
+  "width": 200,
+  "depth": 200,
+  "spawnRoom": 0,
+  "spawnPosition": {
+    "x": 99,
+    "z": 89
+  },
+  "tileData": "H4sIAAAAAAAACjvBwMBwgoGBoYHdXLxhL4N6w2oG64bVDK4Ny5DwYobQhnl4cXjDXIbYhlk48FywPDJG6F3I4I\u002BGPRtWMtiD8QYGw4YNDMoN2xmUG3YygNxHDJZs2IOGtzGoNqxg8G1YBMbRDbMZohumMySj4eyGyTjwNIZUOJ7CkEkApzdMhWJkfSCMHGYgv5nJAgCIEPC2fwEAAA==",
+  "rooms": [],
+  "corridors": [],
+  "enemies": [
+    {
+      "type": "wolf",
+      "roomId": -1,
+      "position": {
+        "x": 89,
+        "z": 142
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0
+    },
+    {
+      "type": "wolf",
+      "roomId": -1,
+      "position": {
+        "x": 92,
+        "z": 148
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0
+    },
+    {
+      "type": "wolf",
+      "roomId": -1,
+      "position": {
+        "x": 102,
+        "z": 149
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0
+    },
+    {
+      "type": "wolf",
+      "roomId": -1,
+      "position": {
+        "x": 109,
+        "z": 143
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0
+    },
+    {
+      "type": "spider_queen",
+      "roomId": -1,
+      "position": {
+        "x": 114,
+        "z": 156
+      },
+      "level": 1,
+      "isBoss": true,
+      "rotationY": 0
+    },
+    {
+      "type": "mordecai_the_traitor",
+      "roomId": -1,
+      "position": {
+        "x": 96,
+        "z": 157
+      },
+      "level": 1,
+      "isBoss": true,
+      "rotationY": 0
+    },
+    {
+      "type": "zev_the_loot_goblin",
+      "roomId": -1,
+      "position": {
+        "x": 79,
+        "z": 151
+      },
+      "level": 1,
+      "isBoss": true,
+      "rotationY": 0
+    },
+    {
+      "type": "goblin",
+      "roomId": -1,
+      "position": {
+        "x": 104,
+        "z": 121
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": -2.3561943
+    },
+    {
+      "type": "goblin",
+      "roomId": -1,
+      "position": {
+        "x": 95,
+        "z": 121
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 2.3561945
+    },
+    {
+      "type": "goblin",
+      "roomId": -1,
+      "position": {
+        "x": 100,
+        "z": 121
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": -3.1415925
+    }
+  ],
+  "monsterGroups": [],
+  "groupTemplates": [],
+  "customTiles": [],
+  "placedProps": [
+    {
+      "type": "thorny_vines",
+      "x": 94,
+      "y": 1.7053304,
+      "z": 110.730835,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "thorny_vines",
+      "x": 94.15,
+      "y": 1.7002234,
+      "z": 112.99969,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "thorny_vines",
+      "x": 94,
+      "y": 2.8216195,
+      "z": 111.593544,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "thorny_vines",
+      "x": 94.15,
+      "y": 2.4981158,
+      "z": 113.14555,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "thorny_vines",
+      "x": 94,
+      "y": 2.5912912,
+      "z": 112.523674,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "thorny_vines",
+      "x": 94.15,
+      "y": 2.6971948,
+      "z": 112.025246,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "thorny_vines",
+      "x": 94,
+      "y": 1.6745658,
+      "z": 110.59707,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "thorny_vines",
+      "x": 94.15,
+      "y": 1.913414,
+      "z": 110.935165,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "thorny_vines",
+      "x": 94.15,
+      "y": 2.0380118,
+      "z": 110.95361,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "thorny_vines",
+      "x": 94.15,
+      "y": 2.2465072,
+      "z": 111.10193,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "thorny_vines",
+      "x": 94,
+      "y": 2.414746,
+      "z": 111.19721,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "thorny_vines",
+      "x": 94,
+      "y": 2.5058076,
+      "z": 111.3922,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "thorny_vines",
+      "x": 94.15,
+      "y": 2.5692356,
+      "z": 111.8716,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "thorny_vines",
+      "x": 94.15,
+      "y": 2.5490541,
+      "z": 112.11721,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "thorny_vines",
+      "x": 94,
+      "y": 2.5579236,
+      "z": 112.34557,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "thorny_vines",
+      "x": 94,
+      "y": 2.5201755,
+      "z": 112.689835,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "thorny_vines",
+      "x": 94.15,
+      "y": 2.3888135,
+      "z": 112.98229,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "thorny_vines",
+      "x": 94,
+      "y": 2.3923666,
+      "z": 113.197556,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "thorny_vines",
+      "x": 94,
+      "y": 2.3497696,
+      "z": 113.3588,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "thorny_vines",
+      "x": 94,
+      "y": 2.161793,
+      "z": 113.488556,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "thorny_vines",
+      "x": 94,
+      "y": 1.8582382,
+      "z": 113.43483,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "thorny_vines",
+      "x": 94,
+      "y": 1.8488176,
+      "z": 113.212456,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "thorny_vines",
+      "x": 94.15,
+      "y": 2.0853233,
+      "z": 113.044716,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "thorny_vines",
+      "x": 94,
+      "y": 2.1496804,
+      "z": 113.35502,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "thorny_vines",
+      "x": 94,
+      "y": 2.1415792,
+      "z": 112.809,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "thorny_vines",
+      "x": 94,
+      "y": 2.4376204,
+      "z": 112.32981,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "thorny_vines",
+      "x": 94.15,
+      "y": 2.243894,
+      "z": 111.98856,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "thorny_vines",
+      "x": 94,
+      "y": 2.132056,
+      "z": 111.58381,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "thorny_vines",
+      "x": 94,
+      "y": 1.9084067,
+      "z": 111.355385,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "thorny_vines",
+      "x": 94,
+      "y": 1.8646681,
+      "z": 111.33413,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "thorny_vines",
+      "x": 94.15,
+      "y": 1.8458092,
+      "z": 111.89704,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "thorny_vines",
+      "x": 94.15,
+      "y": 2.1630607,
+      "z": 112.07753,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "thorny_vines",
+      "x": 94,
+      "y": 2.2565432,
+      "z": 112.65985,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "thorny_vines",
+      "x": 94,
+      "y": 2.2703075,
+      "z": 113.21618,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "thorny_vines",
+      "x": 94.15,
+      "y": 1.759206,
+      "z": 112.98923,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "thorny_vines",
+      "x": 94,
+      "y": 1.972466,
+      "z": 112.70853,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "thorny_vines",
+      "x": 94,
+      "y": 2.0851889,
+      "z": 112.321915,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "thorny_vines",
+      "x": 94.15,
+      "y": 1.9227409,
+      "z": 111.89704,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "thorny_vines",
+      "x": 94.02056,
+      "y": 1.9892547,
+      "z": 111.15,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "thorny_vines",
+      "x": 94,
+      "y": 2.0964715,
+      "z": 111.534645,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "thorny_vines",
+      "x": 94.05175,
+      "y": 1.9532685,
+      "z": 112.15,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "thorny_vines",
+      "x": 94.15,
+      "y": 1.9263408,
+      "z": 112.99269,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "thorny_vines",
+      "x": 94,
+      "y": 2.3055902,
+      "z": 113.21619,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "thorny_vines",
+      "x": 94.15,
+      "y": 2.1934617,
+      "z": 112.867805,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 99.53147,
+      "y": 0,
+      "z": 125.46836,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 99.87387,
+      "y": 0,
+      "z": 125.41755,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 100.16458,
+      "y": 0,
+      "z": 125.38425,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 99.23427,
+      "y": 0,
+      "z": 125.45132,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 98.8887,
+      "y": 0,
+      "z": 125.4354,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 98.39162,
+      "y": 0,
+      "z": 125.22499,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 98.45705,
+      "y": 0,
+      "z": 124.77643,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 98.40926,
+      "y": 0,
+      "z": 124.37951,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 98.45847,
+      "y": 0,
+      "z": 124.031334,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 98.47811,
+      "y": 0,
+      "z": 123.62842,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 98.5532,
+      "y": 0,
+      "z": 123.133896,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 98.72073,
+      "y": 0,
+      "z": 122.72305,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 99.118546,
+      "y": 0,
+      "z": 122.63444,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 99.39463,
+      "y": 0,
+      "z": 122.62978,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 99.674995,
+      "y": 0,
+      "z": 122.62308,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 100.03179,
+      "y": 0,
+      "z": 122.6803,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 100.3885,
+      "y": 0,
+      "z": 122.73626,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 100.78097,
+      "y": 0,
+      "z": 122.83465,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 101.05994,
+      "y": 0,
+      "z": 123.091156,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 101.29385,
+      "y": 0,
+      "z": 123.54721,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 101.24627,
+      "y": 0,
+      "z": 124.04167,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 101.08967,
+      "y": 0,
+      "z": 124.435135,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 100.80996,
+      "y": 0,
+      "z": 124.83573,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 100.42822,
+      "y": 0,
+      "z": 125.033745,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 99.96258,
+      "y": 0,
+      "z": 124.973595,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 99.69781,
+      "y": 0,
+      "z": 125.03043,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 99.52974,
+      "y": 0,
+      "z": 125.02471,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 99.2887,
+      "y": 0,
+      "z": 125.04892,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 99.117485,
+      "y": 0,
+      "z": 125.00955,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 98.97688,
+      "y": 0,
+      "z": 124.85026,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 98.97714,
+      "y": 0,
+      "z": 124.56987,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 98.954155,
+      "y": 0,
+      "z": 124.363075,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 98.975624,
+      "y": 0,
+      "z": 124.13274,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 98.84421,
+      "y": 0,
+      "z": 123.95654,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 98.82404,
+      "y": 0,
+      "z": 123.72076,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 98.76877,
+      "y": 0,
+      "z": 123.27741,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 99.06688,
+      "y": 0,
+      "z": 123.1854,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 99.43201,
+      "y": 0,
+      "z": 123.185425,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 99.93084,
+      "y": 0,
+      "z": 123.22691,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 100.40515,
+      "y": 0,
+      "z": 123.33943,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 101.28327,
+      "y": 0,
+      "z": 123.63578,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 101.18174,
+      "y": 0,
+      "z": 124.18343,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 100.6019,
+      "y": 0,
+      "z": 124.521034,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 100.185974,
+      "y": 0,
+      "z": 124.602104,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 99.64586,
+      "y": 0,
+      "z": 124.38353,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 99.48222,
+      "y": 0,
+      "z": 124.51495,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 99.428185,
+      "y": 0,
+      "z": 124.12391,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 99.387474,
+      "y": 0,
+      "z": 124.11323,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 99.40907,
+      "y": 0,
+      "z": 124.92516,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 99.80653,
+      "y": 0,
+      "z": 124.25282,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 100.54501,
+      "y": 0,
+      "z": 124.43102,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 100.84757,
+      "y": 0,
+      "z": 124.299995,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 100.76381,
+      "y": 0,
+      "z": 123.600204,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 100.42645,
+      "y": 0,
+      "z": 123.560234,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 100.21139,
+      "y": 0,
+      "z": 124.16523,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 98.493645,
+      "y": 0,
+      "z": 125.16207,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 99.15907,
+      "y": 0,
+      "z": 124.15088,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 100.01877,
+      "y": 0,
+      "z": 124.18212,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 100.655426,
+      "y": 0,
+      "z": 123.60965,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 100.715256,
+      "y": 0,
+      "z": 123.97684,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 100.74252,
+      "y": 0,
+      "z": 122.73469,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 101.06169,
+      "y": 0,
+      "z": 123.42747,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 100.36245,
+      "y": 0,
+      "z": 123.29412,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 99.44407,
+      "y": 0,
+      "z": 122.653854,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 99.663185,
+      "y": 0,
+      "z": 122.95526,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 100.204704,
+      "y": 0,
+      "z": 123.05456,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 99.67936,
+      "y": 0,
+      "z": 123.38714,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 99.7398,
+      "y": 0,
+      "z": 123.668945,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 99.4794,
+      "y": 0,
+      "z": 123.39723,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 99.25953,
+      "y": 0,
+      "z": 123.84207,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 100.63184,
+      "y": 0,
+      "z": 123.87212,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 99.7694,
+      "y": 0,
+      "z": 123.863335,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 100.19302,
+      "y": 0,
+      "z": 123.71802,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "abandoned_campfire",
+      "x": 99.9316,
+      "y": 0,
+      "z": 131.5356,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "table",
+      "x": 99.93328,
+      "y": 0,
+      "z": 130.02902,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "table",
+      "x": 101.5579,
+      "y": 0,
+      "z": 130.1145,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "table",
+      "x": 98.114265,
+      "y": 0,
+      "z": 130.0723,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "ancient_scroll",
+      "x": 98.523476,
+      "y": 0,
+      "z": 129.49725,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "ancient_scroll",
+      "x": 100.98819,
+      "y": 0,
+      "z": 129.38399,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "ancient_scroll",
+      "x": 99.85384,
+      "y": 0,
+      "z": 129.44266,
+      "rotationY": 1.5707963,
+      "scale": 1
+    },
+    {
+      "type": "campfire",
+      "x": 93.962265,
+      "y": 0,
+      "z": 128.01991,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "campfire",
+      "x": 106.3673,
+      "y": 0,
+      "z": 128.81273,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "campfire",
+      "x": 117.56233,
+      "y": 0,
+      "z": 131.32323,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "campfire",
+      "x": 121.34597,
+      "y": 0,
+      "z": 137.61487,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "campfire",
+      "x": 120.41446,
+      "y": 0,
+      "z": 158.36288,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "campfire",
+      "x": 99.42748,
+      "y": 0,
+      "z": 159.9726,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "campfire",
+      "x": 93.34289,
+      "y": 0,
+      "z": 158.79901,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "campfire",
+      "x": 74.7622,
+      "y": 0,
+      "z": 154.53111,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "campfire",
+      "x": 72.62492,
+      "y": 0,
+      "z": 150.20328,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "campfire",
+      "x": 72.963646,
+      "y": 0,
+      "z": 137.02243,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "campfire",
+      "x": 76.90391,
+      "y": 0,
+      "z": 130.07085,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "bone_pile",
+      "x": 99.92358,
+      "y": 0,
+      "z": 127.61344,
+      "rotationY": -1.570796,
+      "scale": 1
+    },
+    {
+      "type": "bone_pile",
+      "x": 101.0845,
+      "y": 0,
+      "z": 127.50923,
+      "rotationY": 3.5762793E-07,
+      "scale": 1
+    },
+    {
+      "type": "bone_pile",
+      "x": 98.63075,
+      "y": 0,
+      "z": 127.60532,
+      "rotationY": -3.1415923,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 102.27182,
+      "y": 0,
+      "z": 126.39134,
+      "rotationY": 0.7853985,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 101.628555,
+      "y": 0,
+      "z": 126.33543,
+      "rotationY": 1.5707967,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 101.16071,
+      "y": 0,
+      "z": 126.36992,
+      "rotationY": 2.356195,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 100.67901,
+      "y": 0,
+      "z": 126.20659,
+      "rotationY": -3.1415923,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 100.166336,
+      "y": 0,
+      "z": 126.10294,
+      "rotationY": -2.356194,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 99.779,
+      "y": 0,
+      "z": 126.13071,
+      "rotationY": -1.5707959,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 99.180244,
+      "y": 0,
+      "z": 126.25034,
+      "rotationY": -0.78539777,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 98.579,
+      "y": 0,
+      "z": 126.25867,
+      "rotationY": 4.1723254E-07,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 97.87686,
+      "y": 0,
+      "z": 126.306076,
+      "rotationY": 4.1723254E-07,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 116.2403,
+      "y": 0,
+      "z": 158.37122,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 116.30131,
+      "y": 0,
+      "z": 157.31566,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 116.31349,
+      "y": 0,
+      "z": 156.58917,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 116.108635,
+      "y": 0,
+      "z": 155.3929,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 115.31809,
+      "y": 0,
+      "z": 154.24612,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 114.66128,
+      "y": 0,
+      "z": 154.41866,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 113.695885,
+      "y": 0,
+      "z": 154.3077,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 113.05584,
+      "y": 0,
+      "z": 154.89781,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 112.81659,
+      "y": 0,
+      "z": 155.33316,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 112.46539,
+      "y": 0,
+      "z": 156.39597,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 113.1085,
+      "y": 0,
+      "z": 156.59547,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 113.0805,
+      "y": 0,
+      "z": 157.28772,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 113.42476,
+      "y": 0,
+      "z": 157.37952,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 114.2019,
+      "y": 0,
+      "z": 157.86353,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 114.818306,
+      "y": 0,
+      "z": 158.14279,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 115.41963,
+      "y": 0,
+      "z": 158.56917,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 115.92709,
+      "y": 0,
+      "z": 158.15927,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 116.22295,
+      "y": 0,
+      "z": 157.98257,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 116.76972,
+      "y": 0,
+      "z": 157.99379,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 116.97508,
+      "y": 0,
+      "z": 157.30011,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 117.02236,
+      "y": 0,
+      "z": 156.46803,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 116.82698,
+      "y": 0,
+      "z": 155.66537,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 116.451256,
+      "y": 0,
+      "z": 155.09485,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 116.09706,
+      "y": 0,
+      "z": 154.35982,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 115.56188,
+      "y": 0,
+      "z": 154.18884,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 115.10152,
+      "y": 0,
+      "z": 153.98424,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 114.337875,
+      "y": 0,
+      "z": 153.72258,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 113.84454,
+      "y": 0,
+      "z": 153.81802,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 113.171036,
+      "y": 0,
+      "z": 153.96504,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 113.067,
+      "y": 0,
+      "z": 154.27594,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 112.19006,
+      "y": 0,
+      "z": 154.79651,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 112.00412,
+      "y": 0,
+      "z": 155.25162,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 111.71157,
+      "y": 0,
+      "z": 155.9416,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 111.95249,
+      "y": 0,
+      "z": 156.71939,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 112.24292,
+      "y": 0,
+      "z": 157.62852,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 112.33155,
+      "y": 0,
+      "z": 158.51994,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 113.22993,
+      "y": 0,
+      "z": 158.69148,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 113.298164,
+      "y": 0,
+      "z": 158.28624,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 113.28713,
+      "y": 0,
+      "z": 158.14232,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 93.88513,
+      "y": 0,
+      "z": 129.32379,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 94.15794,
+      "y": 0,
+      "z": 129.45282,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 94.23795,
+      "y": 0,
+      "z": 129.42834,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 94.354416,
+      "y": 0,
+      "z": 129.33203,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 94.36656,
+      "y": 0,
+      "z": 129.09879,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 94.30718,
+      "y": 0,
+      "z": 128.84485,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 94.68622,
+      "y": 0,
+      "z": 128.82384,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 94.7749,
+      "y": 0,
+      "z": 129.3608,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 94.59511,
+      "y": 0,
+      "z": 129.41382,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 94.31874,
+      "y": 0,
+      "z": 129.22006,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 94.57196,
+      "y": 0,
+      "z": 128.86797,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 94.78853,
+      "y": 0,
+      "z": 128.52667,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 94.88351,
+      "y": 0,
+      "z": 127.89175,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 94.78559,
+      "y": 0,
+      "z": 127.407776,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 94.60018,
+      "y": 0,
+      "z": 127.10764,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 94.89689,
+      "y": 0,
+      "z": 127.75718,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 94.88922,
+      "y": 0,
+      "z": 128.5871,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 94.75462,
+      "y": 0,
+      "z": 128.92587,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 95.00216,
+      "y": 0,
+      "z": 128.54337,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 94.923706,
+      "y": 0,
+      "z": 128.0369,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 79.82923,
+      "y": 0,
+      "z": 149.78177,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 79.397354,
+      "y": 0,
+      "z": 150.08127,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 79.193306,
+      "y": 0,
+      "z": 150.85957,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 78.65601,
+      "y": 0,
+      "z": 151.17162,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 78.407036,
+      "y": 0,
+      "z": 151.19168,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 77.92039,
+      "y": 0,
+      "z": 151.04863,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 77.9937,
+      "y": 0,
+      "z": 150.6203,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 78.510635,
+      "y": 0,
+      "z": 150.67502,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 79.24514,
+      "y": 0,
+      "z": 150.24919,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 79.51752,
+      "y": 0,
+      "z": 150.32092,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 79.78177,
+      "y": 0,
+      "z": 151.07947,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 79.84376,
+      "y": 0,
+      "z": 151.59915,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 80.19413,
+      "y": 0,
+      "z": 151.77652,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 80.073814,
+      "y": 0,
+      "z": 151.82841,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 80.174934,
+      "y": 0,
+      "z": 152.16557,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 79.849365,
+      "y": 0,
+      "z": 152.43535,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 79.27493,
+      "y": 0,
+      "z": 152.03293,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 78.84851,
+      "y": 0,
+      "z": 152.04578,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 78.80902,
+      "y": 0,
+      "z": 151.42001,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 77.91147,
+      "y": 0,
+      "z": 151.33495,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 78.08742,
+      "y": 0,
+      "z": 152.26192,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 78.66193,
+      "y": 0,
+      "z": 153.07098,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 78.84229,
+      "y": 0,
+      "z": 153.84816,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 79.744736,
+      "y": 0,
+      "z": 153.41934,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 79.877464,
+      "y": 0,
+      "z": 152.69415,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 80.13488,
+      "y": 0,
+      "z": 152.21735,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 80.78492,
+      "y": 0,
+      "z": 152.82365,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 81.31884,
+      "y": 0,
+      "z": 152.3047,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 81.055435,
+      "y": 0,
+      "z": 151.08449,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 80.38493,
+      "y": 0,
+      "z": 150.57013,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 80.19556,
+      "y": 0,
+      "z": 150.3783,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 79.56211,
+      "y": 0,
+      "z": 150.50603,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 78.71785,
+      "y": 0,
+      "z": 150.27397,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 78.41074,
+      "y": 0,
+      "z": 150.6709,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 78.0404,
+      "y": 0,
+      "z": 151.15108,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 77.986824,
+      "y": 0,
+      "z": 151.65063,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 77.84293,
+      "y": 0,
+      "z": 151.75047,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 78.68294,
+      "y": 0,
+      "z": 152.04822,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 79.09474,
+      "y": 0,
+      "z": 152.31812,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 78.97804,
+      "y": 0,
+      "z": 152.75606,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 79.603645,
+      "y": 0,
+      "z": 151.96762,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 79.699585,
+      "y": 0,
+      "z": 151.90877,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 79.47413,
+      "y": 0,
+      "z": 152.42917,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 78.72825,
+      "y": 0,
+      "z": 153.35329,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 79.30846,
+      "y": 0,
+      "z": 153.75256,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 79.959015,
+      "y": 0,
+      "z": 152.94785,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 79.480606,
+      "y": 0,
+      "z": 152.51013,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 79.40228,
+      "y": 0,
+      "z": 152.49199,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 79.71676,
+      "y": 0,
+      "z": 153.13606,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 80.505714,
+      "y": 0,
+      "z": 152.96107,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 81.03954,
+      "y": 0,
+      "z": 152.59297,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 80.96309,
+      "y": 0,
+      "z": 151.48663,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 80.30112,
+      "y": 0,
+      "z": 151.04697,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 80.10029,
+      "y": 0,
+      "z": 150.95013,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 80.16096,
+      "y": 0,
+      "z": 151.15741,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 80.37091,
+      "y": 0,
+      "z": 151.72346,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 80.505615,
+      "y": 0,
+      "z": 152.7723,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 80.75193,
+      "y": 0,
+      "z": 151.5922,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 81.60462,
+      "y": 0,
+      "z": 151.84615,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 81.25358,
+      "y": 0,
+      "z": 151.92569,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 81.02814,
+      "y": 0,
+      "z": 152.17578,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 80.183426,
+      "y": 0,
+      "z": 152.43144,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 80.66342,
+      "y": 0,
+      "z": 153.56613,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 80.29827,
+      "y": 0,
+      "z": 153.27965,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 79.47792,
+      "y": 0,
+      "z": 153.18732,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 79.26902,
+      "y": 0,
+      "z": 152.56108,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 79.56487,
+      "y": 0,
+      "z": 152.7019,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 78.861435,
+      "y": 0,
+      "z": 152.68369,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 78.97865,
+      "y": 0,
+      "z": 152.36665,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 78.597404,
+      "y": 0,
+      "z": 152.42818,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 77.73128,
+      "y": 0,
+      "z": 153.23085,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 78.14723,
+      "y": 0,
+      "z": 153.64876,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 78.32541,
+      "y": 0,
+      "z": 152.58113,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 77.92737,
+      "y": 0,
+      "z": 152.36346,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 77.719604,
+      "y": 0,
+      "z": 151.91385,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 77.976616,
+      "y": 0,
+      "z": 151.96904,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 78.30739,
+      "y": 0,
+      "z": 152.52379,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 77.843864,
+      "y": 0,
+      "z": 153.21664,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "crystal",
+      "x": 78.39251,
+      "y": 0,
+      "z": 153.34251,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "crystal",
+      "x": 80.161156,
+      "y": 0,
+      "z": 153.49847,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "crystal",
+      "x": 79.17584,
+      "y": 0,
+      "z": 153.51558,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "crystal",
+      "x": 82.32525,
+      "y": 0,
+      "z": 150.29659,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "crystal",
+      "x": 113.32214,
+      "y": 0,
+      "z": 145.88304,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 96.97021,
+      "y": 0,
+      "z": 156.56583,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 96.95915,
+      "y": 0,
+      "z": 156.2035,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 96.76454,
+      "y": 0,
+      "z": 156.05168,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 96.444336,
+      "y": 0,
+      "z": 155.95386,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 96.11873,
+      "y": 0,
+      "z": 155.88608,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 95.76077,
+      "y": 0,
+      "z": 156.33366,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 95.63591,
+      "y": 0,
+      "z": 156.45891,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 95.449646,
+      "y": 0,
+      "z": 156.94359,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 95.396454,
+      "y": 0,
+      "z": 157.20688,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 95.343735,
+      "y": 0,
+      "z": 157.5953,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 95.4931,
+      "y": 0,
+      "z": 158.1094,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 95.622856,
+      "y": 0,
+      "z": 158.3485,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 95.760574,
+      "y": 0,
+      "z": 158.7577,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 95.48425,
+      "y": 0,
+      "z": 157.86006,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 95.674835,
+      "y": 0,
+      "z": 156.74811,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 95.93402,
+      "y": 0,
+      "z": 156.46484,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 96.105125,
+      "y": 0,
+      "z": 156.1857,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 96.438774,
+      "y": 0,
+      "z": 156.47398,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 96.49533,
+      "y": 0,
+      "z": 156.48946,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 96.769554,
+      "y": 0,
+      "z": 156.65944,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 97.31262,
+      "y": 0,
+      "z": 156.63182,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 97.49148,
+      "y": 0,
+      "z": 156.4124,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 97.058975,
+      "y": 0,
+      "z": 156.28458,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 96.96049,
+      "y": 0,
+      "z": 156.07442,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 96.73676,
+      "y": 0,
+      "z": 155.88176,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 96.31722,
+      "y": 0,
+      "z": 155.7912,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 95.75843,
+      "y": 0,
+      "z": 156.13086,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 95.490616,
+      "y": 0,
+      "z": 156.49612,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 96.388,
+      "y": 0,
+      "z": 157.539,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 96.70155,
+      "y": 0,
+      "z": 157.07207,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 96.114525,
+      "y": 0,
+      "z": 156.96465,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 96.04771,
+      "y": 0,
+      "z": 157.46771,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 96.55475,
+      "y": 0,
+      "z": 157.58994,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 96.6039,
+      "y": 0,
+      "z": 157.06647,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 97.153786,
+      "y": 0,
+      "z": 157.19539,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 97.402275,
+      "y": 0,
+      "z": 157.19455,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 97.63153,
+      "y": 0,
+      "z": 156.85596,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 97.0984,
+      "y": 0,
+      "z": 156.78828,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 96.443665,
+      "y": 0,
+      "z": 156.77081,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 96.77102,
+      "y": 0,
+      "z": 156.26944,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 96.29935,
+      "y": 0,
+      "z": 156.5762,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 95.82514,
+      "y": 0,
+      "z": 156.68964,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 95.88593,
+      "y": 0,
+      "z": 157.88727,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 96.03396,
+      "y": 0,
+      "z": 158.06924,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 96.1354,
+      "y": 0,
+      "z": 158.3355,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 96.30429,
+      "y": 0,
+      "z": 158.41745,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 96.7574,
+      "y": 0,
+      "z": 158.47241,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 97.02686,
+      "y": 0,
+      "z": 158.55147,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 97.43008,
+      "y": 0,
+      "z": 158.6003,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 97.91936,
+      "y": 0,
+      "z": 158.37067,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 97.90489,
+      "y": 0,
+      "z": 157.55467,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 97.72565,
+      "y": 0,
+      "z": 157.23828,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 97.849045,
+      "y": 0,
+      "z": 159.0186,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 97.52084,
+      "y": 0,
+      "z": 158.80429,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 97.39939,
+      "y": 0,
+      "z": 157.86327,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 97.78653,
+      "y": 0,
+      "z": 157.76155,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 97.17253,
+      "y": 0,
+      "z": 157.56898,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 96.90309,
+      "y": 0,
+      "z": 157.32703,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 96.68599,
+      "y": 0,
+      "z": 157.27281,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 96.184654,
+      "y": 0,
+      "z": 157.12436,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 95.95613,
+      "y": 0,
+      "z": 157.17528,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 95.62615,
+      "y": 0,
+      "z": 157.56898,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 96.1224,
+      "y": 0,
+      "z": 157.4119,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 95.727264,
+      "y": 0,
+      "z": 157.25404,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 96.250496,
+      "y": 0,
+      "z": 157.73425,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 96.62058,
+      "y": 0,
+      "z": 158.04681,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 97.06065,
+      "y": 0,
+      "z": 157.97057,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 97.46767,
+      "y": 0,
+      "z": 158.44121,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 97.0115,
+      "y": 0,
+      "z": 158.64632,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 96.70146,
+      "y": 0,
+      "z": 157.86234,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 97.03391,
+      "y": 0,
+      "z": 157.44122,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 97.59853,
+      "y": 0,
+      "z": 158.66187,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 97.31333,
+      "y": 0,
+      "z": 157.02736,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 95.92472,
+      "y": 0,
+      "z": 158.75203,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 95.754715,
+      "y": 0,
+      "z": 158.56462,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 96.4669,
+      "y": 0,
+      "z": 158.2036,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 96.885544,
+      "y": 0,
+      "z": 158.336,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 97.16094,
+      "y": 0,
+      "z": 158.23782,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 97.45828,
+      "y": 0,
+      "z": 158.12878,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 97.71608,
+      "y": 0,
+      "z": 158.05956,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 97.82381,
+      "y": 0,
+      "z": 157.96495,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 97.57471,
+      "y": 0,
+      "z": 157.78464,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 97.236694,
+      "y": 0,
+      "z": 157.48314,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 97.56031,
+      "y": 0,
+      "z": 157.62125,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 96.723305,
+      "y": 0,
+      "z": 157.67003,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 96.319214,
+      "y": 0,
+      "z": 157.92499,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 96.09024,
+      "y": 0,
+      "z": 157.97728,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 96.54726,
+      "y": 0,
+      "z": 156.97795,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 95.97958,
+      "y": 0,
+      "z": 158.58153,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 96.5413,
+      "y": 0,
+      "z": 159.02405,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 96.52764,
+      "y": 0,
+      "z": 158.5588,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 96.26117,
+      "y": 0,
+      "z": 158.72232,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 95.873,
+      "y": 0,
+      "z": 159.01328,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 96.7419,
+      "y": 0,
+      "z": 158.72559,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "cauldron",
+      "x": 108.04033,
+      "y": 0,
+      "z": 143.43985,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "cauldron",
+      "x": 101.002235,
+      "y": 0,
+      "z": 149.39777,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "cauldron",
+      "x": 93.695526,
+      "y": 0,
+      "z": 148.5714,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "cauldron",
+      "x": 90.445366,
+      "y": 0,
+      "z": 142.44768,
+      "rotationY": -1.5707964,
+      "scale": 1
+    }
+  ],
+  "useProceduralProps": false
+}

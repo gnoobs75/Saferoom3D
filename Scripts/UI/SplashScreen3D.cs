@@ -398,7 +398,7 @@ public partial class SplashScreen3D : Control
         }
         else
         {
-            CustomMapPath = $"user://maps/{mapName}.json";  // Fallback
+            CustomMapPath = $"res://maps/{mapName}.json";  // Fallback
         }
         GD.Print($"[SplashScreen3D] Selected custom map: {CustomMapPath}");
 
