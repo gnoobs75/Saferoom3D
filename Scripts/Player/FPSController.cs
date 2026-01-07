@@ -26,8 +26,9 @@ public partial class FPSController : CharacterBody3D
     private Node3D? _weaponHolder;   // Attach weapon models here
 
     // First-person weapon display
-    private Node3D? _torchNode;      // Torch in left hand
+    private Node3D? _torchNode;      // Torch in left hand (when equipped)
     private Node3D? _weaponNode;     // Weapon in right hand (dynamic based on equipment)
+    private Node3D? _leftHandNode;   // Left hand item: torch, shield, or dual-wield weapon
     private OmniLight3D? _torchLight;
     private float _torchFlickerTimer;
     private float _weaponSwingAngle;  // Current swing angle for attack animation
@@ -36,6 +37,17 @@ public partial class FPSController : CharacterBody3D
     private Vector3 _weaponRestPos;
     private Vector3 _weaponSwingPos;
     private Core.WeaponType _currentWeaponType = Core.WeaponType.None;  // Track current weapon to avoid unnecessary rebuilds
+
+    // Left hand / dual wield state
+    private enum LeftHandItemType { None, Torch, Shield, Weapon }
+    private LeftHandItemType _leftHandType = LeftHandItemType.None;
+    private bool _isLeftHandSwinging;
+    private float _leftHandSwingTimer;
+    private Vector3 _leftHandRestPos;
+    private Vector3 _leftHandSwingPos;
+    private bool _lastSwingWasRight = true;  // For alternating dual wield
+    private float _attackHoldTimer;           // For detecting hold vs click
+    private const float AttackHoldThreshold = 0.15f; // 150ms to trigger dual swing
 
     // Movement state
     private Vector3 _velocity;
@@ -214,7 +226,7 @@ public partial class FPSController : CharacterBody3D
         // Torch in left hand - positioned at left side
         _torchNode = new Node3D();
         _torchNode.Name = "FirstPersonTorch";
-        _torchNode.Position = new Vector3(-0.5f, -0.4f, -0.4f); // Left side, lower position
+        _torchNode.Position = new Vector3(-0.5f, -0.65f, -0.35f); // Left side, lowered so flame is centered
 
         // Constants for torch geometry
         float handleHeight = 0.5f;
@@ -360,9 +372,9 @@ public partial class FPSController : CharacterBody3D
         _torchLight = new OmniLight3D();
         _torchLight.Position = firePos;  // At torch head/flame position
         _torchLight.LightColor = new Color(1f, 0.7f, 0.35f);
-        _torchLight.LightEnergy = 1.2f; // Slightly less intense
-        _torchLight.OmniRange = 7f;
-        _torchLight.OmniAttenuation = 1.4f;
+        _torchLight.LightEnergy = 2.5f; // Brighter for better visibility
+        _torchLight.OmniRange = 12f;    // Extended range to light up more dungeon
+        _torchLight.OmniAttenuation = 1.2f; // Smoother falloff
         _torchLight.ShadowEnabled = false;
         _torchNode.AddChild(_torchLight);
 
@@ -535,6 +547,56 @@ public partial class FPSController : CharacterBody3D
         };
     }
 
+    /// <summary>
+    /// Get weapon-specific animation parameters for different swing styles.
+    /// Returns: (speedMultiplier, yArcDegrees, zRollDegrees, swingStyle)
+    /// </summary>
+    private static (float speed, float yArc, float zRoll, string style) GetWeaponAnimationStyle(Core.WeaponType type)
+    {
+        return type switch
+        {
+            // Quick jabbing weapons - fast, small arc, thrust style
+            Core.WeaponType.Dagger => (1.4f, 40f, 25f, "thrust"),
+
+            // Balanced swords - standard slash
+            Core.WeaponType.ShortSword => (1.1f, 85f, 45f, "slash"),
+            Core.WeaponType.LongSword => (1.0f, 90f, 50f, "slash"),
+
+            // Heavy chopping weapons - slower, downward arc
+            Core.WeaponType.Axe => (0.9f, 70f, 55f, "chop"),
+            Core.WeaponType.BattleAxe => (0.8f, 75f, 40f, "chop"),
+
+            // Smashing weapons - overhead motion
+            Core.WeaponType.Mace => (0.85f, 60f, 45f, "smash"),
+            Core.WeaponType.WarHammer => (0.75f, 65f, 35f, "smash"),
+            Core.WeaponType.Club => (0.9f, 55f, 40f, "smash"),
+
+            // Thrusting weapons - linear poke
+            Core.WeaponType.Spear => (1.1f, 20f, 15f, "thrust"),
+
+            // Sweeping weapons - wide arc
+            Core.WeaponType.Staff => (0.95f, 100f, 35f, "sweep"),
+            Core.WeaponType.Scythe => (0.85f, 110f, 40f, "sweep"),
+
+            // Bow - unique (probably shouldn't melee but fallback)
+            Core.WeaponType.Bow => (1.2f, 30f, 20f, "thrust"),
+
+            // Default balanced slash
+            _ => (1.0f, 90f, 50f, "slash")
+        };
+    }
+
+    /// <summary>
+    /// Get the current weapon's pushback multiplier from WeaponFactory.
+    /// </summary>
+    private float GetCurrentWeaponPushback()
+    {
+        // Convert Core.WeaponType to WeaponFactory.WeaponType and get pushback
+        var factoryType = MapToFactoryWeaponType(_currentWeaponType);
+        var weaponData = SafeRoom3D.Enemies.WeaponFactory.GetWeaponData(factoryType);
+        return weaponData.Pushback;
+    }
+
     private void UpdateFirstPersonWeapons(float delta)
     {
         // Update torch flicker
@@ -550,7 +612,7 @@ public partial class FPSController : CharacterBody3D
             _torchLight.LightColor = new Color(1f, warmth, 0.35f);
         }
 
-        // Update weapon swing animation - slash from right to left across body
+        // Update weapon swing animation - overhauled with wind-up, accelerating swing, impact
         if (_isWeaponSwinging && _weaponNode != null)
         {
             _weaponSwingTimer += delta;
@@ -558,35 +620,138 @@ public partial class FPSController : CharacterBody3D
             // Get rest rotation for current weapon type
             var (_, _, restRotation, _) = GetWeaponPositioning(_currentWeaponType);
 
-            // Swing animation: reach out and slash left to right (from player's right to left)
-            float swingDuration = 0.2f;   // Quick slash
-            float returnDuration = 0.25f; // Slower return
-            float totalDuration = swingDuration + returnDuration;
+            // Get weapon-specific animation parameters
+            var (speedMult, yArc, zRoll, swingStyle) = GetWeaponAnimationStyle(_currentWeaponType);
 
-            if (_weaponSwingTimer < swingDuration)
+            // Animation phases - adjust speed based on weapon type
+            float baseSpeed = 1f / speedMult; // Higher speedMult = faster animation
+            float windupDuration = 0.05f * baseSpeed;
+            float swingDuration = 0.12f * baseSpeed;
+            float impactDuration = 0.03f;
+            float followDuration = 0.08f * baseSpeed;
+            float recoveryDuration = 0.15f * baseSpeed;
+            float totalDuration = windupDuration + swingDuration + impactDuration + followDuration + recoveryDuration;
+
+            float elapsed = _weaponSwingTimer;
+
+            // Swing style adjustments for thrusting weapons (dagger, spear)
+            bool isThrust = swingStyle == "thrust";
+            float windupY = isThrust ? -10 : 15;       // Thrust pulls back on Z, not Y
+            float windupZ = isThrust ? 0.1f : 0.05f;   // Thrust pulls back more
+            float xTilt = isThrust ? 5 : 15;           // Less X tilt for thrust
+
+            if (elapsed < windupDuration)
             {
-                // Swing phase: weapon moves from right side across body to left
-                float t = _weaponSwingTimer / swingDuration;
-                t = Mathf.Sin(t * Mathf.Pi / 2); // Ease out for snappy feel
-                _weaponNode.Position = _weaponRestPos.Lerp(_weaponSwingPos, t);
-                // Rotate to show slash motion across body
+                // Wind-up phase: pull weapon back slightly (builds tension)
+                float t = elapsed / windupDuration;
+                _weaponNode.Position = _weaponRestPos + new Vector3(0, 0, windupZ * t);
                 _weaponNode.RotationDegrees = new Vector3(
-                    Mathf.Lerp(restRotation.X, restRotation.X + 10, t),    // Slightly level out
-                    Mathf.Lerp(restRotation.Y, restRotation.Y - 70, t),    // Rotate across body
-                    Mathf.Lerp(restRotation.Z, restRotation.Z - 40, t)     // Roll during slash
+                    restRotation.X,
+                    restRotation.Y + windupY * t,
+                    restRotation.Z
                 );
             }
-            else if (_weaponSwingTimer < totalDuration)
+            else if (elapsed < windupDuration + swingDuration)
             {
-                // Return phase: bring weapon back to rest position
-                float t = (_weaponSwingTimer - swingDuration) / returnDuration;
-                t = t * t; // Ease in for smooth return
-                _weaponNode.Position = _weaponSwingPos.Lerp(_weaponRestPos, t);
-                _weaponNode.RotationDegrees = new Vector3(
-                    Mathf.Lerp(restRotation.X + 10, restRotation.X, t),
-                    Mathf.Lerp(restRotation.Y - 70, restRotation.Y, t),
-                    Mathf.Lerp(restRotation.Z - 40, restRotation.Z, t)
-                );
+                // Swing phase: fast, ACCELERATING attack (ease-in for power feel)
+                float t = (elapsed - windupDuration) / swingDuration;
+                t = t * t; // Ease-IN = ACCELERATES toward impact
+
+                if (isThrust)
+                {
+                    // Thrust: move forward on Z axis
+                    _weaponNode.Position = _weaponRestPos + new Vector3(0, 0, Mathf.Lerp(windupZ, -0.3f, t));
+                    _weaponNode.RotationDegrees = new Vector3(
+                        Mathf.Lerp(restRotation.X, restRotation.X + xTilt, t),
+                        Mathf.Lerp(restRotation.Y + windupY, restRotation.Y - yArc * 0.3f, t),
+                        restRotation.Z
+                    );
+                }
+                else
+                {
+                    // Slash: arc movement
+                    _weaponNode.Position = _weaponRestPos.Lerp(_weaponSwingPos, t);
+                    _weaponNode.RotationDegrees = new Vector3(
+                        Mathf.Lerp(restRotation.X, restRotation.X + xTilt, t),
+                        Mathf.Lerp(restRotation.Y + windupY, restRotation.Y - yArc, t),
+                        Mathf.Lerp(restRotation.Z, restRotation.Z - zRoll, t)
+                    );
+                }
+
+                // Add camera roll during swing for whoosh feel
+                if (_camera != null)
+                {
+                    float rollIntensity = isThrust ? 1f : 2f;
+                    float swingRoll = Mathf.Sin(t * Mathf.Pi) * rollIntensity;
+                    _camera.RotationDegrees = new Vector3(_cameraPitch, _camera.RotationDegrees.Y, swingRoll);
+                }
+            }
+            else if (elapsed < windupDuration + swingDuration + impactDuration)
+            {
+                // Impact pause: brief freeze for visceral hit feel
+                if (isThrust)
+                {
+                    _weaponNode.Position = _weaponRestPos + new Vector3(0, 0, -0.3f);
+                    _weaponNode.RotationDegrees = new Vector3(
+                        restRotation.X + xTilt,
+                        restRotation.Y - yArc * 0.3f,
+                        restRotation.Z
+                    );
+                }
+                else
+                {
+                    _weaponNode.Position = _weaponSwingPos;
+                    _weaponNode.RotationDegrees = new Vector3(
+                        restRotation.X + xTilt,
+                        restRotation.Y - yArc,
+                        restRotation.Z - zRoll
+                    );
+                }
+            }
+            else if (elapsed < windupDuration + swingDuration + impactDuration + followDuration)
+            {
+                // Follow-through: continue slightly past impact point
+                float t = (elapsed - windupDuration - swingDuration - impactDuration) / followDuration;
+                if (isThrust)
+                {
+                    _weaponNode.Position = _weaponRestPos + new Vector3(0, 0, Mathf.Lerp(-0.3f, -0.35f, t));
+                }
+                else
+                {
+                    _weaponNode.Position = _weaponSwingPos + new Vector3(-0.05f * t, -0.02f * t, 0);
+                    _weaponNode.RotationDegrees = new Vector3(
+                        restRotation.X + xTilt + 5 * t,
+                        restRotation.Y - yArc - 10 * t,
+                        restRotation.Z - zRoll
+                    );
+                }
+            }
+            else if (elapsed < totalDuration)
+            {
+                // Recovery phase: smooth return to ready position
+                float t = (elapsed - windupDuration - swingDuration - impactDuration - followDuration) / recoveryDuration;
+                t = 1 - (1 - t) * (1 - t); // Ease out for smooth settle
+
+                if (isThrust)
+                {
+                    Vector3 thrustEndPos = _weaponRestPos + new Vector3(0, 0, -0.35f);
+                    _weaponNode.Position = thrustEndPos.Lerp(_weaponRestPos, t);
+                    _weaponNode.RotationDegrees = restRotation;
+                }
+                else
+                {
+                    Vector3 followEndPos = _weaponSwingPos + new Vector3(-0.05f, -0.02f, 0);
+                    Vector3 followEndRot = new Vector3(restRotation.X + xTilt + 5, restRotation.Y - yArc - 10, restRotation.Z - zRoll);
+                    _weaponNode.Position = followEndPos.Lerp(_weaponRestPos, t);
+                    _weaponNode.RotationDegrees = followEndRot.Lerp(restRotation, t);
+                }
+
+                // Reset camera roll
+                if (_camera != null)
+                {
+                    float resetRoll = (1 - t) * 1f;
+                    _camera.RotationDegrees = new Vector3(_cameraPitch, _camera.RotationDegrees.Y, resetRoll);
+                }
             }
             else
             {
@@ -595,6 +760,69 @@ public partial class FPSController : CharacterBody3D
                 _weaponSwingTimer = 0;
                 _weaponNode.Position = _weaponRestPos;
                 _weaponNode.RotationDegrees = restRotation;
+                if (_camera != null)
+                {
+                    _camera.RotationDegrees = new Vector3(_cameraPitch, _camera.RotationDegrees.Y, 0);
+                }
+            }
+        }
+
+        // Update LEFT hand swing animation (for dual wield)
+        if (_isLeftHandSwinging && _leftHandNode != null && _leftHandType == LeftHandItemType.Weapon)
+        {
+            _leftHandSwingTimer += delta;
+
+            // Mirrored animation phases
+            float windupDuration = 0.05f;
+            float swingDuration = 0.12f;
+            float impactDuration = 0.03f;
+            float followDuration = 0.08f;
+            float recoveryDuration = 0.15f;
+            float totalDuration = windupDuration + swingDuration + impactDuration + followDuration + recoveryDuration;
+
+            // Get mirrored rest rotation
+            Vector3 restRotation = _leftHandNode.RotationDegrees;
+
+            float elapsed = _leftHandSwingTimer;
+
+            if (elapsed < windupDuration)
+            {
+                float t = elapsed / windupDuration;
+                _leftHandNode.Position = _leftHandRestPos + new Vector3(0, 0, 0.05f * t);
+                _leftHandNode.RotationDegrees = new Vector3(restRotation.X, restRotation.Y - 15 * t, restRotation.Z);
+            }
+            else if (elapsed < windupDuration + swingDuration)
+            {
+                float t = (elapsed - windupDuration) / swingDuration;
+                t = t * t; // Accelerating
+                _leftHandNode.Position = _leftHandRestPos.Lerp(_leftHandSwingPos, t);
+                _leftHandNode.RotationDegrees = new Vector3(
+                    Mathf.Lerp(restRotation.X, restRotation.X + 15, t),
+                    Mathf.Lerp(restRotation.Y - 15, restRotation.Y + 90, t), // Mirrored arc
+                    Mathf.Lerp(restRotation.Z, restRotation.Z + 50, t)       // Mirrored roll
+                );
+            }
+            else if (elapsed < windupDuration + swingDuration + impactDuration)
+            {
+                _leftHandNode.Position = _leftHandSwingPos;
+            }
+            else if (elapsed < windupDuration + swingDuration + impactDuration + followDuration)
+            {
+                float t = (elapsed - windupDuration - swingDuration - impactDuration) / followDuration;
+                _leftHandNode.Position = _leftHandSwingPos + new Vector3(0.05f * t, -0.02f * t, 0);
+            }
+            else if (elapsed < totalDuration)
+            {
+                float t = (elapsed - windupDuration - swingDuration - impactDuration - followDuration) / recoveryDuration;
+                t = 1 - (1 - t) * (1 - t);
+                Vector3 followEndPos = _leftHandSwingPos + new Vector3(0.05f, -0.02f, 0);
+                _leftHandNode.Position = followEndPos.Lerp(_leftHandRestPos, t);
+            }
+            else
+            {
+                _isLeftHandSwinging = false;
+                _leftHandSwingTimer = 0;
+                _leftHandNode.Position = _leftHandRestPos;
             }
         }
 
@@ -602,7 +830,7 @@ public partial class FPSController : CharacterBody3D
         if (_torchNode != null && !_isWeaponSwinging)
         {
             float sway = Mathf.Sin(_headBobTime * 2f) * 0.01f;
-            _torchNode.Position = new Vector3(-0.55f + sway, -0.35f, -0.45f); // Match new torch position
+            _torchNode.Position = new Vector3(-0.5f + sway, -0.65f, -0.35f); // Lowered torch position
         }
         if (_weaponNode != null && !_isWeaponSwinging)
         {
@@ -612,7 +840,7 @@ public partial class FPSController : CharacterBody3D
     }
 
     /// <summary>
-    /// Trigger weapon swing animation
+    /// Trigger weapon swing animation (right hand)
     /// </summary>
     public void SwingWeapon()
     {
@@ -622,6 +850,32 @@ public partial class FPSController : CharacterBody3D
             _weaponSwingTimer = 0;
         }
     }
+
+    /// <summary>
+    /// Trigger left hand swing animation (dual wield)
+    /// </summary>
+    public void SwingLeftHand()
+    {
+        if (!_isLeftHandSwinging && _leftHandType == LeftHandItemType.Weapon)
+        {
+            _isLeftHandSwinging = true;
+            _leftHandSwingTimer = 0;
+        }
+    }
+
+    /// <summary>
+    /// Swing both weapons simultaneously (dual wield hold attack)
+    /// </summary>
+    public void SwingBothWeapons()
+    {
+        SwingWeapon();
+        SwingLeftHand();
+    }
+
+    /// <summary>
+    /// Check if player is currently dual wielding
+    /// </summary>
+    public bool IsDualWielding => _leftHandType == LeftHandItemType.Weapon;
 
     /// <summary>
     /// Legacy method for backwards compatibility
@@ -898,21 +1152,39 @@ public partial class FPSController : CharacterBody3D
         bool isTargeting = AbilityManager3D.Instance?.IsTargeting ?? false;
         bool isInMenu = Input.MouseMode == Input.MouseModeEnum.Visible;
 
-        // Charged attack system - hold left mouse button (suppress when in menus or edit mode)
+        // Attack system - handles both single weapon and dual wield
+        // Single weapon: hold for strong attack, quick release for normal
+        // Dual wield: quick release alternates hands, hold 0.15s for simultaneous
         if (Input.IsActionPressed("attack") && _attackCooldown <= 0 && !isTargeting && !_isInspectMode && !_isEditMode && !isInMenu)
         {
             if (!_isChargingAttack)
             {
-                // Start charging
+                // Start charging/holding
                 _isChargingAttack = true;
                 _chargeTimer = 0f;
-                ShowChargeIndicator();
+                _attackHoldTimer = 0f;
+                if (!IsDualWielding)
+                {
+                    ShowChargeIndicator();
+                }
             }
             else
             {
                 // Continue charging
                 _chargeTimer += dt;
-                UpdateChargeIndicator();
+                _attackHoldTimer += dt;
+
+                // For dual wield: trigger simultaneous attack after hold threshold
+                if (IsDualWielding && _attackHoldTimer >= AttackHoldThreshold && !_isWeaponSwinging && !_isLeftHandSwinging)
+                {
+                    PerformDualWieldSimultaneousAttack();
+                    _isChargingAttack = false;
+                    _attackHoldTimer = 0f;
+                }
+                else if (!IsDualWielding)
+                {
+                    UpdateChargeIndicator();
+                }
             }
         }
         else if (_isChargingAttack)
@@ -921,20 +1193,35 @@ public partial class FPSController : CharacterBody3D
             if (isInMenu)
             {
                 _isChargingAttack = false;
+                _attackHoldTimer = 0f;
                 HideChargeIndicator();
             }
             else
             {
-                // Released attack button - perform attack based on charge level
-                if (_chargeTimer >= StrongAttackChargeTime)
+                // Released attack button - perform attack based on context
+                if (IsDualWielding)
                 {
-                    PerformStrongAttack();
+                    // Dual wield: quick release = alternating attack
+                    if (_attackHoldTimer < AttackHoldThreshold)
+                    {
+                        PerformDualWieldAlternatingAttack();
+                    }
+                    // If held past threshold, attack already performed above
                 }
                 else
                 {
-                    PerformMeleeAttack();
+                    // Single weapon: charged attack system
+                    if (_chargeTimer >= StrongAttackChargeTime)
+                    {
+                        PerformStrongAttack();
+                    }
+                    else
+                    {
+                        PerformMeleeAttack();
+                    }
                 }
                 _isChargingAttack = false;
+                _attackHoldTimer = 0f;
                 HideChargeIndicator();
             }
         }
@@ -1249,7 +1536,8 @@ public partial class FPSController : CharacterBody3D
                     {
                         // Use CharacterStats for damage calculation
                         var (damage, isCrit) = Stats.CalculateMeleeDamage();
-                        enemy3D.Call("TakeDamage", (float)damage, GlobalPosition, "Melee", isCrit);
+                        float pushback = GetCurrentWeaponPushback();
+                        enemy3D.Call("TakeDamage", (float)damage, GlobalPosition, "Melee", isCrit, pushback);
                         hitSomething = true;
 
                         // Record damage dealt in game stats
@@ -1288,6 +1576,170 @@ public partial class FPSController : CharacterBody3D
         GD.Print("[FPSController] Melee attack!");
     }
 
+    /// <summary>
+    /// Dual wield alternating attack - swings one weapon at a time, alternating hands.
+    /// Triggered by quick clicks while dual wielding.
+    /// </summary>
+    private void PerformDualWieldAlternatingAttack()
+    {
+        _attackCooldown = Constants.AttackCooldown * 0.7f; // Faster attacks when dual wielding
+        _isAttacking = true;
+        _attackTimer = Constants.AttackWindup;
+
+        EmitSignal(SignalName.Attacked);
+
+        // Alternate between right and left hand
+        if (_lastSwingWasRight)
+        {
+            SwingLeftHand();
+            _lastSwingWasRight = false;
+        }
+        else
+        {
+            SwingWeapon();
+            _lastSwingWasRight = true;
+        }
+
+        // Play attack sound
+        SoundManager3D.Instance?.PlayAttackSound();
+
+        // Create slash effect
+        if (_camera != null)
+        {
+            MeleeSlashEffect3D.Create(_camera);
+        }
+
+        // Hit detection (same as normal melee but slightly reduced damage per hit)
+        bool hitSomething = false;
+        var enemies = GetTree().GetNodesInGroup("Enemies");
+        Vector3 attackOrigin = _camera?.GlobalPosition ?? GlobalPosition + new Vector3(0, Constants.PlayerEyeHeight, 0);
+        Vector3 attackDir = GetLookDirection();
+
+        foreach (var node in enemies)
+        {
+            if (node is Node3D enemy3D)
+            {
+                Vector3 toEnemy = enemy3D.GlobalPosition - attackOrigin;
+                float horizontalDistance = new Vector2(toEnemy.X, toEnemy.Z).Length();
+
+                if (horizontalDistance > Constants.AttackRange + 1.5f) continue;
+
+                float dot = toEnemy.Normalized().Dot(attackDir);
+                if (dot > 0.3f)
+                {
+                    if (enemy3D.HasMethod("TakeDamage"))
+                    {
+                        var (damage, isCrit) = Stats.CalculateMeleeDamage();
+                        // Dual wield single swing = 80% damage but faster overall DPS
+                        damage = (int)(damage * 0.8f);
+                        float pushback = GetCurrentWeaponPushback() * 0.8f; // Slightly less pushback for lighter swing
+                        enemy3D.Call("TakeDamage", (float)damage, GlobalPosition, "Dual Wield", isCrit, pushback);
+                        hitSomething = true;
+
+                        string targetType = GetEnemyDisplayName(enemy3D);
+                        GameStats.Instance?.RecordDamageDealt(damage, targetType);
+                        GameStats.Instance?.RecordMeleeAttack();
+                        if (isCrit) GameStats.Instance?.RecordCriticalHit();
+
+                        if (Stats.LifeOnHit > 0) Heal(Stats.LifeOnHit);
+                        if (Stats.ManaOnHit > 0) RestoreMana(Stats.ManaOnHit);
+
+                        string attackType = isCrit ? "critical dual wield" : "dual wield";
+                        HUD3D.Instance?.LogPlayerDamage(targetType, damage, attackType);
+                        GD.Print($"[FPSController] Dual wield hit {enemy3D.Name} for {damage}{(isCrit ? " (CRIT!)" : "")}!");
+                    }
+                }
+            }
+        }
+
+        if (hitSomething)
+        {
+            RequestScreenShake(Constants.ScreenShakeDuration * 0.7f, Constants.ScreenShakeIntensity * 0.8f);
+            SoundManager3D.Instance?.PlayHitSound(GetCameraPosition());
+        }
+
+        GD.Print($"[FPSController] Dual wield alternating attack ({(_lastSwingWasRight ? "right" : "left")} next)!");
+    }
+
+    /// <summary>
+    /// Dual wield simultaneous attack - both weapons swing together.
+    /// Triggered by holding attack button while dual wielding.
+    /// </summary>
+    private void PerformDualWieldSimultaneousAttack()
+    {
+        _attackCooldown = Constants.AttackCooldown * 1.2f; // Slightly longer cooldown for power move
+        _isAttacking = true;
+        _attackTimer = Constants.AttackWindup;
+
+        EmitSignal(SignalName.Attacked);
+
+        // Swing both weapons
+        SwingBothWeapons();
+
+        // Play attack sound (could be louder/different for simultaneous)
+        SoundManager3D.Instance?.PlayAttackSound();
+        SoundManager3D.Instance?.PlaySound("attack_alt"); // Second sound for power feel
+
+        // Create slash effect (maybe two?)
+        if (_camera != null)
+        {
+            MeleeSlashEffect3D.Create(_camera);
+        }
+
+        // Hit detection with bonus damage for simultaneous strike
+        bool hitSomething = false;
+        var enemies = GetTree().GetNodesInGroup("Enemies");
+        Vector3 attackOrigin = _camera?.GlobalPosition ?? GlobalPosition + new Vector3(0, Constants.PlayerEyeHeight, 0);
+        Vector3 attackDir = GetLookDirection();
+
+        foreach (var node in enemies)
+        {
+            if (node is Node3D enemy3D)
+            {
+                Vector3 toEnemy = enemy3D.GlobalPosition - attackOrigin;
+                float horizontalDistance = new Vector2(toEnemy.X, toEnemy.Z).Length();
+
+                if (horizontalDistance > Constants.AttackRange + 1.5f) continue;
+
+                float dot = toEnemy.Normalized().Dot(attackDir);
+                if (dot > 0.3f)
+                {
+                    if (enemy3D.HasMethod("TakeDamage"))
+                    {
+                        var (damage, isCrit) = Stats.CalculateMeleeDamage();
+                        // Simultaneous strike = 160% damage (both weapons hit)
+                        damage = (int)(damage * 1.6f);
+                        float pushback = GetCurrentWeaponPushback() * 1.5f; // Big pushback for dual strike
+                        enemy3D.Call("TakeDamage", (float)damage, GlobalPosition, "Dual Strike", isCrit, pushback);
+                        hitSomething = true;
+
+                        string targetType = GetEnemyDisplayName(enemy3D);
+                        GameStats.Instance?.RecordDamageDealt(damage, targetType);
+                        GameStats.Instance?.RecordMeleeAttack();
+                        GameStats.Instance?.RecordMeleeAttack(); // Count as 2 attacks
+                        if (isCrit) GameStats.Instance?.RecordCriticalHit();
+
+                        if (Stats.LifeOnHit > 0) Heal(Stats.LifeOnHit * 2); // Double life on hit
+                        if (Stats.ManaOnHit > 0) RestoreMana(Stats.ManaOnHit * 2);
+
+                        string attackType = isCrit ? "critical DUAL STRIKE" : "DUAL STRIKE";
+                        HUD3D.Instance?.LogPlayerDamage(targetType, damage, attackType);
+                        GD.Print($"[FPSController] DUAL STRIKE hit {enemy3D.Name} for {damage}{(isCrit ? " (CRIT!)" : "")}!");
+                    }
+                }
+            }
+        }
+
+        if (hitSomething)
+        {
+            // Bigger impact for simultaneous attack
+            RequestScreenShake(Constants.ScreenShakeDuration * 1.5f, Constants.ScreenShakeIntensity * 1.3f);
+            SoundManager3D.Instance?.PlayHitSound(GetCameraPosition());
+        }
+
+        GD.Print("[FPSController] DUAL WIELD SIMULTANEOUS ATTACK!");
+    }
+
     private void PerformStrongAttack()
     {
         _attackCooldown = Constants.AttackCooldown * 1.5f; // Longer cooldown for strong attack
@@ -1313,7 +1765,6 @@ public partial class FPSController : CharacterBody3D
         // Strong attack uses CharacterStats damage with multiplier
         var (baseDamage, isCrit) = Stats.CalculateMeleeDamage();
         int strongDamage = (int)(baseDamage * StrongAttackDamageMultiplier);
-        float strongKnockback = Constants.KnockbackForce * StrongAttackKnockbackMultiplier;
 
         // Check all enemies in range - wider arc for strong attack
         var enemies = GetTree().GetNodesInGroup("Enemies");
@@ -1337,7 +1788,9 @@ public partial class FPSController : CharacterBody3D
                 {
                     if (enemy3D.HasMethod("TakeDamage"))
                     {
-                        enemy3D.Call("TakeDamage", (float)strongDamage, GlobalPosition, "StrongMelee", isCrit);
+                        // Strong attacks get extra pushback multiplier
+                        float pushback = GetCurrentWeaponPushback() * StrongAttackKnockbackMultiplier;
+                        enemy3D.Call("TakeDamage", (float)strongDamage, GlobalPosition, "StrongMelee", isCrit, pushback);
                         hitSomething = true;
 
                         // Record damage dealt in game stats
@@ -1360,13 +1813,6 @@ public partial class FPSController : CharacterBody3D
                         string enemyName = targetType;
                         string attackType = isCrit ? "critical strong melee" : "strong melee";
                         HUD3D.Instance?.LogPlayerDamage(enemyName, strongDamage, attackType);
-
-                        // Apply extra knockback for strong attack
-                        if (enemy3D.HasMethod("ApplyKnockback"))
-                        {
-                            Vector3 knockbackDir = (enemy3D.GlobalPosition - GlobalPosition).Normalized();
-                            enemy3D.Call("ApplyKnockback", knockbackDir * strongKnockback);
-                        }
 
                         GD.Print($"[FPSController] Strong attack hit {enemy3D.Name} for {strongDamage}{(isCrit ? " (CRIT!)" : "")}!");
                     }
@@ -1882,7 +2328,142 @@ public partial class FPSController : CharacterBody3D
         // Update first-person weapon to match equipped weapon
         CreateFirstPersonWeapon();
 
+        // Update left hand item (torch, shield, or dual-wield weapon)
+        UpdateLeftHandItem();
+
         GD.Print($"[FPSController] Equipment changed. Stats: {Stats.GetStatsSummary()}");
+    }
+
+    /// <summary>
+    /// Update the left hand visual based on OffHand equipment slot.
+    /// Can display: torch, shield, or dual-wield weapon.
+    /// </summary>
+    private void UpdateLeftHandItem()
+    {
+        // Clear existing left hand visuals
+        if (_leftHandNode != null)
+        {
+            _leftHandNode.QueueFree();
+            _leftHandNode = null;
+        }
+        if (_torchNode != null)
+        {
+            _torchNode.QueueFree();
+            _torchNode = null;
+            _torchLight = null;
+        }
+
+        // Get OffHand equipment
+        var offHand = Equipment.GetEquippedItem(EquipmentSlot.OffHand);
+
+        // Check if main hand is two-handed (no left hand item)
+        var mainHand = Equipment.GetEquippedItem(EquipmentSlot.MainHand);
+        if (mainHand?.IsTwoHanded == true)
+        {
+            _leftHandType = LeftHandItemType.None;
+            GD.Print("[FPSController] Two-handed weapon equipped, left hand empty");
+            return;
+        }
+
+        // No off-hand item equipped
+        if (offHand == null)
+        {
+            _leftHandType = LeftHandItemType.None;
+            GD.Print("[FPSController] No off-hand item, left hand empty");
+            return;
+        }
+
+        // Determine what type of item and create appropriate visual
+        if (offHand.Name.Contains("Torch", System.StringComparison.OrdinalIgnoreCase))
+        {
+            // It's a torch - use the existing torch creation
+            CreateFirstPersonTorch();
+            _leftHandType = LeftHandItemType.Torch;
+            GD.Print("[FPSController] Torch equipped in left hand");
+        }
+        else if (offHand.Slot == EquipmentSlot.OffHand && offHand.BlockChance > 0)
+        {
+            // It's a shield
+            CreateLeftHandShield(offHand);
+            _leftHandType = LeftHandItemType.Shield;
+            GD.Print($"[FPSController] Shield equipped in left hand: {offHand.Name}");
+        }
+        else if (offHand.WeaponType != Core.WeaponType.None && !offHand.IsTwoHanded)
+        {
+            // It's a one-handed weapon for dual wielding
+            CreateLeftHandWeapon(offHand);
+            _leftHandType = LeftHandItemType.Weapon;
+            GD.Print($"[FPSController] Dual-wield weapon in left hand: {offHand.Name}");
+        }
+        else
+        {
+            _leftHandType = LeftHandItemType.None;
+        }
+    }
+
+    /// <summary>
+    /// Create a shield in the left hand based on equipment.
+    /// </summary>
+    private void CreateLeftHandShield(EquipmentItem shield)
+    {
+        if (_weaponHolder == null) return;
+
+        _leftHandNode = new Node3D();
+        _leftHandNode.Name = "LeftHandShield";
+
+        // Determine shield type from name/stats
+        ShieldFactory.ShieldType shieldType = ShieldFactory.ShieldType.RoundShield;
+        string nameLower = shield.Name.ToLower();
+        if (nameLower.Contains("buckler")) shieldType = ShieldFactory.ShieldType.Buckler;
+        else if (nameLower.Contains("kite")) shieldType = ShieldFactory.ShieldType.KiteShield;
+        else if (nameLower.Contains("tower")) shieldType = ShieldFactory.ShieldType.TowerShield;
+        else if (nameLower.Contains("spike")) shieldType = ShieldFactory.ShieldType.SpikedShield;
+
+        // Create shield mesh
+        var shieldMesh = ShieldFactory.CreateShield(shieldType, 0.8f);
+        _leftHandNode.AddChild(shieldMesh);
+
+        // Position shield in left hand - angled to face slightly forward
+        _leftHandRestPos = new Vector3(-0.55f, -0.25f, -0.35f);
+        _leftHandNode.Position = _leftHandRestPos;
+        _leftHandNode.RotationDegrees = new Vector3(10, 30, -15); // Angled outward
+
+        _weaponHolder.AddChild(_leftHandNode);
+    }
+
+    /// <summary>
+    /// Create a mirrored weapon in the left hand for dual wielding.
+    /// </summary>
+    private void CreateLeftHandWeapon(EquipmentItem weapon)
+    {
+        if (_weaponHolder == null) return;
+
+        _leftHandNode = new Node3D();
+        _leftHandNode.Name = "LeftHandWeapon";
+
+        // Map to factory weapon type
+        var factoryType = MapToFactoryWeaponType(weapon.WeaponType);
+        var weaponMesh = WeaponFactory.CreateWeapon(factoryType, 0.9f);
+
+        // Rotate to first-person orientation
+        weaponMesh.RotationDegrees = new Vector3(90, 0, 0);
+        _leftHandNode.AddChild(weaponMesh);
+
+        // Get mirrored position from right hand positioning
+        var (restPos, swingPos, restRot, _) = GetWeaponPositioning(weapon.WeaponType);
+
+        // Mirror X position for left hand
+        _leftHandRestPos = new Vector3(-restPos.X, restPos.Y, restPos.Z);
+        _leftHandSwingPos = new Vector3(-swingPos.X, swingPos.Y, swingPos.Z);
+        _leftHandNode.Position = _leftHandRestPos;
+
+        // Mirror rotation
+        _leftHandNode.RotationDegrees = new Vector3(restRot.X, -restRot.Y, -restRot.Z);
+
+        // Mirror the mesh itself on X axis
+        _leftHandNode.Scale = new Vector3(-1, 1, 1);
+
+        _weaponHolder.AddChild(_leftHandNode);
     }
 
     /// <summary>

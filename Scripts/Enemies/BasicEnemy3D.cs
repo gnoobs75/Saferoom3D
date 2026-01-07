@@ -87,6 +87,13 @@ public partial class BasicEnemy3D : CharacterBody3D
     private StandardMaterial3D? _material;
     private float _hitFlashTimer;
 
+    // Hit shake effect (model wiggle on damage for haptic feedback)
+    private float _hitShakeTimer;
+    private float _hitShakeIntensity;
+    private Vector3 _hitShakeOffset;
+    private const float HitShakeDuration = 0.25f;
+    private const float HitShakeBaseIntensity = 0.08f;
+
     // Health bar and floating text
     private Node3D? _healthBarContainer;
     private MeshInstance3D? _healthBarBg;
@@ -2154,6 +2161,26 @@ public partial class BasicEnemy3D : CharacterBody3D
 
         if (_meshInstance == null) return;
 
+        // Update hit shake effect
+        if (_hitShakeTimer > 0)
+        {
+            _hitShakeTimer -= dt;
+            float shakeProgress = _hitShakeTimer / HitShakeDuration;
+            float currentIntensity = _hitShakeIntensity * shakeProgress; // Decay over time
+
+            // Rapid random wiggle on X and Z axes
+            float shakeFreq = 45f; // Fast vibration
+            _hitShakeOffset = new Vector3(
+                Mathf.Sin(_animTimer * shakeFreq) * currentIntensity,
+                Mathf.Sin(_animTimer * shakeFreq * 1.3f) * currentIntensity * 0.3f, // Less Y movement
+                Mathf.Cos(_animTimer * shakeFreq * 0.9f) * currentIntensity
+            );
+        }
+        else
+        {
+            _hitShakeOffset = Vector3.Zero;
+        }
+
         // Determine animation based on state
         bool isMoving = Velocity.LengthSquared() > 0.1f;
 
@@ -2216,7 +2243,7 @@ public partial class BasicEnemy3D : CharacterBody3D
         {
             // Walking animation - bob up and down
             _walkBobAmount = Mathf.Sin(_animTimer * 12f) * 0.04f;
-            _meshInstance.Position = new Vector3(0, _walkBobAmount + 0.02f, 0);
+            _meshInstance.Position = new Vector3(0, _walkBobAmount + 0.02f, 0) + _hitShakeOffset;
 
             // Slight side-to-side sway (hips swaying)
             float sway = Mathf.Sin(_animTimer * 6f) * 0.03f;
@@ -2251,7 +2278,7 @@ public partial class BasicEnemy3D : CharacterBody3D
         {
             // Interaction animations based on what we're doing
             _idleBreathAmount = Mathf.Sin(_animTimer * 2f) * 0.01f;
-            _meshInstance.Position = new Vector3(0, _idleBreathAmount, 0);
+            _meshInstance.Position = new Vector3(0, _idleBreathAmount, 0) + _hitShakeOffset;
 
             switch (_currentInteraction)
             {
@@ -2307,7 +2334,7 @@ public partial class BasicEnemy3D : CharacterBody3D
         {
             // Idle animation - gentle breathing and subtle sway
             _idleBreathAmount = Mathf.Sin(_animTimer * 2f) * 0.015f;
-            _meshInstance.Position = new Vector3(0, _idleBreathAmount, 0);
+            _meshInstance.Position = new Vector3(0, _idleBreathAmount, 0) + _hitShakeOffset;
 
             // Subtle idle sway
             float idleSway = Mathf.Sin(_animTimer * 1.5f) * 0.01f;
@@ -2344,10 +2371,19 @@ public partial class BasicEnemy3D : CharacterBody3D
     // Overload for Godot's Call() which doesn't support C# optional parameters
     public void TakeDamage(float damage, Vector3 fromPosition, string source)
     {
-        TakeDamage(damage, fromPosition, source, false);
+        TakeDamage(damage, fromPosition, source, false, 1f);
     }
 
     public void TakeDamage(float damage, Vector3 fromPosition, string source, bool isCrit)
+    {
+        TakeDamage(damage, fromPosition, source, isCrit, 1f);
+    }
+
+    /// <summary>
+    /// Full TakeDamage with weapon pushback multiplier.
+    /// </summary>
+    /// <param name="pushbackMultiplier">Weapon-specific pushback (0.3 for bow, 2.0 for war hammer)</param>
+    public void TakeDamage(float damage, Vector3 fromPosition, string source, bool isCrit, float pushbackMultiplier)
     {
         if (CurrentState == State.Dead) return;
 
@@ -2366,6 +2402,11 @@ public partial class BasicEnemy3D : CharacterBody3D
         // Visual feedback
         _hitFlashTimer = 0.15f;
 
+        // Hit shake effect (intensity scales with damage proportion and pushback)
+        float damageRatio = Mathf.Min(1f, damage / (MaxHealth * 0.25f)); // 25% HP hit = full intensity
+        _hitShakeTimer = HitShakeDuration;
+        _hitShakeIntensity = HitShakeBaseIntensity * (0.5f + damageRatio * 0.5f) * Mathf.Clamp(pushbackMultiplier, 0.5f, 1.5f);
+
         // Play hit reaction animation (doesn't change state)
         if (_animPlayer != null && CurrentState != State.Dead)
         {
@@ -2381,10 +2422,10 @@ public partial class BasicEnemy3D : CharacterBody3D
         // Play monster-specific hit sound
         PlayMonsterSound("hit");
 
-        // Knockback
+        // Knockback with weapon pushback multiplier
         Vector3 knockDir = (GlobalPosition - fromPosition).Normalized();
         knockDir.Y = 0;
-        Velocity += knockDir * Constants.KnockbackForce;
+        Velocity += knockDir * Constants.KnockbackForce * pushbackMultiplier;
 
         EmitSignal(SignalName.Damaged, intDamage, CurrentHealth);
 

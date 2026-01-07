@@ -96,6 +96,66 @@ public class EquipmentManager
     }
 
     /// <summary>
+    /// Check if a weapon type can be dual-wielded (equipped in off-hand).
+    /// Only small one-handed weapons can be used in the off-hand.
+    /// </summary>
+    public static bool CanDualWield(WeaponType type)
+    {
+        return type switch
+        {
+            WeaponType.Dagger => true,
+            WeaponType.ShortSword => true,
+            WeaponType.Club => true,    // Simple weapon can be off-hand
+            WeaponType.Mace => true,    // One-handed mace
+            WeaponType.Axe => true,     // One-handed axe
+            _ => false  // LongSword and two-handed weapons cannot be off-hand
+        };
+    }
+
+    /// <summary>
+    /// Equip an item in a specific slot, overriding the item's default slot.
+    /// Used for dual wielding (putting main-hand weapons in off-hand).
+    /// </summary>
+    public EquipmentItem? EquipToSlot(EquipmentItem item, EquipmentSlot targetSlot)
+    {
+        // Validate dual wield
+        if (targetSlot == EquipmentSlot.OffHand && item.Slot == EquipmentSlot.MainHand)
+        {
+            if (!CanDualWield(item.WeaponType))
+            {
+                GD.Print($"[EquipmentManager] Cannot dual-wield {item.Name}: {item.WeaponType} is not dual-wieldable");
+                return null;
+            }
+
+            // Check 2H in main hand
+            var mainHand = GetEquippedItem(EquipmentSlot.MainHand);
+            if (mainHand != null && mainHand.IsTwoHanded)
+            {
+                GD.Print($"[EquipmentManager] Cannot dual-wield: 2H weapon {mainHand.Name} is equipped");
+                return null;
+            }
+        }
+
+        // Check level requirement
+        int playerLevel = FPSController.Instance?.PlayerLevel ?? 1;
+        if (playerLevel < item.RequiredLevel)
+        {
+            GD.Print($"[EquipmentManager] Cannot equip {item.Name}: requires level {item.RequiredLevel}");
+            return null;
+        }
+
+        var previousItem = _equippedItems[targetSlot];
+        _equippedItems[targetSlot] = item;
+
+        OnSlotChanged?.Invoke(targetSlot, item);
+        RecalculateStats();
+        OnEquipmentChanged?.Invoke();
+
+        GD.Print($"[EquipmentManager] Equipped {item.Name} to {targetSlot}");
+        return previousItem;
+    }
+
+    /// <summary>
     /// Equip an item to its appropriate slot.
     /// Returns the previously equipped item (if any) to be returned to inventory.
     /// </summary>

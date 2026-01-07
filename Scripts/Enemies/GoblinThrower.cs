@@ -54,6 +54,13 @@ public partial class GoblinThrower : CharacterBody3D
     private float _hitFlashTimer;
     private bool _isWindingUp;
 
+    // Hit shake effect
+    private float _hitShakeTimer;
+    private float _hitShakeIntensity;
+    private Vector3 _hitShakeOffset;
+    private const float HitShakeDuration = 0.25f;
+    private const float HitShakeBaseIntensity = 0.08f;
+
     // Health bar
     private Node3D? _healthBarContainer;
     private MeshInstance3D? _healthBarFill;
@@ -793,6 +800,27 @@ public partial class GoblinThrower : CharacterBody3D
         _throwTimer += dt;
         _stateTimer += dt;
         _hitFlashTimer -= dt;
+
+        // Hit shake effect update
+        if (_hitShakeTimer > 0 && _meshInstance != null)
+        {
+            _hitShakeTimer -= dt;
+            float shakeProgress = _hitShakeTimer / HitShakeDuration;
+            float currentIntensity = _hitShakeIntensity * shakeProgress;
+
+            float shakeFreq = 45f;
+            _hitShakeOffset = new Vector3(
+                Mathf.Sin(_throwTimer * shakeFreq) * currentIntensity,
+                Mathf.Sin(_throwTimer * shakeFreq * 1.3f) * currentIntensity * 0.3f,
+                Mathf.Cos(_throwTimer * shakeFreq * 0.9f) * currentIntensity
+            );
+            _meshInstance.Position = _hitShakeOffset;
+        }
+        else if (_meshInstance != null && _hitShakeOffset != Vector3.Zero)
+        {
+            _hitShakeOffset = Vector3.Zero;
+            _meshInstance.Position = Vector3.Zero;
+        }
     }
 
     private void UpdateBehavior(float dt)
@@ -1207,6 +1235,11 @@ public partial class GoblinThrower : CharacterBody3D
         CurrentHealth -= intDamage;
 
         _hitFlashTimer = 0.2f;
+
+        // Hit shake effect
+        float damageRatio = Mathf.Min(1f, damage / (MaxHealth * 0.25f));
+        _hitShakeTimer = HitShakeDuration;
+        _hitShakeIntensity = HitShakeBaseIntensity * (0.5f + damageRatio * 0.5f);
 
         // Play hit animation
         if (CurrentState != State.Dead)

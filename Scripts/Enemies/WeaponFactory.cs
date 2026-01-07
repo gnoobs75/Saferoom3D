@@ -57,6 +57,7 @@ public static class WeaponFactory
         public float SpeedModifier;  // 1.0 = normal, <1 = slower, >1 = faster
         public float Range;          // Attack range in meters
         public bool IsTwoHanded;
+        public float Pushback;       // Knockback multiplier (1.0 = normal, higher = more pushback)
 
         public static WeaponData Default => new()
         {
@@ -65,7 +66,8 @@ public static class WeaponFactory
             DamageBonus = 0f,
             SpeedModifier = 1f,
             Range = 2f,
-            IsTwoHanded = false
+            IsTwoHanded = false,
+            Pushback = 1f
         };
     }
 
@@ -79,7 +81,8 @@ public static class WeaponFactory
             DamageBonus = 5f,
             SpeedModifier = 1.4f,
             Range = 1.2f,
-            IsTwoHanded = false
+            IsTwoHanded = false,
+            Pushback = 0.5f  // Light, quick jabs - minimal pushback
         },
         [WeaponType.ShortSword] = new WeaponData
         {
@@ -88,7 +91,8 @@ public static class WeaponFactory
             DamageBonus = 10f,
             SpeedModifier = 1.2f,
             Range = 1.8f,
-            IsTwoHanded = false
+            IsTwoHanded = false,
+            Pushback = 0.8f  // Light sword - low pushback
         },
         [WeaponType.LongSword] = new WeaponData
         {
@@ -97,7 +101,8 @@ public static class WeaponFactory
             DamageBonus = 18f,
             SpeedModifier = 0.9f,
             Range = 2.5f,
-            IsTwoHanded = true
+            IsTwoHanded = true,
+            Pushback = 1.2f  // Heavy slashing - medium-high pushback
         },
         [WeaponType.Axe] = new WeaponData
         {
@@ -106,7 +111,8 @@ public static class WeaponFactory
             DamageBonus = 15f,
             SpeedModifier = 1.0f,
             Range = 1.8f,
-            IsTwoHanded = false
+            IsTwoHanded = false,
+            Pushback = 1.3f  // Chopping force - good pushback
         },
         [WeaponType.BattleAxe] = new WeaponData
         {
@@ -115,7 +121,8 @@ public static class WeaponFactory
             DamageBonus = 25f,
             SpeedModifier = 0.7f,
             Range = 2.2f,
-            IsTwoHanded = true
+            IsTwoHanded = true,
+            Pushback = 1.8f  // Heavy two-handed - high pushback
         },
         [WeaponType.Spear] = new WeaponData
         {
@@ -124,7 +131,8 @@ public static class WeaponFactory
             DamageBonus = 14f,
             SpeedModifier = 0.85f,
             Range = 3.0f,
-            IsTwoHanded = true
+            IsTwoHanded = true,
+            Pushback = 1.0f  // Thrust - medium pushback
         },
         [WeaponType.Mace] = new WeaponData
         {
@@ -133,7 +141,8 @@ public static class WeaponFactory
             DamageBonus = 16f,
             SpeedModifier = 0.95f,
             Range = 1.6f,
-            IsTwoHanded = false
+            IsTwoHanded = false,
+            Pushback = 1.5f  // Blunt impact - high pushback
         },
         [WeaponType.WarHammer] = new WeaponData
         {
@@ -142,7 +151,8 @@ public static class WeaponFactory
             DamageBonus = 28f,
             SpeedModifier = 0.65f,
             Range = 2.0f,
-            IsTwoHanded = true
+            IsTwoHanded = true,
+            Pushback = 2.0f  // Heaviest impact - maximum pushback
         },
         [WeaponType.Staff] = new WeaponData
         {
@@ -151,7 +161,8 @@ public static class WeaponFactory
             DamageBonus = 6f,
             SpeedModifier = 1.1f,
             Range = 2.5f,
-            IsTwoHanded = true
+            IsTwoHanded = true,
+            Pushback = 0.6f  // Light wood - minimal pushback
         },
         [WeaponType.Bow] = new WeaponData
         {
@@ -160,7 +171,8 @@ public static class WeaponFactory
             DamageBonus = 12f,
             SpeedModifier = 0.8f,
             Range = 15f,
-            IsTwoHanded = true
+            IsTwoHanded = true,
+            Pushback = 0.3f  // Ranged - arrow impact only
         },
         [WeaponType.Club] = new WeaponData
         {
@@ -169,7 +181,8 @@ public static class WeaponFactory
             DamageBonus = 8f,
             SpeedModifier = 1.1f,
             Range = 1.5f,
-            IsTwoHanded = false
+            IsTwoHanded = false,
+            Pushback = 1.4f  // Blunt smash - good pushback
         },
         [WeaponType.Scythe] = new WeaponData
         {
@@ -178,7 +191,8 @@ public static class WeaponFactory
             DamageBonus = 22f,
             SpeedModifier = 0.75f,
             Range = 2.8f,
-            IsTwoHanded = true
+            IsTwoHanded = true,
+            Pushback = 1.3f  // Wide arc - medium-high pushback
         }
     };
 

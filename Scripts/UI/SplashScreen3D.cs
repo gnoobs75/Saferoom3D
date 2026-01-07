@@ -55,8 +55,11 @@ public partial class SplashScreen3D : Control
     private Button? _musicButton;
     private Button? _soundButton;
     private Button? _editorButton;
+    private Button? _optionsButton;
+    private Button? _exitButton;
     private PanelContainer? _mapSelectorPopup;
     private ItemList? _mapSelectorList;
+    private PanelContainer? _optionsPopup;
     private List<string> _mapFilePaths = new();  // Store full paths for map selection
 
     // State
@@ -158,6 +161,12 @@ public partial class SplashScreen3D : Control
 
         // Audio toggle buttons in top-left corner
         CreateAudioButtons();
+
+        // Exit Game button in bottom-left corner
+        CreateExitButton();
+
+        // Options popup (hidden initially)
+        CreateOptionsPopup();
 
         // Title label for 3D version
         var titleLabel = new Label();
@@ -419,12 +428,157 @@ public partial class SplashScreen3D : Control
     {
         var editorContainer = new HBoxContainer();
         editorContainer.SetAnchorsPreset(LayoutPreset.TopRight);
-        editorContainer.Position = new Vector2(-130, 20);
+        editorContainer.Position = new Vector2(-260, 20);
+        editorContainer.AddThemeConstantOverride("separation", 10);
         AddChild(editorContainer);
+
+        _optionsButton = CreateStyledButton("Options");
+        _optionsButton.Pressed += OnOptionsButtonPressed;
+        editorContainer.AddChild(_optionsButton);
 
         _editorButton = CreateStyledButton("Editor");
         _editorButton.Pressed += OnEditorButtonPressed;
         editorContainer.AddChild(_editorButton);
+    }
+
+    private void CreateExitButton()
+    {
+        var exitContainer = new HBoxContainer();
+        exitContainer.SetAnchorsPreset(LayoutPreset.BottomLeft);
+        exitContainer.Position = new Vector2(20, -70);
+        AddChild(exitContainer);
+
+        _exitButton = new Button();
+        _exitButton.Text = "Exit Game";
+        _exitButton.CustomMinimumSize = new Vector2(120, 40);
+        _exitButton.MouseDefaultCursorShape = CursorShape.PointingHand;
+
+        // Red-tinted style for exit button
+        var normalStyle = new StyleBoxFlat();
+        normalStyle.BgColor = new Color(0.35f, 0.15f, 0.15f, 0.9f);
+        normalStyle.SetBorderWidthAll(2);
+        normalStyle.BorderColor = new Color(0.6f, 0.3f, 0.3f);
+        normalStyle.SetCornerRadiusAll(6);
+        _exitButton.AddThemeStyleboxOverride("normal", normalStyle);
+
+        var hoverStyle = new StyleBoxFlat();
+        hoverStyle.BgColor = new Color(0.5f, 0.2f, 0.2f, 0.95f);
+        hoverStyle.SetBorderWidthAll(2);
+        hoverStyle.BorderColor = new Color(1f, 0.4f, 0.4f);
+        hoverStyle.SetCornerRadiusAll(6);
+        _exitButton.AddThemeStyleboxOverride("hover", hoverStyle);
+
+        var pressedStyle = new StyleBoxFlat();
+        pressedStyle.BgColor = new Color(0.25f, 0.1f, 0.1f, 0.95f);
+        pressedStyle.SetBorderWidthAll(2);
+        pressedStyle.BorderColor = new Color(1f, 0.4f, 0.4f);
+        pressedStyle.SetCornerRadiusAll(6);
+        _exitButton.AddThemeStyleboxOverride("pressed", pressedStyle);
+
+        _exitButton.AddThemeColorOverride("font_color", new Color(1f, 0.8f, 0.8f));
+        _exitButton.AddThemeColorOverride("font_hover_color", new Color(1f, 0.9f, 0.9f));
+
+        _exitButton.Pressed += OnExitButtonPressed;
+        exitContainer.AddChild(_exitButton);
+    }
+
+    private void CreateOptionsPopup()
+    {
+        // Create popup panel for options
+        _optionsPopup = new PanelContainer();
+        _optionsPopup.SetAnchorsPreset(LayoutPreset.Center);
+        _optionsPopup.CustomMinimumSize = new Vector2(350, 280);
+        _optionsPopup.Position = new Vector2(-175, -140);
+        _optionsPopup.Visible = false;
+
+        var panelStyle = new StyleBoxFlat();
+        panelStyle.BgColor = new Color(0.08f, 0.08f, 0.12f, 0.98f);
+        panelStyle.SetBorderWidthAll(3);
+        panelStyle.BorderColor = new Color(0.5f, 0.5f, 0.6f);
+        panelStyle.SetCornerRadiusAll(10);
+        _optionsPopup.AddThemeStyleboxOverride("panel", panelStyle);
+        AddChild(_optionsPopup);
+
+        var margin = new MarginContainer();
+        margin.AddThemeConstantOverride("margin_left", 25);
+        margin.AddThemeConstantOverride("margin_right", 25);
+        margin.AddThemeConstantOverride("margin_top", 20);
+        margin.AddThemeConstantOverride("margin_bottom", 20);
+        _optionsPopup.AddChild(margin);
+
+        var vbox = new VBoxContainer();
+        vbox.AddThemeConstantOverride("separation", 18);
+        margin.AddChild(vbox);
+
+        // Title
+        var title = new Label();
+        title.Text = "OPTIONS";
+        title.HorizontalAlignment = HorizontalAlignment.Center;
+        title.AddThemeFontSizeOverride("font_size", 26);
+        title.AddThemeColorOverride("font_color", new Color(1f, 0.85f, 0.3f));
+        vbox.AddChild(title);
+
+        // Music toggle row
+        var musicRow = new HBoxContainer();
+        var musicLabel = new Label();
+        musicLabel.Text = "Music:";
+        musicLabel.CustomMinimumSize = new Vector2(100, 0);
+        musicLabel.AddThemeFontSizeOverride("font_size", 18);
+        musicRow.AddChild(musicLabel);
+        var musicToggle = CreateToggleButton(AudioConfig.IsMusicEnabled ? "ON" : "OFF");
+        musicToggle.Pressed += () =>
+        {
+            AudioConfig.ToggleMusic();
+            musicToggle.Text = AudioConfig.IsMusicEnabled ? "ON" : "OFF";
+            if (AudioConfig.IsMusicEnabled) SplashMusic.Instance?.Play();
+            else SplashMusic.Instance?.Stop();
+            UpdateAudioButtonLabels();
+        };
+        musicRow.AddChild(musicToggle);
+        vbox.AddChild(musicRow);
+
+        // Sound toggle row
+        var soundRow = new HBoxContainer();
+        var soundLabel = new Label();
+        soundLabel.Text = "Sound:";
+        soundLabel.CustomMinimumSize = new Vector2(100, 0);
+        soundLabel.AddThemeFontSizeOverride("font_size", 18);
+        soundRow.AddChild(soundLabel);
+        var soundToggle = CreateToggleButton(AudioConfig.IsSoundEnabled ? "ON" : "OFF");
+        soundToggle.Pressed += () =>
+        {
+            AudioConfig.ToggleSound();
+            soundToggle.Text = AudioConfig.IsSoundEnabled ? "ON" : "OFF";
+            UpdateAudioButtonLabels();
+        };
+        soundRow.AddChild(soundToggle);
+        vbox.AddChild(soundRow);
+
+        // Spacer
+        var spacer = new Control();
+        spacer.CustomMinimumSize = new Vector2(0, 10);
+        vbox.AddChild(spacer);
+
+        // Close button
+        var closeBtn = CreateStyledButton("Close");
+        closeBtn.CustomMinimumSize = new Vector2(100, 40);
+        closeBtn.Pressed += () => { if (_optionsPopup != null) _optionsPopup.Visible = false; };
+        vbox.AddChild(closeBtn);
+    }
+
+    private void OnOptionsButtonPressed()
+    {
+        if (_optionsPopup != null)
+        {
+            _optionsPopup.Visible = !_optionsPopup.Visible;
+        }
+        GD.Print("[SplashScreen3D] Options button clicked");
+    }
+
+    private void OnExitButtonPressed()
+    {
+        GD.Print("[SplashScreen3D] Exit button clicked - quitting game");
+        GetTree().Quit();
     }
 
     private void CreateAudioButtons()

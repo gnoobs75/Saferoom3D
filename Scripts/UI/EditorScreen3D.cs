@@ -1,9 +1,12 @@
 using Godot;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using SafeRoom3D.Core;
 using SafeRoom3D.Abilities;
 using SafeRoom3D.Enemies;
 using SafeRoom3D.Environment;
+using SafeRoom3D.Items;
 using SafeRoom3D.Pet;
 
 namespace SafeRoom3D.UI;
@@ -104,6 +107,14 @@ public partial class EditorScreen3D : Control
     private Label? _weaponSpeedLabel;
     private Label? _weaponRangeLabel;
     private Label? _weaponHandedLabel;
+
+    // Shields/Armor editor
+    private Dictionary<string, Button> _shieldButtons = new();
+    private string? _selectedShieldType;
+    private Label? _shieldArmorLabel;
+    private Label? _shieldBlockChanceLabel;
+    private Label? _shieldBlockAmountLabel;
+    private Label? _shieldMovePenaltyLabel;
 
     // Info labels
     private Label? _selectedItemLabel;
@@ -464,26 +475,66 @@ public partial class EditorScreen3D : Control
             _npcButtons[npc] = btn;
         }
 
-        // Weapons tab
-        var weaponsScroll = new ScrollContainer();
-        weaponsScroll.Name = "Weapons";
-        weaponsScroll.SizeFlagsVertical = SizeFlags.ExpandFill;
-        weaponsScroll.HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled;
-        _tabContainer.AddChild(weaponsScroll);
+        // Equipment tab (combined Weapons + Shields)
+        var equipmentScroll = new ScrollContainer();
+        equipmentScroll.Name = "Equipment";
+        equipmentScroll.SizeFlagsVertical = SizeFlags.ExpandFill;
+        equipmentScroll.HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled;
+        _tabContainer.AddChild(equipmentScroll);
 
-        var weaponsVBox = new VBoxContainer();
-        weaponsVBox.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-        weaponsVBox.AddThemeConstantOverride("separation", 4);
-        weaponsScroll.AddChild(weaponsVBox);
+        var equipmentVBox = new VBoxContainer();
+        equipmentVBox.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        equipmentVBox.AddThemeConstantOverride("separation", 4);
+        equipmentScroll.AddChild(equipmentVBox);
 
-        // Get all weapon types from the factory
-        var weaponTypes = WeaponFactory.GetWeaponTypes();
+        // --- Shields Section ---
+        var shieldsHeader = new Label();
+        shieldsHeader.Text = "Shields";
+        shieldsHeader.AddThemeColorOverride("font_color", new Color(0.4f, 0.7f, 1.0f));
+        shieldsHeader.AddThemeFontSizeOverride("font_size", 14);
+        equipmentVBox.AddChild(shieldsHeader);
+
+        // Get all shield types from the factory (alphabetized)
+        var shieldTypes = new List<(ShieldFactory.ShieldType type, string name)>();
+        foreach (var shieldType in ShieldFactory.GetAllTypes())
+        {
+            var shieldData = ShieldFactory.GetShieldData(shieldType);
+            shieldTypes.Add((shieldType, shieldData.Name));
+        }
+        shieldTypes.Sort((a, b) => string.Compare(a.name, b.name, StringComparison.Ordinal));
+
+        foreach (var (shieldType, shieldName) in shieldTypes)
+        {
+            var btn = CreateListButton(shieldName);
+            string capturedName = shieldName;
+            var capturedType = shieldType;
+            btn.Pressed += () => SelectShield(capturedName, capturedType);
+            equipmentVBox.AddChild(btn);
+            _shieldButtons[capturedName] = btn;
+        }
+
+        // Spacer between sections
+        var spacer = new Control();
+        spacer.CustomMinimumSize = new Vector2(0, 12);
+        equipmentVBox.AddChild(spacer);
+
+        // --- Weapons Section ---
+        var weaponsHeader = new Label();
+        weaponsHeader.Text = "Weapons";
+        weaponsHeader.AddThemeColorOverride("font_color", new Color(1.0f, 0.6f, 0.4f));
+        weaponsHeader.AddThemeFontSizeOverride("font_size", 14);
+        equipmentVBox.AddChild(weaponsHeader);
+
+        // Get all weapon types from the factory (alphabetized)
+        var weaponTypes = WeaponFactory.GetWeaponTypes().ToList();
+        weaponTypes.Sort((a, b) => string.Compare(a, b, StringComparison.Ordinal));
+
         foreach (var weaponName in weaponTypes)
         {
             var btn = CreateListButton(weaponName);
-            string capturedName = weaponName; // Capture for closure
+            string capturedName = weaponName;
             btn.Pressed += () => SelectWeapon(capturedName);
-            weaponsVBox.AddChild(btn);
+            equipmentVBox.AddChild(btn);
             _weaponButtons[weaponName] = btn;
         }
 
@@ -1492,7 +1543,7 @@ public partial class EditorScreen3D : Control
         ClearPreview();
 
         // Show/hide map editor overlay based on tab
-        // Tab indices: 0=Monsters, 1=Abilities, 2=Props, 3=NPCs, 4=Weapons, 5=Maps
+        // Tab indices: 0=Monsters, 1=Abilities, 2=Props, 3=NPCs, 4=Equipment, 5=Maps
         bool isMapTab = (tab == 5);
 
         if (_mapEditorOverlay != null)
@@ -1512,13 +1563,14 @@ public partial class EditorScreen3D : Control
     {
         if (_titleLabel == null) return;
 
+        // Tab indices: 0=Monsters, 1=Abilities, 2=Props, 3=NPCs, 4=Equipment, 5=Maps
         string title = _currentTab switch
         {
             0 => "MONSTER EDITOR",
             1 => "ABILITY EDITOR",
             2 => "PROPS EDITOR",
             3 => "NPC EDITOR",
-            4 => "WEAPON EDITOR",
+            4 => "EQUIPMENT EDITOR",
             5 => GetMapEditorTitle(),
             _ => "EDITOR"
         };
@@ -1540,6 +1592,7 @@ public partial class EditorScreen3D : Control
 
     /// <summary>
     /// Updates visibility of UI sections based on the active tab.
+    /// Tab indices: 0=Monsters, 1=Abilities, 2=Props, 3=NPCs, 4=Equipment, 5=Maps
     /// </summary>
     private void UpdateTabVisibility()
     {
@@ -1547,7 +1600,7 @@ public partial class EditorScreen3D : Control
         bool isAbilities = _currentTab == 1;
         bool isProps = _currentTab == 2;
         bool isNpcs = _currentTab == 3;
-        bool isWeapons = _currentTab == 4;
+        bool isEquipment = _currentTab == 4;
 
         // Top bar controls - only show on Monsters tab
         if (_animationControlsContainer != null)
@@ -1567,7 +1620,7 @@ public partial class EditorScreen3D : Control
         if (_npcStatsSection != null)
             _npcStatsSection.Visible = isNpcs;
         if (_weaponStatsSection != null)
-            _weaponStatsSection.Visible = isWeapons;
+            _weaponStatsSection.Visible = isEquipment;
 
         // Update viewport hint for context
         UpdateViewportHint();
@@ -1582,13 +1635,16 @@ public partial class EditorScreen3D : Control
 
         string baseHint = "Drag to rotate | Scroll to zoom | Right-click to reset";
 
+        // Tab 4 = Equipment (combined Weapons + Shields)
+        bool hasEquipmentSelected = _selectedWeaponType != null || _selectedShieldType != null;
+
         string contextHint = _currentTab switch
         {
             0 => _selectedMonsterId == null ? "Select a monster to preview" : baseHint,
             1 => _selectedAbilityId == null ? "Select an ability to preview" : baseHint,
             2 => _selectedCosmeticType == null ? "Select a prop to preview" : baseHint,
             3 => _selectedNpcId == null ? "Select an NPC to preview" : baseHint,
-            4 => _selectedWeaponType == null ? "Select a weapon to preview" : baseHint,
+            4 => !hasEquipmentSelected ? "Select a weapon or shield to preview" : baseHint,
             _ => baseHint
         };
 
@@ -1822,6 +1878,71 @@ public partial class EditorScreen3D : Control
             _cameraDistance = 2f;
             _cameraTargetY = 0.5f;
         }
+
+        _previewScene?.AddChild(_previewObject);
+        UpdateCameraPosition();
+    }
+
+    private void SelectShield(string shieldName, ShieldFactory.ShieldType shieldType)
+    {
+        _selectedShieldType = shieldName;
+        _selectedMonsterId = null;
+        _selectedAbilityId = null;
+        _selectedCosmeticType = null;
+        _selectedNpcId = null;
+        _selectedWeaponType = null;
+
+        // Update label
+        if (_selectedItemLabel != null)
+        {
+            _selectedItemLabel.Text = $"Selected: {shieldName}";
+        }
+
+        // Update button highlighting
+        foreach (var (name, btn) in _shieldButtons)
+        {
+            var style = new StyleBoxFlat();
+            style.BgColor = name == shieldName ? new Color(0.25f, 0.35f, 0.5f) : new Color(0.08f, 0.08f, 0.12f);
+            style.SetCornerRadiusAll(4);
+            style.ContentMarginLeft = 12;
+            btn.AddThemeStyleboxOverride("normal", style);
+        }
+
+        // Update shield stats display
+        var shieldData = ShieldFactory.GetShieldData(shieldType);
+
+        if (_shieldArmorLabel != null) _shieldArmorLabel.Text = $"+{shieldData.Armor}";
+        if (_shieldBlockChanceLabel != null) _shieldBlockChanceLabel.Text = $"{shieldData.BlockChance * 100:F0}%";
+        if (_shieldBlockAmountLabel != null) _shieldBlockAmountLabel.Text = $"{shieldData.BlockAmount}";
+        if (_shieldMovePenaltyLabel != null) _shieldMovePenaltyLabel.Text = shieldData.MovementPenalty > 0 ? $"-{shieldData.MovementPenalty * 100:F0}%" : "None";
+
+        // Create preview
+        UpdatePreviewShield(shieldType);
+
+        // Update viewport hint
+        UpdateViewportHint();
+
+        GD.Print($"[EditorScreen3D] Selected shield: {shieldName}");
+    }
+
+    private void UpdatePreviewShield(ShieldFactory.ShieldType shieldType)
+    {
+        ClearPreview();
+
+        _previewObject = new Node3D();
+        _previewObject.Name = "ShieldPreview";
+
+        // Create shield mesh
+        var shield = ShieldFactory.CreateShield(shieldType);
+        _previewObject.AddChild(shield);
+
+        // Position shield upright, face toward camera
+        shield.Position = new Vector3(0, 0.3f, 0);
+        shield.RotationDegrees = new Vector3(0, 180, 0); // Face camera
+
+        // Adjust camera for shield preview
+        _cameraDistance = 1.5f;
+        _cameraTargetY = 0.3f;
 
         _previewScene?.AddChild(_previewObject);
         UpdateCameraPosition();

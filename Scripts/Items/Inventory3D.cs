@@ -167,7 +167,7 @@ public partial class Inventory3D : Node
     /// </summary>
     private void AddStarterWeapons()
     {
-        // Dagger
+        // Dagger (main hand)
         AddItem(InventoryItem.FromEquipment(new EquipmentItem
         {
             Id = Guid.NewGuid().ToString(),
@@ -182,6 +182,42 @@ public partial class Inventory3D : Node
             MaxDamage = 8,
             AttackSpeed = 1.4f,
             WeaponRange = 1.5f,
+            IsTwoHanded = false
+        }));
+
+        // Off-Hand Dagger (for dual wield testing)
+        AddItem(InventoryItem.FromEquipment(new EquipmentItem
+        {
+            Id = Guid.NewGuid().ToString(),
+            Name = "Off-Hand Dagger",
+            Description = "A light dagger perfect for dual wielding.",
+            Slot = EquipmentSlot.OffHand,  // Pre-set to off-hand
+            Rarity = ItemRarity.Magic,
+            WeaponType = WeaponType.Dagger,
+            ItemLevel = 5,
+            RequiredLevel = 1,
+            MinDamage = 3,
+            MaxDamage = 7,
+            AttackSpeed = 1.5f,
+            WeaponRange = 1.5f,
+            IsTwoHanded = false
+        }));
+
+        // Short Sword (can dual wield)
+        AddItem(InventoryItem.FromEquipment(new EquipmentItem
+        {
+            Id = Guid.NewGuid().ToString(),
+            Name = "Test Short Sword",
+            Description = "A nimble blade that can be dual-wielded.",
+            Slot = EquipmentSlot.MainHand,
+            Rarity = ItemRarity.Magic,
+            WeaponType = WeaponType.ShortSword,
+            ItemLevel = 5,
+            RequiredLevel = 1,
+            MinDamage = 5,
+            MaxDamage = 10,
+            AttackSpeed = 1.2f,
+            WeaponRange = 2.0f,
             IsTwoHanded = false
         }));
 

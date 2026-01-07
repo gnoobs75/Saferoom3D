@@ -58,6 +58,13 @@ public partial class BossEnemy3D : CharacterBody3D
     private float _hitFlashTimer;
     private float _pulseTimer;
 
+    // Hit shake effect (model wiggle on damage for haptic feedback)
+    private float _hitShakeTimer;
+    private float _hitShakeIntensity;
+    private Vector3 _hitShakeOffset;
+    private const float HitShakeDuration = 0.3f; // Slightly longer for bosses
+    private const float HitShakeBaseIntensity = 0.12f; // Bigger shake for bosses
+
     // Animation support
     private MonsterMeshFactory.LimbNodes? _limbNodes;
     private AnimationPlayer? _animPlayer;
@@ -533,6 +540,28 @@ public partial class BossEnemy3D : CharacterBody3D
             _hitFlashTimer -= dt;
         }
 
+        // Hit shake effect update
+        if (_hitShakeTimer > 0 && _meshInstance != null)
+        {
+            _hitShakeTimer -= dt;
+            float shakeProgress = _hitShakeTimer / HitShakeDuration;
+            float currentIntensity = _hitShakeIntensity * shakeProgress;
+
+            // Rapid random wiggle
+            float shakeFreq = 40f;
+            _hitShakeOffset = new Vector3(
+                Mathf.Sin(_pulseTimer * shakeFreq) * currentIntensity,
+                Mathf.Sin(_pulseTimer * shakeFreq * 1.3f) * currentIntensity * 0.3f,
+                Mathf.Cos(_pulseTimer * shakeFreq * 0.9f) * currentIntensity
+            );
+            _meshInstance.Position = _hitShakeOffset;
+        }
+        else if (_meshInstance != null && _hitShakeOffset != Vector3.Zero)
+        {
+            _hitShakeOffset = Vector3.Zero;
+            _meshInstance.Position = Vector3.Zero;
+        }
+
         // Dead bosses don't process AI
         if (CurrentState == State.Dead) return;
 
@@ -872,6 +901,11 @@ public partial class BossEnemy3D : CharacterBody3D
 
         // Visual feedback
         _hitFlashTimer = 0.2f;
+
+        // Hit shake effect (intensity scales with damage proportion)
+        float damageRatio = Mathf.Min(1f, damage / (MaxHealth * 0.1f)); // 10% HP hit = full intensity (bosses are tanky)
+        _hitShakeTimer = HitShakeDuration;
+        _hitShakeIntensity = HitShakeBaseIntensity * (0.5f + damageRatio * 0.5f);
 
         // Play hit animation (if not already dying)
         if (CurrentHealth > 0 && _animPlayer != null)
