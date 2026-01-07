@@ -45,7 +45,7 @@ Scripts/
 ├── Broadcaster/    # AIBroadcaster, BroadcasterUI, CommentaryDatabase
 ├── Combat/         # Projectile3D, ThrownProjectile3D, MeleeSlashEffect3D
 ├── Environment/    # Cosmetic3D (40+ prop types), WaterEffects3D
-└── Pet/            # Steve companion (WIP)
+└── Pet/            # Steve companion (supports GLB models)
 ```
 
 **Singletons:** `GameManager3D`, `SoundManager3D`, `FPSController`, `AbilityManager3D`, `Inventory3D`, `HUD3D`, `DungeonRadio`, `SplashMusic`, `AIBroadcaster`
@@ -69,19 +69,25 @@ Idle → Patrol → Tracking → Aggro → Attack → Dead
 - Always set `SphereMesh.Height = 2 × Radius`
 - Eyes must protrude (Z >= headRadius × 0.75)
 
-### SurfaceTool (Godot 4.5)
-**CRITICAL:** Godot 4.5 requires normals for ALL vertices if any vertex has a normal set.
-```csharp
-// CORRECT - Set normal before every AddVertex
-st.SetNormal(normal);
-st.AddVertex(v1);
-st.SetNormal(normal);
-st.AddVertex(v2);
+### SurfaceTool (Godot 4.5 Cross-Version Compatibility)
+**CRITICAL:** Godot 4.5 has stricter validation - if first vertex has a normal, ALL must have normals.
 
-// WRONG - Will crash in Godot 4.5
+**Best Practice:** Don't use `SetNormal()` at all. Let `GenerateNormals()` handle it.
+```csharp
+// CORRECT - No manual normals, let GenerateNormals() calculate them
+var st = new SurfaceTool();
+st.Begin(Mesh.PrimitiveType.Triangles);
+st.AddVertex(v1);
+st.AddVertex(v2);
+st.AddVertex(v3);
+st.GenerateNormals();  // Calculate normals from geometry
+st.GenerateTangents(); // Optional, for normal maps
+var mesh = st.Commit();
+
+// WRONG - Mixing SetNormal with no-normal vertices crashes on Godot 4.5
 st.SetNormal(normal);
 st.AddVertex(v1);
-st.AddVertex(v2);  // Missing SetNormal!
+st.AddVertex(v2);  // No SetNormal = CRASH!
 ```
 
 ### Performance Critical
@@ -279,6 +285,32 @@ Custom skills for specialized capabilities (auto-loaded in Claude Code sessions)
 
 ---
 
+## Steve the Chihuahua (Pet System)
+
+Steve is the player's companion pet with healing and attack abilities.
+
+### GLB Model Support
+
+Steve supports switching between procedural mesh and custom .glb models at runtime:
+
+1. **Place GLB file at:** `Assets/Models/steve.glb`
+2. **In-game toggle:**
+   - Open Editor Screen → NPCs tab → Select "Steve the Chihuahua"
+   - Click **"Model Type"** toggle to switch between "Procedural" and "GLB Model"
+   - Changes apply immediately to both preview and in-game Steve
+
+```csharp
+// Programmatic access
+Steve3D.UseGlbModel = true;  // Enable GLB mode
+Steve3D.Instance?.ReloadModel();  // Apply changes to live instance
+```
+
+### Steve's Abilities
+- **Heal** (10s cooldown): Heals player for 50 HP when they take damage
+- **Magic Missile** (10s cooldown): Attacks enemies threatening the player
+
+---
+
 ## Known Issues
 
 1. No save/load system yet
@@ -287,6 +319,7 @@ Custom skills for specialized capabilities (auto-loaded in Claude Code sessions)
 
 ## Recent Fixes (v4.5 Upgrade)
 
-1. **SurfaceTool Compatibility** - Fixed `Cosmetic3D.cs` to set normals before every vertex (Godot 4.5 requirement)
+1. **SurfaceTool Compatibility** - Removed all `SetNormal()` calls, use `GenerateNormals()` instead (6 files fixed: Cosmetic3D, ProceduralMesh3D, MonsterLODSystem, LODManager, WaterEffects3D, MonsterMeshFactory, DungeonGenerator3D)
 2. **RLE Encoding Bug** - Fixed `TileDataEncoder.cs` map corruption when tile runs >= 64 consecutive tiles
 3. **GPU Compatibility** - Added GPU-aware launchers that use OpenGL for Intel/AMD integrated graphics
+4. **Steve GLB Support** - Added runtime toggle to switch Steve between procedural mesh and .glb model

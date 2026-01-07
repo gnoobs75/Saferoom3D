@@ -368,8 +368,6 @@ public static class LODMeshHelper
                         int idx = indices[j + k];
                         if (idx < vertices.Length)
                         {
-                            if (normals != null && idx < normals.Length)
-                                surfaceTool.SetNormal(normals[idx]);
                             surfaceTool.AddVertex(vertices[idx]);
                         }
                     }
@@ -377,6 +375,7 @@ public static class LODMeshHelper
             }
         }
 
+        surfaceTool.GenerateNormals();
         return surfaceTool.Commit();
     }
 
@@ -427,7 +426,6 @@ public static class LODMeshHelper
             Vector3 p1 = topCenter + new Vector3(Mathf.Cos(angle1) * radius, 0, Mathf.Sin(angle1) * radius);
             Vector3 p2 = topCenter + new Vector3(Mathf.Cos(angle2) * radius, 0, Mathf.Sin(angle2) * radius);
 
-            surfaceTool.SetNormal(Vector3.Up);
             surfaceTool.AddVertex(topCenter);
             surfaceTool.AddVertex(p2);
             surfaceTool.AddVertex(p1);
@@ -443,7 +441,6 @@ public static class LODMeshHelper
             Vector3 p1 = bottomCenter + new Vector3(Mathf.Cos(angle1) * radius, 0, Mathf.Sin(angle1) * radius);
             Vector3 p2 = bottomCenter + new Vector3(Mathf.Cos(angle2) * radius, 0, Mathf.Sin(angle2) * radius);
 
-            surfaceTool.SetNormal(Vector3.Down);
             surfaceTool.AddVertex(bottomCenter);
             surfaceTool.AddVertex(p1);
             surfaceTool.AddVertex(p2);
@@ -460,26 +457,18 @@ public static class LODMeshHelper
             Vector3 bottom1 = bottomCenter + new Vector3(Mathf.Cos(angle1) * radius, 0, Mathf.Sin(angle1) * radius);
             Vector3 bottom2 = bottomCenter + new Vector3(Mathf.Cos(angle2) * radius, 0, Mathf.Sin(angle2) * radius);
 
-            Vector3 normal1 = new Vector3(Mathf.Cos(angle1), 0, Mathf.Sin(angle1));
-            Vector3 normal2 = new Vector3(Mathf.Cos(angle2), 0, Mathf.Sin(angle2));
-
             // First triangle
-            surfaceTool.SetNormal(normal1);
             surfaceTool.AddVertex(bottom1);
-            surfaceTool.SetNormal(normal1);
             surfaceTool.AddVertex(top1);
-            surfaceTool.SetNormal(normal2);
             surfaceTool.AddVertex(top2);
 
             // Second triangle
-            surfaceTool.SetNormal(normal1);
             surfaceTool.AddVertex(bottom1);
-            surfaceTool.SetNormal(normal2);
             surfaceTool.AddVertex(top2);
-            surfaceTool.SetNormal(normal2);
             surfaceTool.AddVertex(bottom2);
         }
 
+        surfaceTool.GenerateNormals();
         return surfaceTool.Commit();
     }
 
@@ -533,11 +522,11 @@ public static class LODMeshHelper
         {
             for (int i = 0; i < faces[f].Length; i++)
             {
-                surfaceTool.SetNormal(normals[f]);
                 surfaceTool.AddVertex(vertices[faces[f][i]]);
             }
         }
 
+        surfaceTool.GenerateNormals();
         return surfaceTool.Commit();
     }
 }

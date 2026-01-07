@@ -145,6 +145,8 @@ public partial class EditorScreen3D : Control
     // NPC editor controls
     private ColorPickerButton? _npcSkinColorPicker;
     private SpinBox? _npcScaleSpinBox;
+    private CheckBox? _npcUseGlbCheckbox;
+    private Label? _npcGlbPathLabel;
 
     // Close button
     private Button? _closeButton;
@@ -1034,6 +1036,58 @@ public partial class EditorScreen3D : Control
         vbox.AddChild(_npcStatsSection);
 
         _npcScaleSpinBox = CreateAttributeRow(_npcStatsSection, "Scale", 0.5, 3, 1);
+
+        // GLB Model toggle - styled button that acts as toggle
+        var glbRow = new HBoxContainer();
+        glbRow.AddThemeConstantOverride("separation", 10);
+        var glbLabel = new Label { Text = "Model Type" };
+        glbLabel.AddThemeFontSizeOverride("font_size", 14);
+        glbLabel.CustomMinimumSize = new Vector2(100, 0);
+        glbRow.AddChild(glbLabel);
+
+        _npcUseGlbCheckbox = new CheckBox();
+        _npcUseGlbCheckbox.Text = Pet.Steve3D.UseGlbModel ? "GLB Model" : "Procedural";
+        _npcUseGlbCheckbox.ButtonPressed = Pet.Steve3D.UseGlbModel;
+        _npcUseGlbCheckbox.CustomMinimumSize = new Vector2(120, 30);
+        _npcUseGlbCheckbox.AddThemeFontSizeOverride("font_size", 14);
+        _npcUseGlbCheckbox.AddThemeColorOverride("font_color", Colors.White);
+        _npcUseGlbCheckbox.AddThemeColorOverride("font_pressed_color", new Color(0.5f, 1f, 0.5f));
+        _npcUseGlbCheckbox.AddThemeColorOverride("font_hover_color", new Color(0.8f, 0.9f, 1f));
+        // Style the checkbox background
+        var checkboxStyle = new StyleBoxFlat();
+        checkboxStyle.BgColor = new Color(0.15f, 0.15f, 0.2f);
+        checkboxStyle.SetCornerRadiusAll(4);
+        checkboxStyle.ContentMarginLeft = 8;
+        checkboxStyle.ContentMarginRight = 8;
+        _npcUseGlbCheckbox.AddThemeStyleboxOverride("normal", checkboxStyle);
+        var checkboxHover = new StyleBoxFlat();
+        checkboxHover.BgColor = new Color(0.2f, 0.25f, 0.35f);
+        checkboxHover.SetCornerRadiusAll(4);
+        checkboxHover.ContentMarginLeft = 8;
+        checkboxHover.ContentMarginRight = 8;
+        _npcUseGlbCheckbox.AddThemeStyleboxOverride("hover", checkboxHover);
+        var checkboxPressed = new StyleBoxFlat();
+        checkboxPressed.BgColor = new Color(0.2f, 0.4f, 0.3f);
+        checkboxPressed.SetCornerRadiusAll(4);
+        checkboxPressed.ContentMarginLeft = 8;
+        checkboxPressed.ContentMarginRight = 8;
+        _npcUseGlbCheckbox.AddThemeStyleboxOverride("pressed", checkboxPressed);
+        _npcUseGlbCheckbox.Toggled += OnNpcGlbToggled;
+        glbRow.AddChild(_npcUseGlbCheckbox);
+        _npcStatsSection.AddChild(glbRow);
+
+        // GLB path info
+        var glbPathRow = new HBoxContainer();
+        glbPathRow.AddThemeConstantOverride("separation", 10);
+        var pathLabel = new Label { Text = "GLB Path:" };
+        pathLabel.AddThemeFontSizeOverride("font_size", 12);
+        pathLabel.AddThemeColorOverride("font_color", new Color(0.6f, 0.6f, 0.6f));
+        glbPathRow.AddChild(pathLabel);
+        _npcGlbPathLabel = new Label { Text = Pet.Steve3D.GlbModelPath };
+        _npcGlbPathLabel.AddThemeFontSizeOverride("font_size", 12);
+        _npcGlbPathLabel.AddThemeColorOverride("font_color", new Color(0.5f, 0.7f, 0.9f));
+        glbPathRow.AddChild(_npcGlbPathLabel);
+        _npcStatsSection.AddChild(glbPathRow);
 
         var npcSkinRow = new HBoxContainer();
         npcSkinRow.AddThemeConstantOverride("separation", 10);
@@ -3451,6 +3505,31 @@ public partial class EditorScreen3D : Control
     {
         if (_previewObject == null) return;
 
+        // Check if we should use GLB model
+        if (Pet.Steve3D.UseGlbModel)
+        {
+            string glbPath = Pet.Steve3D.GlbModelPath;
+            if (ResourceLoader.Exists(glbPath))
+            {
+                var scene = GD.Load<PackedScene>(glbPath);
+                if (scene != null)
+                {
+                    var glbInstance = scene.Instantiate<Node3D>();
+                    // Scale the GLB model appropriately (adjust as needed)
+                    glbInstance.Scale = new Vector3(0.3f, 0.3f, 0.3f);
+                    _previewObject.AddChild(glbInstance);
+                    GD.Print($"[EditorScreen3D] Loaded GLB model for Steve: {glbPath}");
+                    return;
+                }
+            }
+            else
+            {
+                GD.PrintErr($"[EditorScreen3D] GLB file not found: {glbPath}");
+                // Fall through to procedural mesh
+            }
+        }
+
+        // Procedural mesh fallback
         // Dark gray chihuahua with pink tongue
         var bodyColor = new Color(0.30f, 0.28f, 0.26f);   // Dark gray chihuahua
         var eyeColor = new Color(0.15f, 0.1f, 0.08f);     // Dark eyes
@@ -3585,6 +3664,41 @@ public partial class EditorScreen3D : Control
             _previewObject.AddChild(leg);
             _fallbackLimbNodes[legNames[i]] = leg;
         }
+    }
+
+    private void OnNpcGlbToggled(bool pressed)
+    {
+        // Update the static flag in Steve3D
+        Pet.Steve3D.UseGlbModel = pressed;
+
+        // Update checkbox text to reflect current state
+        if (_npcUseGlbCheckbox != null)
+        {
+            _npcUseGlbCheckbox.Text = pressed ? "GLB Model" : "Procedural";
+        }
+
+        // Update path label color based on whether file exists
+        if (_npcGlbPathLabel != null)
+        {
+            bool fileExists = ResourceLoader.Exists(Pet.Steve3D.GlbModelPath);
+            _npcGlbPathLabel.AddThemeColorOverride("font_color",
+                pressed ? (fileExists ? new Color(0.5f, 0.9f, 0.5f) : new Color(0.9f, 0.5f, 0.5f))
+                        : new Color(0.5f, 0.5f, 0.5f));
+        }
+
+        // Refresh preview
+        if (_selectedNpcId == "steve")
+        {
+            UpdatePreviewNpc("steve");
+        }
+
+        // Update live Steve if exists
+        if (Pet.Steve3D.Instance != null)
+        {
+            Pet.Steve3D.Instance.ReloadModel();
+        }
+
+        GD.Print($"[EditorScreen3D] Steve model: {(pressed ? "GLB" : "Procedural")}");
     }
 
     private void OnApplyChanges()

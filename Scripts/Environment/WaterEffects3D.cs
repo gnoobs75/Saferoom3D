@@ -116,12 +116,10 @@ public partial class WaterStream : Node3D
             Vector3 leftPos = basePos + perpendicular * halfWidth;
             Vector3 rightPos = basePos - perpendicular * halfWidth;
 
-            // Add vertices with normals pointing up
-            surfaceTool.SetNormal(Vector3.Up);
+            // Add vertices
             surfaceTool.SetUV(new Vector2(0, t * length));
             surfaceTool.AddVertex(leftPos - StartPoint);
 
-            surfaceTool.SetNormal(Vector3.Up);
             surfaceTool.SetUV(new Vector2(1, t * length));
             surfaceTool.AddVertex(rightPos - StartPoint);
         }
@@ -140,6 +138,7 @@ public partial class WaterStream : Node3D
             surfaceTool.AddIndex(baseIdx + 3);
         }
 
+        surfaceTool.GenerateNormals();
         surfaceTool.GenerateTangents();
         var mesh = surfaceTool.Commit();
         _meshInstance.Mesh = mesh;

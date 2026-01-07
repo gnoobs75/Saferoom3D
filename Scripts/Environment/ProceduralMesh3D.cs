@@ -30,12 +30,10 @@ public static class ProceduralMesh3D
             float z = Mathf.Sin(angle) * radius;
 
             // Bottom vertex
-            surfaceTool.SetNormal(new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)));
             surfaceTool.SetUV(new Vector2((float)i / segments, 0));
             surfaceTool.AddVertex(new Vector3(x, -halfHeight, z));
 
             // Top vertex
-            surfaceTool.SetNormal(new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)));
             surfaceTool.SetUV(new Vector2((float)i / segments, 1));
             surfaceTool.AddVertex(new Vector3(x, halfHeight, z));
         }
@@ -59,7 +57,6 @@ public static class ProceduralMesh3D
             int capStartIdx = (segments + 1) * 2;
 
             // Top cap center
-            surfaceTool.SetNormal(Vector3.Up);
             surfaceTool.SetUV(new Vector2(0.5f, 0.5f));
             surfaceTool.AddVertex(new Vector3(0, halfHeight, 0));
 
@@ -69,7 +66,6 @@ public static class ProceduralMesh3D
                 float angle = i * angleStep;
                 float x = Mathf.Cos(angle) * radius;
                 float z = Mathf.Sin(angle) * radius;
-                surfaceTool.SetNormal(Vector3.Up);
                 surfaceTool.SetUV(new Vector2(0.5f + Mathf.Cos(angle) * 0.5f, 0.5f + Mathf.Sin(angle) * 0.5f));
                 surfaceTool.AddVertex(new Vector3(x, halfHeight, z));
             }
@@ -85,7 +81,6 @@ public static class ProceduralMesh3D
             int bottomCapStart = capStartIdx + segments + 2;
 
             // Bottom cap center
-            surfaceTool.SetNormal(Vector3.Down);
             surfaceTool.SetUV(new Vector2(0.5f, 0.5f));
             surfaceTool.AddVertex(new Vector3(0, -halfHeight, 0));
 
@@ -95,7 +90,6 @@ public static class ProceduralMesh3D
                 float angle = i * angleStep;
                 float x = Mathf.Cos(angle) * radius;
                 float z = Mathf.Sin(angle) * radius;
-                surfaceTool.SetNormal(Vector3.Down);
                 surfaceTool.SetUV(new Vector2(0.5f + Mathf.Cos(angle) * 0.5f, 0.5f + Mathf.Sin(angle) * 0.5f));
                 surfaceTool.AddVertex(new Vector3(x, -halfHeight, z));
             }
@@ -109,6 +103,7 @@ public static class ProceduralMesh3D
             }
         }
 
+        surfaceTool.GenerateNormals();
         surfaceTool.GenerateTangents();
         return surfaceTool.Commit();
     }
@@ -154,7 +149,6 @@ public static class ProceduralMesh3D
         {
             for (int i = 0; i < 4; i++)
             {
-                surfaceTool.SetNormal(normal);
                 surfaceTool.SetUV(uvs[i]);
                 surfaceTool.AddVertex(corners[indices[i]]);
             }
@@ -171,6 +165,7 @@ public static class ProceduralMesh3D
             vertexCount += 4;
         }
 
+        surfaceTool.GenerateNormals();
         surfaceTool.GenerateTangents();
         return surfaceTool.Commit();
     }
@@ -194,12 +189,10 @@ public static class ProceduralMesh3D
             float sinA = Mathf.Sin(angle);
 
             // Bottom vertex
-            surfaceTool.SetNormal(new Vector3(cosA, 0, sinA).Normalized());
             surfaceTool.SetUV(new Vector2((float)i / segments, 0));
             surfaceTool.AddVertex(new Vector3(cosA * bottomRadius, -halfHeight, sinA * bottomRadius));
 
             // Top vertex
-            surfaceTool.SetNormal(new Vector3(cosA, 0.3f, sinA).Normalized());
             surfaceTool.SetUV(new Vector2((float)i / segments, 1));
             surfaceTool.AddVertex(new Vector3(cosA * topRadius, halfHeight, sinA * topRadius));
         }
@@ -228,12 +221,10 @@ public static class ProceduralMesh3D
             float sinA = Mathf.Sin(angle);
 
             // Inner rim
-            surfaceTool.SetNormal(Vector3.Up);
             surfaceTool.SetUV(new Vector2((float)i / segments, 0));
             surfaceTool.AddVertex(new Vector3(cosA * topRadius, halfHeight, sinA * topRadius));
 
             // Outer rim
-            surfaceTool.SetNormal(new Vector3(cosA, 0.5f, sinA).Normalized());
             surfaceTool.SetUV(new Vector2((float)i / segments, 1));
             surfaceTool.AddVertex(new Vector3(cosA * rimRadius, halfHeight + rimHeight, sinA * rimRadius));
         }
@@ -250,6 +241,7 @@ public static class ProceduralMesh3D
             surfaceTool.AddIndex(baseIdx + 3);
         }
 
+        surfaceTool.GenerateNormals();
         surfaceTool.GenerateTangents();
         return surfaceTool.Commit();
     }
@@ -289,16 +281,8 @@ public static class ProceduralMesh3D
             Vector3 v1 = midPoints[i];
             Vector3 v2 = midPoints[next];
 
-            // Calculate face normal
-            Vector3 edge1 = v1 - topPoint;
-            Vector3 edge2 = v2 - topPoint;
-            Vector3 normal = edge2.Cross(edge1).Normalized();
-
-            surfaceTool.SetNormal(normal);
             surfaceTool.AddVertex(topPoint);
-            surfaceTool.SetNormal(normal);
             surfaceTool.AddVertex(v1);
-            surfaceTool.SetNormal(normal);
             surfaceTool.AddVertex(v2);
         }
 
@@ -309,19 +293,12 @@ public static class ProceduralMesh3D
             Vector3 v1 = midPoints[i];
             Vector3 v2 = midPoints[next];
 
-            // Calculate face normal (reversed winding)
-            Vector3 edge1 = v1 - bottomPoint;
-            Vector3 edge2 = v2 - bottomPoint;
-            Vector3 normal = edge1.Cross(edge2).Normalized();
-
-            surfaceTool.SetNormal(normal);
             surfaceTool.AddVertex(bottomPoint);
-            surfaceTool.SetNormal(normal);
             surfaceTool.AddVertex(v2);
-            surfaceTool.SetNormal(normal);
             surfaceTool.AddVertex(v1);
         }
 
+        surfaceTool.GenerateNormals();
         surfaceTool.GenerateTangents();
         return surfaceTool.Commit();
     }

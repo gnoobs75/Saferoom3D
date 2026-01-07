@@ -201,9 +201,8 @@ namespace SafeRoom3D.Enemies
             // Create a simple quad facing camera
             float size = 1.5f;
 
-            // Set color and normal
+            // Set color
             surfaceTool.SetColor(baseColor);
-            surfaceTool.SetNormal(Vector3.Back);
 
             // Create quad vertices
             surfaceTool.SetUV(new Vector2(0, 0));
@@ -224,6 +223,7 @@ namespace SafeRoom3D.Enemies
             surfaceTool.SetUV(new Vector2(0, 1));
             surfaceTool.AddVertex(new Vector3(-size/2, size * 1.5f, 0));
 
+            surfaceTool.GenerateNormals();
             var mesh = surfaceTool.Commit();
 
             // Apply simple material
@@ -298,6 +298,7 @@ namespace SafeRoom3D.Enemies
             }
             // Low detail - just body and head, no limbs
 
+            surfaceTool.GenerateNormals();
             return surfaceTool.Commit();
         }
 
@@ -320,6 +321,7 @@ namespace SafeRoom3D.Enemies
                 Color orbColor = new Color(0.3f, 0.6f, 1.0f);
                 AddSphere(surfaceTool, new Vector3(0.6f, 1.8f, 0), 0.12f, GetSegmentCount(level)/2, GetRingCount(level)/2, orbColor);
 
+                surfaceTool.GenerateNormals();
                 return surfaceTool.Commit();
             }
 
@@ -375,6 +377,7 @@ namespace SafeRoom3D.Enemies
                 AddCylinder(surfaceTool, new Vector3(0.7f, 1.1f, 0), 0.15f, 0.8f, segments, limbColor);
             }
 
+            surfaceTool.GenerateNormals();
             return surfaceTool.Commit();
         }
 
@@ -402,6 +405,7 @@ namespace SafeRoom3D.Enemies
                 AddSphere(surfaceTool, new Vector3(0.2f, 0.5f, 0.45f), 0.05f, 8, 4, Colors.Black);
             }
 
+            surfaceTool.GenerateNormals();
             return surfaceTool.Commit();
         }
 
@@ -424,6 +428,7 @@ namespace SafeRoom3D.Enemies
                 AddSphere(surfaceTool, new Vector3(0, 0.8f, 0.5f), 0.12f, segments/2, rings/2, Colors.Black);
             }
 
+            surfaceTool.GenerateNormals();
             return surfaceTool.Commit();
         }
 
@@ -450,6 +455,7 @@ namespace SafeRoom3D.Enemies
                 AddSphere(surfaceTool, new Vector3(0.1f, 0.88f, -0.2f), 0.07f, 8, 4, spotColor);
             }
 
+            surfaceTool.GenerateNormals();
             return surfaceTool.Commit();
         }
 
@@ -490,6 +496,7 @@ namespace SafeRoom3D.Enemies
                 }
             }
 
+            surfaceTool.GenerateNormals();
             return surfaceTool.Commit();
         }
 
@@ -531,6 +538,7 @@ namespace SafeRoom3D.Enemies
                 AddCylinder(surfaceTool, new Vector3(0.3f, 0.3f, 0.3f), 0.12f, 0.5f, segments, limbColor);
             }
 
+            surfaceTool.GenerateNormals();
             return surfaceTool.Commit();
         }
 
@@ -571,6 +579,7 @@ namespace SafeRoom3D.Enemies
                 AddCylinder(surfaceTool, new Vector3(0.5f, 1.0f, 0), 0.08f, 0.7f, segments, boneColor);
             }
 
+            surfaceTool.GenerateNormals();
             return surfaceTool.Commit();
         }
 
@@ -615,6 +624,7 @@ namespace SafeRoom3D.Enemies
                 AddCylinder(surfaceTool, new Vector3(0.3f, 0.25f, 0.5f), 0.1f, 0.5f, segments, limbColor);
             }
 
+            surfaceTool.GenerateNormals();
             return surfaceTool.Commit();
         }
 
@@ -652,6 +662,7 @@ namespace SafeRoom3D.Enemies
                 AddBox(surfaceTool, new Vector3(0.4f, 0.8f, 0), new Vector3(0.3f, 0.05f, 0.2f), wingColor);
             }
 
+            surfaceTool.GenerateNormals();
             return surfaceTool.Commit();
         }
 
@@ -706,6 +717,7 @@ namespace SafeRoom3D.Enemies
                 AddCylinder(surfaceTool, new Vector3(0.6f, 0.4f, 0.4f), 0.25f, 0.8f, segments, limbColor);
             }
 
+            surfaceTool.GenerateNormals();
             return surfaceTool.Commit();
         }
 
@@ -720,6 +732,7 @@ namespace SafeRoom3D.Enemies
             // Simple sphere
             AddSphere(surfaceTool, Vector3.Up * 0.8f, 0.5f, segments, rings, baseColor);
 
+            surfaceTool.GenerateNormals();
             return surfaceTool.Commit();
         }
 
@@ -776,21 +789,15 @@ namespace SafeRoom3D.Enemies
 
                     if (i > 0)
                     {
-                        st.SetNormal(n00);
                         st.AddVertex(v00);
-                        st.SetNormal(n01);
                         st.AddVertex(v01);
-                        st.SetNormal(n10);
                         st.AddVertex(v10);
                     }
 
                     if (i < rings - 1)
                     {
-                        st.SetNormal(n01);
                         st.AddVertex(v01);
-                        st.SetNormal(n11);
                         st.AddVertex(v11);
-                        st.SetNormal(n10);
                         st.AddVertex(v10);
                     }
                 }
@@ -823,18 +830,12 @@ namespace SafeRoom3D.Enemies
 
                 st.SetColor(color);
 
-                st.SetNormal(n0);
                 st.AddVertex(v0Bottom);
-                st.SetNormal(n1);
                 st.AddVertex(v1Bottom);
-                st.SetNormal(n0);
                 st.AddVertex(v0Top);
 
-                st.SetNormal(n1);
                 st.AddVertex(v1Bottom);
-                st.SetNormal(n1);
                 st.AddVertex(v1Top);
-                st.SetNormal(n0);
                 st.AddVertex(v0Top);
             }
 
@@ -852,13 +853,11 @@ namespace SafeRoom3D.Enemies
                 st.SetColor(color);
 
                 // Bottom cap
-                st.SetNormal(Vector3.Down);
                 st.AddVertex(bottom);
                 st.AddVertex(bottom + new Vector3(x1, 0, z1));
                 st.AddVertex(bottom + new Vector3(x0, 0, z0));
 
                 // Top cap
-                st.SetNormal(Vector3.Up);
                 st.AddVertex(top);
                 st.AddVertex(top + new Vector3(x0, 0, z0));
                 st.AddVertex(top + new Vector3(x1, 0, z1));
@@ -906,14 +905,11 @@ namespace SafeRoom3D.Enemies
             for (int i = 0; i < faces.Length; i++)
             {
                 int[] face = faces[i];
-                Vector3 normal = normals[i];
 
-                st.SetNormal(normal);
                 st.AddVertex(vertices[face[0]]);
                 st.AddVertex(vertices[face[1]]);
                 st.AddVertex(vertices[face[2]]);
 
-                st.SetNormal(normal);
                 st.AddVertex(vertices[face[0]]);
                 st.AddVertex(vertices[face[2]]);
                 st.AddVertex(vertices[face[3]]);

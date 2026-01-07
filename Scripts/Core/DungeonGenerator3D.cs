@@ -711,9 +711,6 @@ public partial class DungeonGenerator3D : Node3D
                 float hD = z > 0 ? heightMap[x, z - 1] : height;
                 float hU = z < zVerts - 1 ? heightMap[x, z + 1] : height;
 
-                Vector3 normal = new Vector3(hL - hR, 2f * xStep, hD - hU).Normalized();
-
-                surfaceTool.SetNormal(normal);
                 surfaceTool.SetUV(new Vector2(worldX / 4f + 0.5f, worldZ / 4f + 0.5f)); // UV for texture tiling
                 surfaceTool.AddVertex(new Vector3(worldX, height, worldZ));
             }
@@ -741,6 +738,7 @@ public partial class DungeonGenerator3D : Node3D
             }
         }
 
+        surfaceTool.GenerateNormals();
         surfaceTool.GenerateTangents();
         return surfaceTool.Commit();
     }

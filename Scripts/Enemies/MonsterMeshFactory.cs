@@ -3614,7 +3614,6 @@ public static class MonsterMeshFactory
             var simpleMembrane = new MeshInstance3D { MaterialOverride = wingMat };
             var st = new SurfaceTool();
             st.Begin(Mesh.PrimitiveType.Triangles);
-            st.SetNormal(Vector3.Up);
             st.AddVertex(new Vector3(0, 0, 0));
             st.AddVertex(new Vector3(-0.25f * baseSize * wingSpan, 0.05f * baseSize, -0.1f * baseSize * wingSpan));
             st.AddVertex(new Vector3(-0.25f * baseSize * wingSpan, -0.05f * baseSize, 0.1f * baseSize * wingSpan));
@@ -3677,7 +3676,6 @@ public static class MonsterMeshFactory
             var simpleMembrane = new MeshInstance3D { MaterialOverride = wingMat };
             var st = new SurfaceTool();
             st.Begin(Mesh.PrimitiveType.Triangles);
-            st.SetNormal(Vector3.Up);
             st.AddVertex(new Vector3(0, 0, 0));
             st.AddVertex(new Vector3(0.25f * baseSize * wingSpan, 0.05f * baseSize, -0.1f * baseSize * wingSpan));
             st.AddVertex(new Vector3(0.25f * baseSize * wingSpan, -0.05f * baseSize, 0.1f * baseSize * wingSpan));

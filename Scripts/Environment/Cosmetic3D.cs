@@ -593,8 +593,6 @@ public partial class Cosmetic3D : StaticBody3D
                 float x = Mathf.Cos(angle) * r;
                 float z = Mathf.Sin(angle) * r;
 
-                Vector3 normal = new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)).Normalized();
-                surfaceTool.SetNormal(normal);
                 surfaceTool.SetUV(new Vector2((float)i / segments, t));
                 surfaceTool.AddVertex(new Vector3(x, y, z));
             }
@@ -636,11 +634,8 @@ public partial class Cosmetic3D : StaticBody3D
                 float angle = i * angleStep;
                 float x = Mathf.Cos(angle) * bandRadius;
                 float z = Mathf.Sin(angle) * bandRadius;
-                Vector3 normal = new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)).Normalized();
 
-                surfaceTool.SetNormal(normal);
                 surfaceTool.AddVertex(new Vector3(x, bandY - bandHeight / 2, z));
-                surfaceTool.SetNormal(normal);
                 surfaceTool.AddVertex(new Vector3(x, bandY + bandHeight / 2, z));
 
                 if (i < segments)
@@ -692,14 +687,12 @@ public partial class Cosmetic3D : StaticBody3D
         float topBulge = 1f + 0.15f * Mathf.Sin(Mathf.Pi);
         float topRadius = radius * topBulge * 0.98f;
 
-        surfaceTool.SetNormal(Vector3.Up);
         surfaceTool.AddVertex(new Vector3(0, topY, 0));
         int topCenterIdx = currentVertexOffset;
 
         for (int i = 0; i <= segments; i++)
         {
             float angle = i * angleStep;
-            surfaceTool.SetNormal(Vector3.Up);
             surfaceTool.AddVertex(new Vector3(Mathf.Cos(angle) * topRadius, topY, Mathf.Sin(angle) * topRadius));
         }
 
@@ -710,6 +703,7 @@ public partial class Cosmetic3D : StaticBody3D
             surfaceTool.AddIndex(topCenterIdx + 2 + i);
         }
 
+        surfaceTool.GenerateNormals();
         var mesh = surfaceTool.Commit();
         var material = ProceduralMesh3D.CreateWoodMaterial(PrimaryColor.Darkened(0.1f));
         material.Roughness = 0.8f;
@@ -845,6 +839,7 @@ public partial class Cosmetic3D : StaticBody3D
                 new Vector3(nailSize, nailSize, nailSize));
         }
 
+        surfaceTool.GenerateNormals();
         var mesh = surfaceTool.Commit();
         var material = ProceduralMesh3D.CreateWoodMaterial(PrimaryColor);
         material.Roughness = 0.85f;
@@ -888,8 +883,6 @@ public partial class Cosmetic3D : StaticBody3D
                 float x = Mathf.Cos(angle) * r;
                 float z = Mathf.Sin(angle) * r;
 
-                Vector3 normal = new Vector3(Mathf.Cos(angle), 0.2f, Mathf.Sin(angle)).Normalized();
-                surfaceTool.SetNormal(normal);
                 surfaceTool.SetUV(new Vector2((float)i / segments, t));
                 surfaceTool.AddVertex(new Vector3(x, y, z));
             }
@@ -928,11 +921,8 @@ public partial class Cosmetic3D : StaticBody3D
                 float angle = i * angleStep;
                 float x = Mathf.Cos(angle) * bandRadius;
                 float z = Mathf.Sin(angle) * bandRadius;
-                Vector3 normal = new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)).Normalized();
 
-                surfaceTool.SetNormal(normal);
                 surfaceTool.AddVertex(new Vector3(x, bandY - bandThickness, z));
-                surfaceTool.SetNormal(normal);
                 surfaceTool.AddVertex(new Vector3(x, bandY + bandThickness, z));
 
                 if (i < segments)
@@ -965,9 +955,7 @@ public partial class Cosmetic3D : StaticBody3D
             float x = Mathf.Cos(angle) * rimR;
             float z = Mathf.Sin(angle) * rimR;
 
-            surfaceTool.SetNormal(Vector3.Up);
             surfaceTool.AddVertex(new Vector3(x, rimTop, z));
-            surfaceTool.SetNormal(new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)));
             surfaceTool.AddVertex(new Vector3(x, rimTop - rimHeight, z));
 
             if (i < segments)
@@ -990,14 +978,12 @@ public partial class Cosmetic3D : StaticBody3D
         float lidY = rimTop + lidHeight / 2;
 
         // Lid body (cylinder simulated)
-        surfaceTool.SetNormal(Vector3.Up);
         surfaceTool.AddVertex(new Vector3(0, lidY + lidHeight / 2, 0));
         int lidCenterIdx = currentVertexOffset;
 
         for (int i = 0; i <= segments; i++)
         {
             float angle = i * angleStep;
-            surfaceTool.SetNormal(Vector3.Up);
             surfaceTool.AddVertex(new Vector3(Mathf.Cos(angle) * lidRadius, lidY + lidHeight / 2, Mathf.Sin(angle) * lidRadius));
         }
 
@@ -1014,6 +1000,7 @@ public partial class Cosmetic3D : StaticBody3D
         AddBoxToSurfaceTool(surfaceTool, new Vector3(0, handleY, 0),
             new Vector3(handleRadius * 2, handleRadius * 2, handleRadius * 2));
 
+        surfaceTool.GenerateNormals();
         var mesh = surfaceTool.Commit();
         var material = ProceduralMesh3D.CreateMaterial(PrimaryColor, 0.8f);
         mesh.SurfaceSetMaterial(0, material);
@@ -1052,8 +1039,6 @@ public partial class Cosmetic3D : StaticBody3D
                 float x = Mathf.Cos(angle) * (r - wearOffset);
                 float z = Mathf.Sin(angle) * (r - wearOffset);
 
-                Vector3 normal = new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)).Normalized();
-                surfaceTool.SetNormal(normal);
                 surfaceTool.SetUV(new Vector2((float)i / segments, t));
                 surfaceTool.AddVertex(new Vector3(x, y, z));
             }
@@ -1106,8 +1091,6 @@ public partial class Cosmetic3D : StaticBody3D
                 float x = Mathf.Cos(angle) * r;
                 float z = Mathf.Sin(angle) * r;
 
-                Vector3 normal = new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)).Normalized();
-                surfaceTool.SetNormal(normal);
                 surfaceTool.SetUV(new Vector2((float)i / segments, t + 0.3f));
                 surfaceTool.AddVertex(new Vector3(x, y, z));
             }
@@ -1150,8 +1133,6 @@ public partial class Cosmetic3D : StaticBody3D
                 float x = Mathf.Cos(angle) * (r - carveDepth);
                 float z = Mathf.Sin(angle) * (r - carveDepth);
 
-                Vector3 normal = new Vector3(Mathf.Cos(angle), 0.3f, Mathf.Sin(angle)).Normalized();
-                surfaceTool.SetNormal(normal);
                 surfaceTool.SetUV(new Vector2((float)i / segments, t + 0.8f));
                 surfaceTool.AddVertex(new Vector3(x, y, z));
             }
@@ -1210,6 +1191,7 @@ public partial class Cosmetic3D : StaticBody3D
             }
         }
 
+        surfaceTool.GenerateNormals();
         var mesh = surfaceTool.Commit();
         var material = ProceduralMesh3D.CreateMaterial(PrimaryColor, 0.85f);
         mesh.SurfaceSetMaterial(0, material);
@@ -1261,11 +1243,6 @@ public partial class Cosmetic3D : StaticBody3D
             Vector3 v1 = upperPoints[i];
             Vector3 v2 = upperPoints[next];
 
-            Vector3 edge1 = v1 - topPoint;
-            Vector3 edge2 = v2 - topPoint;
-            Vector3 normal = edge2.Cross(edge1).Normalized();
-
-            surfaceTool.SetNormal(normal);
             surfaceTool.AddVertex(topPoint);
             surfaceTool.AddVertex(v1);
             surfaceTool.AddVertex(v2);
@@ -1280,14 +1257,10 @@ public partial class Cosmetic3D : StaticBody3D
             Vector3 l1 = lowerPoints[i];
             Vector3 l2 = lowerPoints[next];
 
-            Vector3 normal = (u2 - u1).Cross(l1 - u1).Normalized();
-
-            surfaceTool.SetNormal(normal);
             surfaceTool.AddVertex(u1);
             surfaceTool.AddVertex(l1);
             surfaceTool.AddVertex(u2);
 
-            surfaceTool.SetNormal(normal);
             surfaceTool.AddVertex(u2);
             surfaceTool.AddVertex(l1);
             surfaceTool.AddVertex(l2);
@@ -1301,11 +1274,6 @@ public partial class Cosmetic3D : StaticBody3D
             Vector3 v1 = lowerPoints[i];
             Vector3 v2 = lowerPoints[next];
 
-            Vector3 edge1 = v1 - bottomPoint;
-            Vector3 edge2 = v2 - bottomPoint;
-            Vector3 normal = edge1.Cross(edge2).Normalized();
-
-            surfaceTool.SetNormal(normal);
             surfaceTool.AddVertex(bottomPoint);
             surfaceTool.AddVertex(v2);
             surfaceTool.AddVertex(v1);
@@ -1345,8 +1313,6 @@ public partial class Cosmetic3D : StaticBody3D
                 Vector3 p1 = clusterBase + new Vector3(Mathf.Cos(a1) * clusterSize * 0.35f, 0, Mathf.Sin(a1) * clusterSize * 0.35f);
                 Vector3 p2 = clusterBase + new Vector3(Mathf.Cos(a2) * clusterSize * 0.35f, 0, Mathf.Sin(a2) * clusterSize * 0.35f);
 
-                Vector3 normal = (clusterTop - p1).Cross(clusterTop - p2).Normalized();
-                surfaceTool.SetNormal(normal);
                 surfaceTool.AddVertex(clusterTop);
                 surfaceTool.AddVertex(p1);
                 surfaceTool.AddVertex(p2);
@@ -1368,20 +1334,17 @@ public partial class Cosmetic3D : StaticBody3D
             Vector3 m2 = new Vector3(Mathf.Cos(a2) * coreRadius, 0, Mathf.Sin(a2) * coreRadius);
 
             // Top triangles
-            Vector3 normalTop = (coreTop - m1).Cross(coreTop - m2).Normalized();
-            surfaceTool.SetNormal(normalTop);
             surfaceTool.AddVertex(coreTop);
             surfaceTool.AddVertex(m2);
             surfaceTool.AddVertex(m1);
 
             // Bottom triangles
-            Vector3 normalBot = (coreBot - m2).Cross(coreBot - m1).Normalized();
-            surfaceTool.SetNormal(normalBot);
             surfaceTool.AddVertex(coreBot);
             surfaceTool.AddVertex(m1);
             surfaceTool.AddVertex(m2);
         }
 
+        surfaceTool.GenerateNormals();
         var mesh = surfaceTool.Commit();
 
         // Crystal material with internal glow
@@ -1775,8 +1738,6 @@ public partial class Cosmetic3D : StaticBody3D
                 float x = Mathf.Cos(angle) * r;
                 float z = Mathf.Sin(angle) * r;
 
-                Vector3 normal = new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)).Normalized();
-                surfaceTool.SetNormal(normal);
                 surfaceTool.AddVertex(new Vector3(x, y, z));
             }
         }
@@ -1807,7 +1768,6 @@ public partial class Cosmetic3D : StaticBody3D
             float r1 = radius;
             float r2 = radius * 1.08f;
 
-            surfaceTool.SetNormal(Vector3.Up);
             surfaceTool.AddVertex(new Vector3(Mathf.Cos(angle) * r1, rimY, Mathf.Sin(angle) * r1));
             surfaceTool.AddVertex(new Vector3(Mathf.Cos(angle) * r2, rimY + 0.03f * s, Mathf.Sin(angle) * r2));
 
@@ -1878,7 +1838,7 @@ public partial class Cosmetic3D : StaticBody3D
         AddBoxToSurfaceTool(surfaceTool, new Vector3(-0.08f * s, steamY + 0.05f * s, -0.04f * s), new Vector3(0.012f * s, 0.18f * s, 0.012f * s));
         AddBoxToSurfaceTool(surfaceTool, new Vector3(0.02f * s, steamY + 0.08f * s, 0.08f * s), new Vector3(0.01f * s, 0.15f * s, 0.01f * s));
 
-        // Skip GenerateTangents() - not needed without normal maps, saves ~2-5ms per prop
+        surfaceTool.GenerateNormals();
         var mesh = surfaceTool.Commit();
         var material = ProceduralMesh3D.CreateMetalMaterial(AccentColor, 0.45f);
         mesh.SurfaceSetMaterial(0, material);
@@ -1906,8 +1866,6 @@ public partial class Cosmetic3D : StaticBody3D
             Vector3 t1 = new Vector3(Mathf.Cos(angle1) * 0.25f * s, baseHeight, Mathf.Sin(angle1) * 0.25f * s);
             Vector3 t2 = new Vector3(Mathf.Cos(angle2) * 0.25f * s, baseHeight, Mathf.Sin(angle2) * 0.25f * s);
 
-            Vector3 normal = ((b1 + b2) / 2f).Normalized();
-            surfaceTool.SetNormal(normal);
             surfaceTool.AddVertex(b1);
             surfaceTool.AddVertex(b2);
             surfaceTool.AddVertex(t2);
@@ -1941,8 +1899,6 @@ public partial class Cosmetic3D : StaticBody3D
                 float x = Mathf.Cos(angle) * r;
                 float z = Mathf.Sin(angle) * r;
 
-                Vector3 normal = new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)).Normalized();
-                surfaceTool.SetNormal(normal);
                 surfaceTool.AddVertex(new Vector3(x, y, z));
             }
         }
@@ -2011,7 +1967,7 @@ public partial class Cosmetic3D : StaticBody3D
         AddBoxToSurfaceTool(surfaceTool, new Vector3(0.35f * s, 0.02f * s, -0.25f * s),
             new Vector3(0.06f * s, 0.04f * s, 0.07f * s));
 
-        // Skip GenerateTangents() - not needed without normal maps, saves ~2-5ms per prop
+        surfaceTool.GenerateNormals();
         var mesh = surfaceTool.Commit();
         var material = ProceduralMesh3D.CreateMaterial(PrimaryColor, 0.75f, 0.05f);
         mesh.SurfaceSetMaterial(0, material);
@@ -2379,8 +2335,9 @@ public partial class Cosmetic3D : StaticBody3D
     private void AddCylinderToSurfaceTool(SurfaceTool st, Vector3 start, Vector3 end, float radius)
     {
         // Create a simple cylinder between two points using quads
+        // NOTE: Do NOT set normals here - let GenerateNormals() handle it at the end
+        // This ensures compatibility with both Godot 4.3 and 4.5 (no mixed normal format)
         Vector3 dir = (end - start).Normalized();
-        float length = start.DistanceTo(end);
 
         // Find perpendicular vectors
         Vector3 perp1 = dir.Cross(Vector3.Up).Normalized();
@@ -2401,28 +2358,20 @@ public partial class Cosmetic3D : StaticBody3D
             Vector3 v3 = end + offset2;
             Vector3 v4 = end + offset1;
 
-            // Calculate normals (pointing outward radially) - Godot 4.5 requirement
-            Vector3 n1 = offset1.Normalized();
-            Vector3 n2 = offset2.Normalized();
-
-            // Two triangles for the quad
-            st.SetNormal(n1);
+            // Two triangles for the quad - normals calculated by GenerateNormals()
             st.AddVertex(v1);
-            st.SetNormal(n2);
             st.AddVertex(v2);
-            st.SetNormal(n2);
             st.AddVertex(v3);
 
-            st.SetNormal(n1);
             st.AddVertex(v1);
-            st.SetNormal(n2);
             st.AddVertex(v3);
-            st.SetNormal(n1);
             st.AddVertex(v4);
         }
     }
 
     // Overload for tapered cylinders (different top/bottom radii)
+    // NOTE: Do NOT set normals here - let GenerateNormals() handle it at the end
+    // This ensures compatibility with both Godot 4.3 and 4.5 (no mixed normal format)
     private void AddCylinderToSurfaceTool(SurfaceTool st, Vector3 center, float bottomRadius, float topRadius, float height)
     {
         Vector3 start = center - new Vector3(0, height / 2f, 0);
@@ -2444,23 +2393,13 @@ public partial class Cosmetic3D : StaticBody3D
             Vector3 v3 = end + offsetTop2;
             Vector3 v4 = end + offsetTop1;
 
-            // Calculate normals (pointing outward radially) - Godot 4.5 requirement
-            Vector3 n1 = new Vector3(Mathf.Cos(angle1), 0, Mathf.Sin(angle1));
-            Vector3 n2 = new Vector3(Mathf.Cos(angle2), 0, Mathf.Sin(angle2));
-
-            // Two triangles for the quad
-            st.SetNormal(n1);
+            // Two triangles for the quad - normals calculated by GenerateNormals()
             st.AddVertex(v1);
-            st.SetNormal(n2);
             st.AddVertex(v2);
-            st.SetNormal(n2);
             st.AddVertex(v3);
 
-            st.SetNormal(n1);
             st.AddVertex(v1);
-            st.SetNormal(n2);
             st.AddVertex(v3);
-            st.SetNormal(n1);
             st.AddVertex(v4);
         }
     }
@@ -2596,6 +2535,8 @@ public partial class Cosmetic3D : StaticBody3D
     private void AddBoxToSurfaceTool(SurfaceTool st, Vector3 center, Vector3 size)
     {
         // Helper to add a box to the surface tool
+        // NOTE: Do NOT set normals here - let GenerateNormals() handle it at the end
+        // This ensures compatibility with both Godot 4.3 and 4.5 (no mixed normal format)
         Vector3 half = size / 2f;
 
         // Define the 8 vertices
@@ -2610,21 +2551,20 @@ public partial class Cosmetic3D : StaticBody3D
             center + new Vector3(-half.X, half.Y, half.Z),
         };
 
-        // Define the 6 faces (2 triangles each) with normals - Godot 4.5 requirement
-        (int[], Vector3)[] facesWithNormals = {
-            (new[] {0, 1, 2, 0, 2, 3}, new Vector3(0, 0, -1)), // front
-            (new[] {5, 4, 7, 5, 7, 6}, new Vector3(0, 0, 1)),  // back
-            (new[] {4, 0, 3, 4, 3, 7}, new Vector3(-1, 0, 0)), // left
-            (new[] {1, 5, 6, 1, 6, 2}, new Vector3(1, 0, 0)),  // right
-            (new[] {3, 2, 6, 3, 6, 7}, new Vector3(0, 1, 0)),  // top
-            (new[] {4, 5, 1, 4, 1, 0}, new Vector3(0, -1, 0)), // bottom
+        // Define the 6 faces (2 triangles each) - normals calculated by GenerateNormals()
+        int[][] faces = {
+            new[] {0, 1, 2, 0, 2, 3}, // front
+            new[] {5, 4, 7, 5, 7, 6}, // back
+            new[] {4, 0, 3, 4, 3, 7}, // left
+            new[] {1, 5, 6, 1, 6, 2}, // right
+            new[] {3, 2, 6, 3, 6, 7}, // top
+            new[] {4, 5, 1, 4, 1, 0}, // bottom
         };
 
-        foreach (var (face, normal) in facesWithNormals)
+        foreach (var face in faces)
         {
             foreach (var idx in face)
             {
-                st.SetNormal(normal);
                 st.AddVertex(verts[idx]);
             }
         }
@@ -2633,6 +2573,8 @@ public partial class Cosmetic3D : StaticBody3D
     private void AddRotatedBoxToSurfaceTool(SurfaceTool st, Vector3 center, Vector3 size, float yRotation)
     {
         // Helper to add a Y-axis rotated box to the surface tool
+        // NOTE: Do NOT set normals here - let GenerateNormals() handle it at the end
+        // This ensures compatibility with both Godot 4.3 and 4.5 (no mixed normal format)
         Vector3 half = size / 2f;
         float cos = Mathf.Cos(yRotation);
         float sin = Mathf.Sin(yRotation);
@@ -2658,24 +2600,20 @@ public partial class Cosmetic3D : StaticBody3D
             verts[i] = center + new Vector3(rotX, localVerts[i].Y, rotZ);
         }
 
-        // Define the 6 faces with normals (rotated) - Godot 4.5 requirement
-        // Rotate normals around Y axis
-        Vector3 RotateNormal(Vector3 n) => new Vector3(n.X * cos - n.Z * sin, n.Y, n.X * sin + n.Z * cos);
-
-        (int[], Vector3)[] facesWithNormals = {
-            (new[] {0, 1, 2, 0, 2, 3}, RotateNormal(new Vector3(0, 0, -1))), // front
-            (new[] {5, 4, 7, 5, 7, 6}, RotateNormal(new Vector3(0, 0, 1))),  // back
-            (new[] {4, 0, 3, 4, 3, 7}, RotateNormal(new Vector3(-1, 0, 0))), // left
-            (new[] {1, 5, 6, 1, 6, 2}, RotateNormal(new Vector3(1, 0, 0))),  // right
-            (new[] {3, 2, 6, 3, 6, 7}, new Vector3(0, 1, 0)),  // top (unchanged)
-            (new[] {4, 5, 1, 4, 1, 0}, new Vector3(0, -1, 0)), // bottom (unchanged)
+        // Define the 6 faces - normals calculated by GenerateNormals()
+        int[][] faces = {
+            new[] {0, 1, 2, 0, 2, 3}, // front
+            new[] {5, 4, 7, 5, 7, 6}, // back
+            new[] {4, 0, 3, 4, 3, 7}, // left
+            new[] {1, 5, 6, 1, 6, 2}, // right
+            new[] {3, 2, 6, 3, 6, 7}, // top
+            new[] {4, 5, 1, 4, 1, 0}, // bottom
         };
 
-        foreach (var (face, normal) in facesWithNormals)
+        foreach (var face in faces)
         {
             foreach (var idx in face)
             {
-                st.SetNormal(normal);
                 st.AddVertex(verts[idx]);
             }
         }
@@ -2684,6 +2622,8 @@ public partial class Cosmetic3D : StaticBody3D
     private void AddSphereToSurfaceTool(SurfaceTool st, Vector3 center, float radius)
     {
         // Create a low-poly sphere (icosahedron-like)
+        // NOTE: Do NOT set normals here - let GenerateNormals() handle it at the end
+        // This ensures compatibility with both Godot 4.3 and 4.5 (no mixed normal format)
         int rings = 4;
         int sectors = 6;
 
@@ -2714,19 +2654,13 @@ public partial class Cosmetic3D : StaticBody3D
                     radius * Mathf.Cos(theta2),
                     radius * Mathf.Sin(theta2) * Mathf.Sin(phi1));
 
-                // Two triangles for the quad - set normals before each vertex (Godot 4.5 requirement)
-                st.SetNormal((v1 - center).Normalized());
+                // Two triangles for the quad - normals calculated by GenerateNormals()
                 st.AddVertex(v1);
-                st.SetNormal((v2 - center).Normalized());
                 st.AddVertex(v2);
-                st.SetNormal((v3 - center).Normalized());
                 st.AddVertex(v3);
 
-                st.SetNormal((v1 - center).Normalized());
                 st.AddVertex(v1);
-                st.SetNormal((v3 - center).Normalized());
                 st.AddVertex(v3);
-                st.SetNormal((v4 - center).Normalized());
                 st.AddVertex(v4);
             }
         }
@@ -3021,6 +2955,7 @@ public partial class Cosmetic3D : StaticBody3D
         // Enhanced irregular moss patch with varied thickness
         int segments = 12;
         Vector3 center = new Vector3(0, 0.01f * s, 0);
+        Vector3 upNormal = Vector3.Up; // Flat moss patch faces up
         for (int i = 0; i < segments; i++)
         {
             float angle1 = i * Mathf.Tau / segments;
@@ -3089,6 +3024,7 @@ public partial class Cosmetic3D : StaticBody3D
         // Enhanced irregular puddle with ripple rings and debris
         int segments = 14;
         Vector3 center = new Vector3(0, 0.002f * s, 0);
+        Vector3 upNormal = Vector3.Up; // Flat water surface faces up
         for (int i = 0; i < segments; i++)
         {
             float angle1 = i * Mathf.Tau / segments;
@@ -3215,7 +3151,6 @@ public partial class Cosmetic3D : StaticBody3D
                 Vector3 p1Top = p1 + new Vector3(0, 0.01f * s, 0);
                 Vector3 p2Top = p2 + new Vector3(0, 0.01f * s, 0);
 
-                surfaceTool.SetNormal(Vector3.Up);
                 surfaceTool.AddVertex(coinPos);
                 surfaceTool.AddVertex(p1Top);
                 surfaceTool.AddVertex(p2Top);
@@ -3241,7 +3176,6 @@ public partial class Cosmetic3D : StaticBody3D
                 Vector3 p1Top = p1 + new Vector3(0, 0.01f * s, 0);
                 Vector3 p2Top = p2 + new Vector3(0, 0.01f * s, 0);
 
-                surfaceTool.SetNormal(Vector3.Up);
                 surfaceTool.AddVertex(coinPos);
                 surfaceTool.AddVertex(p1Top);
                 surfaceTool.AddVertex(p2Top);
@@ -4088,11 +4022,22 @@ public partial class Cosmetic3D : StaticBody3D
                 Vector3 b2 = new Vector3(sx + spikeBase, 0.01f * s, sz - spikeBase);
                 Vector3 b3 = new Vector3(sx + spikeBase, 0.01f * s, sz + spikeBase);
                 Vector3 b4 = new Vector3(sx - spikeBase, 0.01f * s, sz + spikeBase);
-                // Four faces
-                surfaceTool.AddVertex(b1); surfaceTool.AddVertex(b2); surfaceTool.AddVertex(top);
-                surfaceTool.AddVertex(b2); surfaceTool.AddVertex(b3); surfaceTool.AddVertex(top);
-                surfaceTool.AddVertex(b3); surfaceTool.AddVertex(b4); surfaceTool.AddVertex(top);
-                surfaceTool.AddVertex(b4); surfaceTool.AddVertex(b1); surfaceTool.AddVertex(top);
+                // Four faces (pyramid)
+                surfaceTool.AddVertex(b1);
+                surfaceTool.AddVertex(b2);
+                surfaceTool.AddVertex(top);
+
+                surfaceTool.AddVertex(b2);
+                surfaceTool.AddVertex(b3);
+                surfaceTool.AddVertex(top);
+
+                surfaceTool.AddVertex(b3);
+                surfaceTool.AddVertex(b4);
+                surfaceTool.AddVertex(top);
+
+                surfaceTool.AddVertex(b4);
+                surfaceTool.AddVertex(b1);
+                surfaceTool.AddVertex(top);
 
                 // Base mounting collar
                 AddCylinderToSurfaceTool(surfaceTool, new Vector3(sx, 0.005f * s, sz), spikeBase * 1.2f, spikeBase * 1.2f, 0.01f * s);
@@ -4411,7 +4356,7 @@ public partial class Cosmetic3D : StaticBody3D
         float scrollDepth = 0.32f * s;
         float scrollY = 0.008f * s;
 
-        // Main parchment with slight wave/curl
+        // Main parchment with slight wave/curl - normals handled by GenerateNormals()
         int waveSegs = 6;
         for (int i = 0; i < waveSegs; i++)
         {
@@ -4434,12 +4379,11 @@ public partial class Cosmetic3D : StaticBody3D
         float rollRadius = 0.025f * s;
         float rollY = 0.022f * s;
 
-        // Left roll (slightly raised)
+        // Left roll (slightly raised) - normals handled by GenerateNormals()
         for (int i = 0; i < 8; i++)
         {
             float angle1 = i * Mathf.Tau / 8;
             float angle2 = (i + 1) * Mathf.Tau / 8;
-            // Roll cylinder
             surfaceTool.AddVertex(new Vector3(-scrollWidth / 2 - 0.01f * s, rollY + Mathf.Sin(angle1) * rollRadius, Mathf.Cos(angle1) * rollRadius));
             surfaceTool.AddVertex(new Vector3(-scrollWidth / 2 + 0.02f * s, rollY + Mathf.Sin(angle1) * rollRadius, Mathf.Cos(angle1) * rollRadius));
             surfaceTool.AddVertex(new Vector3(-scrollWidth / 2 + 0.02f * s, rollY + Mathf.Sin(angle2) * rollRadius, Mathf.Cos(angle2) * rollRadius));
@@ -4449,7 +4393,7 @@ public partial class Cosmetic3D : StaticBody3D
             surfaceTool.AddVertex(new Vector3(-scrollWidth / 2 - 0.01f * s, rollY + Mathf.Sin(angle2) * rollRadius, Mathf.Cos(angle2) * rollRadius));
         }
 
-        // Right roll
+        // Right roll - normals handled by GenerateNormals()
         for (int i = 0; i < 8; i++)
         {
             float angle1 = i * Mathf.Tau / 8;
@@ -4492,7 +4436,6 @@ public partial class Cosmetic3D : StaticBody3D
         // === DECORATIVE RUNE SYMBOLS - mystical glyphs ===
         // Large central rune
         float runeY = scrollY + 0.003f * s;
-        // Rune circle
         float runeRadius = 0.035f * s;
         for (int i = 0; i < 6; i++)
         {
@@ -4642,8 +4585,12 @@ public partial class Cosmetic3D : StaticBody3D
             Vector3 tr = new Vector3(Mathf.Cos(angle2) * r1Top, bowlH, Mathf.Sin(angle2) * r1Top);
             Vector3 bl = new Vector3(Mathf.Cos(angle1) * r1Bot, 0, Mathf.Sin(angle1) * r1Bot);
             Vector3 br = new Vector3(Mathf.Cos(angle2) * r1Bot, 0, Mathf.Sin(angle2) * r1Bot);
-            surfaceTool.AddVertex(bl); surfaceTool.AddVertex(tl); surfaceTool.AddVertex(tr);
-            surfaceTool.AddVertex(bl); surfaceTool.AddVertex(tr); surfaceTool.AddVertex(br);
+            surfaceTool.AddVertex(bl);
+            surfaceTool.AddVertex(tl);
+            surfaceTool.AddVertex(tr);
+            surfaceTool.AddVertex(bl);
+            surfaceTool.AddVertex(tr);
+            surfaceTool.AddVertex(br);
         }
 
         // Legs (3 legs) with decorative feet
@@ -6226,7 +6173,6 @@ public partial class Cosmetic3D : StaticBody3D
                 float r1 = patchSize * (0.7f + rng.Randf() * 0.6f);
                 float r2 = patchSize * (0.7f + rng.Randf() * 0.6f);
 
-                surfaceTool.SetNormal(Vector3.Up);
                 surfaceTool.AddVertex(center);
                 surfaceTool.AddVertex(center + new Vector3(Mathf.Cos(a1) * r1, 0, Mathf.Sin(a1) * r1));
                 surfaceTool.AddVertex(center + new Vector3(Mathf.Cos(a2) * r2, 0, Mathf.Sin(a2) * r2));
@@ -6317,7 +6263,6 @@ public partial class Cosmetic3D : StaticBody3D
                 Vector3 c = basePos + new Vector3(0, shelfThick, 0);
                 Vector3 p1 = basePos + new Vector3(Mathf.Cos(a1) * shelfWidth, shelfThick, Mathf.Sin(a1) * shelfDepth);
                 Vector3 p2 = basePos + new Vector3(Mathf.Cos(a2) * shelfWidth, shelfThick, Mathf.Sin(a2) * shelfDepth);
-                surfaceTool.SetNormal(Vector3.Up);
                 surfaceTool.AddVertex(c);
                 surfaceTool.AddVertex(p1);
                 surfaceTool.AddVertex(p2);
@@ -6325,13 +6270,11 @@ public partial class Cosmetic3D : StaticBody3D
                 // Bottom surface (underside)
                 Vector3 b1 = basePos + new Vector3(Mathf.Cos(a1) * shelfWidth, 0, Mathf.Sin(a1) * shelfDepth);
                 Vector3 b2 = basePos + new Vector3(Mathf.Cos(a2) * shelfWidth, 0, Mathf.Sin(a2) * shelfDepth);
-                surfaceTool.SetNormal(Vector3.Down);
                 surfaceTool.AddVertex(basePos);
                 surfaceTool.AddVertex(b2);
                 surfaceTool.AddVertex(b1);
 
                 // Edge
-                surfaceTool.SetNormal((p1 - basePos).Normalized());
                 surfaceTool.AddVertex(p1);
                 surfaceTool.AddVertex(b1);
                 surfaceTool.AddVertex(b2);

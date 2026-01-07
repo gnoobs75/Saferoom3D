@@ -17,6 +17,11 @@ public partial class Steve3D : Node3D
 {
     public static Steve3D? Instance { get; private set; }
 
+    // GLB Model support
+    public const string GlbModelPath = "res://Assets/Models/steve.glb";
+    public static bool UseGlbModel { get; set; } = false;
+    private Node3D? _glbModelInstance;
+
     // Stats
     public const float HealAmount = 50f;
     public const float MagicMissileDamage = 25f;
@@ -94,8 +99,72 @@ public partial class Steve3D : Node3D
         }
     }
 
+    /// <summary>
+    /// Reload the model (switch between procedural and GLB)
+    /// </summary>
+    public void ReloadModel()
+    {
+        // Clear existing model
+        ClearModel();
+
+        // Recreate
+        CreateMesh();
+        CreateGlowLight();
+
+        GD.Print($"[Steve3D] Model reloaded, UseGlb: {UseGlbModel}");
+    }
+
+    private void ClearModel()
+    {
+        // Remove GLB instance if exists
+        if (_glbModelInstance != null)
+        {
+            _glbModelInstance.QueueFree();
+            _glbModelInstance = null;
+        }
+
+        // Remove procedural meshes
+        _bodyMesh?.QueueFree();
+        _bodyMesh = null;
+        _headMesh?.QueueFree();
+        _headMesh = null;
+        _earLeft?.QueueFree();
+        _earLeft = null;
+        _earRight?.QueueFree();
+        _earRight = null;
+        _tail?.QueueFree();
+        _tail = null;
+        _glowLight?.QueueFree();
+        _glowLight = null;
+
+        // Remove all other mesh children (snout, nose, eyes, tongue, legs)
+        foreach (var child in GetChildren())
+        {
+            if (child is MeshInstance3D || child is Node3D)
+            {
+                child.QueueFree();
+            }
+        }
+    }
+
     private void CreateMesh()
     {
+        // Check if we should use GLB model
+        if (UseGlbModel && ResourceLoader.Exists(GlbModelPath))
+        {
+            var scene = GD.Load<PackedScene>(GlbModelPath);
+            if (scene != null)
+            {
+                _glbModelInstance = scene.Instantiate<Node3D>();
+                // Scale the GLB model appropriately (adjust as needed for your model)
+                _glbModelInstance.Scale = new Vector3(0.15f, 0.15f, 0.15f);
+                AddChild(_glbModelInstance);
+                GD.Print($"[Steve3D] Using GLB model: {GlbModelPath}");
+                return;
+            }
+        }
+
+        // Procedural mesh fallback
         // Main body (small, round chihuahua body)
         _bodyMesh = new MeshInstance3D();
         var bodyShape = new SphereMesh { Radius = 0.12f, Height = 0.24f };
