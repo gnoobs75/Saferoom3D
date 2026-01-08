@@ -546,7 +546,7 @@ public partial class DungeonGenerator3D
             float distance = position.DistanceTo(spawnPos);
             if (distance <= _deferredEnemyRadius)
             {
-                var spawnedEnemy = SpawnEnemyFromPlacement(enemy.Type, position, enemy.Level, enemy.IsBoss, enemy.RotationY);
+                var spawnedEnemy = SpawnEnemyFromPlacement(enemy.Type, position, enemy.Level, enemy.IsBoss, enemy.RotationY, enemy.IsRoamer);
                 if (spawnedEnemy != null)
                 {
                     spawnedCount++;
@@ -682,7 +682,7 @@ public partial class DungeonGenerator3D
                 float distance = position.DistanceTo(playerPos);
                 if (distance <= _deferredEnemyRadius)
                 {
-                    var spawnedEnemy = SpawnEnemyFromPlacement(enemy.Type, position, enemy.Level, enemy.IsBoss, enemy.RotationY);
+                    var spawnedEnemy = SpawnEnemyFromPlacement(enemy.Type, position, enemy.Level, enemy.IsBoss, enemy.RotationY, enemy.IsRoamer);
                     if (spawnedEnemy != null)
                     {
                         spawnedThisFrame++;
@@ -785,7 +785,7 @@ public partial class DungeonGenerator3D
     /// <summary>
     /// Spawns a single enemy from placement data.
     /// </summary>
-    private Node3D? SpawnEnemyFromPlacement(string type, Vector3 position, int level, bool isBoss, float rotationY = 0f)
+    private Node3D? SpawnEnemyFromPlacement(string type, Vector3 position, int level, bool isBoss, float rotationY = 0f, bool isRoamer = false)
     {
         if (_enemyContainer == null) return null;
 
@@ -807,6 +807,12 @@ public partial class DungeonGenerator3D
 
         // Apply rotation from placement
         enemy.Rotation = new Vector3(0, rotationY, 0);
+
+        // Configure roamer behavior if applicable
+        if (isRoamer && enemy is Enemies.BasicEnemy3D basicEnemy)
+        {
+            basicEnemy.SetRoamer(true);
+        }
 
         enemy.AddToGroup("Enemies");
         _enemyContainer.AddChild(enemy);
@@ -927,6 +933,46 @@ public partial class DungeonGenerator3D
                 mordecai.GlobalPosition = position;
                 mordecai.Rotation = new Vector3(0, npcData.RotationY, 0);
                 npcContainer.AddChild(mordecai);
+                totalSpawned++;
+            }
+            else if (npcData.Type == "crawler_rex")
+            {
+                var npc = new SafeRoom3D.NPC.CrawlerRex();
+                npc.GlobalPosition = position;
+                npc.Rotation = new Vector3(0, npcData.RotationY, 0);
+                npcContainer.AddChild(npc);
+                totalSpawned++;
+            }
+            else if (npcData.Type == "crawler_lily")
+            {
+                var npc = new SafeRoom3D.NPC.CrawlerLily();
+                npc.GlobalPosition = position;
+                npc.Rotation = new Vector3(0, npcData.RotationY, 0);
+                npcContainer.AddChild(npc);
+                totalSpawned++;
+            }
+            else if (npcData.Type == "crawler_chad")
+            {
+                var npc = new SafeRoom3D.NPC.CrawlerChad();
+                npc.GlobalPosition = position;
+                npc.Rotation = new Vector3(0, npcData.RotationY, 0);
+                npcContainer.AddChild(npc);
+                totalSpawned++;
+            }
+            else if (npcData.Type == "crawler_shade")
+            {
+                var npc = new SafeRoom3D.NPC.CrawlerShade();
+                npc.GlobalPosition = position;
+                npc.Rotation = new Vector3(0, npcData.RotationY, 0);
+                npcContainer.AddChild(npc);
+                totalSpawned++;
+            }
+            else if (npcData.Type == "crawler_hank")
+            {
+                var npc = new SafeRoom3D.NPC.CrawlerHank();
+                npc.GlobalPosition = position;
+                npc.Rotation = new Vector3(0, npcData.RotationY, 0);
+                npcContainer.AddChild(npc);
                 totalSpawned++;
             }
             // Steve is spawned by GameManager separately as a singleton

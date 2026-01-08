@@ -1996,6 +1996,21 @@ public partial class FPSController : CharacterBody3D
             }
         }
 
+        // Check crawler NPCs
+        var crawlers = GetTree().GetNodesInGroup("Crawlers");
+        foreach (var node in crawlers)
+        {
+            if (node is NPC.BaseNPC3D npc && IsInstanceValid(npc))
+            {
+                float dist = GlobalPosition.DistanceTo(npc.GlobalPosition);
+                if (dist < nearestDist)
+                {
+                    nearestDist = dist;
+                    nearestNPC = npc;
+                }
+            }
+        }
+
         if (nearestNPC != null)
         {
             GD.Print($"[FPSController] Interacting with NPC: {nearestNPC.NPCName}");

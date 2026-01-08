@@ -56,6 +56,7 @@ public partial class InMapEditor : Control
     private ItemList? _monsterList;
     private ItemList? _npcList;
     private CheckBox? _proceduralPropsToggle;
+    private CheckBox? _roamerToggle;
 
     // Hotbar for quick prop access
     private string?[] _hotbarProps = new string?[10];
@@ -88,7 +89,10 @@ public partial class InMapEditor : Control
     };
 
     // NPC types for placement
-    private static readonly string[] NpcTypes = { "steve", "bopca", "mordecai" };
+    private static readonly string[] NpcTypes = {
+        "steve", "bopca", "mordecai",
+        "crawler_rex", "crawler_lily", "crawler_chad", "crawler_shade", "crawler_hank"
+    };
 
     public override void _Ready()
     {
@@ -468,6 +472,13 @@ public partial class InMapEditor : Control
         PopulateMonsterList("");
         paletteVBox.AddChild(_monsterList);
 
+        // Roamer toggle (hidden by default, shows when monster tab is active)
+        _roamerToggle = new CheckBox();
+        _roamerToggle.Text = "Roamer (Large Patrol Area)";
+        _roamerToggle.TooltipText = "Roamers patrol a 25-unit radius around their spawn point instead of 8";
+        _roamerToggle.Visible = false;
+        paletteVBox.AddChild(_roamerToggle);
+
         // NPCs list (hidden by default)
         _npcList = new ItemList();
         _npcList.CustomMinimumSize = new Vector2(0, 300);
@@ -535,6 +546,11 @@ public partial class InMapEditor : Control
                 "steve" => "Steve (Companion)",
                 "bopca" => "Bopca (Shopkeeper)",
                 "mordecai" => "Mordecai (Quest Giver)",
+                "crawler_rex" => "Rex (Veteran Crawler)",
+                "crawler_lily" => "Lily (Rookie Crawler)",
+                "crawler_chad" => "Chad (Showoff Crawler)",
+                "crawler_shade" => "Shade (Mysterious Crawler)",
+                "crawler_hank" => "Hank (Comedic Crawler)",
                 _ => npc.Replace("_", " ").Capitalize()
             };
             if (string.IsNullOrEmpty(filter) || displayName.ToLower().Contains(filter.ToLower()))
@@ -816,6 +832,13 @@ public partial class InMapEditor : Control
             _propList.Visible = (tab == 0);
             _monsterList.Visible = (tab == 1);
             _npcList.Visible = (tab == 2);
+
+            // Show roamer toggle only for monsters tab
+            if (_roamerToggle != null)
+            {
+                _roamerToggle.Visible = (tab == 1);
+            }
+
             // Re-apply search filter for the new tab
             string filter = _searchBox?.Text ?? "";
             if (tab == 0)
@@ -1155,6 +1178,7 @@ public partial class InMapEditor : Control
         if (_currentMap == null) return;
 
         bool isBoss = System.Array.IndexOf(BossTypes, monsterType) >= 0;
+        bool isRoamer = _roamerToggle?.ButtonPressed ?? false;
 
         // Add to map definition (enemies list)
         int tileX = (int)(position.X / Constants.TileSize);
@@ -1167,7 +1191,8 @@ public partial class InMapEditor : Control
             Level = 1,
             IsBoss = isBoss,
             RoomId = -1,
-            RotationY = rotationY
+            RotationY = rotationY,
+            IsRoamer = isRoamer
         });
 
         // Spawn the actual monster in stasis mode (immediate visibility)
@@ -1222,6 +1247,7 @@ public partial class InMapEditor : Control
             var enemy = new BasicEnemy3D();
             enemy.MonsterType = monsterType;
             enemy.GlobalPosition = position;
+            if (isRoamer) enemy.SetRoamer(true);
             spawnedMonster = enemy;
 
             var enemiesContainer = GetTree().Root.FindChild("Enemies", true, false) as Node3D;
@@ -1240,7 +1266,8 @@ public partial class InMapEditor : Control
             _placedObjects.Add(spawnedMonster);
         }
 
-        GD.Print($"[InMapEditor] Spawned monster in stasis: {monsterType} at {position} rotation={rotationY}");
+        string roamerSuffix = isRoamer ? " (Roamer)" : "";
+        GD.Print($"[InMapEditor] Spawned monster in stasis: {monsterType}{roamerSuffix} at {position} rotation={rotationY}");
     }
 
     /// <summary>
@@ -1286,6 +1313,46 @@ public partial class InMapEditor : Control
             mordecai.Rotation = new Vector3(0, rotationY, 0);
             spawnedNpc = mordecai;
             npcsContainer.AddChild(mordecai);
+        }
+        else if (npcType == "crawler_rex")
+        {
+            var rex = new SafeRoom3D.NPC.CrawlerRex();
+            rex.GlobalPosition = position;
+            rex.Rotation = new Vector3(0, rotationY, 0);
+            spawnedNpc = rex;
+            npcsContainer.AddChild(rex);
+        }
+        else if (npcType == "crawler_lily")
+        {
+            var lily = new SafeRoom3D.NPC.CrawlerLily();
+            lily.GlobalPosition = position;
+            lily.Rotation = new Vector3(0, rotationY, 0);
+            spawnedNpc = lily;
+            npcsContainer.AddChild(lily);
+        }
+        else if (npcType == "crawler_chad")
+        {
+            var chad = new SafeRoom3D.NPC.CrawlerChad();
+            chad.GlobalPosition = position;
+            chad.Rotation = new Vector3(0, rotationY, 0);
+            spawnedNpc = chad;
+            npcsContainer.AddChild(chad);
+        }
+        else if (npcType == "crawler_shade")
+        {
+            var shade = new SafeRoom3D.NPC.CrawlerShade();
+            shade.GlobalPosition = position;
+            shade.Rotation = new Vector3(0, rotationY, 0);
+            spawnedNpc = shade;
+            npcsContainer.AddChild(shade);
+        }
+        else if (npcType == "crawler_hank")
+        {
+            var hank = new SafeRoom3D.NPC.CrawlerHank();
+            hank.GlobalPosition = position;
+            hank.Rotation = new Vector3(0, rotationY, 0);
+            spawnedNpc = hank;
+            npcsContainer.AddChild(hank);
         }
         // Steve handled by existing Pet system
 

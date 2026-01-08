@@ -496,6 +496,13 @@ public class EnemyPlacement
     public float RotationY { get; set; } = 0f;
 
     /// <summary>
+    /// If true, this enemy patrols a much larger area (25 units vs 8).
+    /// Roamers wander farther from their spawn point.
+    /// </summary>
+    [JsonPropertyName("isRoamer")]
+    public bool IsRoamer { get; set; } = false;
+
+    /// <summary>
     /// Unique ID for this placement (used in editor).
     /// </summary>
     [JsonIgnore]

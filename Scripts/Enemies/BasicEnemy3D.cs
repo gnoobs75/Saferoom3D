@@ -34,6 +34,11 @@ public partial class BasicEnemy3D : CharacterBody3D
     public float PatrolRadius { get; private set; } = 8f;
     public float PatrolSpeed { get; private set; } = 2f;
 
+    // Roamer system - large patrol radius monsters
+    private bool _isRoamer;
+    private Vector3 _spawnPosition;
+    private const float RoamerPatrolRadius = 25f;
+
     // State machine
     public enum State { Idle, IdleInteracting, Patrolling, Tracking, Aggro, Attacking, Dead, Sleeping, Stasis }
     public State CurrentState { get; private set; } = State.Idle;
@@ -81,6 +86,13 @@ public partial class BasicEnemy3D : CharacterBody3D
     private static readonly List<Node3D> _propCache = new();
     private static bool _propCacheInitialized;
     private static float _propCacheRefreshTimer;
+
+    // Social chat system (monsters chatting with each other)
+    private BasicEnemy3D? _socialChatPartner;
+    private MonsterChatBubble? _chatBubble;
+    private float _socialChatTimer;
+    private bool _isSocialChatting;
+    private const float SocialChatCheckInterval = 5f; // Check every 5 seconds
 
     // Visual
     private Color _baseColor = new(0.4f, 0.7f, 0.3f); // Default slime green
@@ -140,13 +152,16 @@ public partial class BasicEnemy3D : CharacterBody3D
 
         CurrentHealth = MaxHealth;
 
+        // Record spawn position for roamer patrol calculations
+        _spawnPosition = GlobalPosition;
+
         // Find player - use deferred to ensure player is ready
         CallDeferred(MethodName.FindPlayer);
 
         // Start in idle
         ChangeState(State.Idle);
 
-        GD.Print($"[BasicEnemy3D] Spawned: {MonsterType} at {GlobalPosition}");
+        GD.Print($"[BasicEnemy3D] Spawned: {MonsterType} at {GlobalPosition}{(_isRoamer ? " (Roamer)" : "")}");
     }
 
     private void FindPlayer()
@@ -162,6 +177,25 @@ public partial class BasicEnemy3D : CharacterBody3D
             GD.Print($"[BasicEnemy3D] {MonsterType} found player at {_player.GlobalPosition}");
         }
     }
+
+    /// <summary>
+    /// Configure this enemy as a roamer with large patrol radius.
+    /// Roamers patrol 25 units around their spawn point instead of 8.
+    /// </summary>
+    public void SetRoamer(bool isRoamer)
+    {
+        _isRoamer = isRoamer;
+        if (isRoamer)
+        {
+            PatrolRadius = RoamerPatrolRadius;
+            GD.Print($"[BasicEnemy3D] {MonsterType} configured as Roamer (patrol radius: {PatrolRadius})");
+        }
+    }
+
+    /// <summary>
+    /// Check if this enemy is a roamer.
+    /// </summary>
+    public bool IsRoamer => _isRoamer;
 
     private void LoadMonsterConfig()
     {
@@ -1413,6 +1447,9 @@ public partial class BasicEnemy3D : CharacterBody3D
     {
         float dt = (float)delta;
 
+        // Update global chat cooldown (once per frame, any enemy can do this)
+        MonsterChatDatabase.UpdateCooldown(dt);
+
         // Stasis mode - only play idle animation, no AI processing
         if (_isInStasis)
         {
@@ -1554,12 +1591,23 @@ public partial class BasicEnemy3D : CharacterBody3D
     private void ProcessIdle(float dt)
     {
         _stateTimer -= dt;
+        _socialChatTimer -= dt;
 
         // Check for player aggro - requires line of sight
         if (CheckPlayerDistance() <= AggroRange && HasLineOfSightToPlayer())
         {
             ChangeState(State.Aggro);
             return;
+        }
+
+        // Social chat check (occasional monster-to-monster chat)
+        if (_socialChatTimer <= 0 && !_isSocialChatting)
+        {
+            _socialChatTimer = SocialChatCheckInterval;
+            if (TrySocialChat())
+            {
+                return; // Entered IdleInteracting for chat
+            }
         }
 
         // Goblins have a chance to interact with nearby props
@@ -1586,6 +1634,7 @@ public partial class BasicEnemy3D : CharacterBody3D
         {
             _interactionTarget = null;
             _currentInteraction = "";
+            EndSocialChat(); // Clean up any active social chat
             ChangeState(State.Aggro);
             return;
         }
@@ -1593,6 +1642,7 @@ public partial class BasicEnemy3D : CharacterBody3D
         // If we have no target, go back to idle
         if (_interactionTarget == null || !IsInstanceValid(_interactionTarget))
         {
+            EndSocialChat(); // Clean up any active social chat
             ChangeState(State.Idle);
             return;
         }
@@ -1637,6 +1687,8 @@ public partial class BasicEnemy3D : CharacterBody3D
             {
                 _interactionTarget = null;
                 _currentInteraction = "";
+                EndSocialChat(); // Clean up any active social chat
+
                 // 50% chance to patrol, 50% chance to find another interaction
                 if (GD.Randf() < 0.5f && TryFindInteractionTarget())
                 {
@@ -2064,12 +2116,176 @@ public partial class BasicEnemy3D : CharacterBody3D
     {
         float angle = GD.Randf() * Mathf.Tau;
         float dist = GD.Randf() * PatrolRadius;
-        _patrolTarget = GlobalPosition + new Vector3(
+
+        // Roamers patrol around their spawn position, normal enemies patrol around current position
+        Vector3 patrolCenter = _isRoamer ? _spawnPosition : GlobalPosition;
+
+        _patrolTarget = patrolCenter + new Vector3(
             Mathf.Cos(angle) * dist,
             0,
             Mathf.Sin(angle) * dist
         );
     }
+
+    #region Social Chat System
+
+    /// <summary>
+    /// Try to initiate a social chat with a nearby monster.
+    /// </summary>
+    private bool TrySocialChat()
+    {
+        // Check global cooldown
+        if (!MonsterChatDatabase.CanInitiateChat())
+            return false;
+
+        // Find a nearby monster to chat with
+        var partner = FindNearbyMonsterForChat();
+        if (partner == null)
+            return false;
+
+        // Start the chat!
+        _socialChatPartner = partner;
+        _isSocialChatting = true;
+
+        // Get dialogue lines
+        var (line1, line2) = MonsterChatDatabase.GetChatLines(MonsterType, partner.MonsterType);
+
+        // Show chat bubble for this monster
+        ShowChatBubble(line1);
+
+        // If partner has a response, show it after a short delay
+        if (line2 != null)
+        {
+            partner._isSocialChatting = true;
+            partner._socialChatPartner = this;
+            // Partner shows their bubble slightly delayed (using CallDeferred with timer)
+            partner.CallDeferred(nameof(ShowChatBubbleDelayed), line2, 1.2f);
+        }
+
+        // Log to combat log
+        UI.HUD3D.Instance?.AddCombatLogMessage(
+            $"[{GetDisplayName()}]: \"{line1}\"",
+            new Color(0.7f, 0.55f, 0.85f) // Purple for monster chat
+        );
+        if (line2 != null)
+        {
+            UI.HUD3D.Instance?.AddCombatLogMessage(
+                $"[{partner.GetDisplayName()}]: \"{line2}\"",
+                new Color(0.7f, 0.55f, 0.85f)
+            );
+        }
+
+        // Start global cooldown
+        MonsterChatDatabase.StartChatCooldown();
+
+        // Enter interaction state (face each other)
+        _interactionTarget = partner;
+        _interactionTimer = MonsterChatDatabase.ChatDuration;
+        ChangeState(State.IdleInteracting);
+
+        GD.Print($"[BasicEnemy3D] Social chat: {MonsterType} <-> {partner.MonsterType}");
+        return true;
+    }
+
+    /// <summary>
+    /// Find a nearby monster suitable for chatting.
+    /// </summary>
+    private BasicEnemy3D? FindNearbyMonsterForChat()
+    {
+        var enemies = GetTree().GetNodesInGroup("Enemies");
+        BasicEnemy3D? bestCandidate = null;
+        float bestDist = MonsterChatDatabase.ChatRange;
+
+        foreach (var node in enemies)
+        {
+            if (node == this) continue;
+            if (node is not BasicEnemy3D other) continue;
+            if (!IsInstanceValid(other)) continue;
+
+            // Don't chat with dead, sleeping, or already chatting monsters
+            if (other.CurrentState == State.Dead || other._isSleeping || other._isSocialChatting)
+                continue;
+
+            // Only chat when both are idle or patrolling
+            if (other.CurrentState != State.Idle && other.CurrentState != State.Patrolling)
+                continue;
+
+            float dist = GlobalPosition.DistanceTo(other.GlobalPosition);
+            if (dist < bestDist)
+            {
+                bestDist = dist;
+                bestCandidate = other;
+            }
+        }
+
+        return bestCandidate;
+    }
+
+    /// <summary>
+    /// Show a chat bubble above this monster.
+    /// </summary>
+    private void ShowChatBubble(string text)
+    {
+        // Remove old bubble if exists
+        _chatBubble?.QueueFree();
+
+        // Create new bubble above head
+        float bubbleHeight = GetBubbleHeight();
+        Vector3 bubblePos = GlobalPosition + new Vector3(0, bubbleHeight, 0);
+
+        _chatBubble = MonsterChatBubble.Create(text, bubblePos, MonsterChatDatabase.ChatDuration);
+        GetTree().Root.AddChild(_chatBubble);
+    }
+
+    /// <summary>
+    /// Show a chat bubble after a delay (called via CallDeferred).
+    /// </summary>
+    private async void ShowChatBubbleDelayed(string text, float delay)
+    {
+        await ToSignal(GetTree().CreateTimer(delay), "timeout");
+        if (IsInstanceValid(this))
+        {
+            ShowChatBubble(text);
+        }
+    }
+
+    /// <summary>
+    /// End the social chat interaction.
+    /// </summary>
+    private void EndSocialChat()
+    {
+        _isSocialChatting = false;
+        _socialChatPartner = null;
+        _chatBubble?.QueueFree();
+        _chatBubble = null;
+    }
+
+    /// <summary>
+    /// Get height for chat bubble based on monster type.
+    /// </summary>
+    private float GetBubbleHeight()
+    {
+        return MonsterType.ToLower() switch
+        {
+            "slime" => 1.0f,
+            "bat" => 1.5f,
+            "spider" => 1.2f,
+            "mushroom" => 1.3f,
+            "eye" => 1.4f,
+            "dragon" or "dragon_king" => 2.5f,
+            _ => 1.8f // Default for humanoids
+        };
+    }
+
+    /// <summary>
+    /// Get display name for combat log.
+    /// </summary>
+    private string GetDisplayName()
+    {
+        return MonsterType.Replace("_", " ").ToLower();
+    }
+
+    #endregion
 
     private float CheckPlayerDistance()
     {

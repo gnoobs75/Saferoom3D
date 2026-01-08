@@ -463,7 +463,10 @@ public partial class EditorScreen3D : Control
         npcsVBox.AddThemeConstantOverride("separation", 4);
         npcsScroll.AddChild(npcsVBox);
 
-        string[] npcs = { "steve", "bopca", "mordecai" };
+        string[] npcs = {
+            "steve", "bopca", "mordecai",
+            "crawler_rex", "crawler_lily", "crawler_chad", "crawler_shade", "crawler_hank"
+        };
         foreach (var npc in npcs)
         {
             var displayName = npc switch
@@ -471,6 +474,11 @@ public partial class EditorScreen3D : Control
                 "steve" => "Steve the Chihuahua",
                 "bopca" => "Bopca the Shopkeeper",
                 "mordecai" => "Mordecai the Game Guide",
+                "crawler_rex" => "Rex (Veteran Crawler)",
+                "crawler_lily" => "Lily (Rookie Crawler)",
+                "crawler_chad" => "Chad (Showoff Crawler)",
+                "crawler_shade" => "Shade (Mysterious Crawler)",
+                "crawler_hank" => "Hank (Comedic Crawler)",
                 _ => npc.Replace("_", " ").Capitalize()
             };
             var btn = CreateListButton(displayName);
@@ -3514,6 +3522,11 @@ public partial class EditorScreen3D : Control
             // Create Mordecai preview using MonsterMeshFactory
             CreateMordecaiPreviewModel();
         }
+        else if (npcId.StartsWith("crawler_"))
+        {
+            // Create Crawler preview using MonsterMeshFactory
+            CreateCrawlerPreviewModel(npcId);
+        }
 
         // Apply scale from spinbox
         if (_npcScaleSpinBox != null)
@@ -3525,9 +3538,19 @@ public partial class EditorScreen3D : Control
         _previewScene?.AddChild(_previewObject);
         ResetCameraView();
 
-        // Adjust camera for smaller NPC model
+        // Adjust camera for NPC model
         _cameraDistance = 1.5f;
-        _cameraTargetY = npcId == "bopca" ? 0.4f : (npcId == "mordecai" ? 0.8f : 0.15f); // Mordecai is tallest
+        _cameraTargetY = npcId switch
+        {
+            "bopca" => 0.4f,
+            "mordecai" => 0.8f,
+            "crawler_rex" => 0.6f,
+            "crawler_lily" => 0.5f,
+            "crawler_chad" => 0.65f,
+            "crawler_shade" => 0.6f,
+            "crawler_hank" => 0.55f,
+            _ => 0.15f // Steve
+        };
     }
 
     private void CreateBopcaPreviewModel()
@@ -3549,6 +3572,17 @@ public partial class EditorScreen3D : Control
         var meshRoot = new Node3D();
         meshRoot.Name = "MordecaiMesh";
         Enemies.MonsterMeshFactory.CreateMonsterMesh(meshRoot, "mordecai");
+        _previewObject.AddChild(meshRoot);
+    }
+
+    private void CreateCrawlerPreviewModel(string crawlerType)
+    {
+        if (_previewObject == null) return;
+
+        // Use MonsterMeshFactory to create Crawler mesh
+        var meshRoot = new Node3D();
+        meshRoot.Name = $"{crawlerType}Mesh";
+        Enemies.MonsterMeshFactory.CreateMonsterMesh(meshRoot, crawlerType);
         _previewObject.AddChild(meshRoot);
     }
 

@@ -42,14 +42,14 @@ Scripts/
 ├── Abilities/      # AbilityManager3D, 14 ability effects in Effects/
 ├── Items/          # Inventory3D, ItemDatabase, LootBag, ConsumableItems3D
 ├── UI/             # HUD3D, SpellBook3D, InventoryUI3D, DungeonRadio, EscapeMenu3D, QuestUI3D
-├── NPC/            # BaseNPC3D, Bopca3D (shopkeeper), Mordecai3D (quest giver)
+├── NPC/            # BaseNPC3D, Bopca3D (shopkeeper), Mordecai3D (quest giver), 5 Crawler NPCs
 ├── Broadcaster/    # AIBroadcaster, BroadcasterUI, CommentaryDatabase
 ├── Combat/         # Projectile3D, ThrownProjectile3D, MeleeSlashEffect3D
 ├── Environment/    # Cosmetic3D (40+ prop types), WaterEffects3D
 └── Pet/            # Steve companion (supports GLB models)
 ```
 
-**Singletons:** `GameManager3D`, `SoundManager3D`, `FPSController`, `AbilityManager3D`, `Inventory3D`, `HUD3D`, `DungeonRadio`, `SplashMusic`, `AIBroadcaster`, `QuestManager`, `QuestUI3D`
+**Singletons:** `GameManager3D`, `SoundManager3D`, `FPSController`, `AbilityManager3D`, `Inventory3D`, `HUD3D`, `DungeonRadio`, `SplashMusic`, `AIBroadcaster`, `QuestManager`, `QuestUI3D`, `CrawlerDialogueUI3D`
 
 **Namespaces:** `SafeRoom3D.Core`, `.Player`, `.Enemies`, `.Abilities`, `.Items`, `.UI`, `.NPC`, `.Combat`, `.Environment`
 
@@ -63,6 +63,21 @@ Idle → Patrol → Tracking → Aggro → Attack → Dead
                     ↓
                  Sleep (>40m from player)
 ```
+
+### Monster Roamer System
+Monsters can be marked as "Roamers" in the map editor to patrol larger areas:
+- **Normal monsters**: 8-unit patrol radius around spawn
+- **Roamers**: 25-unit patrol radius around spawn
+- Toggle in InMapEditor with checkbox when placing monsters
+- Stored in `EnemyPlacement.IsRoamer` field in map JSON
+
+### Monster Social Chat System
+Monsters occasionally stop to chat with each other (30-60 second cooldown):
+- Speech bubbles appear above monsters with comedic dialogue
+- Chat lines vary by monster type pairs (goblin+skeleton, slime+slime, etc.)
+- Dialogue also logged to combat log in purple color
+- Both monsters enter `IdleInteracting` state during chat
+- Files: `MonsterChatDatabase.cs`, `MonsterChatBubble.cs`
 
 ### Procedural Mesh (MonsterMeshFactory)
 - Use `BodyGeometry` for attachment points
@@ -328,6 +343,20 @@ Dynamic quest system that generates collection and boss kill quests based on mon
 **Bopca the Shopkeeper** (`Scripts/NPC/Bopca3D.cs`)
 - Friendly cat merchant for buying/selling items
 - Press **T** to interact and open shop UI
+
+**Crawler NPCs** - DCC-themed humanoid dungeon delvers with branching dialogue:
+
+| Crawler | Personality | Dialogue Theme |
+|---------|-------------|----------------|
+| Rex "Ironside" | Grizzled veteran, cynical | Combat tips, war stories |
+| Lily Chen | Nervous rookie, cautious | Dungeon hints, fears |
+| Chad "The Champ" | Cocky showoff, arrogant | Boasts, sarcastic advice |
+| The Silent One (Shade) | Mysterious, cryptic | Rare warnings, dungeon lore |
+| Hank "Noodles" | Comedic relief, clumsy | Funny stories, random items |
+
+- All crawlers in `Scripts/NPC/Crawler*.cs`
+- Dialogue database in `Scripts/Core/CrawlerDialogueDatabase.cs`
+- Dialogue UI in `Scripts/UI/CrawlerDialogueUI3D.cs`
 
 ### Quest Types
 

@@ -1039,7 +1039,10 @@ public partial class MapEditorTab : Control
         _npcPalette.ItemSelected += OnNpcSelected;
 
         // Add NPCs to palette
-        string[] npcTypes = { "steve", "bopca", "mordecai" };
+        string[] npcTypes = {
+            "steve", "bopca", "mordecai",
+            "crawler_rex", "crawler_lily", "crawler_chad", "crawler_shade", "crawler_hank"
+        };
         foreach (var npc in npcTypes)
         {
             string displayName = npc switch
@@ -1047,6 +1050,11 @@ public partial class MapEditorTab : Control
                 "steve" => "Steve",
                 "bopca" => "Bopca (Shop)",
                 "mordecai" => "Mordecai (Quest)",
+                "crawler_rex" => "Rex (Veteran)",
+                "crawler_lily" => "Lily (Rookie)",
+                "crawler_chad" => "Chad (Showoff)",
+                "crawler_shade" => "Shade (Mystery)",
+                "crawler_hank" => "Hank (Comedic)",
                 _ => npc.Replace("_", " ").Capitalize()
             };
             _npcPalette.AddItem(displayName);
@@ -1089,7 +1097,10 @@ public partial class MapEditorTab : Control
         _isPlacingGroup = false;
 
         // Set NPC selection
-        string[] npcTypes = { "steve", "bopca", "mordecai" };
+        string[] npcTypes = {
+            "steve", "bopca", "mordecai",
+            "crawler_rex", "crawler_lily", "crawler_chad", "crawler_shade", "crawler_hank"
+        };
         if (index >= 0 && index < npcTypes.Length)
         {
             _selectedNpcType = npcTypes[index];
