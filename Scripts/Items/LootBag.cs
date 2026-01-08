@@ -17,6 +17,9 @@ public class LootBag
     // Store monster level for equipment generation
     public int MonsterLevel { get; set; } = 1;
 
+    // Gold amount to be picked up directly (not as inventory item)
+    public int GoldAmount { get; set; } = 0;
+
     public LootBag(int slots = DefaultSlots)
     {
         _items = new InventoryItem?[slots];
@@ -122,13 +125,8 @@ public class LootBag
         // Scale gold with monster level
         goldAmount = (int)(goldAmount * (1f + monsterLevel * 0.1f));
 
-        // Always add some gold
-        if (goldAmount > 0)
-        {
-            var gold = ItemDatabase.CreateGoldCoins();
-            gold.StackCount = goldAmount;
-            bag.AddItem(gold);
-        }
+        // Store gold amount for direct pickup (not as inventory item)
+        bag.GoldAmount = goldAmount;
 
         // Add random items
         for (int i = 0; i < itemCount; i++)

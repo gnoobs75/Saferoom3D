@@ -1237,10 +1237,14 @@ public partial class FPSController : CharacterBody3D
             TryInteract();
         }
 
-        // Loot input (T key)
+        // Loot/Interact input (T key) - check NPCs first, then corpses
         if (Input.IsActionJustPressed("loot"))
         {
-            TryLootNearbyCorpse();
+            // NPCs take priority over corpses
+            if (!TryInteractNearbyNPC())
+            {
+                TryLootNearbyCorpse();
+            }
         }
 
         // Safety: check if fallen through world
@@ -1948,6 +1952,40 @@ public partial class FPSController : CharacterBody3D
                 GD.Print($"[FPSController] Interacted with: {target.Name}");
             }
         }
+    }
+
+    /// <summary>
+    /// Try to interact with a nearby shopkeeper NPC.
+    /// Returns true if an NPC was found and interacted with.
+    /// </summary>
+    private bool TryInteractNearbyNPC()
+    {
+        const float InteractRange = 3.5f;
+        NPC.BaseNPC3D? nearestNPC = null;
+        float nearestDist = InteractRange;
+
+        var shopkeepers = GetTree().GetNodesInGroup("Shopkeepers");
+        foreach (var node in shopkeepers)
+        {
+            if (node is NPC.BaseNPC3D npc && IsInstanceValid(npc))
+            {
+                float dist = GlobalPosition.DistanceTo(npc.GlobalPosition);
+                if (dist < nearestDist)
+                {
+                    nearestDist = dist;
+                    nearestNPC = npc;
+                }
+            }
+        }
+
+        if (nearestNPC != null)
+        {
+            GD.Print($"[FPSController] Interacting with NPC: {nearestNPC.NPCName}");
+            nearestNPC.Interact(this);
+            return true;
+        }
+
+        return false;
     }
 
     private void TryLootNearbyCorpse()

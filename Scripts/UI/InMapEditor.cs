@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using SafeRoom3D.Core;
 using SafeRoom3D.Environment;
 using SafeRoom3D.Enemies;
+using SafeRoom3D.NPC;
 using SafeRoom3D.Player;
 
 namespace SafeRoom3D.UI;
@@ -21,7 +22,7 @@ public partial class InMapEditor : Control
     public bool IsSelectorPaneOpen => _propPalette?.Visible == true;
 
     // Edit mode state
-    public enum EditState { Idle, PlacingProp, PlacingMonster, Selecting }
+    public enum EditState { Idle, PlacingProp, PlacingMonster, PlacingNpc, Selecting }
     private EditState _currentState = EditState.Idle;
 
     // Surface snapping
@@ -36,6 +37,7 @@ public partial class InMapEditor : Control
     // Placement state
     private string? _selectedPropType;
     private string? _selectedMonsterType;
+    private string? _selectedNpcType;
     private Node3D? _placementPreview;
     private bool _isPreviewValid = false;
 
@@ -52,6 +54,7 @@ public partial class InMapEditor : Control
     private Control? _propPalette;
     private ItemList? _propList;
     private ItemList? _monsterList;
+    private ItemList? _npcList;
     private CheckBox? _proceduralPropsToggle;
 
     // Hotbar for quick prop access
@@ -83,6 +86,9 @@ public partial class InMapEditor : Control
         "skeleton_lord", "dragon_king", "spider_queen",
         "the_butcher", "mordecai_the_traitor", "princess_donut", "mongo_the_destroyer", "zev_the_loot_goblin"
     };
+
+    // NPC types for placement
+    private static readonly string[] NpcTypes = { "steve", "bopca" };
 
     public override void _Ready()
     {
@@ -437,10 +443,11 @@ public partial class InMapEditor : Control
         paletteVBox.AddChild(searchBox);
         _searchBox = searchBox;
 
-        // Tabs for Props vs Monsters
+        // Tabs for Props vs Monsters vs NPCs
         var tabBar = new TabBar();
         tabBar.AddTab("Props");
         tabBar.AddTab("Monsters");
+        tabBar.AddTab("NPCs");
         tabBar.TabChanged += OnPaletteTabChanged;
         paletteVBox.AddChild(tabBar);
 
@@ -460,6 +467,15 @@ public partial class InMapEditor : Control
         _monsterList.Visible = false;
         PopulateMonsterList("");
         paletteVBox.AddChild(_monsterList);
+
+        // NPCs list (hidden by default)
+        _npcList = new ItemList();
+        _npcList.CustomMinimumSize = new Vector2(0, 300);
+        _npcList.SizeFlagsVertical = SizeFlags.ExpandFill;
+        _npcList.ItemSelected += OnNpcSelected;
+        _npcList.Visible = false;
+        PopulateNpcList("");
+        paletteVBox.AddChild(_npcList);
 
         // Close button
         var closeBtn = new Button();
@@ -508,12 +524,33 @@ public partial class InMapEditor : Control
         }
     }
 
+    private void PopulateNpcList(string filter)
+    {
+        if (_npcList == null) return;
+        _npcList.Clear();
+        foreach (var npc in NpcTypes)
+        {
+            string displayName = npc switch
+            {
+                "steve" => "Steve (Companion)",
+                "bopca" => "Bopca (Shopkeeper)",
+                _ => npc.Replace("_", " ").Capitalize()
+            };
+            if (string.IsNullOrEmpty(filter) || displayName.ToLower().Contains(filter.ToLower()))
+            {
+                _npcList.AddItem(displayName);
+            }
+        }
+    }
+
     private void OnSearchTextChanged(string newText)
     {
         if (_currentPaletteTab == 0)
             PopulatePropList(newText);
-        else
+        else if (_currentPaletteTab == 1)
             PopulateMonsterList(newText);
+        else
+            PopulateNpcList(newText);
     }
 
     private void OpenSelectorPane()
@@ -645,7 +682,7 @@ public partial class InMapEditor : Control
                 return;
             }
 
-            if (_currentState == EditState.PlacingProp || _currentState == EditState.PlacingMonster)
+            if (_currentState == EditState.PlacingProp || _currentState == EditState.PlacingMonster || _currentState == EditState.PlacingNpc)
             {
                 if (_isPreviewValid)
                 {
@@ -707,9 +744,9 @@ public partial class InMapEditor : Control
 
     private Node3D? FindDeletableRoot(Node node)
     {
-        // Check if this is a prop or enemy
+        // Check if this is a prop, enemy, or NPC
         if (node is Cosmetic3D || node is BasicEnemy3D || node is BossEnemy3D ||
-            node is GoblinShaman || node is GoblinThrower)
+            node is GoblinShaman || node is GoblinThrower || node is BaseNPC3D)
         {
             return node as Node3D;
         }
@@ -756,21 +793,36 @@ public partial class InMapEditor : Control
                 return;
             }
         }
+
+        // Try to remove from NPCs
+        for (int i = _currentMap.Npcs.Count - 1; i >= 0; i--)
+        {
+            var npc = _currentMap.Npcs[i];
+            if (Mathf.Abs(npc.X - pos.X) < 1f && Mathf.Abs(npc.Z - pos.Z) < 1f)
+            {
+                _currentMap.Npcs.RemoveAt(i);
+                GD.Print($"[InMapEditor] Removed NPC from map definition");
+                return;
+            }
+        }
     }
 
     private void OnPaletteTabChanged(long tab)
     {
         _currentPaletteTab = (int)tab;
-        if (_propList != null && _monsterList != null)
+        if (_propList != null && _monsterList != null && _npcList != null)
         {
             _propList.Visible = (tab == 0);
             _monsterList.Visible = (tab == 1);
+            _npcList.Visible = (tab == 2);
             // Re-apply search filter for the new tab
             string filter = _searchBox?.Text ?? "";
             if (tab == 0)
                 PopulatePropList(filter);
-            else
+            else if (tab == 1)
                 PopulateMonsterList(filter);
+            else
+                PopulateNpcList(filter);
         }
     }
 
@@ -811,6 +863,23 @@ public partial class InMapEditor : Control
         Input.MouseMode = Input.MouseModeEnum.Captured;
 
         GD.Print($"[InMapEditor] Selected monster: {_selectedMonsterType}");
+    }
+
+    private void OnNpcSelected(long index)
+    {
+        if (index >= 0 && index < NpcTypes.Length)
+        {
+            _selectedNpcType = NpcTypes[index];
+            _selectedPropType = null;
+            _selectedMonsterType = null;
+            _currentState = EditState.PlacingNpc;
+
+            CreatePlacementPreview();
+            _propPalette!.Visible = false;
+            Input.MouseMode = Input.MouseModeEnum.Captured;
+
+            GD.Print($"[InMapEditor] Selected NPC: {_selectedNpcType}");
+        }
     }
 
     private void OnProceduralPropsToggled(bool pressed)
@@ -861,6 +930,27 @@ public partial class InMapEditor : Control
             // Create monster preview (simplified mesh)
             _placementPreview = new Node3D();
             MonsterMeshFactory.CreateMonsterMesh(_placementPreview, _selectedMonsterType, null, null);
+            MakePreviewTransparent(_placementPreview);
+            GetTree().Root.AddChild(_placementPreview);
+        }
+        else if (_currentState == EditState.PlacingNpc && _selectedNpcType != null)
+        {
+            // Create NPC preview using MonsterMeshFactory (for bopca) or custom mesh
+            _placementPreview = new Node3D();
+            if (_selectedNpcType == "bopca")
+            {
+                MonsterMeshFactory.CreateMonsterMesh(_placementPreview, "bopca", null, null);
+            }
+            else
+            {
+                // For other NPCs like Steve, create a simple placeholder
+                var placeholder = new MeshInstance3D();
+                placeholder.Mesh = new CapsuleMesh { Radius = 0.3f, Height = 1.5f };
+                var mat = new StandardMaterial3D { AlbedoColor = new Color(0.2f, 0.7f, 0.9f) };
+                placeholder.MaterialOverride = mat;
+                placeholder.Position = new Vector3(0, 0.75f, 0);
+                _placementPreview.AddChild(placeholder);
+            }
             MakePreviewTransparent(_placementPreview);
             GetTree().Root.AddChild(_placementPreview);
         }
@@ -1052,6 +1142,11 @@ public partial class InMapEditor : Control
             // Create monster in idle mode with rotation
             SpawnIdleMonster(_selectedMonsterType, position, rotation);
         }
+        else if (_currentState == EditState.PlacingNpc && _selectedNpcType != null)
+        {
+            // Place NPC using SpawnNPC method
+            SpawnNPC(_selectedNpcType, position, rotation);
+        }
     }
 
     private void SpawnIdleMonster(string monsterType, Vector3 position, float rotationY = 0f)
@@ -1147,6 +1242,52 @@ public partial class InMapEditor : Control
         GD.Print($"[InMapEditor] Spawned monster in stasis: {monsterType} at {position} rotation={rotationY}");
     }
 
+    /// <summary>
+    /// Spawn an NPC at the given position
+    /// </summary>
+    public void SpawnNPC(string npcType, Vector3 position, float rotationY = 0f)
+    {
+        if (_currentMap == null) return;
+
+        // Add to map definition (npcs list)
+        _currentMap.Npcs.Add(new NpcPlacement
+        {
+            Type = npcType,
+            X = position.X,
+            Z = position.Z,
+            RotationY = rotationY
+        });
+
+        // Spawn the actual NPC
+        Node3D? spawnedNpc = null;
+
+        if (npcType == "bopca")
+        {
+            var bopca = new SafeRoom3D.NPC.Bopca3D();
+            bopca.GlobalPosition = position;
+            bopca.Rotation = new Vector3(0, rotationY, 0);
+            spawnedNpc = bopca;
+
+            // Add to scene
+            var npcsContainer = GetTree().Root.FindChild("NPCs", true, false) as Node3D;
+            if (npcsContainer == null)
+            {
+                npcsContainer = new Node3D();
+                npcsContainer.Name = "NPCs";
+                GetTree().Root.AddChild(npcsContainer);
+            }
+            npcsContainer.AddChild(bopca);
+        }
+        // Steve handled by existing Pet system
+
+        if (spawnedNpc != null)
+        {
+            _placedObjects.Add(spawnedNpc);
+        }
+
+        GD.Print($"[InMapEditor] Spawned NPC: {npcType} at {position} rotation={rotationY}");
+    }
+
     private void TrySelectObject()
     {
         var camera = GetViewport().GetCamera3D();
@@ -1211,6 +1352,7 @@ public partial class InMapEditor : Control
         ClearPlacementPreview();
         _selectedPropType = null;
         _selectedMonsterType = null;
+        _selectedNpcType = null;
         _currentState = EditState.Idle;
     }
 

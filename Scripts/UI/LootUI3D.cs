@@ -229,6 +229,9 @@ public partial class LootUI3D : Control
     {
         _currentCorpse = corpse;
 
+        // Auto-collect gold when opening loot window
+        CollectGold(corpse);
+
         // Update title
         if (_titleLabel != null)
         {
@@ -422,6 +425,59 @@ public partial class LootUI3D : Control
     private void OnClosePressed()
     {
         Close();
+    }
+
+    /// <summary>
+    /// Collect gold from the corpse directly into player's gold counter
+    /// </summary>
+    private void CollectGold(Corpse3D corpse)
+    {
+        int goldAmount = corpse.Loot.GoldAmount;
+        if (goldAmount <= 0) return;
+
+        // Add gold to player's wallet
+        Inventory3D.Instance?.AddGold(goldAmount);
+
+        // Clear the gold from loot bag
+        corpse.Loot.GoldAmount = 0;
+
+        // Play coin sound
+        Core.SoundManager3D.Instance?.PlaySound("coin_pickup");
+
+        // Show floating text at player position
+        var player = Player.FPSController.Instance;
+        if (player != null)
+        {
+            ShowGoldPickupText(goldAmount, player.GlobalPosition + Vector3.Up * 1.5f);
+        }
+
+        // Log to HUD combat log
+        HUD3D.Instance?.AddCombatLogMessage($"+{goldAmount} Gold", new Color(1f, 0.85f, 0.2f));
+
+        GD.Print($"[LootUI3D] Collected {goldAmount} gold");
+    }
+
+    /// <summary>
+    /// Show floating text for gold pickup
+    /// </summary>
+    private void ShowGoldPickupText(int amount, Vector3 position)
+    {
+        var label = new Label3D();
+        label.Text = $"+{amount}g";
+        label.FontSize = 48;
+        label.OutlineSize = 6;
+        label.Modulate = new Color(1f, 0.85f, 0.2f); // Gold color
+        label.Position = position;
+        label.Billboard = BaseMaterial3D.BillboardModeEnum.Enabled;
+        label.NoDepthTest = true;
+
+        GetTree().Root.AddChild(label);
+
+        // Animate upward and fade
+        var tween = label.CreateTween();
+        tween.Parallel().TweenProperty(label, "position:y", position.Y + 1.5f, 1.5f);
+        tween.Parallel().TweenProperty(label, "modulate:a", 0f, 1.5f).SetDelay(0.5f);
+        tween.TweenCallback(Callable.From(() => label.QueueFree()));
     }
 
     public override void _ExitTree()

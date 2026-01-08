@@ -463,12 +463,13 @@ public partial class EditorScreen3D : Control
         npcsVBox.AddThemeConstantOverride("separation", 4);
         npcsScroll.AddChild(npcsVBox);
 
-        string[] npcs = { "steve" };
+        string[] npcs = { "steve", "bopca" };
         foreach (var npc in npcs)
         {
             var displayName = npc switch
             {
                 "steve" => "Steve the Chihuahua",
+                "bopca" => "Bopca the Shopkeeper",
                 _ => npc.Replace("_", " ").Capitalize()
             };
             var btn = CreateListButton(displayName);
@@ -1821,6 +1822,7 @@ public partial class EditorScreen3D : Control
             string displayName = npcId switch
             {
                 "steve" => "Steve the Chihuahua",
+                "bopca" => "Bopca the Shopkeeper",
                 _ => npcId.Replace("_", " ").Capitalize()
             };
             _selectedItemLabel.Text = $"Selected: {displayName}";
@@ -3492,13 +3494,29 @@ public partial class EditorScreen3D : Control
             // Create Steve preview model (same mesh structure as Steve3D but simplified for preview)
             CreateStevePreviewModel();
         }
+        else if (npcId == "bopca")
+        {
+            // Create Bopca preview using MonsterMeshFactory
+            CreateBopcaPreviewModel();
+        }
 
         _previewScene?.AddChild(_previewObject);
         ResetCameraView();
 
         // Adjust camera for smaller NPC model
         _cameraDistance = 1.5f;
-        _cameraTargetY = 0.15f;
+        _cameraTargetY = npcId == "bopca" ? 0.4f : 0.15f; // Bopca is taller
+    }
+
+    private void CreateBopcaPreviewModel()
+    {
+        if (_previewObject == null) return;
+
+        // Use MonsterMeshFactory to create Bopca mesh
+        var meshRoot = new Node3D();
+        meshRoot.Name = "BopcaMesh";
+        Enemies.MonsterMeshFactory.CreateMonsterMesh(meshRoot, "bopca");
+        _previewObject.AddChild(meshRoot);
     }
 
     private void CreateStevePreviewModel()

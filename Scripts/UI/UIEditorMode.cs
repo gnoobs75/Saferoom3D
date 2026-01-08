@@ -198,6 +198,22 @@ public partial class UIEditorMode : CanvasLayer
             }
         }
 
+        // Get Shop UI Panel
+        var shopUI = ShopUI3D.Instance;
+        if (shopUI != null)
+        {
+            var shopPanel = shopUI.GetMainPanel();
+            if (shopPanel != null)
+            {
+                // Make it visible temporarily so it can be dragged
+                shopPanel.Visible = true;
+                shopUI.Visible = true;
+                var handle = new DragHandle(shopPanel, "ShopUI", "Shop Window");
+                AddChild(handle);
+                _dragHandles.Add(handle);
+            }
+        }
+
         GD.Print($"[UIEditorMode] Created {_dragHandles.Count} drag handles");
     }
 

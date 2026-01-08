@@ -116,6 +116,9 @@ public partial class Inventory3D : Node
     // The inventory grid (null = empty slot)
     private InventoryItem?[] _items = new InventoryItem?[TotalSlots];
 
+    // Gold (currency) - separate from inventory slots
+    private int _gold = 0; // Start with 0 gold - earn through combat!
+
     // Signals
     [Signal] public delegate void InventoryChangedEventHandler();
     [Signal] public delegate void ItemUsedEventHandler(string itemId, int slotIndex);
@@ -568,6 +571,69 @@ public partial class Inventory3D : Node
             if (_items[i] != null)
                 yield return (i, _items[i]!);
         }
+    }
+
+    // ========================================================================
+    // GOLD / CURRENCY SYSTEM
+    // ========================================================================
+
+    /// <summary>
+    /// Get the player's current gold count
+    /// </summary>
+    public int GetGoldCount() => _gold;
+
+    /// <summary>
+    /// Attempt to spend gold. Returns true if successful, false if insufficient funds.
+    /// </summary>
+    public bool SpendGold(int amount)
+    {
+        if (amount <= 0) return true; // Nothing to spend
+        if (_gold < amount) return false; // Not enough gold
+
+        _gold -= amount;
+        EmitSignal(SignalName.InventoryChanged);
+        GD.Print($"[Inventory] Spent {amount} gold. Remaining: {_gold}");
+        return true;
+    }
+
+    /// <summary>
+    /// Add gold to the player's wallet
+    /// </summary>
+    public void AddGold(int amount)
+    {
+        if (amount <= 0) return;
+        _gold += amount;
+        EmitSignal(SignalName.InventoryChanged);
+        GD.Print($"[Inventory] Gained {amount} gold. Total: {_gold}");
+    }
+
+    /// <summary>
+    /// Check if player has at least the specified amount of gold
+    /// </summary>
+    public bool HasGold(int amount) => _gold >= amount;
+
+    /// <summary>
+    /// Remove an item from inventory (for selling). Returns true if successful.
+    /// </summary>
+    public bool RemoveItem(int slotIndex, int count = 1)
+    {
+        if (slotIndex < 0 || slotIndex >= TotalSlots) return false;
+        var item = _items[slotIndex];
+        if (item == null) return false;
+
+        if (item.StackCount <= count)
+        {
+            // Remove entire stack
+            _items[slotIndex] = null;
+        }
+        else
+        {
+            // Reduce stack count
+            item.StackCount -= count;
+        }
+
+        EmitSignal(SignalName.InventoryChanged);
+        return true;
     }
 
     public override void _ExitTree()

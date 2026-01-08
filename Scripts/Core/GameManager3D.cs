@@ -281,6 +281,11 @@ public partial class GameManager3D : Node
         lootUI.Name = "LootUI";
         hudLayer.AddChild(lootUI);
 
+        // Create Shop UI (for NPC shopkeepers like Bopca)
+        var shopUI = new ShopUI3D();
+        shopUI.Name = "ShopUI";
+        hudLayer.AddChild(shopUI);
+
         // Create Character Sheet UI
         var characterSheet = new CharacterSheetUI();
         characterSheet.Name = "CharacterSheet";

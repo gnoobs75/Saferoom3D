@@ -82,6 +82,12 @@ public class MapDefinition
     public List<PropPlacement> PlacedProps { get; set; } = new();
 
     /// <summary>
+    /// NPC placements (shopkeepers and other non-combat characters).
+    /// </summary>
+    [JsonPropertyName("npcs")]
+    public List<NpcPlacement> Npcs { get; set; } = new();
+
+    /// <summary>
     /// Whether to use procedural prop generation for rooms.
     /// If false, only player-placed props are used.
     /// </summary>
@@ -419,6 +425,36 @@ public class PropPlacement
 
     [JsonPropertyName("scale")]
     public float Scale { get; set; } = 1f;
+}
+
+/// <summary>
+/// NPC placement (shopkeepers, quest givers, etc.)
+/// </summary>
+public class NpcPlacement
+{
+    [JsonPropertyName("type")]
+    public string Type { get; set; } = "bopca";
+
+    [JsonPropertyName("x")]
+    public float X { get; set; }
+
+    [JsonPropertyName("z")]
+    public float Z { get; set; }
+
+    [JsonPropertyName("rotationY")]
+    public float RotationY { get; set; }
+
+    /// <summary>
+    /// Unique ID for this placement (used in editor).
+    /// </summary>
+    [JsonIgnore]
+    public string PlacementId { get; set; } = System.Guid.NewGuid().ToString();
+
+    /// <summary>
+    /// Helper to get position as Vector3.
+    /// </summary>
+    [JsonIgnore]
+    public Vector3 WorldPosition => new Vector3(X, 0, Z);
 }
 
 /// <summary>

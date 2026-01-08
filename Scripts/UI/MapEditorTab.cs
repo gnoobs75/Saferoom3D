@@ -20,6 +20,7 @@ public partial class MapEditorTab : Control
     private ItemList? _savedMapsList;
     private ItemList? _monsterPalette;
     private ItemList? _groupPalette;
+    private ItemList? _npcPalette;
     private Label? _mapInfoLabel;
     private Label? _selectedItemLabel;
     private LineEdit? _mapNameInput;
@@ -46,8 +47,10 @@ public partial class MapEditorTab : Control
     // Placement state
     private string? _selectedMonsterType;
     private MonsterGroupTemplate? _selectedGroupTemplate;
+    private string? _selectedNpcType;
     private bool _isPlacingMonster = false;
     private bool _isPlacingGroup = false;
+    private bool _isPlacingNpc = false;
     private Vector2 _placementPreviewPos;
 
     // === WYSIWYG TILE PAINTER STATE ===
@@ -147,6 +150,7 @@ public partial class MapEditorTab : Control
     private static readonly Color EnemyColor = new(0.9f, 0.2f, 0.2f);
     private static readonly Color BossColor = new(1f, 0.5f, 0.1f);
     private static readonly Color GroupColor = new(0.8f, 0.3f, 0.8f);
+    private static readonly Color NpcColor = new(0.2f, 0.7f, 0.9f);  // Cyan for NPCs
     private static readonly Color GridColor = new(0.15f, 0.15f, 0.18f);
     private static readonly Color SelectionColor = new(1f, 0.85f, 0.2f);
     private static readonly Color WallColor = new(0.8f, 0.2f, 0.2f);  // Red for walls
@@ -956,9 +960,17 @@ public partial class MapEditorTab : Control
         margin.AddThemeConstantOverride("margin_bottom", 10);
         rightPanel.AddChild(margin);
 
+        // Wrap in ScrollContainer for scrolling when content exceeds panel height
+        var scrollContainer = new ScrollContainer();
+        scrollContainer.SizeFlagsVertical = SizeFlags.ExpandFill;
+        scrollContainer.HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled;
+        scrollContainer.VerticalScrollMode = ScrollContainer.ScrollMode.Auto;
+        margin.AddChild(scrollContainer);
+
         var vbox = new VBoxContainer();
         vbox.AddThemeConstantOverride("separation", 8);
-        margin.AddChild(vbox);
+        vbox.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        scrollContainer.AddChild(vbox);
 
         // Monster palette title
         var monsterTitle = new Label();
@@ -1006,6 +1018,32 @@ public partial class MapEditorTab : Control
         }
         vbox.AddChild(_groupPalette);
 
+        // NPC palette title
+        var npcTitle = new Label();
+        npcTitle.Text = "NPCs";
+        npcTitle.AddThemeFontSizeOverride("font_size", 16);
+        npcTitle.AddThemeColorOverride("font_color", new Color(0.2f, 0.8f, 0.4f)); // Green for friendly NPCs
+        vbox.AddChild(npcTitle);
+
+        // NPC palette
+        _npcPalette = new ItemList();
+        _npcPalette.CustomMinimumSize = new Vector2(0, 80);
+        _npcPalette.ItemSelected += OnNpcSelected;
+
+        // Add NPCs to palette
+        string[] npcTypes = { "steve", "bopca" };
+        foreach (var npc in npcTypes)
+        {
+            string displayName = npc switch
+            {
+                "steve" => "Steve",
+                "bopca" => "Bopca (Shop)",
+                _ => npc.Replace("_", " ").Capitalize()
+            };
+            _npcPalette.AddItem(displayName);
+        }
+        vbox.AddChild(_npcPalette);
+
         // Selected item label
         _selectedItemLabel = new Label();
         _selectedItemLabel.Text = "Select to place";
@@ -1019,13 +1057,37 @@ public partial class MapEditorTab : Control
         {
             _selectedMonsterType = null;
             _selectedGroupTemplate = null;
+            _selectedNpcType = null;
             _isPlacingMonster = false;
             _isPlacingGroup = false;
+            _isPlacingNpc = false;
             _monsterPalette?.DeselectAll();
             _groupPalette?.DeselectAll();
+            _npcPalette?.DeselectAll();
             UpdateSelectedLabel();
         };
         vbox.AddChild(deselectBtn);
+    }
+
+    private void OnNpcSelected(long index)
+    {
+        // Deselect monster and group
+        _monsterPalette?.DeselectAll();
+        _groupPalette?.DeselectAll();
+        _selectedMonsterType = null;
+        _selectedGroupTemplate = null;
+        _isPlacingMonster = false;
+        _isPlacingGroup = false;
+
+        // Set NPC selection
+        string[] npcTypes = { "steve", "bopca" };
+        if (index >= 0 && index < npcTypes.Length)
+        {
+            _selectedNpcType = npcTypes[index];
+            _isPlacingNpc = true;
+            UpdateSelectedLabel();
+            GD.Print($"[MapEditorTab] Selected NPC: {_selectedNpcType}");
+        }
     }
 
     private Button CreateButton(string text)
@@ -1701,10 +1763,13 @@ public partial class MapEditorTab : Control
 
     private void OnMonsterSelected(long index)
     {
-        // Deselect group
+        // Deselect group and NPC
         _groupPalette?.DeselectAll();
+        _npcPalette?.DeselectAll();
         _selectedGroupTemplate = null;
+        _selectedNpcType = null;
         _isPlacingGroup = false;
+        _isPlacingNpc = false;
 
         // Get monster type
         int totalMonsters = MonsterTypes.Length;
@@ -1743,10 +1808,13 @@ public partial class MapEditorTab : Control
 
     private void OnGroupSelected(long index)
     {
-        // Deselect monster
+        // Deselect monster and NPC
         _monsterPalette?.DeselectAll();
+        _npcPalette?.DeselectAll();
         _selectedMonsterType = null;
+        _selectedNpcType = null;
         _isPlacingMonster = false;
+        _isPlacingNpc = false;
 
         // Get group template
         var templates = DefaultGroupTemplates.GetDefaultTemplates();
@@ -1777,6 +1845,16 @@ public partial class MapEditorTab : Control
         {
             _selectedItemLabel.Text = $"Placing Group: {_selectedGroupTemplate.Name}\n" +
                                       $"({_selectedGroupTemplate.Monsters.Count} monsters)";
+        }
+        else if (_isPlacingNpc && _selectedNpcType != null)
+        {
+            string displayName = _selectedNpcType switch
+            {
+                "steve" => "Steve",
+                "bopca" => "Bopca (Shopkeeper)",
+                _ => _selectedNpcType.Replace("_", " ").Capitalize()
+            };
+            _selectedItemLabel.Text = $"Placing NPC: {displayName}";
         }
         else
         {
@@ -2190,6 +2268,19 @@ public partial class MapEditorTab : Control
             _currentMap.MonsterGroups.Add(groupPlacement);
             GD.Print($"[MapEditorTab] Placed group '{_selectedGroupTemplate.Name}' at ({tile.X}, {tile.Y})");
         }
+        else if (_isPlacingNpc && _selectedNpcType != null)
+        {
+            // Place NPC
+            var npcPlacement = new NpcPlacement
+            {
+                Type = _selectedNpcType,
+                X = tile.X,
+                Z = tile.Y,
+                RotationY = 0f
+            };
+            _currentMap.Npcs.Add(npcPlacement);
+            GD.Print($"[MapEditorTab] Placed NPC '{_selectedNpcType}' at ({tile.X}, {tile.Y})");
+        }
 
         UpdateMapInfo();
         _mapDrawArea?.QueueRedraw();
@@ -2223,6 +2314,20 @@ public partial class MapEditorTab : Control
             {
                 _currentMap.MonsterGroups.RemoveAt(i);
                 GD.Print($"[MapEditorTab] Removed group at ({tile.X}, {tile.Y})");
+                UpdateMapInfo();
+                _mapDrawArea?.QueueRedraw();
+                return;
+            }
+        }
+
+        // Try to remove NPC at this tile
+        for (int i = _currentMap.Npcs.Count - 1; i >= 0; i--)
+        {
+            var npc = _currentMap.Npcs[i];
+            if ((int)npc.X == tile.X && (int)npc.Z == tile.Y)
+            {
+                _currentMap.Npcs.RemoveAt(i);
+                GD.Print($"[MapEditorTab] Removed NPC at ({tile.X}, {tile.Y})");
                 UpdateMapInfo();
                 _mapDrawArea?.QueueRedraw();
                 return;
@@ -2330,11 +2435,12 @@ public partial class MapEditorTab : Control
         // Draw brush preview
         DrawBrushPreview();
 
-        // Draw enemies and groups
+        // Draw enemies, groups, and NPCs
         DrawEnemies();
         DrawMonsterGroups();
+        DrawNpcs();
 
-        // Draw monster placement preview
+        // Draw placement preview (monsters, groups, NPCs)
         DrawPlacementPreview();
     }
 
@@ -2710,11 +2816,34 @@ public partial class MapEditorTab : Control
         }
     }
 
+    private void DrawNpcs()
+    {
+        if (_mapDrawArea == null || _currentMap == null) return;
+
+        foreach (var npc in _currentMap.Npcs)
+        {
+            var pos = TileToScreen((int)npc.X, (int)npc.Z);
+            pos += new Vector2(_viewScale / 2, _viewScale / 2);
+
+            // Draw NPC as a diamond shape (cyan)
+            float size = 6f;
+            var points = new Vector2[]
+            {
+                pos + new Vector2(0, -size),
+                pos + new Vector2(size, 0),
+                pos + new Vector2(0, size),
+                pos + new Vector2(-size, 0)
+            };
+            _mapDrawArea.DrawPolygon(points, new Color[] { NpcColor });
+            _mapDrawArea.DrawPolyline(new Vector2[] { points[0], points[1], points[2], points[3], points[0] }, NpcColor.Darkened(0.3f), 1.5f);
+        }
+    }
+
     private void DrawPlacementPreview()
     {
         if (_mapDrawArea == null) return;
 
-        if (_isPlacingMonster || _isPlacingGroup)
+        if (_isPlacingMonster || _isPlacingGroup || _isPlacingNpc)
         {
             var tile = ScreenToTile(_placementPreviewPos);
             var previewPos = TileToScreen(tile.X, tile.Y);
@@ -2737,6 +2866,20 @@ public partial class MapEditorTab : Control
                     var monsterPos = previewPos + new Vector2(monster.OffsetX, monster.OffsetZ) * _viewScale;
                     _mapDrawArea.DrawCircle(monsterPos, 3f, new Color(EnemyColor, 0.5f));
                 }
+            }
+            else if (_isPlacingNpc)
+            {
+                // Draw NPC preview as diamond shape
+                float size = 6f;
+                Color previewColor = new Color(NpcColor, 0.5f);
+                var points = new Vector2[]
+                {
+                    previewPos + new Vector2(0, -size),
+                    previewPos + new Vector2(size, 0),
+                    previewPos + new Vector2(0, size),
+                    previewPos + new Vector2(-size, 0)
+                };
+                _mapDrawArea.DrawPolygon(points, new Color[] { previewColor });
             }
         }
     }

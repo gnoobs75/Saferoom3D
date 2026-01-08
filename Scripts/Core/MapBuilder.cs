@@ -301,11 +301,15 @@ public partial class DungeonGenerator3D
         SpawnPropsFromDefinition(map);
         GD.Print($"[TIMING] After SpawnProps: {stopwatch.ElapsedMilliseconds}ms");
 
+        // Spawn NPCs from map definition
+        SpawnNPCsFromDefinition(map);
+        GD.Print($"[TIMING] After SpawnNPCs: {stopwatch.ElapsedMilliseconds}ms");
+
         // Add ambient lighting
         AddAmbientLighting();
         GD.Print($"[TIMING] TOTAL: {stopwatch.ElapsedMilliseconds}ms");
 
-        GD.Print($"[DungeonGenerator3D] Tile-mode map built: {Rooms.Count} rooms, {map.Enemies.Count + CountGroupMonsters(map)} enemies, {map.PlacedProps.Count} placed props");
+        GD.Print($"[DungeonGenerator3D] Tile-mode map built: {Rooms.Count} rooms, {map.Enemies.Count + CountGroupMonsters(map)} enemies, {map.PlacedProps.Count} placed props, {map.Npcs.Count} NPCs");
         EmitSignal(SignalName.GenerationComplete);
     }
 
@@ -406,10 +410,13 @@ public partial class DungeonGenerator3D
         // Spawn placed props from map definition
         SpawnPropsFromDefinition(map);
 
+        // Spawn NPCs from map definition
+        SpawnNPCsFromDefinition(map);
+
         // Add ambient lighting
         AddAmbientLighting();
 
-        GD.Print($"[DungeonGenerator3D] Map built: {Rooms.Count} rooms, {map.Enemies.Count + CountGroupMonsters(map)} enemies, {map.PlacedProps.Count} placed props");
+        GD.Print($"[DungeonGenerator3D] Map built: {Rooms.Count} rooms, {map.Enemies.Count + CountGroupMonsters(map)} enemies, {map.PlacedProps.Count} placed props, {map.Npcs.Count} NPCs");
         EmitSignal(SignalName.GenerationComplete);
     }
 
@@ -840,6 +847,44 @@ public partial class DungeonGenerator3D
         }
 
         GD.Print($"[DungeonGenerator3D] Spawned {totalSpawned} placed props from map definition");
+    }
+
+    /// <summary>
+    /// Spawns NPCs from the map definition's Npcs data.
+    /// </summary>
+    private void SpawnNPCsFromDefinition(MapDefinition map)
+    {
+        if (map.Npcs == null || map.Npcs.Count == 0)
+        {
+            return;
+        }
+
+        // Create NPC container if it doesn't exist
+        Node3D? npcContainer = GetTree().Root.FindChild("NPCs", true, false) as Node3D;
+        if (npcContainer == null)
+        {
+            npcContainer = new Node3D();
+            npcContainer.Name = "NPCs";
+            AddChild(npcContainer);
+        }
+
+        int totalSpawned = 0;
+        foreach (var npcData in map.Npcs)
+        {
+            var position = new Vector3(npcData.X, 0, npcData.Z);
+
+            if (npcData.Type == "bopca")
+            {
+                var bopca = new SafeRoom3D.NPC.Bopca3D();
+                bopca.GlobalPosition = position;
+                bopca.Rotation = new Vector3(0, npcData.RotationY, 0);
+                npcContainer.AddChild(bopca);
+                totalSpawned++;
+            }
+            // Steve is spawned by GameManager separately as a singleton
+        }
+
+        GD.Print($"[DungeonGenerator3D] Spawned {totalSpawned} NPCs from map definition");
     }
 
     /// <summary>
