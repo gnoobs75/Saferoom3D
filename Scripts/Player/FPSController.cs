@@ -1231,13 +1231,17 @@ public partial class FPSController : CharacterBody3D
             PerformRangedAttack();
         }
 
-        // Interact input
+        // Interact input (E key default, or T for this user) - handles NPCs and world objects
         if (Input.IsActionJustPressed("interact"))
         {
-            TryInteract();
+            // NPCs take priority
+            if (!TryInteractNearbyNPC())
+            {
+                TryInteract();
+            }
         }
 
-        // Loot/Interact input (T key) - check NPCs first, then corpses
+        // Loot input (T key default, or G for this user) - handles NPCs and corpses
         if (Input.IsActionJustPressed("loot"))
         {
             // NPCs take priority over corpses
@@ -2013,7 +2017,6 @@ public partial class FPSController : CharacterBody3D
 
         if (nearestNPC != null)
         {
-            GD.Print($"[FPSController] Interacting with NPC: {nearestNPC.NPCName}");
             nearestNPC.Interact(this);
             return true;
         }

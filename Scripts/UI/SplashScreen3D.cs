@@ -71,6 +71,11 @@ public partial class SplashScreen3D : Control
 
     public override void _Ready()
     {
+        // Check GPU and relaunch with OpenGL if Intel integrated graphics
+        // Must be first - if relaunch happens, we return early
+        if (GpuDetector.CheckAndRelaunchIfNeeded(this))
+            return;
+
         // CRITICAL: Ensure proper state for splash screen
         // These can get stuck from editor/gameplay returning improperly
         GetTree().Paused = false;

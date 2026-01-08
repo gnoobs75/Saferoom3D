@@ -636,12 +636,25 @@ public partial class DungeonGenerator3D
         }
     }
 
+    // Startup delay to let GPU stabilize (helps with Intel integrated graphics)
+    private float _startupDelay = 0.5f;
+    private bool _startupComplete = false;
+
     /// <summary>
     /// Updates deferred enemy spawning based on player position.
     /// Call this from _Process in GameManager3D.
     /// </summary>
     public void UpdateDeferredSpawning(float delta)
     {
+        // Wait for startup delay to complete (helps with Intel GPUs)
+        if (!_startupComplete)
+        {
+            _startupDelay -= delta;
+            if (_startupDelay > 0) return;
+            _startupComplete = true;
+            GD.Print("[MapBuilder] Startup delay complete, beginning deferred spawning");
+        }
+
         // Get player position (needed for both enemy spawning and tile building)
         var player = Player.FPSController.Instance;
         if (player == null) return;
@@ -922,57 +935,57 @@ public partial class DungeonGenerator3D
             if (npcData.Type == "bopca")
             {
                 var bopca = new SafeRoom3D.NPC.Bopca3D();
-                bopca.GlobalPosition = position;
+                npcContainer.AddChild(bopca);  // Add to tree FIRST
+                bopca.GlobalPosition = position;  // Then set position
                 bopca.Rotation = new Vector3(0, npcData.RotationY, 0);
-                npcContainer.AddChild(bopca);
                 totalSpawned++;
             }
             else if (npcData.Type == "mordecai")
             {
                 var mordecai = new SafeRoom3D.NPC.Mordecai3D();
-                mordecai.GlobalPosition = position;
+                npcContainer.AddChild(mordecai);  // Add to tree FIRST
+                mordecai.GlobalPosition = position;  // Then set position
                 mordecai.Rotation = new Vector3(0, npcData.RotationY, 0);
-                npcContainer.AddChild(mordecai);
                 totalSpawned++;
             }
             else if (npcData.Type == "crawler_rex")
             {
                 var npc = new SafeRoom3D.NPC.CrawlerRex();
-                npc.GlobalPosition = position;
+                npcContainer.AddChild(npc);  // Add to tree FIRST
+                npc.GlobalPosition = position;  // Then set position
                 npc.Rotation = new Vector3(0, npcData.RotationY, 0);
-                npcContainer.AddChild(npc);
                 totalSpawned++;
             }
             else if (npcData.Type == "crawler_lily")
             {
                 var npc = new SafeRoom3D.NPC.CrawlerLily();
-                npc.GlobalPosition = position;
+                npcContainer.AddChild(npc);  // Add to tree FIRST
+                npc.GlobalPosition = position;  // Then set position
                 npc.Rotation = new Vector3(0, npcData.RotationY, 0);
-                npcContainer.AddChild(npc);
                 totalSpawned++;
             }
             else if (npcData.Type == "crawler_chad")
             {
                 var npc = new SafeRoom3D.NPC.CrawlerChad();
-                npc.GlobalPosition = position;
+                npcContainer.AddChild(npc);  // Add to tree FIRST
+                npc.GlobalPosition = position;  // Then set position
                 npc.Rotation = new Vector3(0, npcData.RotationY, 0);
-                npcContainer.AddChild(npc);
                 totalSpawned++;
             }
             else if (npcData.Type == "crawler_shade")
             {
                 var npc = new SafeRoom3D.NPC.CrawlerShade();
-                npc.GlobalPosition = position;
+                npcContainer.AddChild(npc);  // Add to tree FIRST
+                npc.GlobalPosition = position;  // Then set position
                 npc.Rotation = new Vector3(0, npcData.RotationY, 0);
-                npcContainer.AddChild(npc);
                 totalSpawned++;
             }
             else if (npcData.Type == "crawler_hank")
             {
                 var npc = new SafeRoom3D.NPC.CrawlerHank();
-                npc.GlobalPosition = position;
+                npcContainer.AddChild(npc);  // Add to tree FIRST
+                npc.GlobalPosition = position;  // Then set position
                 npc.Rotation = new Vector3(0, npcData.RotationY, 0);
-                npcContainer.AddChild(npc);
                 totalSpawned++;
             }
             // Steve is spawned by GameManager separately as a singleton

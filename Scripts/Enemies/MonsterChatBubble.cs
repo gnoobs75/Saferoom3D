@@ -20,6 +20,8 @@ public partial class MonsterChatBubble : Node3D
     private const float BobAmount = 0.05f;
 
     private Vector3 _basePosition;
+    private Vector3 _pendingPosition;  // Position to apply when entering tree
+    private bool _positionPending = false;
 
     /// <summary>
     /// Creates a chat bubble at the given position with the specified text.
@@ -29,7 +31,9 @@ public partial class MonsterChatBubble : Node3D
         var bubble = new MonsterChatBubble();
         bubble._lifetime = duration;
         bubble._fadeStartTime = duration - FadeDuration;
-        bubble.GlobalPosition = worldPosition;
+        // Store position to apply when in tree (avoid !is_inside_tree error)
+        bubble._pendingPosition = worldPosition;
+        bubble._positionPending = true;
         bubble._basePosition = worldPosition;
 
         // Create text label
@@ -52,6 +56,16 @@ public partial class MonsterChatBubble : Node3D
         bubble.CreateBubbleBackground(text.Length);
 
         return bubble;
+    }
+
+    public override void _Ready()
+    {
+        // Apply pending position now that we're in the tree
+        if (_positionPending)
+        {
+            GlobalPosition = _pendingPosition;
+            _positionPending = false;
+        }
     }
 
     private void CreateBubbleBackground(int textLength)

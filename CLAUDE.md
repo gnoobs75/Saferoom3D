@@ -5,10 +5,10 @@
 | Command | Purpose |
 |---------|---------|
 | `dotnet build "C:\Claude\SafeRoom3D\SafeRoom3D.csproj"` | Build project |
-| `.\launch_game.bat` | Launch game (auto-detects GPU) |
-| `.\launch_editor.bat` | Open editor (auto-detects GPU) |
+| `Start-Process 'C:\Godot\Godot_v4.5.1-stable_mono_win64.exe' -ArgumentList '--path','C:\Claude\SafeRoom3D'` | Launch game |
+| `Start-Process 'C:\Godot\Godot_v4.5.1-stable_mono_win64.exe' -ArgumentList '--editor','--path','C:\Claude\SafeRoom3D'` | Open editor |
 
-**GPU-Aware Launchers:** The `.bat` files automatically use Vulkan for NVIDIA GPUs and OpenGL for Intel/AMD integrated graphics.
+**Auto GPU Detection:** The game automatically detects Intel integrated graphics (Iris Xe, UHD, HD Graphics) and relaunches with OpenGL3 for stability. See `GpuDetector.cs`.
 
 **Repository:** https://github.com/gnoobs75/Saferoom3D
 
@@ -170,10 +170,12 @@ public override void _Input(InputEvent @event)
 | Shift | Sprint | I | Inventory |
 | LMB | Melee | M | Map |
 | RMB | Ranged | Esc | Menu |
-| E | Interact | F3 | Performance |
-| T | Loot | F5 | **Panic key** (force reset all UI/input) |
+| E | Interact/NPC | F3 | Performance |
+| T | Loot/NPC | F5 | **Panic key** (force reset all UI/input) |
 | N | Toggle nameplates | C | Character Sheet |
 | Y | Dungeon Radio | | |
+
+**Note:** Both E (interact) and T (loot) keys work for NPC interaction (shops, quests). Keys are rebindable in Options.
 
 ### UI Editor Mode
 
