@@ -147,6 +147,9 @@ public partial class GameManager3D : Node
         // Create inventory
         CreateInventory();
 
+        // Create quest manager
+        CreateQuestManager();
+
         // Create enemy container
         _enemyContainer = new Node3D { Name = "Enemies" };
         AddChild(_enemyContainer);
@@ -248,6 +251,15 @@ public partial class GameManager3D : Node
         GD.Print("[GameManager3D] Inventory created");
     }
 
+    private void CreateQuestManager()
+    {
+        var questManager = new QuestManager();
+        questManager.Name = "QuestManager";
+        AddChild(questManager);
+
+        GD.Print("[GameManager3D] Quest Manager created");
+    }
+
     private void CreateUI()
     {
         // Create HUD layer
@@ -285,6 +297,11 @@ public partial class GameManager3D : Node
         var shopUI = new ShopUI3D();
         shopUI.Name = "ShopUI";
         hudLayer.AddChild(shopUI);
+
+        // Create Quest UI (for quest givers like Mordecai)
+        var questUI = new QuestUI3D();
+        questUI.Name = "QuestUI";
+        hudLayer.AddChild(questUI);
 
         // Create Character Sheet UI
         var characterSheet = new CharacterSheetUI();

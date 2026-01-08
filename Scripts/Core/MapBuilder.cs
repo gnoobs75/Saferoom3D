@@ -594,6 +594,46 @@ public partial class DungeonGenerator3D
         }
 
         GD.Print($"[DungeonGenerator3D] Spawned {spawnedCount} enemies initially, {deferredCount} deferred for later");
+
+        // Generate quests based on monsters on this floor
+        GenerateQuestsForFloor(map);
+    }
+
+    /// <summary>
+    /// Generate quests for the current floor based on monster types present.
+    /// </summary>
+    private void GenerateQuestsForFloor(MapDefinition map)
+    {
+        var monsterTypes = new System.Collections.Generic.List<string>();
+
+        // Collect monster types from individual enemies
+        foreach (var enemy in map.Enemies)
+        {
+            if (!string.IsNullOrEmpty(enemy.Type))
+            {
+                monsterTypes.Add(enemy.Type);
+            }
+        }
+
+        // Collect monster types from groups
+        foreach (var group in map.MonsterGroups)
+        {
+            foreach (var monster in group.Monsters)
+            {
+                if (!string.IsNullOrEmpty(monster.Type))
+                {
+                    monsterTypes.Add(monster.Type);
+                }
+            }
+        }
+
+        // Generate quests if we have monsters
+        if (monsterTypes.Count > 0)
+        {
+            int floorLevel = 1; // TODO: Get from map definition or floor counter
+            QuestManager.Instance?.GenerateQuestsForFloor(monsterTypes, floorLevel);
+            GD.Print($"[DungeonGenerator3D] Generated quests for {monsterTypes.Count} monster types");
+        }
     }
 
     /// <summary>
@@ -879,6 +919,14 @@ public partial class DungeonGenerator3D
                 bopca.GlobalPosition = position;
                 bopca.Rotation = new Vector3(0, npcData.RotationY, 0);
                 npcContainer.AddChild(bopca);
+                totalSpawned++;
+            }
+            else if (npcData.Type == "mordecai")
+            {
+                var mordecai = new SafeRoom3D.NPC.Mordecai3D();
+                mordecai.GlobalPosition = position;
+                mordecai.Rotation = new Vector3(0, npcData.RotationY, 0);
+                npcContainer.AddChild(mordecai);
                 totalSpawned++;
             }
             // Steve is spawned by GameManager separately as a singleton

@@ -463,13 +463,14 @@ public partial class EditorScreen3D : Control
         npcsVBox.AddThemeConstantOverride("separation", 4);
         npcsScroll.AddChild(npcsVBox);
 
-        string[] npcs = { "steve", "bopca" };
+        string[] npcs = { "steve", "bopca", "mordecai" };
         foreach (var npc in npcs)
         {
             var displayName = npc switch
             {
                 "steve" => "Steve the Chihuahua",
                 "bopca" => "Bopca the Shopkeeper",
+                "mordecai" => "Mordecai the Game Guide",
                 _ => npc.Replace("_", " ").Capitalize()
             };
             var btn = CreateListButton(displayName);
@@ -977,6 +978,7 @@ public partial class EditorScreen3D : Control
         vbox.AddChild(_cosmeticPropsSection);
 
         _cosmeticScaleSpinBox = CreateAttributeRow(_cosmeticPropsSection, "Scale", 0.1, 5, 1);
+        _cosmeticScaleSpinBox.ValueChanged += OnScaleSpinBoxChanged;
 
         var lightRow = new HBoxContainer();
         _cosmeticHasLightCheckBox = new CheckBox { Text = "Has Light" };
@@ -1037,6 +1039,7 @@ public partial class EditorScreen3D : Control
         vbox.AddChild(_npcStatsSection);
 
         _npcScaleSpinBox = CreateAttributeRow(_npcStatsSection, "Scale", 0.5, 3, 1);
+        _npcScaleSpinBox.ValueChanged += OnScaleSpinBoxChanged;
 
         // GLB Model toggle - styled button that acts as toggle
         var glbRow = new HBoxContainer();
@@ -3478,6 +3481,13 @@ public partial class EditorScreen3D : Control
             new Color(0.4f, 0.4f, 0.45f), 0.5f, 1f, true);
         _previewObject.AddChild(cosmetic);
 
+        // Apply scale from spinbox
+        if (_cosmeticScaleSpinBox != null)
+        {
+            float scale = (float)_cosmeticScaleSpinBox.Value;
+            _previewObject.Scale = new Vector3(scale, scale, scale);
+        }
+
         _previewScene?.AddChild(_previewObject);
         ResetCameraView();
     }
@@ -3499,13 +3509,25 @@ public partial class EditorScreen3D : Control
             // Create Bopca preview using MonsterMeshFactory
             CreateBopcaPreviewModel();
         }
+        else if (npcId == "mordecai")
+        {
+            // Create Mordecai preview using MonsterMeshFactory
+            CreateMordecaiPreviewModel();
+        }
+
+        // Apply scale from spinbox
+        if (_npcScaleSpinBox != null)
+        {
+            float scale = (float)_npcScaleSpinBox.Value;
+            _previewObject.Scale = new Vector3(scale, scale, scale);
+        }
 
         _previewScene?.AddChild(_previewObject);
         ResetCameraView();
 
         // Adjust camera for smaller NPC model
         _cameraDistance = 1.5f;
-        _cameraTargetY = npcId == "bopca" ? 0.4f : 0.15f; // Bopca is taller
+        _cameraTargetY = npcId == "bopca" ? 0.4f : (npcId == "mordecai" ? 0.8f : 0.15f); // Mordecai is tallest
     }
 
     private void CreateBopcaPreviewModel()
@@ -3516,6 +3538,17 @@ public partial class EditorScreen3D : Control
         var meshRoot = new Node3D();
         meshRoot.Name = "BopcaMesh";
         Enemies.MonsterMeshFactory.CreateMonsterMesh(meshRoot, "bopca");
+        _previewObject.AddChild(meshRoot);
+    }
+
+    private void CreateMordecaiPreviewModel()
+    {
+        if (_previewObject == null) return;
+
+        // Use MonsterMeshFactory to create Mordecai mesh
+        var meshRoot = new Node3D();
+        meshRoot.Name = "MordecaiMesh";
+        Enemies.MonsterMeshFactory.CreateMonsterMesh(meshRoot, "mordecai");
         _previewObject.AddChild(meshRoot);
     }
 
@@ -3728,6 +3761,17 @@ public partial class EditorScreen3D : Control
             // Refresh the preview with new color/stats
             UpdatePreviewMonster(_selectedMonsterId);
             UpdateSoundStatus($"Changes applied to {_selectedMonsterId}");
+        }
+    }
+
+    private void OnScaleSpinBoxChanged(double value)
+    {
+        // Update preview object scale when scale spinbox changes
+        if (_previewObject != null)
+        {
+            float scale = (float)value;
+            _previewObject.Scale = new Vector3(scale, scale, scale);
+            GD.Print($"[EditorScreen3D] Preview scale set to {scale}");
         }
     }
 

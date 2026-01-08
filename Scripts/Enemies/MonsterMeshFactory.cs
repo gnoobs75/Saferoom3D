@@ -599,6 +599,9 @@ public static class MonsterMeshFactory
             case "bopca":
                 CreateBopcaMesh(parent, limbs, skinColorOverride, lod);
                 break;
+            case "mordecai":
+                CreateMordecaiMesh(parent, limbs, skinColorOverride, lod);
+                break;
 
             default:
                 CreateSlimeMesh(parent, limbs, skinColorOverride);
@@ -13694,6 +13697,524 @@ public static class MonsterMeshFactory
 
         // Set body reference for animations
         limbs.Body = parent;
+    }
+
+    /// <summary>
+    /// Create Mordecai the Game Guide - a Splinter-style rat humanoid sage with robes and staff.
+    /// Wise old rat mentor figure, tall and slender, wearing flowing robes.
+    /// </summary>
+    private static void CreateMordecaiMesh(Node3D parent, LimbNodes limbs, Color? skinColorOverride, LODLevel lod = LODLevel.High)
+    {
+        // Mordecai proportions: tall and slender rat humanoid, about 1.6m tall (hunched to ~1.4m)
+        float scale = 1.0f;
+
+        // Colors - wise sage rat palette
+        Color furColor = skinColorOverride ?? new Color(0.55f, 0.48f, 0.42f); // Warm gray-brown fur
+        Color darkFurColor = furColor.Darkened(0.2f);
+        Color lightFurColor = furColor.Lightened(0.15f);
+        Color robeColor = new Color(0.35f, 0.28f, 0.45f); // Deep purple sage robes
+        Color robeDarkColor = robeColor.Darkened(0.2f);
+        Color robeGoldTrim = new Color(0.75f, 0.6f, 0.2f); // Gold trim
+        Color sashColor = new Color(0.65f, 0.55f, 0.3f); // Tan sash
+        Color staffColor = new Color(0.4f, 0.3f, 0.2f); // Dark wood
+        Color gemColor = new Color(0.3f, 0.8f, 0.6f); // Teal crystal on staff
+        Color noseColor = new Color(0.8f, 0.6f, 0.6f); // Pink nose
+        Color eyeColor = new Color(0.4f, 0.35f, 0.25f); // Wise brown eyes
+        Color whiskerColor = new Color(0.85f, 0.82f, 0.78f); // White whiskers
+
+        // LOD-based segment counts
+        int radialSegs = GetRadialSegments(lod);
+        int rings = GetRings(lod);
+
+        // Materials
+        var furMat = new StandardMaterial3D { AlbedoColor = furColor, Roughness = 0.85f };
+        var darkFurMat = new StandardMaterial3D { AlbedoColor = darkFurColor, Roughness = 0.9f };
+        var lightFurMat = new StandardMaterial3D { AlbedoColor = lightFurColor, Roughness = 0.85f };
+        var robeMat = new StandardMaterial3D { AlbedoColor = robeColor, Roughness = 0.8f };
+        var robeDarkMat = new StandardMaterial3D { AlbedoColor = robeDarkColor, Roughness = 0.85f };
+        var goldTrimMat = new StandardMaterial3D { AlbedoColor = robeGoldTrim, Metallic = 0.4f, Roughness = 0.4f };
+        var sashMat = new StandardMaterial3D { AlbedoColor = sashColor, Roughness = 0.75f };
+        var staffMat = new StandardMaterial3D { AlbedoColor = staffColor, Roughness = 0.7f };
+        var gemMat = new StandardMaterial3D { AlbedoColor = gemColor, Metallic = 0.2f, Roughness = 0.2f, Emission = gemColor * 0.3f, EmissionEnabled = true };
+        var noseMat = new StandardMaterial3D { AlbedoColor = noseColor, Roughness = 0.5f };
+        var eyeWhiteMat = new StandardMaterial3D { AlbedoColor = new Color(0.95f, 0.93f, 0.9f), Roughness = 0.3f };
+        var eyeMat = new StandardMaterial3D { AlbedoColor = eyeColor, Roughness = 0.4f };
+        var pupilMat = new StandardMaterial3D { AlbedoColor = Colors.Black };
+        var whiskerMat = new StandardMaterial3D { AlbedoColor = whiskerColor, Roughness = 0.6f };
+
+        // === BODY - Slender robed torso (slightly hunched) ===
+        float bodyRadius = 0.14f * scale;
+        float bodyHeight = 0.45f * scale;
+        float bodyCenterY = 0.65f * scale;
+
+        // Main torso in robes
+        var bodyNode = new Node3D();
+        bodyNode.Position = new Vector3(0, bodyCenterY, 0);
+        bodyNode.RotationDegrees = new Vector3(8, 0, 0); // Slight hunch forward
+        parent.AddChild(bodyNode);
+        limbs.Body = bodyNode;
+
+        var body = new MeshInstance3D();
+        var bodyMesh = new CapsuleMesh { Radius = bodyRadius, Height = bodyHeight, RadialSegments = radialSegs, Rings = rings };
+        body.Mesh = bodyMesh;
+        body.MaterialOverride = robeMat;
+        body.Scale = new Vector3(1.0f, 1.0f, 0.85f); // Slightly thin
+        bodyNode.AddChild(body);
+
+        // Robe folds (flowing fabric detail)
+        if (lod >= LODLevel.Medium)
+        {
+            var foldMesh = new BoxMesh { Size = new Vector3(0.06f * scale, 0.35f * scale, 0.03f * scale) };
+            for (int i = 0; i < 5; i++)
+            {
+                float angle = -60 + i * 30;
+                var fold = new MeshInstance3D { Mesh = foldMesh, MaterialOverride = robeDarkMat };
+                fold.Position = new Vector3(
+                    Mathf.Sin(Mathf.DegToRad(angle)) * 0.12f * scale,
+                    -0.08f * scale,
+                    Mathf.Cos(Mathf.DegToRad(angle)) * 0.1f * scale
+                );
+                fold.RotationDegrees = new Vector3(5, angle, 0);
+                bodyNode.AddChild(fold);
+            }
+        }
+
+        // Flowing robe bottom (skirt)
+        var robeSkirt = new MeshInstance3D();
+        var skirtMesh = new CylinderMesh
+        {
+            TopRadius = 0.16f * scale,
+            BottomRadius = 0.28f * scale,
+            Height = 0.5f * scale,
+            RadialSegments = radialSegs,
+            Rings = rings / 2
+        };
+        robeSkirt.Mesh = skirtMesh;
+        robeSkirt.MaterialOverride = robeMat;
+        robeSkirt.Position = new Vector3(0, -0.45f * scale, 0);
+        bodyNode.AddChild(robeSkirt);
+
+        // Gold trim at robe hem
+        if (lod >= LODLevel.Medium)
+        {
+            var trimMesh = new CylinderMesh
+            {
+                TopRadius = 0.285f * scale,
+                BottomRadius = 0.29f * scale,
+                Height = 0.025f * scale,
+                RadialSegments = radialSegs,
+                Rings = 1
+            };
+            var trimHem = new MeshInstance3D { Mesh = trimMesh, MaterialOverride = goldTrimMat };
+            trimHem.Position = new Vector3(0, -0.69f * scale, 0);
+            bodyNode.AddChild(trimHem);
+        }
+
+        // Sash/belt
+        var sash = new MeshInstance3D();
+        var sashMesh = new CylinderMesh
+        {
+            TopRadius = 0.145f * scale,
+            BottomRadius = 0.15f * scale,
+            Height = 0.06f * scale,
+            RadialSegments = radialSegs,
+            Rings = 1
+        };
+        sash.Mesh = sashMesh;
+        sash.MaterialOverride = sashMat;
+        sash.Position = new Vector3(0, -0.15f * scale, 0);
+        bodyNode.AddChild(sash);
+
+        // Sash knot/tail
+        var sashTail = new MeshInstance3D();
+        var sashTailMesh = new BoxMesh { Size = new Vector3(0.04f * scale, 0.15f * scale, 0.02f * scale) };
+        sashTail.Mesh = sashTailMesh;
+        sashTail.MaterialOverride = sashMat;
+        sashTail.Position = new Vector3(0.1f * scale, -0.2f * scale, 0.1f * scale);
+        sashTail.RotationDegrees = new Vector3(15, 20, -10);
+        bodyNode.AddChild(sashTail);
+
+        // === HEAD - Rat head with long snout ===
+        float headRadius = 0.1f * scale;
+        float headHeight = 0.22f * scale;
+        float headCenterY = 1.05f * scale;
+
+        var headNode = new Node3D();
+        headNode.Position = new Vector3(0, headCenterY, 0.05f * scale); // Slightly forward (hunched)
+        headNode.RotationDegrees = new Vector3(-5, 0, 0); // Tilted slightly down (wise contemplative pose)
+        parent.AddChild(headNode);
+        limbs.Head = headNode;
+
+        // Main head (oval rat skull shape)
+        var head = new MeshInstance3D();
+        var headMesh = new SphereMesh { Radius = headRadius, Height = headHeight, RadialSegments = radialSegs, Rings = rings };
+        head.Mesh = headMesh;
+        head.MaterialOverride = furMat;
+        head.Scale = new Vector3(0.9f, 1.0f, 1.1f); // Elongated skull
+        headNode.AddChild(head);
+
+        // === RAT SNOUT - Long pointed snout ===
+        var snout = new MeshInstance3D();
+        var snoutMesh = new CylinderMesh
+        {
+            TopRadius = 0.02f * scale,  // Pointed tip
+            BottomRadius = 0.07f * scale, // Wide at face
+            Height = 0.14f * scale,
+            RadialSegments = radialSegs / 2,
+            Rings = rings / 2
+        };
+        snout.Mesh = snoutMesh;
+        snout.MaterialOverride = furMat;
+        snout.Position = new Vector3(0, -0.03f * scale, 0.12f * scale);
+        snout.RotationDegrees = new Vector3(-75, 0, 0); // Point forward
+        headNode.AddChild(snout);
+
+        // Snout bridge (top of snout)
+        var snoutBridge = new MeshInstance3D();
+        var bridgeMesh = new BoxMesh { Size = new Vector3(0.05f * scale, 0.12f * scale, 0.04f * scale) };
+        snoutBridge.Mesh = bridgeMesh;
+        snoutBridge.MaterialOverride = furMat;
+        snoutBridge.Position = new Vector3(0, 0, 0.13f * scale);
+        snoutBridge.RotationDegrees = new Vector3(-15, 0, 0);
+        headNode.AddChild(snoutBridge);
+
+        // Pink nose at snout tip
+        var nose = new MeshInstance3D();
+        var noseMesh = new SphereMesh { Radius = 0.025f * scale, Height = 0.05f * scale, RadialSegments = radialSegs / 4, Rings = rings / 4 };
+        nose.Mesh = noseMesh;
+        nose.MaterialOverride = noseMat;
+        nose.Position = new Vector3(0, -0.04f * scale, 0.22f * scale);
+        nose.Scale = new Vector3(1.2f, 0.8f, 0.9f);
+        headNode.AddChild(nose);
+
+        // Nostrils
+        var nostrilMesh = new SphereMesh { Radius = 0.008f * scale, Height = 0.016f * scale, RadialSegments = 6, Rings = 3 };
+        var leftNostril = new MeshInstance3D { Mesh = nostrilMesh, MaterialOverride = darkFurMat };
+        leftNostril.Position = new Vector3(-0.012f * scale, -0.045f * scale, 0.235f * scale);
+        headNode.AddChild(leftNostril);
+        var rightNostril = new MeshInstance3D { Mesh = nostrilMesh, MaterialOverride = darkFurMat };
+        rightNostril.Position = new Vector3(0.012f * scale, -0.045f * scale, 0.235f * scale);
+        headNode.AddChild(rightNostril);
+
+        // === WHISKERS - Long graceful whiskers ===
+        if (lod >= LODLevel.Medium)
+        {
+            var whiskerMesh = new CylinderMesh
+            {
+                TopRadius = 0.001f * scale,
+                BottomRadius = 0.003f * scale,
+                Height = 0.12f * scale,
+                RadialSegments = 4,
+                Rings = 1
+            };
+
+            // 3 whiskers on each side, angled outward
+            for (int w = 0; w < 3; w++)
+            {
+                float whiskerY = -0.02f - w * 0.015f;
+                float whiskerAngle = 10 + w * 8;
+
+                // Left whiskers
+                var leftWhisker = new MeshInstance3D { Mesh = whiskerMesh, MaterialOverride = whiskerMat };
+                leftWhisker.Position = new Vector3(-0.04f * scale, whiskerY * scale, 0.18f * scale);
+                leftWhisker.RotationDegrees = new Vector3(whiskerAngle, -70 - w * 10, 0);
+                headNode.AddChild(leftWhisker);
+
+                // Right whiskers
+                var rightWhisker = new MeshInstance3D { Mesh = whiskerMesh, MaterialOverride = whiskerMat };
+                rightWhisker.Position = new Vector3(0.04f * scale, whiskerY * scale, 0.18f * scale);
+                rightWhisker.RotationDegrees = new Vector3(whiskerAngle, 70 + w * 10, 0);
+                headNode.AddChild(rightWhisker);
+            }
+        }
+
+        // === LARGE RAT EARS ===
+        var earMesh = new SphereMesh { Radius = 0.055f * scale, Height = 0.11f * scale, RadialSegments = radialSegs / 2, Rings = rings / 2 };
+        var earInnerMesh = new SphereMesh { Radius = 0.035f * scale, Height = 0.07f * scale, RadialSegments = radialSegs / 3, Rings = rings / 3 };
+
+        // Left ear
+        var leftEar = new MeshInstance3D { Mesh = earMesh, MaterialOverride = furMat };
+        leftEar.Position = new Vector3(-0.08f * scale, 0.08f * scale, 0);
+        leftEar.RotationDegrees = new Vector3(-15, -30, -25);
+        leftEar.Scale = new Vector3(0.6f, 1.0f, 0.15f); // Thin, tall ear
+        headNode.AddChild(leftEar);
+        var leftEarInner = new MeshInstance3D { Mesh = earInnerMesh, MaterialOverride = noseMat }; // Pink inner ear
+        leftEarInner.Position = new Vector3(-0.075f * scale, 0.08f * scale, 0.01f * scale);
+        leftEarInner.RotationDegrees = new Vector3(-15, -30, -25);
+        leftEarInner.Scale = new Vector3(0.5f, 0.85f, 0.1f);
+        headNode.AddChild(leftEarInner);
+
+        // Right ear
+        var rightEar = new MeshInstance3D { Mesh = earMesh, MaterialOverride = furMat };
+        rightEar.Position = new Vector3(0.08f * scale, 0.08f * scale, 0);
+        rightEar.RotationDegrees = new Vector3(-15, 30, 25);
+        rightEar.Scale = new Vector3(0.6f, 1.0f, 0.15f);
+        headNode.AddChild(rightEar);
+        var rightEarInner = new MeshInstance3D { Mesh = earInnerMesh, MaterialOverride = noseMat };
+        rightEarInner.Position = new Vector3(0.075f * scale, 0.08f * scale, 0.01f * scale);
+        rightEarInner.RotationDegrees = new Vector3(-15, 30, 25);
+        rightEarInner.Scale = new Vector3(0.5f, 0.85f, 0.1f);
+        headNode.AddChild(rightEarInner);
+
+        // === WISE EYES - Small, kind eyes ===
+        int eyeSegs = lod == LODLevel.High ? 12 : 8;
+        var eyeWhiteMesh = new SphereMesh { Radius = 0.018f * scale, Height = 0.036f * scale, RadialSegments = eyeSegs, Rings = eyeSegs / 2 };
+        var irisMesh = new SphereMesh { Radius = 0.012f * scale, Height = 0.024f * scale, RadialSegments = eyeSegs, Rings = eyeSegs / 2 };
+        var pupilMeshDef = new SphereMesh { Radius = 0.006f * scale, Height = 0.012f * scale, RadialSegments = eyeSegs / 2, Rings = eyeSegs / 4 };
+
+        float eyeY = 0.03f * scale;
+        float eyeX = 0.04f * scale;
+        float eyeZ = 0.08f * scale;
+
+        // Left eye
+        var leftEyeWhite = new MeshInstance3D { Mesh = eyeWhiteMesh, MaterialOverride = eyeWhiteMat };
+        leftEyeWhite.Position = new Vector3(-eyeX, eyeY, eyeZ);
+        headNode.AddChild(leftEyeWhite);
+        var leftIris = new MeshInstance3D { Mesh = irisMesh, MaterialOverride = eyeMat };
+        leftIris.Position = new Vector3(-eyeX, eyeY, eyeZ + 0.012f * scale);
+        headNode.AddChild(leftIris);
+        var leftPupil = new MeshInstance3D { Mesh = pupilMeshDef, MaterialOverride = pupilMat };
+        leftPupil.Position = new Vector3(-eyeX, eyeY, eyeZ + 0.018f * scale);
+        headNode.AddChild(leftPupil);
+
+        // Right eye
+        var rightEyeWhite = new MeshInstance3D { Mesh = eyeWhiteMesh, MaterialOverride = eyeWhiteMat };
+        rightEyeWhite.Position = new Vector3(eyeX, eyeY, eyeZ);
+        headNode.AddChild(rightEyeWhite);
+        var rightIris = new MeshInstance3D { Mesh = irisMesh, MaterialOverride = eyeMat };
+        rightIris.Position = new Vector3(eyeX, eyeY, eyeZ + 0.012f * scale);
+        headNode.AddChild(rightIris);
+        var rightPupil = new MeshInstance3D { Mesh = pupilMeshDef, MaterialOverride = pupilMat };
+        rightPupil.Position = new Vector3(eyeX, eyeY, eyeZ + 0.018f * scale);
+        headNode.AddChild(rightPupil);
+
+        // Wise eyebrow ridges (furrowed brow)
+        if (lod >= LODLevel.Medium)
+        {
+            var browMesh = new BoxMesh { Size = new Vector3(0.035f * scale, 0.01f * scale, 0.02f * scale) };
+            var leftBrow = new MeshInstance3D { Mesh = browMesh, MaterialOverride = darkFurMat };
+            leftBrow.Position = new Vector3(-eyeX, eyeY + 0.025f * scale, eyeZ);
+            leftBrow.RotationDegrees = new Vector3(15, 0, 10);
+            headNode.AddChild(leftBrow);
+            var rightBrow = new MeshInstance3D { Mesh = browMesh, MaterialOverride = darkFurMat };
+            rightBrow.Position = new Vector3(eyeX, eyeY + 0.025f * scale, eyeZ);
+            rightBrow.RotationDegrees = new Vector3(15, 0, -10);
+            headNode.AddChild(rightBrow);
+        }
+
+        // Small contemplative mouth
+        var mouthMesh = new BoxMesh { Size = new Vector3(0.025f * scale, 0.006f * scale, 0.01f * scale) };
+        var mouth = new MeshInstance3D { Mesh = mouthMesh, MaterialOverride = darkFurMat };
+        mouth.Position = new Vector3(0, -0.06f * scale, 0.14f * scale);
+        headNode.AddChild(mouth);
+
+        // === ARMS - Slender with large paw-hands ===
+        float upperArmRadius = 0.035f * scale;
+        var upperArmMesh = new CapsuleMesh { Radius = upperArmRadius, Height = 0.18f * scale, RadialSegments = radialSegs / 2, Rings = 2 };
+        var lowerArmMesh = new CapsuleMesh { Radius = 0.03f * scale, Height = 0.16f * scale, RadialSegments = radialSegs / 2, Rings = 2 };
+        var handMesh = new SphereMesh { Radius = 0.04f * scale, Height = 0.08f * scale, RadialSegments = radialSegs / 2, Rings = rings / 2 };
+
+        float shoulderY = 0.92f * scale;
+        float shoulderX = 0.16f * scale;
+
+        // Left arm (holding robe)
+        var leftArmNode = new Node3D();
+        leftArmNode.Position = new Vector3(-shoulderX, shoulderY, 0.03f * scale);
+        leftArmNode.RotationDegrees = new Vector3(25, 0, -15);
+        parent.AddChild(leftArmNode);
+        limbs.LeftArm = leftArmNode;
+
+        // Robe sleeve
+        var sleeveMesh = new CylinderMesh
+        {
+            TopRadius = 0.05f * scale,
+            BottomRadius = 0.08f * scale,
+            Height = 0.22f * scale,
+            RadialSegments = radialSegs / 2,
+            Rings = 2
+        };
+        var leftSleeve = new MeshInstance3D { Mesh = sleeveMesh, MaterialOverride = robeMat };
+        leftSleeve.Position = new Vector3(0, -0.11f * scale, 0);
+        leftArmNode.AddChild(leftSleeve);
+
+        var leftUpperArm = new MeshInstance3D { Mesh = upperArmMesh, MaterialOverride = furMat };
+        leftUpperArm.Position = new Vector3(0, -0.09f * scale, 0);
+        leftArmNode.AddChild(leftUpperArm);
+        var leftLowerArm = new MeshInstance3D { Mesh = lowerArmMesh, MaterialOverride = furMat };
+        leftLowerArm.Position = new Vector3(0, -0.22f * scale, 0.02f * scale);
+        leftLowerArm.RotationDegrees = new Vector3(-25, 0, 0);
+        leftArmNode.AddChild(leftLowerArm);
+        var leftHand = new MeshInstance3D { Mesh = handMesh, MaterialOverride = furMat };
+        leftHand.Position = new Vector3(0, -0.34f * scale, 0.05f * scale);
+        leftHand.Scale = new Vector3(1.1f, 0.7f, 1.3f); // Flat paw shape
+        leftArmNode.AddChild(leftHand);
+
+        // Right arm (holding staff)
+        var rightArmNode = new Node3D();
+        rightArmNode.Position = new Vector3(shoulderX, shoulderY, 0.03f * scale);
+        rightArmNode.RotationDegrees = new Vector3(15, 0, 25);
+        parent.AddChild(rightArmNode);
+        limbs.RightArm = rightArmNode;
+
+        var rightSleeve = new MeshInstance3D { Mesh = sleeveMesh, MaterialOverride = robeMat };
+        rightSleeve.Position = new Vector3(0, -0.11f * scale, 0);
+        rightArmNode.AddChild(rightSleeve);
+
+        var rightUpperArm = new MeshInstance3D { Mesh = upperArmMesh, MaterialOverride = furMat };
+        rightUpperArm.Position = new Vector3(0, -0.09f * scale, 0);
+        rightArmNode.AddChild(rightUpperArm);
+        var rightLowerArm = new MeshInstance3D { Mesh = lowerArmMesh, MaterialOverride = furMat };
+        rightLowerArm.Position = new Vector3(0, -0.22f * scale, 0.02f * scale);
+        rightLowerArm.RotationDegrees = new Vector3(-15, 0, 0);
+        rightArmNode.AddChild(rightLowerArm);
+        var rightHand = new MeshInstance3D { Mesh = handMesh, MaterialOverride = furMat };
+        rightHand.Position = new Vector3(0, -0.32f * scale, 0.03f * scale);
+        rightHand.Scale = new Vector3(1.1f, 0.7f, 1.3f);
+        rightArmNode.AddChild(rightHand);
+
+        // Paw fingers/claws (High LOD)
+        if (lod == LODLevel.High)
+        {
+            var clawMesh = new CylinderMesh { TopRadius = 0.004f * scale, BottomRadius = 0.008f * scale, Height = 0.03f * scale, RadialSegments = 5, Rings = 1 };
+            for (int f = 0; f < 4; f++)
+            {
+                float fingerX = (-0.018f + f * 0.012f) * scale;
+                var leftClaw = new MeshInstance3D { Mesh = clawMesh, MaterialOverride = darkFurMat };
+                leftClaw.Position = new Vector3(fingerX, -0.37f * scale, 0.08f * scale);
+                leftClaw.RotationDegrees = new Vector3(-50, 0, -6 + f * 4);
+                leftArmNode.AddChild(leftClaw);
+                var rightClaw = new MeshInstance3D { Mesh = clawMesh, MaterialOverride = darkFurMat };
+                rightClaw.Position = new Vector3(fingerX, -0.35f * scale, 0.06f * scale);
+                rightClaw.RotationDegrees = new Vector3(-50, 0, -6 + f * 4);
+                rightArmNode.AddChild(rightClaw);
+            }
+        }
+
+        // === WALKING STAFF - Gnarled wooden staff with crystal ===
+        var staffNode = new Node3D();
+        staffNode.Position = new Vector3(shoulderX + 0.12f * scale, 0.1f * scale, 0.08f * scale);
+        staffNode.RotationDegrees = new Vector3(-5, 0, -8);
+        parent.AddChild(staffNode);
+
+        // Main staff shaft
+        var staffShaft = new MeshInstance3D();
+        var staffShaftMesh = new CylinderMesh
+        {
+            TopRadius = 0.018f * scale,
+            BottomRadius = 0.022f * scale,
+            Height = 1.3f * scale,
+            RadialSegments = radialSegs / 3,
+            Rings = rings
+        };
+        staffShaft.Mesh = staffShaftMesh;
+        staffShaft.MaterialOverride = staffMat;
+        staffShaft.Position = new Vector3(0, 0.65f * scale, 0);
+        staffNode.AddChild(staffShaft);
+
+        // Staff knots/gnarls (High LOD)
+        if (lod == LODLevel.High)
+        {
+            var knotMesh = new SphereMesh { Radius = 0.025f * scale, Height = 0.05f * scale, RadialSegments = 8, Rings = 4 };
+            for (int k = 0; k < 3; k++)
+            {
+                var knot = new MeshInstance3D { Mesh = knotMesh, MaterialOverride = staffMat };
+                knot.Position = new Vector3(0.01f * scale, 0.3f + k * 0.35f, 0);
+                knot.Scale = new Vector3(1f, 0.6f, 1f);
+                staffNode.AddChild(knot);
+            }
+        }
+
+        // Staff head (gnarled top)
+        var staffHead = new MeshInstance3D();
+        var staffHeadMesh = new SphereMesh { Radius = 0.04f * scale, Height = 0.08f * scale, RadialSegments = radialSegs / 2, Rings = rings / 2 };
+        staffHead.Mesh = staffHeadMesh;
+        staffHead.MaterialOverride = staffMat;
+        staffHead.Position = new Vector3(0, 1.32f * scale, 0);
+        staffHead.Scale = new Vector3(1f, 1.2f, 1f);
+        staffNode.AddChild(staffHead);
+
+        // Glowing crystal/gem at top
+        var crystal = new MeshInstance3D();
+        var crystalMesh = new PrismMesh { Size = new Vector3(0.05f * scale, 0.08f * scale, 0.05f * scale) };
+        crystal.Mesh = crystalMesh;
+        crystal.MaterialOverride = gemMat;
+        crystal.Position = new Vector3(0, 1.4f * scale, 0);
+        crystal.RotationDegrees = new Vector3(0, 45, 0);
+        staffNode.AddChild(crystal);
+
+        // === RAT TAIL - Long, segmented tail ===
+        var tailNode = new Node3D();
+        tailNode.Position = new Vector3(0, 0.25f * scale, -0.2f * scale);
+        parent.AddChild(tailNode);
+        limbs.Tail = tailNode;
+
+        // Tail segments - getting thinner toward tip
+        int tailSegments = lod == LODLevel.High ? 10 : 6;
+        for (int t = 0; t < tailSegments; t++)
+        {
+            float segRadius = (0.025f - t * 0.002f) * scale;
+            float segHeight = 0.1f * scale;
+            float segY = -t * 0.08f * scale;
+            float segZ = -t * 0.04f * scale;
+            float segRotX = 8 + t * 4; // Curves downward
+
+            var tailSeg = new MeshInstance3D();
+            var tailSegMesh = new CapsuleMesh { Radius = Mathf.Max(segRadius, 0.005f * scale), Height = segHeight, RadialSegments = radialSegs / 3, Rings = 2 };
+            tailSeg.Mesh = tailSegMesh;
+            tailSeg.MaterialOverride = noseMat; // Pink hairless tail
+            tailSeg.Position = new Vector3(0, segY, segZ);
+            tailSeg.RotationDegrees = new Vector3(segRotX, 0, Mathf.Sin(t * 0.5f) * 5);
+            tailNode.AddChild(tailSeg);
+        }
+
+        // Tail rings (detail, High LOD)
+        if (lod == LODLevel.High)
+        {
+            var ringMesh = new CylinderMesh { TopRadius = 0.015f * scale, BottomRadius = 0.015f * scale, Height = 0.005f * scale, RadialSegments = 8, Rings = 1 };
+            for (int r = 0; r < 8; r++)
+            {
+                var ring = new MeshInstance3D { Mesh = ringMesh, MaterialOverride = darkFurMat };
+                ring.Position = new Vector3(0, -r * 0.08f * scale, -r * 0.04f * scale);
+                ring.RotationDegrees = new Vector3(8 + r * 4, 0, 0);
+                tailNode.AddChild(ring);
+            }
+        }
+
+        // === LEGS (Hidden under robes, but needed for animation) ===
+        float legRadius = 0.035f * scale;
+        var legMesh = new CapsuleMesh { Radius = legRadius, Height = 0.2f * scale, RadialSegments = radialSegs / 2, Rings = 2 };
+        var footMesh = new SphereMesh { Radius = 0.045f * scale, Height = 0.09f * scale, RadialSegments = radialSegs / 2, Rings = rings / 2 };
+
+        float hipY = 0.15f * scale;
+        float hipX = 0.07f * scale;
+
+        // Left leg
+        var leftLegNode = new Node3D();
+        leftLegNode.Position = new Vector3(-hipX, hipY, 0);
+        parent.AddChild(leftLegNode);
+        limbs.LeftLeg = leftLegNode;
+
+        var leftLeg = new MeshInstance3D { Mesh = legMesh, MaterialOverride = furMat };
+        leftLeg.Position = new Vector3(0, -0.1f * scale, 0);
+        leftLegNode.AddChild(leftLeg);
+        var leftFoot = new MeshInstance3D { Mesh = footMesh, MaterialOverride = noseMat }; // Pink paw
+        leftFoot.Position = new Vector3(0, -0.22f * scale, 0.03f * scale);
+        leftFoot.Scale = new Vector3(1.2f, 0.5f, 1.5f); // Rat paw
+        leftLegNode.AddChild(leftFoot);
+
+        // Right leg
+        var rightLegNode = new Node3D();
+        rightLegNode.Position = new Vector3(hipX, hipY, 0);
+        parent.AddChild(rightLegNode);
+        limbs.RightLeg = rightLegNode;
+
+        var rightLeg = new MeshInstance3D { Mesh = legMesh, MaterialOverride = furMat };
+        rightLeg.Position = new Vector3(0, -0.1f * scale, 0);
+        rightLegNode.AddChild(rightLeg);
+        var rightFoot = new MeshInstance3D { Mesh = footMesh, MaterialOverride = noseMat };
+        rightFoot.Position = new Vector3(0, -0.22f * scale, 0.03f * scale);
+        rightFoot.Scale = new Vector3(1.2f, 0.5f, 1.5f);
+        rightLegNode.AddChild(rightFoot);
     }
 }
 

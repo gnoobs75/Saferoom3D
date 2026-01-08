@@ -88,7 +88,7 @@ public partial class InMapEditor : Control
     };
 
     // NPC types for placement
-    private static readonly string[] NpcTypes = { "steve", "bopca" };
+    private static readonly string[] NpcTypes = { "steve", "bopca", "mordecai" };
 
     public override void _Ready()
     {
@@ -534,6 +534,7 @@ public partial class InMapEditor : Control
             {
                 "steve" => "Steve (Companion)",
                 "bopca" => "Bopca (Shopkeeper)",
+                "mordecai" => "Mordecai (Quest Giver)",
                 _ => npc.Replace("_", " ").Capitalize()
             };
             if (string.IsNullOrEmpty(filter) || displayName.ToLower().Contains(filter.ToLower()))
@@ -935,11 +936,11 @@ public partial class InMapEditor : Control
         }
         else if (_currentState == EditState.PlacingNpc && _selectedNpcType != null)
         {
-            // Create NPC preview using MonsterMeshFactory (for bopca) or custom mesh
+            // Create NPC preview using MonsterMeshFactory (for bopca/mordecai) or custom mesh
             _placementPreview = new Node3D();
-            if (_selectedNpcType == "bopca")
+            if (_selectedNpcType == "bopca" || _selectedNpcType == "mordecai")
             {
-                MonsterMeshFactory.CreateMonsterMesh(_placementPreview, "bopca", null, null);
+                MonsterMeshFactory.CreateMonsterMesh(_placementPreview, _selectedNpcType, null, null);
             }
             else
             {
@@ -1261,22 +1262,30 @@ public partial class InMapEditor : Control
         // Spawn the actual NPC
         Node3D? spawnedNpc = null;
 
+        // Get or create NPCs container
+        var npcsContainer = GetTree().Root.FindChild("NPCs", true, false) as Node3D;
+        if (npcsContainer == null)
+        {
+            npcsContainer = new Node3D();
+            npcsContainer.Name = "NPCs";
+            GetTree().Root.AddChild(npcsContainer);
+        }
+
         if (npcType == "bopca")
         {
             var bopca = new SafeRoom3D.NPC.Bopca3D();
             bopca.GlobalPosition = position;
             bopca.Rotation = new Vector3(0, rotationY, 0);
             spawnedNpc = bopca;
-
-            // Add to scene
-            var npcsContainer = GetTree().Root.FindChild("NPCs", true, false) as Node3D;
-            if (npcsContainer == null)
-            {
-                npcsContainer = new Node3D();
-                npcsContainer.Name = "NPCs";
-                GetTree().Root.AddChild(npcsContainer);
-            }
             npcsContainer.AddChild(bopca);
+        }
+        else if (npcType == "mordecai")
+        {
+            var mordecai = new SafeRoom3D.NPC.Mordecai3D();
+            mordecai.GlobalPosition = position;
+            mordecai.Rotation = new Vector3(0, rotationY, 0);
+            spawnedNpc = mordecai;
+            npcsContainer.AddChild(mordecai);
         }
         // Steve handled by existing Pet system
 

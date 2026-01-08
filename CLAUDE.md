@@ -36,21 +36,22 @@ Never auto-commit without explicit user approval.
 
 ```
 Scripts/
-├── Core/           # GameManager3D, DungeonGenerator3D, SoundManager3D, SplashMusic, Constants
+├── Core/           # GameManager3D, DungeonGenerator3D, SoundManager3D, SplashMusic, QuestManager, Constants
 ├── Player/         # FPSController (movement, combat, camera)
 ├── Enemies/        # BasicEnemy3D, BossEnemy3D, MonsterMeshFactory, GoblinShaman/Thrower
 ├── Abilities/      # AbilityManager3D, 14 ability effects in Effects/
 ├── Items/          # Inventory3D, ItemDatabase, LootBag, ConsumableItems3D
-├── UI/             # HUD3D, SpellBook3D, InventoryUI3D, DungeonRadio, EscapeMenu3D
+├── UI/             # HUD3D, SpellBook3D, InventoryUI3D, DungeonRadio, EscapeMenu3D, QuestUI3D
+├── NPC/            # BaseNPC3D, Bopca3D (shopkeeper), Mordecai3D (quest giver)
 ├── Broadcaster/    # AIBroadcaster, BroadcasterUI, CommentaryDatabase
 ├── Combat/         # Projectile3D, ThrownProjectile3D, MeleeSlashEffect3D
 ├── Environment/    # Cosmetic3D (40+ prop types), WaterEffects3D
 └── Pet/            # Steve companion (supports GLB models)
 ```
 
-**Singletons:** `GameManager3D`, `SoundManager3D`, `FPSController`, `AbilityManager3D`, `Inventory3D`, `HUD3D`, `DungeonRadio`, `SplashMusic`, `AIBroadcaster`
+**Singletons:** `GameManager3D`, `SoundManager3D`, `FPSController`, `AbilityManager3D`, `Inventory3D`, `HUD3D`, `DungeonRadio`, `SplashMusic`, `AIBroadcaster`, `QuestManager`, `QuestUI3D`
 
-**Namespaces:** `SafeRoom3D.Core`, `.Player`, `.Enemies`, `.Abilities`, `.Items`, `.UI`, `.Combat`, `.Environment`
+**Namespaces:** `SafeRoom3D.Core`, `.Player`, `.Enemies`, `.Abilities`, `.Items`, `.UI`, `.NPC`, `.Combat`, `.Environment`
 
 ---
 
@@ -308,6 +309,80 @@ Steve3D.Instance?.ReloadModel();  // Apply changes to live instance
 ### Steve's Abilities
 - **Heal** (10s cooldown): Heals player for 50 HP when they take damage
 - **Magic Missile** (10s cooldown): Attacks enemies threatening the player
+
+---
+
+## Quest System
+
+### Overview
+
+Dynamic quest system that generates collection and boss kill quests based on monsters present on the current floor.
+
+### NPCs
+
+**Mordecai the Game Guide** (`Scripts/NPC/Mordecai3D.cs`)
+- Splinter-style rat humanoid sage who gives quests
+- Press **T** to interact and open quest UI
+- Procedural mesh with idle animations (breathing, tail sway, head turns)
+
+**Bopca the Shopkeeper** (`Scripts/NPC/Bopca3D.cs`)
+- Friendly cat merchant for buying/selling items
+- Press **T** to interact and open shop UI
+
+### Quest Types
+
+| Type | Description | Example |
+|------|-------------|---------|
+| CollectItem | Gather X monster parts | "Collect 5 Goblin Ears" |
+| KillMonster | Kill X of a monster type | "Slay 10 Skeletons" |
+| KillBoss | Defeat a specific boss | "Slay the Dragon King" |
+
+### Quest Flow
+
+```
+Available → Accept → Active → Complete Objectives → ReadyToTurnIn → Turn In → Completed
+```
+
+### QuestManager (`Scripts/Core/QuestManager.cs`)
+
+Singleton that manages all quests:
+
+```csharp
+// Generate quests when loading a map
+QuestManager.Instance?.GenerateQuestsForFloor(monsterTypes, floorLevel);
+
+// Track progress (called automatically)
+QuestManager.Instance?.OnItemPickedUp(itemId, totalCount);
+QuestManager.Instance?.OnMonsterKilled(monsterType, isBoss);
+```
+
+**Quest Generation:**
+- Easy quests (3-5 items) - All floors
+- Medium quests (6-8 items) - Floor 2+
+- Hard quests (8-10 items) - Floor 3+
+- Boss quests - When bosses present
+
+### Monster Parts (`MonsterPartDatabase`)
+
+Every monster drops a unique quest item:
+
+| Monster | Drop |
+|---------|------|
+| Goblin | Goblin Ear |
+| Skeleton | Bone Fragment |
+| Spider | Spider Silk |
+| Slime | Slime Core |
+| Dragon | Dragon Scale |
+| *Bosses* | *Legendary parts (purple)* |
+
+### Quest UI (`Scripts/UI/QuestUI3D.cs`)
+
+Three-tab interface:
+- **Available** - Quests you can accept
+- **Active** - Your current quests with progress
+- **Complete** - Quests ready to turn in for rewards
+
+**Rewards:** Gold + XP (scales with difficulty and floor level)
 
 ---
 

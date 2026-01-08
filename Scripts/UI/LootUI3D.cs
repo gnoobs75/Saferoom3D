@@ -372,6 +372,10 @@ public partial class LootUI3D : Control
             {
                 GD.Print($"[LootUI3D] Picked up {item.Name} x{item.StackCount}");
                 Core.SoundManager3D.Instance?.PlayPickupSound(Player.FPSController.Instance?.GlobalPosition ?? Vector3.Zero);
+
+                // Notify quest manager about item pickup
+                int totalCount = Inventory3D.Instance.CountItemById(item.Id);
+                Core.QuestManager.Instance?.OnItemPickedUp(item.Id, totalCount);
             }
             else
             {
@@ -395,6 +399,8 @@ public partial class LootUI3D : Control
         if (_currentCorpse == null) return;
 
         bool tookSomething = false;
+        var pickedUpItemIds = new System.Collections.Generic.List<string>();
+
         for (int i = 0; i < LootBag.DefaultSlots; i++)
         {
             var item = _currentCorpse.Loot.GetItem(i);
@@ -404,6 +410,7 @@ public partial class LootUI3D : Control
             {
                 _currentCorpse.Loot.SetItem(i, null);
                 tookSomething = true;
+                pickedUpItemIds.Add(item.Id);
                 GD.Print($"[LootUI3D] Picked up {item.Name} x{item.StackCount}");
             }
         }
@@ -411,6 +418,13 @@ public partial class LootUI3D : Control
         if (tookSomething)
         {
             Core.SoundManager3D.Instance?.PlayPickupSound(Player.FPSController.Instance?.GlobalPosition ?? Vector3.Zero);
+
+            // Notify quest manager about all picked up items
+            foreach (var itemId in pickedUpItemIds)
+            {
+                int totalCount = Inventory3D.Instance?.CountItemById(itemId) ?? 0;
+                Core.QuestManager.Instance?.OnItemPickedUp(itemId, totalCount);
+            }
         }
 
         RefreshSlots();

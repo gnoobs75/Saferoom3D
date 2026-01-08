@@ -53,6 +53,14 @@ public partial class MapEditorTab : Control
     private bool _isPlacingNpc = false;
     private Vector2 _placementPreviewPos;
 
+    // Selection state (for viewing/deleting existing placed items)
+    private int _hoveredEnemyIndex = -1;
+    private int _hoveredGroupIndex = -1;
+    private int _hoveredNpcIndex = -1;
+    private int _selectedEnemyIndex = -1;
+    private int _selectedGroupIndex = -1;
+    private int _selectedNpcIndex = -1;
+
     // === WYSIWYG TILE PAINTER STATE ===
 
     // Tool types
@@ -1031,13 +1039,14 @@ public partial class MapEditorTab : Control
         _npcPalette.ItemSelected += OnNpcSelected;
 
         // Add NPCs to palette
-        string[] npcTypes = { "steve", "bopca" };
+        string[] npcTypes = { "steve", "bopca", "mordecai" };
         foreach (var npc in npcTypes)
         {
             string displayName = npc switch
             {
                 "steve" => "Steve",
                 "bopca" => "Bopca (Shop)",
+                "mordecai" => "Mordecai (Quest)",
                 _ => npc.Replace("_", " ").Capitalize()
             };
             _npcPalette.AddItem(displayName);
@@ -1080,11 +1089,16 @@ public partial class MapEditorTab : Control
         _isPlacingGroup = false;
 
         // Set NPC selection
-        string[] npcTypes = { "steve", "bopca" };
+        string[] npcTypes = { "steve", "bopca", "mordecai" };
         if (index >= 0 && index < npcTypes.Length)
         {
             _selectedNpcType = npcTypes[index];
             _isPlacingNpc = true;
+
+            // Switch to Monster tool when NPC is selected (shared placement tool)
+            _currentTool = PaintTool.Monster;
+            UpdateToolButtonStates();
+
             UpdateSelectedLabel();
             GD.Print($"[MapEditorTab] Selected NPC: {_selectedNpcType}");
         }
@@ -1852,6 +1866,7 @@ public partial class MapEditorTab : Control
             {
                 "steve" => "Steve",
                 "bopca" => "Bopca (Shopkeeper)",
+                "mordecai" => "Mordecai (Quest Giver)",
                 _ => _selectedNpcType.Replace("_", " ").Capitalize()
             };
             _selectedItemLabel.Text = $"Placing NPC: {displayName}";
@@ -1980,6 +1995,13 @@ public partial class MapEditorTab : Control
 
         if (mouseButton.Pressed)
         {
+            // Check for selection FIRST - if hovering over an enemy/NPC/group, select it (regardless of tool)
+            if (_hoveredEnemyIndex >= 0 || _hoveredGroupIndex >= 0 || _hoveredNpcIndex >= 0)
+            {
+                SelectHoveredItem();
+                return; // Don't process tool action when selecting
+            }
+
             switch (_currentTool)
             {
                 case PaintTool.Floor:
@@ -2071,16 +2093,22 @@ public partial class MapEditorTab : Control
 
     private void HandleMouseMotion(InputEventMouseMotion motion)
     {
+        bool needsRedraw = false;
+
         if (_isPanning)
         {
             _viewOffset += motion.Position - _lastMousePos;
             _lastMousePos = motion.Position;
-            _mapDrawArea?.QueueRedraw();
+            needsRedraw = true;
         }
 
         _placementPreviewPos = motion.Position;
 
-        if (_currentMap == null || _tileGrid == null) return;
+        if (_currentMap == null || _tileGrid == null)
+        {
+            if (needsRedraw) _mapDrawArea?.QueueRedraw();
+            return;
+        }
 
         var tile = ScreenToTile(motion.Position);
 
@@ -2088,29 +2116,236 @@ public partial class MapEditorTab : Control
         if (_isPaintingFloor)
         {
             PaintBrushAt(tile.X, tile.Y, 1);
-            _mapDrawArea?.QueueRedraw();
+            needsRedraw = true;
         }
         else if (_isPaintingVoid)
         {
             PaintBrushAt(tile.X, tile.Y, 0);
-            _mapDrawArea?.QueueRedraw();
+            needsRedraw = true;
         }
 
         // Update room preview while dragging
         if (_isDrawingRoom)
         {
             _roomEndTile = tile;
-            _mapDrawArea?.QueueRedraw();
+            needsRedraw = true;
         }
 
         // Update coordinate label
         UpdateTileCoordLabel(motion.Position);
 
-        // Redraw for brush/placement preview
-        if (_currentTool != PaintTool.Monster || _isPlacingMonster || _isPlacingGroup)
+        // Detect hovered monster/NPC for selection (returns true if hover changed)
+        if (UpdateHoveredItem(tile))
+        {
+            needsRedraw = true;
+        }
+
+        // Only redraw for placement preview if actively placing something
+        if (_isPlacingMonster || _isPlacingGroup || _isPlacingNpc)
+        {
+            needsRedraw = true;
+        }
+
+        if (needsRedraw)
         {
             _mapDrawArea?.QueueRedraw();
         }
+    }
+
+    private bool UpdateHoveredItem(Vector2I tile)
+    {
+        if (_currentMap == null) return false;
+
+        int prevEnemy = _hoveredEnemyIndex;
+        int prevGroup = _hoveredGroupIndex;
+        int prevNpc = _hoveredNpcIndex;
+
+        _hoveredEnemyIndex = -1;
+        _hoveredGroupIndex = -1;
+        _hoveredNpcIndex = -1;
+
+        // Check enemies
+        for (int i = 0; i < _currentMap.Enemies.Count; i++)
+        {
+            var enemy = _currentMap.Enemies[i];
+            if (enemy.Position.X == tile.X && enemy.Position.Z == tile.Y)
+            {
+                _hoveredEnemyIndex = i;
+                break;
+            }
+        }
+
+        // Check groups (within 2 tiles of center)
+        if (_hoveredEnemyIndex < 0)
+        {
+            for (int i = 0; i < _currentMap.MonsterGroups.Count; i++)
+            {
+                var group = _currentMap.MonsterGroups[i];
+                if (Mathf.Abs(group.Center.X - tile.X) <= 2 && Mathf.Abs(group.Center.Z - tile.Y) <= 2)
+                {
+                    _hoveredGroupIndex = i;
+                    break;
+                }
+            }
+        }
+
+        // Check NPCs
+        if (_hoveredEnemyIndex < 0 && _hoveredGroupIndex < 0)
+        {
+            for (int i = 0; i < _currentMap.Npcs.Count; i++)
+            {
+                var npc = _currentMap.Npcs[i];
+                if ((int)npc.X == tile.X && (int)npc.Z == tile.Y)
+                {
+                    _hoveredNpcIndex = i;
+                    break;
+                }
+            }
+        }
+
+        // Check if hover state changed
+        bool hoverChanged = prevEnemy != _hoveredEnemyIndex || prevGroup != _hoveredGroupIndex || prevNpc != _hoveredNpcIndex;
+
+        // Update hover info display if changed
+        if (hoverChanged)
+        {
+            UpdateHoverInfoLabel();
+        }
+
+        return hoverChanged;
+    }
+
+    private void UpdateHoverInfoLabel()
+    {
+        // Show hovered item info in a tooltip-like manner
+        if (_hoveredEnemyIndex >= 0 && _currentMap != null)
+        {
+            var enemy = _currentMap.Enemies[_hoveredEnemyIndex];
+            string displayName = FormatMonsterName(enemy.Type);
+            _selectedItemLabel!.Text = $"Hover: {displayName} (Lv.{enemy.Level})\n[Click to select, Del to remove]";
+        }
+        else if (_hoveredGroupIndex >= 0 && _currentMap != null)
+        {
+            var group = _currentMap.MonsterGroups[_hoveredGroupIndex];
+            _selectedItemLabel!.Text = $"Hover: Group ({group.Monsters.Count} monsters)\n[Click to select, Del to remove]";
+        }
+        else if (_hoveredNpcIndex >= 0 && _currentMap != null)
+        {
+            var npc = _currentMap.Npcs[_hoveredNpcIndex];
+            string displayName = npc.Type switch
+            {
+                "steve" => "Steve (Pet)",
+                "bopca" => "Bopca (Shopkeeper)",
+                "mordecai" => "Mordecai (Quest Giver)",
+                _ => npc.Type.Replace("_", " ").Capitalize()
+            };
+            _selectedItemLabel!.Text = $"Hover: {displayName}\n[Click to select, Del to remove]";
+        }
+        else if (_selectedEnemyIndex >= 0 && _currentMap != null)
+        {
+            var enemy = _currentMap.Enemies[_selectedEnemyIndex];
+            string displayName = FormatMonsterName(enemy.Type);
+            _selectedItemLabel!.Text = $"SELECTED: {displayName} (Lv.{enemy.Level})\n[Press Del to delete]";
+        }
+        else if (_selectedGroupIndex >= 0 && _currentMap != null)
+        {
+            var group = _currentMap.MonsterGroups[_selectedGroupIndex];
+            _selectedItemLabel!.Text = $"SELECTED: Group ({group.Monsters.Count} monsters)\n[Press Del to delete]";
+        }
+        else if (_selectedNpcIndex >= 0 && _currentMap != null)
+        {
+            var npc = _currentMap.Npcs[_selectedNpcIndex];
+            string displayName = npc.Type switch
+            {
+                "steve" => "Steve (Pet)",
+                "bopca" => "Bopca (Shopkeeper)",
+                "mordecai" => "Mordecai (Quest Giver)",
+                _ => npc.Type.Replace("_", " ").Capitalize()
+            };
+            _selectedItemLabel!.Text = $"SELECTED: {displayName}\n[Press Del to delete]";
+        }
+        else
+        {
+            UpdateSelectedLabel(); // Restore default label
+        }
+    }
+
+    private string FormatMonsterName(string monsterType)
+    {
+        return monsterType.Replace("_", " ").Capitalize();
+    }
+
+    private void SelectHoveredItem()
+    {
+        // Clear previous selection
+        _selectedEnemyIndex = -1;
+        _selectedGroupIndex = -1;
+        _selectedNpcIndex = -1;
+
+        // Transfer hovered to selected
+        if (_hoveredEnemyIndex >= 0)
+        {
+            _selectedEnemyIndex = _hoveredEnemyIndex;
+            GD.Print($"[MapEditorTab] Selected enemy at index {_selectedEnemyIndex}");
+        }
+        else if (_hoveredGroupIndex >= 0)
+        {
+            _selectedGroupIndex = _hoveredGroupIndex;
+            GD.Print($"[MapEditorTab] Selected group at index {_selectedGroupIndex}");
+        }
+        else if (_hoveredNpcIndex >= 0)
+        {
+            _selectedNpcIndex = _hoveredNpcIndex;
+            GD.Print($"[MapEditorTab] Selected NPC at index {_selectedNpcIndex}");
+        }
+
+        UpdateHoverInfoLabel();
+        _mapDrawArea?.QueueRedraw();
+    }
+
+    private void ClearSelection()
+    {
+        _selectedEnemyIndex = -1;
+        _selectedGroupIndex = -1;
+        _selectedNpcIndex = -1;
+        UpdateHoverInfoLabel();
+        _mapDrawArea?.QueueRedraw();
+    }
+
+    private void DeleteSelectedItem()
+    {
+        if (_currentMap == null) return;
+
+        if (_selectedEnemyIndex >= 0 && _selectedEnemyIndex < _currentMap.Enemies.Count)
+        {
+            var enemy = _currentMap.Enemies[_selectedEnemyIndex];
+            GD.Print($"[MapEditorTab] Deleting enemy '{enemy.Type}' at index {_selectedEnemyIndex}");
+            _currentMap.Enemies.RemoveAt(_selectedEnemyIndex);
+            _selectedEnemyIndex = -1;
+        }
+        else if (_selectedGroupIndex >= 0 && _selectedGroupIndex < _currentMap.MonsterGroups.Count)
+        {
+            var group = _currentMap.MonsterGroups[_selectedGroupIndex];
+            GD.Print($"[MapEditorTab] Deleting group with {group.Monsters.Count} monsters at index {_selectedGroupIndex}");
+            _currentMap.MonsterGroups.RemoveAt(_selectedGroupIndex);
+            _selectedGroupIndex = -1;
+        }
+        else if (_selectedNpcIndex >= 0 && _selectedNpcIndex < _currentMap.Npcs.Count)
+        {
+            var npc = _currentMap.Npcs[_selectedNpcIndex];
+            GD.Print($"[MapEditorTab] Deleting NPC '{npc.Type}' at index {_selectedNpcIndex}");
+            _currentMap.Npcs.RemoveAt(_selectedNpcIndex);
+            _selectedNpcIndex = -1;
+        }
+        else
+        {
+            GD.Print("[MapEditorTab] Nothing selected to delete");
+            return;
+        }
+
+        UpdateMapInfo();
+        UpdateHoverInfoLabel();
+        _mapDrawArea?.QueueRedraw();
     }
 
     private void PaintBrushAt(int centerX, int centerZ, int value)
@@ -2516,8 +2751,8 @@ public partial class MapEditorTab : Control
 
         var viewSize = _mapDrawArea.Size;
 
-        // Only draw grid if zoomed in enough
-        if (_viewScale >= 4f)
+        // Only draw grid if zoomed in enough (raised threshold for performance)
+        if (_viewScale >= 8f)
         {
             // Calculate visible tile range
             int startX = Mathf.Max(0, (int)((-_viewOffset.X) / _viewScale) - 1);
@@ -2525,8 +2760,17 @@ public partial class MapEditorTab : Control
             int endX = Mathf.Min(_currentMap.Width, (int)((viewSize.X - _viewOffset.X) / _viewScale) + 1);
             int endZ = Mathf.Min(_currentMap.Depth, (int)((viewSize.Y - _viewOffset.Y) / _viewScale) + 1);
 
+            // Limit max visible tiles for performance (skip some lines if too many)
+            int visibleWidth = endX - startX;
+            int visibleHeight = endZ - startZ;
+            int step = 1;
+            if (visibleWidth > 100 || visibleHeight > 100)
+                step = 2; // Draw every other line
+            if (visibleWidth > 200 || visibleHeight > 200)
+                step = 4; // Draw every 4th line
+
             // Draw vertical lines
-            for (int x = startX; x <= endX; x++)
+            for (int x = startX; x <= endX; x += step)
             {
                 var from = TileToScreen(x, startZ);
                 var to = TileToScreen(x, endZ);
@@ -2534,7 +2778,7 @@ public partial class MapEditorTab : Control
             }
 
             // Draw horizontal lines
-            for (int z = startZ; z <= endZ; z++)
+            for (int z = startZ; z <= endZ; z += step)
             {
                 var from = TileToScreen(startX, z);
                 var to = TileToScreen(endX, z);
@@ -2587,7 +2831,7 @@ public partial class MapEditorTab : Control
         int endX = Mathf.Min(width, (int)((viewSize.X - _viewOffset.X) / _viewScale) + 2);
         int endZ = Mathf.Min(depth, (int)((viewSize.Y - _viewOffset.Y) / _viewScale) + 2);
 
-        // Draw each visible tile
+        // Draw each visible tile (fill only - grid lines are drawn separately by DrawGrid)
         for (int x = startX; x < endX; x++)
         {
             for (int z = startZ; z < endZ; z++)
@@ -2595,15 +2839,9 @@ public partial class MapEditorTab : Control
                 var screenPos = TileToScreen(x, z);
                 var tileRect = new Rect2(screenPos, new Vector2(_viewScale, _viewScale));
 
-                // Floor or void
+                // Floor or void - just fill, no border (DrawGrid handles grid lines)
                 Color tileColor = _tileGrid[x, z] == 1 ? TileFloorColor : TileVoidColor;
                 _mapDrawArea.DrawRect(tileRect, tileColor);
-
-                // Tile border when zoomed in
-                if (_viewScale >= 4f)
-                {
-                    _mapDrawArea.DrawRect(tileRect, GridColor, false, 1f);
-                }
             }
         }
 
@@ -2784,12 +3022,31 @@ public partial class MapEditorTab : Control
     {
         if (_mapDrawArea == null || _currentMap == null) return;
 
-        foreach (var enemy in _currentMap.Enemies)
+        for (int i = 0; i < _currentMap.Enemies.Count; i++)
         {
+            var enemy = _currentMap.Enemies[i];
             var pos = TileToScreen(enemy.Position.X, enemy.Position.Z);
+            pos += new Vector2(_viewScale / 2, _viewScale / 2);
+
             Color color = enemy.IsBoss ? BossColor : EnemyColor;
             float size = enemy.IsBoss ? 8f : 5f;
-            _mapDrawArea.DrawCircle(pos + new Vector2(_viewScale / 2, _viewScale / 2), size, color);
+
+            // Highlight for hover/selection
+            bool isHovered = i == _hoveredEnemyIndex;
+            bool isSelected = i == _selectedEnemyIndex;
+
+            if (isSelected)
+            {
+                // Yellow selection ring
+                _mapDrawArea.DrawArc(pos, size + 4f, 0, Mathf.Tau, 16, Colors.Yellow, 3f);
+            }
+            else if (isHovered)
+            {
+                // White hover ring
+                _mapDrawArea.DrawArc(pos, size + 3f, 0, Mathf.Tau, 16, Colors.White, 2f);
+            }
+
+            _mapDrawArea.DrawCircle(pos, size, color);
         }
     }
 
@@ -2797,10 +3054,26 @@ public partial class MapEditorTab : Control
     {
         if (_mapDrawArea == null || _currentMap == null) return;
 
-        foreach (var group in _currentMap.MonsterGroups)
+        for (int i = 0; i < _currentMap.MonsterGroups.Count; i++)
         {
+            var group = _currentMap.MonsterGroups[i];
             var centerPos = TileToScreen(group.Center.X, group.Center.Z);
             centerPos += new Vector2(_viewScale / 2, _viewScale / 2);
+
+            bool isHovered = i == _hoveredGroupIndex;
+            bool isSelected = i == _selectedGroupIndex;
+
+            // Highlight for hover/selection
+            if (isSelected)
+            {
+                // Yellow selection ring
+                _mapDrawArea.DrawArc(centerPos, 16f, 0, Mathf.Tau, 16, Colors.Yellow, 3f);
+            }
+            else if (isHovered)
+            {
+                // White hover ring
+                _mapDrawArea.DrawArc(centerPos, 15f, 0, Mathf.Tau, 16, Colors.White, 2f);
+            }
 
             // Draw group circle
             _mapDrawArea.DrawCircle(centerPos, 12f, new Color(GroupColor, 0.3f));
@@ -2820,10 +3093,14 @@ public partial class MapEditorTab : Control
     {
         if (_mapDrawArea == null || _currentMap == null) return;
 
-        foreach (var npc in _currentMap.Npcs)
+        for (int i = 0; i < _currentMap.Npcs.Count; i++)
         {
+            var npc = _currentMap.Npcs[i];
             var pos = TileToScreen((int)npc.X, (int)npc.Z);
             pos += new Vector2(_viewScale / 2, _viewScale / 2);
+
+            bool isHovered = i == _hoveredNpcIndex;
+            bool isSelected = i == _selectedNpcIndex;
 
             // Draw NPC as a diamond shape (cyan)
             float size = 6f;
@@ -2834,6 +3111,19 @@ public partial class MapEditorTab : Control
                 pos + new Vector2(0, size),
                 pos + new Vector2(-size, 0)
             };
+
+            // Highlight for hover/selection
+            if (isSelected)
+            {
+                // Yellow selection ring
+                _mapDrawArea.DrawArc(pos, size + 4f, 0, Mathf.Tau, 16, Colors.Yellow, 3f);
+            }
+            else if (isHovered)
+            {
+                // White hover ring
+                _mapDrawArea.DrawArc(pos, size + 3f, 0, Mathf.Tau, 16, Colors.White, 2f);
+            }
+
             _mapDrawArea.DrawPolygon(points, new Color[] { NpcColor });
             _mapDrawArea.DrawPolyline(new Vector2[] { points[0], points[1], points[2], points[3], points[0] }, NpcColor.Darkened(0.3f), 1.5f);
         }
@@ -2977,6 +3267,13 @@ public partial class MapEditorTab : Control
                         break;
                     case Key.Key5:
                         SetBrushSize(4);
+                        break;
+                    case Key.Delete:
+                    case Key.Backspace:
+                        DeleteSelectedItem();
+                        break;
+                    case Key.Escape:
+                        ClearSelection();
                         break;
                 }
             }

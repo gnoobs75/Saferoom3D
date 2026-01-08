@@ -128,6 +128,16 @@ public class LootBag
         // Store gold amount for direct pickup (not as inventory item)
         bag.GoldAmount = goldAmount;
 
+        // Always drop monster-specific part (for quests)
+        var partId = Core.MonsterPartDatabase.GetMonsterPartId(monsterType);
+        var monsterPart = ItemDatabase.CreateMonsterPart(partId);
+        if (monsterPart != null)
+        {
+            // Bosses drop 2-3 parts, regular monsters drop 1
+            monsterPart.StackCount = isBoss ? GD.RandRange(2, 3) : 1;
+            bag.AddItem(monsterPart);
+        }
+
         // Add random items
         for (int i = 0; i < itemCount; i++)
         {

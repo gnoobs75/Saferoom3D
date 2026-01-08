@@ -1413,6 +1413,8 @@ public partial class FPSController : CharacterBody3D
         if (InventoryUI3D.Instance?.Visible == true) return true;
         if (CharacterSheetUI.Instance?.Visible == true) return true;
         if (LootUI3D.Instance?.Visible == true) return true;
+        if (ShopUI3D.Instance?.Visible == true) return true;
+        if (QuestUI3D.Instance?.Visible == true) return true;
         if (EscapeMenu3D.Instance?.Visible == true) return true;
         if (EditorScreen3D.Instance?.Visible == true) return true;
         if (FloorSelector3D.Instance?.IsOpen == true) return true;
@@ -1955,17 +1957,33 @@ public partial class FPSController : CharacterBody3D
     }
 
     /// <summary>
-    /// Try to interact with a nearby shopkeeper NPC.
+    /// Try to interact with a nearby NPC (shopkeeper or quest giver).
     /// Returns true if an NPC was found and interacted with.
     /// </summary>
     private bool TryInteractNearbyNPC()
     {
-        const float InteractRange = 3.5f;
+        const float InteractRange = 4f;
         NPC.BaseNPC3D? nearestNPC = null;
         float nearestDist = InteractRange;
 
+        // Check shopkeepers
         var shopkeepers = GetTree().GetNodesInGroup("Shopkeepers");
         foreach (var node in shopkeepers)
+        {
+            if (node is NPC.BaseNPC3D npc && IsInstanceValid(npc))
+            {
+                float dist = GlobalPosition.DistanceTo(npc.GlobalPosition);
+                if (dist < nearestDist)
+                {
+                    nearestDist = dist;
+                    nearestNPC = npc;
+                }
+            }
+        }
+
+        // Check quest givers
+        var questGivers = GetTree().GetNodesInGroup("QuestGivers");
+        foreach (var node in questGivers)
         {
             if (node is NPC.BaseNPC3D npc && IsInstanceValid(npc))
             {

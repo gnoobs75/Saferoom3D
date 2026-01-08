@@ -124,6 +124,66 @@ public static class ItemDatabase
             ItemType.Material, 10);
     }
 
+    // === MONSTER PARTS (Quest Items) ===
+
+    /// <summary>
+    /// Create a monster part item by its ID.
+    /// </summary>
+    public static InventoryItem? CreateMonsterPart(string partId)
+    {
+        string name = Core.MonsterPartDatabase.GetMonsterPartName(partId);
+        string description = GetMonsterPartDescription(partId);
+
+        return new InventoryItem(partId, name, description, ItemType.Quest, 99);
+    }
+
+    private static string GetMonsterPartDescription(string partId)
+    {
+        return partId switch
+        {
+            "goblin_ear" => "A pointed ear from a goblin. Sought by alchemists.",
+            "shaman_staff_fragment" => "A piece of enchanted wood from a shaman's staff.",
+            "goblin_throwing_knife" => "A crude but sharp throwing knife used by goblin throwers.",
+            "warlord_banner" => "A tattered piece of a warlord's battle banner.",
+            "slime_core" => "The gelatinous core of a slime. Surprisingly valuable.",
+            "bone_fragment" => "A piece of bleached bone from an animated skeleton.",
+            "wolf_fang" => "A sharp fang from a dungeon wolf.",
+            "bat_wing" => "A leathery wing from a cave bat.",
+            "evil_eye_lens" => "The crystalline lens from an evil eye. Still faintly glowing.",
+            "mushroom_cap" => "A colorful cap from a hostile mushroom creature.",
+            "spider_silk" => "Strong silk harvested from a giant spider.",
+            "lizard_scale" => "A tough scale from a dungeon lizard.",
+            "badlama_wool" => "Soft wool from the aggressive badlama.",
+            "rat_whisker" => "A long whisker from a dungeon rat.",
+            "royal_slime_essence" => "Concentrated essence from a Slime King. Very rare.",
+            "ancient_bone" => "An ancient bone imbued with dark magic.",
+            "dragon_heart" => "The still-warm heart of a dragon. Legendary.",
+            "queen_venom_sac" => "A venom sac from a Spider Queen. Extremely poisonous.",
+            "elder_spore" => "A potent spore from the Sporeling Elder.",
+            "crawler_mandible" => "A razor-sharp mandible from a crawler killer.",
+            "shadow_essence" => "Wispy essence from a shadow stalker.",
+            "stitched_flesh" => "Preserved flesh from a flesh golem.",
+            "plague_vial" => "A sealed vial of plague from a plague bearer.",
+            "enchanted_plate" => "A piece of magically animated armor.",
+            "drone_lens" => "A camera lens from a destroyed drone.",
+            "shock_capacitor" => "An electrical capacitor from a shock drone.",
+            "ad_crystal" => "A crystal that projects advertisements. Annoying.",
+            "clockwork_gear" => "A precision gear from a clockwork spider.",
+            "lava_core" => "A molten core from a lava elemental. Handle with care.",
+            "frozen_essence" => "Frozen energy from an ice wraith.",
+            "cube_residue" => "Acidic residue from a gelatinous cube.",
+            "void_fragment" => "A fragment of the void. Reality warps around it.",
+            "mimic_tongue" => "The sticky tongue of a mimic. Disturbing.",
+            "butcher_cleaver_shard" => "A shard from The Butcher's infamous cleaver.",
+            "syndicate_badge" => "A badge from a Syndicate Enforcer.",
+            "hive_queen_egg" => "An egg from the Hive Mother. Pulsating.",
+            "architect_blueprint" => "Mysterious blueprints from the Architect's Favorite.",
+            "shadow_crystal" => "A dark crystal from Mordecai's Shadow.",
+            "monster_essence" => "Generic essence from an unknown creature.",
+            _ => "A part harvested from a defeated monster."
+        };
+    }
+
     // === ITEM ICONS ===
 
     /// <summary>
@@ -157,7 +217,8 @@ public static class ItemDatabase
             "gemstone" => new Color(0.4f, 0.9f, 0.7f),
             "ancient_relic" => new Color(0.7f, 0.5f, 0.2f),
             "dragon_scale" => new Color(0.8f, 0.2f, 0.2f),
-            _ => new Color(0.6f, 0.6f, 0.6f)
+            // Monster parts - use MonsterPartDatabase colors
+            _ => Core.MonsterPartDatabase.GetPartColor(itemId)
         };
     }
 }

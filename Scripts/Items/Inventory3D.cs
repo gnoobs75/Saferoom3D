@@ -531,6 +531,45 @@ public partial class Inventory3D : Node
     public int CountItem(string itemId) => GetItemCount(itemId);
 
     /// <summary>
+    /// Alias for GetItemCount - used by quest system.
+    /// </summary>
+    public int CountItemById(string itemId) => GetItemCount(itemId);
+
+    /// <summary>
+    /// Remove a specific quantity of items by ID from the inventory.
+    /// Returns true if all items were removed successfully.
+    /// </summary>
+    public bool RemoveItemById(string itemId, int count)
+    {
+        if (count <= 0) return true;
+
+        int remaining = count;
+
+        // Go through all slots and remove items with matching ID
+        for (int i = 0; i < TotalSlots && remaining > 0; i++)
+        {
+            if (_items[i]?.Id == itemId)
+            {
+                int toRemove = Math.Min(_items[i]!.StackCount, remaining);
+                _items[i]!.StackCount -= toRemove;
+                remaining -= toRemove;
+
+                if (_items[i]!.StackCount <= 0)
+                {
+                    _items[i] = null;
+                }
+            }
+        }
+
+        if (remaining < count) // At least some items were removed
+        {
+            EmitSignal(SignalName.InventoryChanged);
+        }
+
+        return remaining == 0;
+    }
+
+    /// <summary>
     /// Use one item with the given ID from anywhere in the inventory.
     /// Returns true if an item was used.
     /// </summary>
