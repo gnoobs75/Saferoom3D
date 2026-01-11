@@ -1,5 +1,6 @@
 using Godot;
 using SafeRoom3D.Enemies;
+using SafeRoom3D.NPC.AI;
 using SafeRoom3D.UI;
 
 namespace SafeRoom3D.NPC;
@@ -7,24 +8,20 @@ namespace SafeRoom3D.NPC;
 /// <summary>
 /// Rex "Ironside" Martinez - Grizzled veteran crawler with combat tips and war stories.
 /// Muscular build, battle-scarred, military vest. Cynical but helpful.
+///
+/// AI Personality: Tanky veteran who engages multiple enemies, low flee threshold.
 /// </summary>
-public partial class CrawlerRex : BaseNPC3D
+public partial class CrawlerRex : CrawlerAIBase
 {
-    public override string NPCName => "Rex \"Ironside\" Martinez";
-    public override string InteractionPrompt => "Press T to Talk";
-    public override bool IsShopkeeper => false;
+    // === Identity ===
+    public override string CrawlerName => "Rex";
+    public override CrawlerPersonality Personality => CrawlerPersonality.Rex;
 
+    // === Animation Timers ===
     private float _breathTimer;
     private float _shoulderRollTimer;
     private float _lookTimer;
     private Vector3 _targetLookDir = Vector3.Forward;
-
-    public override void _Ready()
-    {
-        base._Ready();
-        AddToGroup("Crawlers");
-        GD.Print("[CrawlerRex] Rex spawned");
-    }
 
     protected override void CreateMesh()
     {
@@ -33,8 +30,9 @@ public partial class CrawlerRex : BaseNPC3D
         GD.Print("[CrawlerRex] Created Rex mesh");
     }
 
-    protected override float GetNameplateHeight() => 1.3f;
+    protected override float GetNameplateHeight() => 2.1f;
     protected override float GetInteractionRange() => 4.0f;
+    protected override string GetDialogueKey() => "crawler_rex";
 
     public override void Interact(Node3D player)
     {
@@ -42,11 +40,10 @@ public partial class CrawlerRex : BaseNPC3D
         CrawlerDialogueUI3D.Instance?.Open(this, "crawler_rex");
     }
 
-    protected override void AnimateIdle(double delta)
+    protected override void AnimateIdle(float dt)
     {
         if (_limbs == null) return;
 
-        float dt = (float)delta;
         _breathTimer += dt;
         _shoulderRollTimer += dt * 0.3f;
         _lookTimer += dt;
@@ -92,6 +89,84 @@ public partial class CrawlerRex : BaseNPC3D
                 Mathf.Lerp(currentRot.Y, targetYaw, dt * 0.8f),
                 currentRot.Z
             );
+        }
+    }
+
+    protected override void AnimateByState(float dt)
+    {
+        // Different animations based on current AI state
+        switch (CurrentState)
+        {
+            case AIState.Combat:
+                AnimateCombat(dt);
+                break;
+            case AIState.Fleeing:
+            case AIState.ReturningToSafeZone:
+                AnimateMoving(dt);
+                break;
+            default:
+                AnimateIdle(dt);
+                break;
+        }
+    }
+
+    private void AnimateCombat(float dt)
+    {
+        if (_limbs == null) return;
+
+        _breathTimer += dt * 1.5f;  // Faster breathing in combat
+
+        // Combat stance
+        if (_limbs.Body != null)
+        {
+            float breathAmount = Mathf.Sin(_breathTimer * 2f) * 0.005f;
+            _limbs.Body.Position = new Vector3(
+                _limbs.Body.Position.X,
+                0.6f + breathAmount,  // Slightly lower stance
+                _limbs.Body.Position.Z
+            );
+        }
+
+        // Arms ready for attack
+        if (_limbs.LeftArm != null && _limbs.RightArm != null)
+        {
+            float combatSway = Mathf.Sin(_breathTimer * 3f) * 5f;
+            _limbs.LeftArm.RotationDegrees = new Vector3(-30, 0, 10 + combatSway);
+            _limbs.RightArm.RotationDegrees = new Vector3(-30, 0, -10 - combatSway);
+        }
+    }
+
+    private void AnimateMoving(float dt)
+    {
+        if (_limbs == null) return;
+
+        _breathTimer += dt * 2f;  // Even faster when running
+
+        // Bob while moving
+        if (_limbs.Body != null)
+        {
+            float bobAmount = Mathf.Sin(_breathTimer * 6f) * 0.02f;
+            _limbs.Body.Position = new Vector3(
+                _limbs.Body.Position.X,
+                0.65f + bobAmount,
+                _limbs.Body.Position.Z
+            );
+        }
+
+        // Arm swing while moving
+        if (_limbs.LeftArm != null && _limbs.RightArm != null)
+        {
+            float swing = Mathf.Sin(_breathTimer * 6f) * 15f;
+            _limbs.LeftArm.RotationDegrees = new Vector3(swing, 0, 15);
+            _limbs.RightArm.RotationDegrees = new Vector3(-swing, 0, -15);
+        }
+
+        // Leg movement
+        if (_limbs.LeftLeg != null && _limbs.RightLeg != null)
+        {
+            float legSwing = Mathf.Sin(_breathTimer * 6f) * 20f;
+            _limbs.LeftLeg.RotationDegrees = new Vector3(legSwing, 0, 0);
+            _limbs.RightLeg.RotationDegrees = new Vector3(-legSwing, 0, 0);
         }
     }
 }

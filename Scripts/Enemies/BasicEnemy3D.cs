@@ -404,6 +404,15 @@ public partial class BasicEnemy3D : CharacterBody3D
                 MinStopDistance = 1.5f;  // Small critter can get close
                 _baseColor = new Color(0.35f, 0.3f, 0.28f); // Rat gray-brown
                 break;
+            case "rabbidd":
+                MaxHealth = 75;
+                MoveSpeed = 4.5f;
+                Damage = 16f;
+                AttackRange = 2f;
+                AggroRange = 18f;
+                MinStopDistance = 2f;  // Pouncing creature
+                _baseColor = new Color(0.35f, 0.15f, 0.25f); // Dark purple-crimson
+                break;
             default:
                 _baseColor = new Color(0.5f, 0.5f, 0.5f);
                 break;
@@ -458,9 +467,28 @@ public partial class BasicEnemy3D : CharacterBody3D
         _meshInstance.CastShadow = GeometryInstance3D.ShadowCastingSetting.On;
         AddChild(_meshInstance);
 
-        // Create body parts based on monster type using factory (with LOD and AnimationPlayer support)
+        // Check for GLB model override first
         string meshType = MonsterType.ToLower();
-        switch (meshType)
+        bool usedGlbModel = false;
+        if (GlbModelConfig.TryGetMonsterGlbPath(meshType, out string? glbPath) && !string.IsNullOrWhiteSpace(glbPath))
+        {
+            var glbModel = GlbModelConfig.LoadGlbModel(glbPath, 1f);
+            if (glbModel != null)
+            {
+                _meshInstance.AddChild(glbModel);
+                _limbNodes = null; // GLB models don't have procedural LimbNodes
+                usedGlbModel = true;
+                GD.Print($"[BasicEnemy3D] Loaded GLB model for {MonsterType}: {glbPath}");
+            }
+            else
+            {
+                GD.PrintErr($"[BasicEnemy3D] Failed to load GLB for {MonsterType}, falling back to procedural");
+            }
+        }
+
+        // Create body parts based on monster type using factory (with LOD and AnimationPlayer support)
+        // Skip if we already loaded a GLB model
+        if (!usedGlbModel) switch (meshType)
         {
             case "torchbearer":
             case "goblin_torchbearer":
@@ -1655,9 +1683,12 @@ public partial class BasicEnemy3D : CharacterBody3D
             Vector3 direction = (_interactionTarget.GlobalPosition - GlobalPosition).Normalized();
             direction.Y = 0;
 
+            // Apply obstacle avoidance
+            Vector3 moveDir = AvoidObstacles(direction);
+
             float slowMult = EngineOfTomorrow3D.GetGlobalSlowMultiplier();
             float speed = PatrolSpeed * slowMult;
-            Velocity = new Vector3(direction.X * speed, Velocity.Y, direction.Z * speed);
+            Velocity = new Vector3(moveDir.X * speed, Velocity.Y, moveDir.Z * speed);
 
             // Face direction of movement
             if (direction.LengthSquared() > 0.01f)
@@ -1880,6 +1911,9 @@ public partial class BasicEnemy3D : CharacterBody3D
         }
         else
         {
+            // Apply obstacle avoidance
+            direction = AvoidObstacles(direction);
+
             float speed = PatrolSpeed * slowMult;
             Velocity = new Vector3(direction.X * speed, Velocity.Y, direction.Z * speed);
 
@@ -1915,9 +1949,13 @@ public partial class BasicEnemy3D : CharacterBody3D
         {
             Vector3 direction = (_player.GlobalPosition - GlobalPosition).Normalized();
             direction.Y = 0;
+
+            // Apply obstacle avoidance
+            Vector3 moveDir = AvoidObstacles(direction);
+
             float slowMult = EngineOfTomorrow3D.GetGlobalSlowMultiplier();
             float speed = PatrolSpeed * slowMult;
-            Velocity = new Vector3(direction.X * speed, Velocity.Y, direction.Z * speed);
+            Velocity = new Vector3(moveDir.X * speed, Velocity.Y, moveDir.Z * speed);
 
             // Face direction of movement (model's face is at +Z)
             if (direction.LengthSquared() > 0.01f)
@@ -1955,9 +1993,12 @@ public partial class BasicEnemy3D : CharacterBody3D
             // Only move if we're further than the minimum stop distance
             if (dist > MinStopDistance)
             {
+                // Apply obstacle avoidance
+                Vector3 moveDir = AvoidObstacles(direction);
+
                 float slowMult = EngineOfTomorrow3D.GetGlobalSlowMultiplier();
                 float speed = MoveSpeed * slowMult;
-                Velocity = new Vector3(direction.X * speed, Velocity.Y, direction.Z * speed);
+                Velocity = new Vector3(moveDir.X * speed, Velocity.Y, moveDir.Z * speed);
             }
             else
             {
@@ -1986,6 +2027,9 @@ public partial class BasicEnemy3D : CharacterBody3D
             float angle = GD.Randf() * Mathf.Tau;
             fleeDir = new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle));
         }
+
+        // Apply obstacle avoidance
+        fleeDir = AvoidObstacles(fleeDir);
 
         // Move at normal speed away from fear source
         float slowMult = EngineOfTomorrow3D.GetGlobalSlowMultiplier();
@@ -2126,6 +2170,93 @@ public partial class BasicEnemy3D : CharacterBody3D
             Mathf.Sin(angle) * dist
         );
     }
+
+    #region Obstacle Avoidance
+
+    /// <summary>
+    /// Apply obstacle avoidance to a desired movement direction.
+    /// Returns adjusted direction that steers around obstacles.
+    /// </summary>
+    private Vector3 AvoidObstacles(Vector3 desiredDirection)
+    {
+        if (desiredDirection.LengthSquared() < 0.01f)
+            return desiredDirection;
+
+        var spaceState = GetWorld3D().DirectSpaceState;
+        Vector3 origin = GlobalPosition + Vector3.Up * 0.5f;  // Waist height
+        float rayLength = 1.2f;  // Look ahead distance
+
+        // Collision mask: Obstacle (layer 5) + Wall (layer 8)
+        uint obstacleMask = (1u << 4) | (1u << 7);
+
+        // Cast forward ray
+        bool forwardBlocked = CastObstacleRay(spaceState, origin, desiredDirection, rayLength, obstacleMask);
+
+        if (!forwardBlocked)
+        {
+            return desiredDirection;  // Path is clear
+        }
+
+        // Forward is blocked - try to steer around
+        // Calculate left and right directions (45 degrees from forward)
+        Vector3 leftDir = new Vector3(
+            desiredDirection.X * 0.707f - desiredDirection.Z * 0.707f,
+            0,
+            desiredDirection.X * 0.707f + desiredDirection.Z * 0.707f
+        ).Normalized();
+
+        Vector3 rightDir = new Vector3(
+            desiredDirection.X * 0.707f + desiredDirection.Z * 0.707f,
+            0,
+            -desiredDirection.X * 0.707f + desiredDirection.Z * 0.707f
+        ).Normalized();
+
+        bool leftBlocked = CastObstacleRay(spaceState, origin, leftDir, rayLength, obstacleMask);
+        bool rightBlocked = CastObstacleRay(spaceState, origin, rightDir, rayLength, obstacleMask);
+
+        // Choose the clearer path
+        if (!leftBlocked && !rightBlocked)
+        {
+            // Both sides clear, pick one based on position for consistency
+            return ((int)(GlobalPosition.X + GlobalPosition.Z) % 2 == 0) ? leftDir : rightDir;
+        }
+        else if (!leftBlocked)
+        {
+            return leftDir;
+        }
+        else if (!rightBlocked)
+        {
+            return rightDir;
+        }
+        else
+        {
+            // All directions blocked - try perpendicular or reverse
+            Vector3 perpDir = new Vector3(-desiredDirection.Z, 0, desiredDirection.X);
+            if (!CastObstacleRay(spaceState, origin, perpDir, rayLength, obstacleMask))
+            {
+                return perpDir;
+            }
+            // Completely stuck - stay put
+            return Vector3.Zero;
+        }
+    }
+
+    /// <summary>
+    /// Cast a ray to detect obstacles.
+    /// </summary>
+    private bool CastObstacleRay(PhysicsDirectSpaceState3D spaceState, Vector3 origin, Vector3 direction, float length, uint mask)
+    {
+        var query = PhysicsRayQueryParameters3D.Create(
+            origin,
+            origin + direction * length,
+            mask
+        );
+        query.Exclude = new Godot.Collections.Array<Rid> { GetRid() };
+        var result = spaceState.IntersectRay(query);
+        return result.Count > 0;
+    }
+
+    #endregion
 
     #region Social Chat System
 
@@ -2687,6 +2818,10 @@ public partial class BasicEnemy3D : CharacterBody3D
 
             // Record kill in game stats
             GameStats.Instance?.RecordKill(MonsterType);
+
+            // Update quest progress for monster kills
+            bool isBoss = IsBossMonster(MonsterType);
+            Core.QuestManager.Instance?.OnMonsterKilled(MonsterType, isBoss);
         }
 
         // Wait for death animation to complete before spawning corpse
@@ -2709,6 +2844,19 @@ public partial class BasicEnemy3D : CharacterBody3D
         var corpse = Corpse3D.Create(MonsterType, false, GlobalPosition, Rotation.Y, Level);
         GetTree().Root.AddChild(corpse);
         GD.Print($"[BasicEnemy3D] Spawned corpse for {MonsterType} (Level {Level})");
+    }
+
+    /// <summary>
+    /// Check if a monster type is a boss.
+    /// </summary>
+    private static bool IsBossMonster(string monsterType)
+    {
+        return monsterType.ToLower() switch
+        {
+            "skeleton_lord" or "dragon_king" or "spider_queen" or "the_butcher" or
+            "princess_donut" or "mongo" or "zev" or "mordecai" => true,
+            _ => false
+        };
     }
 
     /// <summary>
