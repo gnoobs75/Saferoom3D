@@ -78,6 +78,8 @@ public partial class EditorScreen3D : Control
     private SpinBox? _monsterSpeedSpinBox;
     private SpinBox? _monsterAggroSpinBox;
     private ColorPickerButton? _monsterSkinColorPicker;
+    private CheckBox? _monsterUseGlbCheckbox;
+    private Label? _monsterGlbPathLabel;
 
     // Ability editor
     private Dictionary<string, Button> _abilityButtons = new();
@@ -356,7 +358,7 @@ public partial class EditorScreen3D : Control
         // Regular monsters (original + DCC)
         string[] monsterTypes = {
             // Original monsters
-            "goblin", "goblin_shaman", "goblin_thrower", "slime", "eye", "mushroom", "spider", "lizard", "skeleton", "wolf", "badlama", "bat", "dragon",
+            "goblin", "goblin_shaman", "goblin_thrower", "slime", "eye", "mushroom", "spider", "lizard", "skeleton", "wolf", "badlama", "bat", "dragon", "rabbidd",
             // DCC monsters
             "crawler_killer", "shadow_stalker", "flesh_golem", "plague_bearer", "living_armor",
             "camera_drone", "shock_drone", "advertiser_bot", "clockwork_spider",
@@ -868,6 +870,57 @@ public partial class EditorScreen3D : Control
         // Section: Monster Stats
         _monsterStatsSection = CreateSection("Monster Stats");
         vbox.AddChild(_monsterStatsSection);
+
+        // Model Type toggle (GLB vs Procedural)
+        var monsterGlbRow = new HBoxContainer();
+        monsterGlbRow.AddThemeConstantOverride("separation", 10);
+        var monsterGlbLabel = new Label { Text = "Model Type" };
+        monsterGlbLabel.AddThemeFontSizeOverride("font_size", 14);
+        monsterGlbLabel.CustomMinimumSize = new Vector2(100, 0);
+        monsterGlbRow.AddChild(monsterGlbLabel);
+
+        _monsterUseGlbCheckbox = new CheckBox();
+        _monsterUseGlbCheckbox.Text = "Procedural";
+        _monsterUseGlbCheckbox.ButtonPressed = false;
+        _monsterUseGlbCheckbox.CustomMinimumSize = new Vector2(120, 30);
+        _monsterUseGlbCheckbox.AddThemeFontSizeOverride("font_size", 14);
+        _monsterUseGlbCheckbox.AddThemeColorOverride("font_color", Colors.White);
+        _monsterUseGlbCheckbox.AddThemeColorOverride("font_pressed_color", new Color(0.5f, 1f, 0.5f));
+        _monsterUseGlbCheckbox.AddThemeColorOverride("font_hover_color", new Color(0.8f, 0.9f, 1f));
+        var monsterCheckboxStyle = new StyleBoxFlat();
+        monsterCheckboxStyle.BgColor = new Color(0.15f, 0.15f, 0.2f);
+        monsterCheckboxStyle.SetCornerRadiusAll(4);
+        monsterCheckboxStyle.ContentMarginLeft = 8;
+        monsterCheckboxStyle.ContentMarginRight = 8;
+        _monsterUseGlbCheckbox.AddThemeStyleboxOverride("normal", monsterCheckboxStyle);
+        var monsterCheckboxHover = new StyleBoxFlat();
+        monsterCheckboxHover.BgColor = new Color(0.2f, 0.25f, 0.35f);
+        monsterCheckboxHover.SetCornerRadiusAll(4);
+        monsterCheckboxHover.ContentMarginLeft = 8;
+        monsterCheckboxHover.ContentMarginRight = 8;
+        _monsterUseGlbCheckbox.AddThemeStyleboxOverride("hover", monsterCheckboxHover);
+        var monsterCheckboxPressed = new StyleBoxFlat();
+        monsterCheckboxPressed.BgColor = new Color(0.2f, 0.4f, 0.3f);
+        monsterCheckboxPressed.SetCornerRadiusAll(4);
+        monsterCheckboxPressed.ContentMarginLeft = 8;
+        monsterCheckboxPressed.ContentMarginRight = 8;
+        _monsterUseGlbCheckbox.AddThemeStyleboxOverride("pressed", monsterCheckboxPressed);
+        _monsterUseGlbCheckbox.Toggled += OnMonsterGlbToggled;
+        monsterGlbRow.AddChild(_monsterUseGlbCheckbox);
+        _monsterStatsSection.AddChild(monsterGlbRow);
+
+        // GLB path info label
+        var monsterGlbPathRow = new HBoxContainer();
+        monsterGlbPathRow.AddThemeConstantOverride("separation", 10);
+        var monsterPathLabel = new Label { Text = "GLB Path:" };
+        monsterPathLabel.AddThemeFontSizeOverride("font_size", 12);
+        monsterPathLabel.AddThemeColorOverride("font_color", new Color(0.6f, 0.6f, 0.6f));
+        monsterGlbPathRow.AddChild(monsterPathLabel);
+        _monsterGlbPathLabel = new Label { Text = "Assets/Models/<monster>.glb" };
+        _monsterGlbPathLabel.AddThemeFontSizeOverride("font_size", 12);
+        _monsterGlbPathLabel.AddThemeColorOverride("font_color", new Color(0.5f, 0.5f, 0.5f));
+        monsterGlbPathRow.AddChild(_monsterGlbPathLabel);
+        _monsterStatsSection.AddChild(monsterGlbPathRow);
 
         _monsterHealthSpinBox = CreateAttributeRow(_monsterStatsSection, "Max Health", 10, 500, 75);
         _monsterDamageSpinBox = CreateAttributeRow(_monsterStatsSection, "Damage", 1, 100, 10);
@@ -1739,6 +1792,23 @@ public partial class EditorScreen3D : Control
             btn.AddThemeStyleboxOverride("normal", style);
         }
 
+        // Update GLB checkbox state
+        bool hasGlb = Core.GlbModelConfig.HasMonsterGlb(monsterId);
+        string glbPath = $"res://Assets/Models/{monsterId}.glb";
+        if (_monsterUseGlbCheckbox != null)
+        {
+            _monsterUseGlbCheckbox.SetPressedNoSignal(hasGlb);
+            _monsterUseGlbCheckbox.Text = hasGlb ? "GLB Model" : "Procedural";
+        }
+        if (_monsterGlbPathLabel != null)
+        {
+            _monsterGlbPathLabel.Text = $"Assets/Models/{monsterId}.glb";
+            bool fileExists = ResourceLoader.Exists(glbPath);
+            _monsterGlbPathLabel.AddThemeColorOverride("font_color",
+                hasGlb ? (fileExists ? new Color(0.5f, 0.9f, 0.5f) : new Color(0.9f, 0.5f, 0.5f))
+                       : new Color(0.5f, 0.5f, 0.5f));
+        }
+
         // Create preview
         UpdatePreviewMonster(monsterId);
 
@@ -2357,9 +2427,34 @@ public partial class EditorScreen3D : Control
         _previewObject = new Node3D();
         _previewObject.Name = "MonsterPreview";
 
-        // Use the shared MonsterMeshFactory for consistent appearance with in-game models
-        Color? skinColor = _monsterSkinColorPicker?.Color;
-        var limbs = MonsterMeshFactory.CreateMonsterMesh(_previewObject, monsterId, skinColor);
+        // Check if GLB model is enabled for this monster type
+        bool useGlb = Core.GlbModelConfig.HasMonsterGlb(monsterId);
+        string glbPath = $"res://Assets/Models/{monsterId}.glb";
+
+        MonsterMeshFactory.LimbNodes limbs = new();
+
+        if (useGlb && ResourceLoader.Exists(glbPath))
+        {
+            // Load GLB model
+            var glbModel = Core.GlbModelConfig.LoadGlbModel(glbPath, 1f);
+            if (glbModel != null)
+            {
+                _previewObject.AddChild(glbModel);
+                GD.Print($"[EditorScreen3D] Loaded GLB model for {monsterId}: {glbPath}");
+            }
+            else
+            {
+                // Fallback to procedural if GLB load fails
+                Color? skinColor = _monsterSkinColorPicker?.Color;
+                limbs = MonsterMeshFactory.CreateMonsterMesh(_previewObject, monsterId, skinColor);
+            }
+        }
+        else
+        {
+            // Use procedural mesh
+            Color? skinColor = _monsterSkinColorPicker?.Color;
+            limbs = MonsterMeshFactory.CreateMonsterMesh(_previewObject, monsterId, skinColor);
+        }
 
         // Store limb references for animation
         _previewLimbNodes = limbs;
@@ -2372,28 +2467,35 @@ public partial class EditorScreen3D : Control
 
         _previewScene?.AddChild(_previewObject);
 
-        // Create AnimationPlayer with all 18 animations
-        try
+        // Create AnimationPlayer with all 18 animations (only for procedural meshes)
+        if (!useGlb || !ResourceLoader.Exists(glbPath))
         {
-            _previewAnimPlayer = MonsterAnimationSystem.CreateAnimationPlayer(_previewObject, monsterId, limbs);
-
-            // Start playing the currently selected animation
-            if (_previewAnimPlayer.HasAnimation(_currentAnimation))
+            try
             {
-                _previewAnimPlayer.Play(_currentAnimation);
-            }
-            else if (_previewAnimPlayer.HasAnimation("idle_0"))
-            {
-                _currentAnimation = "idle_0";
-                _currentAnimationIndex = 0;
-                _previewAnimPlayer.Play("idle_0");
-            }
+                _previewAnimPlayer = MonsterAnimationSystem.CreateAnimationPlayer(_previewObject, monsterId, limbs);
 
-            GD.Print($"[EditorScreen3D] Created AnimationPlayer for {monsterId} with {_previewAnimPlayer.GetAnimationList().Length} animations");
+                // Start playing the currently selected animation
+                if (_previewAnimPlayer.HasAnimation(_currentAnimation))
+                {
+                    _previewAnimPlayer.Play(_currentAnimation);
+                }
+                else if (_previewAnimPlayer.HasAnimation("idle_0"))
+                {
+                    _currentAnimation = "idle_0";
+                    _currentAnimationIndex = 0;
+                    _previewAnimPlayer.Play("idle_0");
+                }
+
+                GD.Print($"[EditorScreen3D] Created AnimationPlayer for {monsterId} with {_previewAnimPlayer.GetAnimationList().Length} animations");
+            }
+            catch (System.Exception e)
+            {
+                GD.PrintErr($"[EditorScreen3D] Failed to create AnimationPlayer: {e.Message}");
+                _previewAnimPlayer = null;
+            }
         }
-        catch (System.Exception e)
+        else
         {
-            GD.PrintErr($"[EditorScreen3D] Failed to create AnimationPlayer: {e.Message}");
             _previewAnimPlayer = null;
         }
 
@@ -2421,85 +2523,51 @@ public partial class EditorScreen3D : Control
 
     private void UpdateMonsterStatsDisplay(string monsterId)
     {
-        // Set default values based on monster type
+        // Load stats from JSON data via DataLoader
         float health = 75, damage = 10, speed = 3f, aggro = 15f;
         Color skinColor = new Color(0.45f, 0.55f, 0.35f);
 
-        switch (monsterId.ToLower())
+        // First check if it's a boss
+        var bossConfig = DataLoader.GetBoss(monsterId);
+        if (bossConfig != null)
         {
-            case "goblin":
-                health = 75; damage = 10; speed = 3f; aggro = 15f;
-                skinColor = new Color(0.45f, 0.55f, 0.35f);
-                break;
-            case "goblin_shaman":
-                health = 50; damage = 15; speed = 2f; aggro = 18f;
-                skinColor = new Color(0.35f, 0.45f, 0.55f); // Blue-green for magic
-                break;
-            case "goblin_thrower":
-                health = 60; damage = 12; speed = 2.5f; aggro = 20f;
-                skinColor = new Color(0.5f, 0.45f, 0.35f); // Tan/brown
-                break;
-            case "slime":
-                health = 50; damage = 8; speed = 2f; aggro = 12f;
-                skinColor = new Color(0.3f, 0.8f, 0.4f);
-                break;
-            case "eye":
-                health = 40; damage = 15; speed = 4f; aggro = 20f;
-                skinColor = new Color(0.9f, 0.2f, 0.2f);
-                break;
-            case "mushroom":
-                health = 60; damage = 12; speed = 1.5f; aggro = 10f;
-                skinColor = new Color(0.6f, 0.4f, 0.5f);
-                break;
-            case "spider":
-                health = 55; damage = 14; speed = 4.5f; aggro = 18f;
-                skinColor = new Color(0.2f, 0.2f, 0.25f);
-                break;
-            case "lizard":
-                health = 80; damage = 16; speed = 3.5f; aggro = 16f;
-                skinColor = new Color(0.3f, 0.5f, 0.25f);
-                break;
-            case "skeleton":
-                health = 60; damage = 15; speed = 2.8f; aggro = 15f;
-                skinColor = new Color(0.9f, 0.88f, 0.8f);
-                break;
-            case "wolf":
-                health = 70; damage = 18; speed = 5f; aggro = 20f;
-                skinColor = new Color(0.4f, 0.35f, 0.3f);
-                break;
-            case "bat":
-                health = 40; damage = 8; speed = 4f; aggro = 15f;
-                skinColor = new Color(0.25f, 0.2f, 0.25f);
-                break;
-            case "dragon":
-                health = 200; damage = 35; speed = 2.5f; aggro = 25f;
-                skinColor = new Color(0.7f, 0.2f, 0.15f);
-                _cameraDistance = 5f; // Dragons are bigger
-                _cameraTargetY = 0.8f;
-                UpdateCameraPosition();
-                break;
-            // Bosses
-            case "skeleton_lord":
-                health = 500; damage = 40; speed = 2.5f; aggro = 30f;
-                skinColor = new Color(0.85f, 0.82f, 0.7f);
-                _cameraDistance = 5f;
-                _cameraTargetY = 1.0f;
-                UpdateCameraPosition();
-                break;
-            case "dragon_king":
-                health = 1000; damage = 60; speed = 2f; aggro = 35f;
-                skinColor = new Color(0.15f, 0.1f, 0.25f);
-                _cameraDistance = 7f; // Much bigger
-                _cameraTargetY = 1.2f;
-                UpdateCameraPosition();
-                break;
-            case "spider_queen":
-                health = 600; damage = 45; speed = 3f; aggro = 30f;
-                skinColor = new Color(0.15f, 0.05f, 0.1f);
-                _cameraDistance = 6f;
-                _cameraTargetY = 0.8f;
-                UpdateCameraPosition();
-                break;
+            health = bossConfig.MaxHealth;
+            damage = bossConfig.Damage;
+            speed = bossConfig.MoveSpeed;
+            aggro = bossConfig.AggroRange;
+
+            // Get base monster color for bosses
+            var baseMonster = DataLoader.GetMonster(bossConfig.BaseMonster);
+            if (baseMonster != null)
+            {
+                skinColor = baseMonster.GetGodotColor();
+            }
+
+            // Adjust camera for large bosses
+            AdjustCameraForMonster(monsterId, true);
+        }
+        else
+        {
+            // Check regular monsters
+            var monsterConfig = DataLoader.GetMonster(monsterId);
+            if (monsterConfig != null)
+            {
+                health = monsterConfig.MaxHealth;
+                damage = monsterConfig.Damage;
+                speed = monsterConfig.MoveSpeed;
+                aggro = monsterConfig.AggroRange;
+                skinColor = monsterConfig.GetGodotColor();
+
+                // Adjust camera for large monsters
+                AdjustCameraForMonster(monsterId, false);
+            }
+            else
+            {
+                // Fallback to defaults
+                var defaults = DataLoader.GetMonsterDefaults();
+                aggro = defaults.AggroRange;
+                skinColor = defaults.Color.ToGodotColor();
+            }
         }
 
         if (_monsterHealthSpinBox != null) _monsterHealthSpinBox.Value = health;
@@ -2507,6 +2575,54 @@ public partial class EditorScreen3D : Control
         if (_monsterSpeedSpinBox != null) _monsterSpeedSpinBox.Value = speed;
         if (_monsterAggroSpinBox != null) _monsterAggroSpinBox.Value = aggro;
         if (_monsterSkinColorPicker != null) _monsterSkinColorPicker.Color = skinColor;
+    }
+
+    private void AdjustCameraForMonster(string monsterId, bool isBoss)
+    {
+        // Adjust camera distance/height for large monsters
+        switch (monsterId.ToLower())
+        {
+            case "dragon":
+                _cameraDistance = 5f;
+                _cameraTargetY = 0.8f;
+                UpdateCameraPosition();
+                break;
+            case "dragon_king":
+                _cameraDistance = 7f;
+                _cameraTargetY = 1.2f;
+                UpdateCameraPosition();
+                break;
+            case "skeleton_lord":
+                _cameraDistance = 5f;
+                _cameraTargetY = 1.0f;
+                UpdateCameraPosition();
+                break;
+            case "spider_queen":
+                _cameraDistance = 6f;
+                _cameraTargetY = 0.8f;
+                UpdateCameraPosition();
+                break;
+            case "mongo":
+                _cameraDistance = 6f;
+                _cameraTargetY = 1.0f;
+                UpdateCameraPosition();
+                break;
+            case "the_butcher":
+                _cameraDistance = 5f;
+                _cameraTargetY = 0.9f;
+                UpdateCameraPosition();
+                break;
+            default:
+                if (isBoss)
+                {
+                    // Default boss camera
+                    _cameraDistance = 5f;
+                    _cameraTargetY = 0.9f;
+                    UpdateCameraPosition();
+                }
+                // Regular monsters use default camera
+                break;
+        }
     }
 
     private void CreateGoblinPreviewMesh(MeshInstance3D parent)
@@ -3784,6 +3900,45 @@ public partial class EditorScreen3D : Control
         }
 
         GD.Print($"[EditorScreen3D] Steve model: {(pressed ? "GLB" : "Procedural")}");
+    }
+
+    private void OnMonsterGlbToggled(bool pressed)
+    {
+        if (_selectedMonsterId == null) return;
+
+        // Auto-generate path: Assets/Models/<monster_type>.glb
+        string glbPath = $"res://Assets/Models/{_selectedMonsterId}.glb";
+
+        // Update checkbox text to reflect current state
+        if (_monsterUseGlbCheckbox != null)
+        {
+            _monsterUseGlbCheckbox.Text = pressed ? "GLB Model" : "Procedural";
+        }
+
+        // Update GlbModelConfig
+        if (pressed)
+        {
+            Core.GlbModelConfig.SetMonsterGlbPath(_selectedMonsterId, glbPath);
+        }
+        else
+        {
+            Core.GlbModelConfig.ClearMonsterGlbPath(_selectedMonsterId);
+        }
+
+        // Update path label with actual path and color based on file existence
+        if (_monsterGlbPathLabel != null)
+        {
+            _monsterGlbPathLabel.Text = $"Assets/Models/{_selectedMonsterId}.glb";
+            bool fileExists = ResourceLoader.Exists(glbPath);
+            _monsterGlbPathLabel.AddThemeColorOverride("font_color",
+                pressed ? (fileExists ? new Color(0.5f, 0.9f, 0.5f) : new Color(0.9f, 0.5f, 0.5f))
+                        : new Color(0.5f, 0.5f, 0.5f));
+        }
+
+        // Refresh preview
+        UpdatePreviewMonster(_selectedMonsterId);
+
+        GD.Print($"[EditorScreen3D] Monster {_selectedMonsterId} model: {(pressed ? "GLB" : "Procedural")} -> {glbPath}");
     }
 
     private void OnApplyChanges()

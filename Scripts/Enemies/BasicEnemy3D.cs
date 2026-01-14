@@ -136,6 +136,7 @@ public partial class BasicEnemy3D : CharacterBody3D
 
     // Torch (for torchbearer variant)
     private bool _hasTorch;
+    private bool _canHaveWeapon;
     private OmniLight3D? _torchLight;
     private Node3D? _torchNode;
     private float _torchFlickerTimer;
@@ -199,223 +200,32 @@ public partial class BasicEnemy3D : CharacterBody3D
 
     private void LoadMonsterConfig()
     {
-        // TODO: Load from MonsterConfig when ported
-        // For now, use defaults based on monster type
-        switch (MonsterType.ToLower())
+        // Load from JSON data via DataLoader
+        var config = DataLoader.GetMonster(MonsterType);
+
+        if (config != null)
         {
-            case "slime":
-                MaxHealth = 75;
-                MoveSpeed = 3f;
-                Damage = 10f;
-                _baseColor = new Color(0.3f, 0.7f, 0.3f);
-                break;
-            case "eye":
-                MaxHealth = 60;
-                MoveSpeed = 3.5f;
-                Damage = 12f;
-                _baseColor = new Color(0.8f, 0.2f, 0.2f);
-                break;
-            case "mushroom":
-                MaxHealth = 80;
-                MoveSpeed = 2f;
-                Damage = 8f;
-                _baseColor = new Color(0.6f, 0.4f, 0.5f);
-                break;
-            case "spider":
-                MaxHealth = 55;
-                MoveSpeed = 4.5f;
-                Damage = 15f;
-                _baseColor = new Color(0.3f, 0.25f, 0.2f);
-                break;
-            case "lizard":
-                MaxHealth = 90;
-                MoveSpeed = 3.2f;
-                Damage = 12f;
-                _baseColor = new Color(0.3f, 0.5f, 0.3f);
-                break;
-            case "skeleton":
-                MaxHealth = 60;
-                MoveSpeed = 2.8f;
-                Damage = 15f;
-                AttackRange = 2.5f;
-                _baseColor = new Color(0.9f, 0.88f, 0.8f); // Bone white
-                break;
-            case "wolf":
-                MaxHealth = 70;
-                MoveSpeed = 5f;
-                Damage = 18f;
-                AttackRange = 1.8f;
-                AggroRange = 20f;
-                _baseColor = new Color(0.4f, 0.35f, 0.3f); // Gray-brown fur
-                break;
-            case "bat":
-                MaxHealth = 40;
-                MoveSpeed = 4f;
-                Damage = 8f;
-                AttackRange = 1.5f;
-                _baseColor = new Color(0.25f, 0.2f, 0.25f); // Dark purple-gray
-                break;
-            case "dragon":
-                MaxHealth = 200;
-                MoveSpeed = 2.5f;
-                Damage = 35f;
-                AttackRange = 4f;
-                AggroRange = 25f;
-                _baseColor = new Color(0.7f, 0.2f, 0.15f); // Red scales
-                break;
-            case "badlama":
-                MaxHealth = 90;
-                MoveSpeed = 4f;
-                Damage = 22f;
-                AttackRange = 3f;  // Fire breath range
-                AggroRange = 20f;
-                _baseColor = new Color(0.55f, 0.4f, 0.25f); // Brown llama
-                break;
-            case "torchbearer":
-            case "goblin_torchbearer":
-                MaxHealth = 65;
-                MoveSpeed = 2.8f;
-                Damage = 8f;
-                AttackRange = 2.5f;
-                AggroRange = 18f;
-                _baseColor = new Color(0.45f, 0.55f, 0.35f); // Goblin green
-                _hasTorch = true;
-                break;
-            // DCC Monsters
-            case "crawler_killer":
-                MaxHealth = 120;
-                MoveSpeed = 4.5f;
-                Damage = 22f;
-                AttackRange = 2.5f;
-                AggroRange = 20f;
-                MinStopDistance = 2.0f;  // Robot assassin gets close
-                _baseColor = new Color(0.6f, 0.15f, 0.15f); // Dark red mechanical
-                break;
-            case "shadow_stalker":
-                MaxHealth = 70;
-                MoveSpeed = 5.5f;
-                Damage = 18f;
-                AttackRange = 2f;
-                AggroRange = 25f;
-                _baseColor = new Color(0.1f, 0.1f, 0.15f); // Deep shadow
-                break;
-            case "flesh_golem":
-                MaxHealth = 200;
-                MoveSpeed = 2f;
-                Damage = 30f;
-                AttackRange = 3f;
-                AggroRange = 15f;
-                _baseColor = new Color(0.6f, 0.45f, 0.4f); // Flesh tone
-                break;
-            case "plague_bearer":
-                MaxHealth = 90;
-                MoveSpeed = 2.5f;
-                Damage = 12f;
-                AttackRange = 3f;
-                AggroRange = 18f;
-                _baseColor = new Color(0.3f, 0.5f, 0.2f); // Sickly green
-                break;
-            case "living_armor":
-                MaxHealth = 150;
-                MoveSpeed = 2.8f;
-                Damage = 25f;
-                AttackRange = 2.5f;
-                AggroRange = 18f;
-                _baseColor = new Color(0.4f, 0.4f, 0.45f); // Steel gray
-                break;
-            case "camera_drone":
-                MaxHealth = 40;
-                MoveSpeed = 4f;
-                Damage = 10f;
-                AttackRange = 8f;
-                AggroRange = 30f;
-                _baseColor = new Color(0.7f, 0.7f, 0.75f); // Chrome
-                break;
-            case "shock_drone":
-                MaxHealth = 50;
-                MoveSpeed = 3.5f;
-                Damage = 15f;
-                AttackRange = 6f;
-                AggroRange = 25f;
-                _baseColor = new Color(0.3f, 0.6f, 0.9f); // Electric blue
-                break;
-            case "advertiser_bot":
-                MaxHealth = 80;
-                MoveSpeed = 3f;
-                Damage = 8f;
-                AttackRange = 10f;
-                AggroRange = 35f;
-                _baseColor = new Color(0.9f, 0.7f, 0.2f); // Advertising gold
-                break;
-            case "clockwork_spider":
-                MaxHealth = 65;
-                MoveSpeed = 5f;
-                Damage = 14f;
-                AttackRange = 2f;
-                AggroRange = 20f;
-                _baseColor = new Color(0.6f, 0.5f, 0.3f); // Brass
-                break;
-            case "lava_elemental":
-                MaxHealth = 110;
-                MoveSpeed = 2.5f;
-                Damage = 28f;
-                AttackRange = 3f;
-                AggroRange = 20f;
-                _baseColor = new Color(0.9f, 0.4f, 0.1f); // Lava orange
-                break;
-            case "ice_wraith":
-                MaxHealth = 75;
-                MoveSpeed = 4f;
-                Damage = 16f;
-                AttackRange = 4f;
-                AggroRange = 22f;
-                _baseColor = new Color(0.7f, 0.85f, 0.95f); // Ice blue
-                break;
-            case "gelatinous_cube":
-                MaxHealth = 180;
-                MoveSpeed = 1.5f;
-                Damage = 20f;
-                AttackRange = 2f;
-                AggroRange = 12f;
-                _baseColor = new Color(0.4f, 0.7f, 0.4f, 0.6f); // Translucent green
-                break;
-            case "void_spawn":
-                MaxHealth = 85;
-                MoveSpeed = 4.5f;
-                Damage = 22f;
-                AttackRange = 3f;
-                AggroRange = 25f;
-                _baseColor = new Color(0.2f, 0.05f, 0.3f); // Void purple
-                break;
-            case "mimic":
-                MaxHealth = 100;
-                MoveSpeed = 0.5f;
-                Damage = 35f;
-                AttackRange = 2f;
-                AggroRange = 5f;
-                _baseColor = new Color(0.5f, 0.35f, 0.2f); // Wood brown
-                break;
-            case "dungeon_rat":
-                MaxHealth = 25;
-                MoveSpeed = 6f;
-                Damage = 6f;
-                AttackRange = 1f;
-                AggroRange = 15f;
-                MinStopDistance = 1.5f;  // Small critter can get close
-                _baseColor = new Color(0.35f, 0.3f, 0.28f); // Rat gray-brown
-                break;
-            case "rabbidd":
-                MaxHealth = 75;
-                MoveSpeed = 4.5f;
-                Damage = 16f;
-                AttackRange = 2f;
-                AggroRange = 18f;
-                MinStopDistance = 2f;  // Pouncing creature
-                _baseColor = new Color(0.35f, 0.15f, 0.25f); // Dark purple-crimson
-                break;
-            default:
-                _baseColor = new Color(0.5f, 0.5f, 0.5f);
-                break;
+            // Load all stats from JSON config
+            MaxHealth = config.MaxHealth;
+            MoveSpeed = config.MoveSpeed;
+            Damage = config.Damage;
+            AttackRange = config.AttackRange;
+            AggroRange = config.AggroRange;
+            MinStopDistance = config.MinStopDistance;
+            _baseColor = config.GetGodotColor();
+            _hasTorch = config.HasTorch;
+            _canHaveWeapon = config.CanHaveWeapon;
+        }
+        else
+        {
+            // Fallback to defaults if monster type not found in JSON
+            var defaults = DataLoader.GetMonsterDefaults();
+            AttackRange = defaults.AttackRange;
+            AggroRange = defaults.AggroRange;
+            MinStopDistance = defaults.MinStopDistance;
+            _baseColor = defaults.Color.ToGodotColor();
+
+            GD.PrintErr($"[BasicEnemy3D] Monster type '{MonsterType}' not found in data, using defaults");
         }
 
         // Set MinStopDistance based on attack style - ranged stay back, melee stop at 3.5

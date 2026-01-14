@@ -74,6 +74,9 @@ public partial class GameManager3D : Node
         // CRITICAL: Process even when game is paused so key handling still works
         ProcessMode = ProcessModeEnum.Always;
 
+        // Initialize data-driven configs early
+        DataLoader.Initialize();
+
         GD.Print("[GameManager3D] Initializing...");
 
         // Initialize game deferred (after scene tree is ready)

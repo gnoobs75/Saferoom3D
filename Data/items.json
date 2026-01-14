@@ -1,0 +1,186 @@
+{
+  "consumables": [
+    {
+      "id": "health_potion",
+      "name": "Health Potion",
+      "description": "Restores 100 HP instantly.",
+      "maxStack": 10,
+      "healAmount": 100,
+      "manaAmount": 0,
+      "goldValue": 25,
+      "color": { "r": 0.9, "g": 0.2, "b": 0.2 }
+    },
+    {
+      "id": "mana_potion",
+      "name": "Mana Potion",
+      "description": "Restores 50 MP instantly.",
+      "maxStack": 10,
+      "healAmount": 0,
+      "manaAmount": 50,
+      "goldValue": 25,
+      "color": { "r": 0.2, "g": 0.4, "b": 0.9 }
+    },
+    {
+      "id": "viewers_choice_grenade",
+      "name": "Viewer's Choice Grenade",
+      "description": "A chaotic grenade with random effects. Could heal you, could hurt enemies, could do something weird!",
+      "maxStack": 5,
+      "healAmount": 0,
+      "manaAmount": 0,
+      "goldValue": 100,
+      "color": { "r": 1.0, "g": 0.8, "b": 0.2 },
+      "special": "random_effect"
+    },
+    {
+      "id": "liquid_courage",
+      "name": "Liquid Courage",
+      "description": "Grants 3 seconds of complete invulnerability. You can still attack but take no damage.",
+      "maxStack": 5,
+      "healAmount": 0,
+      "manaAmount": 0,
+      "goldValue": 150,
+      "color": { "r": 1.0, "g": 0.7, "b": 0.3 },
+      "special": "invulnerability",
+      "duration": 3.0
+    },
+    {
+      "id": "recall_beacon",
+      "name": "Recall Beacon",
+      "description": "Teleport back to the center of the arena. Useful for escaping dangerous situations.",
+      "maxStack": 3,
+      "healAmount": 0,
+      "manaAmount": 0,
+      "goldValue": 75,
+      "color": { "r": 0.4, "g": 0.8, "b": 1.0 },
+      "special": "teleport_center"
+    },
+    {
+      "id": "monster_musk",
+      "name": "Monster Musk",
+      "description": "Attracts all enemies toward you for 10 seconds. Dangerous but great for grouping enemies!",
+      "maxStack": 5,
+      "healAmount": 0,
+      "manaAmount": 0,
+      "goldValue": 50,
+      "color": { "r": 0.5, "g": 0.8, "b": 0.3 },
+      "special": "attract_enemies",
+      "duration": 10.0
+    },
+    {
+      "id": "mystery_meat",
+      "name": "Mystery Meat",
+      "description": "Questionable meat from an unknown creature. Eat at your own risk.",
+      "maxStack": 20,
+      "healAmount": 25,
+      "manaAmount": 0,
+      "goldValue": 5,
+      "color": { "r": 0.7, "g": 0.3, "b": 0.3 }
+    }
+  ],
+  "materials": [
+    {
+      "id": "gold_coins",
+      "name": "Gold Coins",
+      "description": "Shiny gold coins. The currency of adventurers.",
+      "maxStack": 9999,
+      "goldValue": 1,
+      "color": { "r": 1.0, "g": 0.85, "b": 0.2 }
+    },
+    {
+      "id": "goblin_tooth",
+      "name": "Goblin Tooth",
+      "description": "A jagged tooth from a goblin. Crafting material.",
+      "maxStack": 50,
+      "goldValue": 3,
+      "color": { "r": 0.85, "g": 0.8, "b": 0.7 }
+    },
+    {
+      "id": "rat_tail",
+      "name": "Rat Tail",
+      "description": "A disgusting tail from a dungeon rat. Surprisingly valuable to alchemists.",
+      "maxStack": 50,
+      "goldValue": 2,
+      "color": { "r": 0.6, "g": 0.45, "b": 0.4 }
+    },
+    {
+      "id": "broken_arrow",
+      "name": "Broken Arrow",
+      "description": "A snapped arrow shaft. The fletching is still usable.",
+      "maxStack": 50,
+      "goldValue": 1,
+      "color": { "r": 0.5, "g": 0.4, "b": 0.3 }
+    },
+    {
+      "id": "enchanted_dust",
+      "name": "Enchanted Dust",
+      "description": "Sparkling magical residue. Used in enchanting and alchemy.",
+      "maxStack": 99,
+      "goldValue": 10,
+      "color": { "r": 0.8, "g": 0.6, "b": 1.0 }
+    },
+    {
+      "id": "gemstone",
+      "name": "Gemstone",
+      "description": "A beautiful gemstone of unknown origin. Worth a fair bit of gold.",
+      "maxStack": 20,
+      "goldValue": 50,
+      "color": { "r": 0.4, "g": 0.9, "b": 0.7 }
+    },
+    {
+      "id": "dragon_scale",
+      "name": "Dragon Scale",
+      "description": "A single scale from a powerful dragon. Extremely rare and valuable.",
+      "maxStack": 10,
+      "goldValue": 200,
+      "color": { "r": 0.8, "g": 0.2, "b": 0.2 }
+    }
+  ],
+  "questItems": [
+    {
+      "id": "ancient_relic",
+      "name": "Ancient Relic",
+      "description": "A mysterious artifact from a forgotten age. Scholars would pay handsomely for this.",
+      "maxStack": 5,
+      "color": { "r": 0.7, "g": 0.5, "b": 0.2 }
+    }
+  ],
+  "monsterParts": {
+    "goblin_ear": { "name": "Goblin Ear", "description": "A pointed ear from a goblin. Sought by alchemists.", "fromMonster": "goblin" },
+    "shaman_staff_fragment": { "name": "Shaman Staff Fragment", "description": "A piece of enchanted wood from a shaman's staff.", "fromMonster": "goblin_shaman" },
+    "goblin_throwing_knife": { "name": "Goblin Throwing Knife", "description": "A crude but sharp throwing knife used by goblin throwers.", "fromMonster": "goblin_thrower" },
+    "warlord_banner": { "name": "Warlord Banner", "description": "A tattered piece of a warlord's battle banner.", "fromMonster": "goblin_warlord" },
+    "slime_core": { "name": "Slime Core", "description": "The gelatinous core of a slime. Surprisingly valuable.", "fromMonster": "slime" },
+    "bone_fragment": { "name": "Bone Fragment", "description": "A piece of bleached bone from an animated skeleton.", "fromMonster": "skeleton" },
+    "wolf_fang": { "name": "Wolf Fang", "description": "A sharp fang from a dungeon wolf.", "fromMonster": "wolf" },
+    "bat_wing": { "name": "Bat Wing", "description": "A leathery wing from a cave bat.", "fromMonster": "bat" },
+    "evil_eye_lens": { "name": "Evil Eye Lens", "description": "The crystalline lens from an evil eye. Still faintly glowing.", "fromMonster": "eye" },
+    "mushroom_cap": { "name": "Mushroom Cap", "description": "A colorful cap from a hostile mushroom creature.", "fromMonster": "mushroom" },
+    "spider_silk": { "name": "Spider Silk", "description": "Strong silk harvested from a giant spider.", "fromMonster": "spider" },
+    "lizard_scale": { "name": "Lizard Scale", "description": "A tough scale from a dungeon lizard.", "fromMonster": "lizard" },
+    "badlama_wool": { "name": "Badlama Wool", "description": "Soft wool from the aggressive badlama.", "fromMonster": "badlama" },
+    "rat_whisker": { "name": "Rat Whisker", "description": "A long whisker from a dungeon rat.", "fromMonster": "dungeon_rat" },
+    "crawler_mandible": { "name": "Crawler Mandible", "description": "A razor-sharp mandible from a crawler killer.", "fromMonster": "crawler_killer" },
+    "shadow_essence": { "name": "Shadow Essence", "description": "Wispy essence from a shadow stalker.", "fromMonster": "shadow_stalker" },
+    "stitched_flesh": { "name": "Stitched Flesh", "description": "Preserved flesh from a flesh golem.", "fromMonster": "flesh_golem" },
+    "plague_vial": { "name": "Plague Vial", "description": "A sealed vial of plague from a plague bearer.", "fromMonster": "plague_bearer" },
+    "enchanted_plate": { "name": "Enchanted Plate", "description": "A piece of magically animated armor.", "fromMonster": "living_armor" },
+    "drone_lens": { "name": "Drone Lens", "description": "A camera lens from a destroyed drone.", "fromMonster": "camera_drone" },
+    "shock_capacitor": { "name": "Shock Capacitor", "description": "An electrical capacitor from a shock drone.", "fromMonster": "shock_drone" },
+    "ad_crystal": { "name": "Ad Crystal", "description": "A crystal that projects advertisements. Annoying.", "fromMonster": "advertiser_bot" },
+    "clockwork_gear": { "name": "Clockwork Gear", "description": "A precision gear from a clockwork spider.", "fromMonster": "clockwork_spider" },
+    "lava_core": { "name": "Lava Core", "description": "A molten core from a lava elemental. Handle with care.", "fromMonster": "lava_elemental" },
+    "frozen_essence": { "name": "Frozen Essence", "description": "Frozen energy from an ice wraith.", "fromMonster": "ice_wraith" },
+    "cube_residue": { "name": "Cube Residue", "description": "Acidic residue from a gelatinous cube.", "fromMonster": "gelatinous_cube" },
+    "void_fragment": { "name": "Void Fragment", "description": "A fragment of the void. Reality warps around it.", "fromMonster": "void_spawn" },
+    "mimic_tongue": { "name": "Mimic Tongue", "description": "The sticky tongue of a mimic. Disturbing.", "fromMonster": "mimic" }
+  },
+  "bossParts": {
+    "royal_slime_essence": { "name": "Royal Slime Essence", "description": "Concentrated essence from a Slime King. Very rare.", "fromBoss": "slime_king" },
+    "ancient_bone": { "name": "Ancient Bone", "description": "An ancient bone imbued with dark magic.", "fromBoss": "skeleton_lord" },
+    "dragon_heart": { "name": "Dragon Heart", "description": "The still-warm heart of a dragon. Legendary.", "fromBoss": "dragon_king" },
+    "queen_venom_sac": { "name": "Queen Venom Sac", "description": "A venom sac from a Spider Queen. Extremely poisonous.", "fromBoss": "spider_queen" },
+    "elder_spore": { "name": "Elder Spore", "description": "A potent spore from the Sporeling Elder.", "fromBoss": "sporeling_elder" },
+    "butcher_cleaver_shard": { "name": "Butcher Cleaver Shard", "description": "A shard from The Butcher's infamous cleaver.", "fromBoss": "the_butcher" },
+    "shadow_crystal": { "name": "Shadow Crystal", "description": "A dark crystal from Mordecai's Shadow.", "fromBoss": "mordecai_boss" }
+  }
+}
