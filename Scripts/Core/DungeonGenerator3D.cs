@@ -49,6 +49,7 @@ public partial class DungeonGenerator3D : Node3D
     private StandardMaterial3D? _floorMaterial;
     private StandardMaterial3D? _wallMaterial;
     private StandardMaterial3D? _ceilingMaterial;
+    private StandardMaterial3D? _trimMaterial; // Baseboard/crown molding
 
     // Configuration - made larger for better gameplay
     [Export] public int DungeonWidth { get; set; } = 80;
@@ -161,6 +162,13 @@ public partial class DungeonGenerator3D : Node3D
         _ceilingMaterial.NormalEnabled = true;
         _ceilingMaterial.NormalTexture = CreateCeilingNormalMap();
         _ceilingMaterial.NormalScale = 1.5f; // Subtle cave-like texture
+
+        // Trim/molding: darker accent for transitions between surfaces
+        _trimMaterial = new StandardMaterial3D();
+        _trimMaterial.AlbedoColor = new Color(0.18f, 0.15f, 0.12f); // Dark brown-gray
+        _trimMaterial.Roughness = 0.75f; // Slightly smoother than walls
+        _trimMaterial.Metallic = 0f;
+        _trimMaterial.CullMode = BaseMaterial3D.CullModeEnum.Disabled;
     }
 
     private ImageTexture CreateStoneFloorTexture()
@@ -1127,12 +1135,13 @@ public partial class DungeonGenerator3D : Node3D
             CreateTestWall(new Vector3(roomCenter.X - rs, WallHeight / 2, roomCenter.Z + rs - sideSegment / 2), new Vector3(0.5f, WallHeight, sideSegment));
         }
 
-        // Add light to the room - only enable shadow if under limit
+        // Add light to the room - brighter for better visibility
         var light = new OmniLight3D();
         light.Position = new Vector3(roomCenter.X, WallHeight * 0.8f, roomCenter.Z);
-        light.LightEnergy = 2f;
-        light.LightColor = new Color(1f, 0.9f, 0.8f);
-        light.OmniRange = roomSize * 1.5f;
+        light.LightEnergy = 3.5f; // Brighter room lights
+        light.LightColor = new Color(1f, 0.92f, 0.85f); // Warmer torch glow
+        light.OmniRange = roomSize * 1.8f; // Wider coverage
+        light.OmniAttenuation = 1.2f; // Softer falloff
         light.ShadowEnabled = _shadowLightCount < MaxShadowLights;
         if (light.ShadowEnabled) _shadowLightCount++;
         _lightContainer?.AddChild(light);
@@ -2236,13 +2245,21 @@ public partial class DungeonGenerator3D : Node3D
 
     private void AddLargeDungeonAtmosphere()
     {
-        // Ambient directional light - warm dim glow like distant torches
+        // Ambient directional light - brighter warm glow
         var ambient = new DirectionalLight3D();
-        ambient.LightColor = new Color(0.15f, 0.10f, 0.06f); // Warm amber ambient
-        ambient.LightEnergy = 0.12f;
+        ambient.LightColor = new Color(0.22f, 0.18f, 0.12f); // Warmer, brighter amber
+        ambient.LightEnergy = 0.3f; // Much brighter for visibility
         ambient.Rotation = new Vector3(Mathf.DegToRad(-60), Mathf.DegToRad(30), 0);
         ambient.ShadowEnabled = false;
         _lightContainer?.AddChild(ambient);
+
+        // Secondary fill light for depth
+        var fillAmbient = new DirectionalLight3D();
+        fillAmbient.LightColor = new Color(0.12f, 0.15f, 0.2f); // Cool blue fill
+        fillAmbient.LightEnergy = 0.12f;
+        fillAmbient.Rotation = new Vector3(Mathf.DegToRad(20), Mathf.DegToRad(-90), 0);
+        fillAmbient.ShadowEnabled = false;
+        _lightContainer?.AddChild(fillAmbient);
 
         // Add warm torchlight ambient in corridors - like flickering wall sconces
         // Sample random corridor positions
@@ -2266,17 +2283,17 @@ public partial class DungeonGenerator3D : Node3D
                     }
                 }
 
-                if (!inRoom && _rng.Randf() > 0.7f)
+                if (!inRoom && _rng.Randf() > 0.6f) // More frequent lights
                 {
                     // Warm torchlight colors - vary between orange and yellow-orange
                     float warmth = _rng.Randf() * 0.15f;
-                    var torchColor = new Color(0.95f, 0.6f + warmth, 0.25f + warmth * 0.5f);
+                    var torchColor = new Color(0.95f, 0.65f + warmth, 0.3f + warmth * 0.5f);
 
                     var light = CreateOptimizedLight(
                         new Vector3(x * TileSize, WallHeight * 0.5f, z * TileSize),
                         torchColor,
-                        0.5f, // Slightly brighter
-                        10f,  // Slightly larger range
+                        1.2f, // Much brighter corridor lights
+                        14f,  // Larger range for better coverage
                         enableShadow: false
                     );
                     _lightContainer?.AddChild(light);
@@ -2468,14 +2485,14 @@ public partial class DungeonGenerator3D : Node3D
                 {
                     var light = new OmniLight3D();
                     light.Position = new Vector3(x * TileSize, WallHeight * 0.7f, z * TileSize);
-                    light.LightColor = new Color(1f, 0.75f, 0.4f); // Warm orange
-                    light.LightEnergy = 2.5f;
-                    light.OmniRange = 15f;
-                    light.OmniAttenuation = 1.2f;
+                    light.LightColor = new Color(1f, 0.8f, 0.5f); // Warm golden
+                    light.LightEnergy = 4f; // Much brighter
+                    light.OmniRange = 18f; // Wider coverage
+                    light.OmniAttenuation = 1.1f; // Softer falloff
                     light.ShadowEnabled = true;
                     light.DistanceFadeEnabled = true;
-                    light.DistanceFadeBegin = 40f;
-                    light.DistanceFadeLength = 20f;
+                    light.DistanceFadeBegin = 45f;
+                    light.DistanceFadeLength = 25f;
 
                     _lightContainer?.AddChild(light);
                     _shadowLightCount++;
@@ -2970,6 +2987,11 @@ public partial class DungeonGenerator3D : Node3D
 
         _wallContainer?.AddChild(mesh);
 
+        // Add baseboard trim at floor-wall junction
+        CreateWallTrim(wallPos, size, direction, isBaseboard: true);
+        // Add crown molding at ceiling-wall junction
+        CreateWallTrim(wallPos, size, direction, isBaseboard: false);
+
         // Add wall collision using StaticBody3D with the shape as a child
         // Use layer bit 7 (value 128) for layer 8, matching what player/enemies expect
         var body = new StaticBody3D();
@@ -2988,6 +3010,55 @@ public partial class DungeonGenerator3D : Node3D
 
         // PERF: Add occluder geometry for this wall (box occluder)
         AddBoxOccluder(wallPos, size);
+    }
+
+    /// <summary>
+    /// Creates decorative trim (baseboard or crown molding) at wall-floor/ceiling junctions.
+    /// Creates a smooth visual transition between surfaces.
+    /// </summary>
+    private void CreateWallTrim(Vector3 wallPos, Vector3 wallSize, Vector3 direction, bool isBaseboard)
+    {
+        // Trim dimensions
+        float trimHeight = isBaseboard ? 0.15f : 0.12f;
+        float trimDepth = isBaseboard ? 0.08f : 0.06f;
+
+        // Calculate trim size based on wall orientation
+        Vector3 trimSize;
+        if (direction == Vector3.Left || direction == Vector3.Right)
+        {
+            trimSize = new Vector3(trimDepth, trimHeight, wallSize.Z);
+        }
+        else
+        {
+            trimSize = new Vector3(wallSize.X, trimHeight, trimDepth);
+        }
+
+        var trimMesh = new BoxMesh();
+        trimMesh.Size = trimSize;
+
+        var mesh = new MeshInstance3D();
+        mesh.Mesh = trimMesh;
+        mesh.MaterialOverride = _trimMaterial;
+        mesh.CastShadow = GeometryInstance3D.ShadowCastingSetting.Off; // Small detail, no shadow
+
+        // Position trim at junction
+        float yPos;
+        if (isBaseboard)
+        {
+            // Baseboard: at floor level, extending slightly out from wall
+            yPos = trimHeight / 2f;
+        }
+        else
+        {
+            // Crown molding: at ceiling level
+            yPos = WallHeight - trimHeight / 2f;
+        }
+
+        // Offset trim slightly toward the room (away from void)
+        Vector3 trimOffset = -direction * (trimDepth / 2f + 0.01f);
+        mesh.Position = new Vector3(wallPos.X, yPos, wallPos.Z) + trimOffset;
+
+        _wallContainer?.AddChild(mesh);
     }
 
     /// <summary>
@@ -3262,13 +3333,21 @@ public partial class DungeonGenerator3D : Node3D
 
     private void AddAmbientLighting()
     {
-        // Very dim ambient light
+        // Brighter ambient light for better visibility
         var ambient = new DirectionalLight3D();
-        ambient.LightColor = new Color(0.15f, 0.12f, 0.1f);
-        ambient.LightEnergy = 0.1f;
+        ambient.LightColor = new Color(0.25f, 0.22f, 0.18f); // Warmer, brighter
+        ambient.LightEnergy = 0.35f; // Significantly brighter
         ambient.Rotation = new Vector3(Mathf.DegToRad(-45), Mathf.DegToRad(45), 0);
         ambient.ShadowEnabled = false;
         _lightContainer?.AddChild(ambient);
+
+        // Add a secondary fill light from below for dungeon atmosphere
+        var fillLight = new DirectionalLight3D();
+        fillLight.LightColor = new Color(0.15f, 0.18f, 0.22f); // Cool blue undertone
+        fillLight.LightEnergy = 0.15f;
+        fillLight.Rotation = new Vector3(Mathf.DegToRad(30), Mathf.DegToRad(-120), 0);
+        fillLight.ShadowEnabled = false;
+        _lightContainer?.AddChild(fillLight);
     }
 
     /// <summary>

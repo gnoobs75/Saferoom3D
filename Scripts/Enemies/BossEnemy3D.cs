@@ -992,6 +992,9 @@ public partial class BossEnemy3D : CharacterBody3D
         CollisionLayer = 0;
         CollisionMask = 0;
 
+        // Spawn blood splatter effect - bosses get bigger splatter
+        SpawnBloodSplatter();
+
         // Play death sound
         PlayMonsterSound("die");
 
@@ -1036,6 +1039,16 @@ public partial class BossEnemy3D : CharacterBody3D
         var corpse = Corpse3D.Create(BossName, true, GlobalPosition, Rotation.Y, Level);
         GetTree().Root.AddChild(corpse);
         GD.Print($"[BossEnemy3D] Spawned boss corpse for {BossName} (Level {Level})");
+    }
+
+    /// <summary>
+    /// Spawns blood splatter effect at the boss's death location.
+    /// Bosses get larger, more dramatic blood splatter.
+    /// </summary>
+    private void SpawnBloodSplatter()
+    {
+        var splatter = BloodSplatter3D.Create(GlobalPosition, MonsterType, isBoss: true);
+        GetTree().Root.AddChild(splatter);
     }
 
     /// <summary>

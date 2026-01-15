@@ -2602,6 +2602,9 @@ public partial class BasicEnemy3D : CharacterBody3D
 
         EmitSignal(SignalName.Died, this);
 
+        // Spawn blood splatter effect
+        SpawnBloodSplatter();
+
         // Play death animation
         PlayAnimation(AnimationType.Die);
 
@@ -2654,6 +2657,15 @@ public partial class BasicEnemy3D : CharacterBody3D
         var corpse = Corpse3D.Create(MonsterType, false, GlobalPosition, Rotation.Y, Level);
         GetTree().Root.AddChild(corpse);
         GD.Print($"[BasicEnemy3D] Spawned corpse for {MonsterType} (Level {Level})");
+    }
+
+    /// <summary>
+    /// Spawns blood splatter effect at the monster's death location.
+    /// </summary>
+    private void SpawnBloodSplatter()
+    {
+        var splatter = BloodSplatter3D.Create(GlobalPosition, MonsterType, IsBossMonster(MonsterType));
+        GetTree().Root.AddChild(splatter);
     }
 
     /// <summary>
