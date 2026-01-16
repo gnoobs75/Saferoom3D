@@ -387,6 +387,17 @@ public static class MonsterMeshFactory
     }
 
     /// <summary>
+    /// Hand pose for humanoid NPCs - affects finger curl and thumb position
+    /// </summary>
+    public enum HandPose
+    {
+        Relaxed,    // Slight finger curl (15°), natural rest position
+        Grip,       // Closed for weapon holding (70° curl, thumb wrapped)
+        Open,       // Flat palm, fingers extended (0° curl)
+        Pointing    // Index extended, others curled
+    }
+
+    /// <summary>
     /// Get radial segment count based on LOD level
     /// </summary>
     private static int GetRadialSegments(LODLevel lod)
@@ -943,7 +954,7 @@ public static class MonsterMeshFactory
 
         var leftArmNode = new Node3D();
         leftArmNode.Position = new Vector3(-shoulderX, shoulderY, 0);
-        leftArmNode.RotationDegrees = new Vector3(0, 0, -26);
+        leftArmNode.RotationDegrees = new Vector3(0, 0, -30);
         parent.AddChild(leftArmNode);
         limbs.LeftArm = leftArmNode;
 
@@ -982,7 +993,7 @@ public static class MonsterMeshFactory
 
         var rightArmNode = new Node3D();
         rightArmNode.Position = new Vector3(shoulderX, shoulderY, 0);
-        rightArmNode.RotationDegrees = new Vector3(0, 0, 26);
+        rightArmNode.RotationDegrees = new Vector3(0, 0, 30);
         parent.AddChild(rightArmNode);
         limbs.RightArm = rightArmNode;
 
@@ -2806,6 +2817,7 @@ public static class MonsterMeshFactory
 
         var armNode = new Node3D();
         armNode.Position = new Vector3(side * 0.18f * scale, shoulderY, 0);
+        armNode.RotationDegrees = new Vector3(0, 0, side * -30);  // Left: Z=-30, Right: Z=+30
         parent.AddChild(armNode);
 
         if (isLeft) limbs.LeftArm = armNode;
@@ -8242,50 +8254,92 @@ public static class MonsterMeshFactory
             headNode.AddChild(rightHalo);
         }
 
-        // Arms
+        // === FACIAL FEATURES (robotic style) ===
+
+        // Eyebrows - angular metal plates above LED eyes (stern/menacing)
+        var browMesh = new BoxMesh { Size = new Vector3(0.055f * scale, 0.012f * scale, 0.02f * scale) };
+        var leftBrow = new MeshInstance3D { Mesh = browMesh, MaterialOverride = darkMetalMat };
+        leftBrow.Position = new Vector3(-0.05f * scale, 0.055f * scale, 0.1f * scale);
+        leftBrow.RotationDegrees = new Vector3(10, 0, -12); // Angled down toward center (aggressive)
+        headNode.AddChild(leftBrow);
+        var rightBrow = new MeshInstance3D { Mesh = browMesh, MaterialOverride = darkMetalMat };
+        rightBrow.Position = new Vector3(0.05f * scale, 0.055f * scale, 0.1f * scale);
+        rightBrow.RotationDegrees = new Vector3(10, 0, 12); // Mirror angle
+        headNode.AddChild(rightBrow);
+
+        // Nose bridge (angular sensor plate)
+        var noseBridgeMesh = new BoxMesh { Size = new Vector3(0.025f * scale, 0.04f * scale, 0.03f * scale) };
+        var noseBridge = new MeshInstance3D { Mesh = noseBridgeMesh, MaterialOverride = metalMat };
+        noseBridge.Position = new Vector3(0, 0, 0.1f * scale);
+        headNode.AddChild(noseBridge);
+
+        // Nose tip (rounded sensor dome)
+        var noseTipMesh = new SphereMesh { Radius = 0.018f * scale, Height = 0.036f * scale, RadialSegments = radialSegs / 2 };
+        var noseTip = new MeshInstance3D { Mesh = noseTipMesh, MaterialOverride = metalMat };
+        noseTip.Position = new Vector3(0, -0.02f * scale, 0.115f * scale);
+        headNode.AddChild(noseTip);
+
+        // Nostrils (small vent holes - dark recesses)
+        var nostrilMat = new StandardMaterial3D { AlbedoColor = metalColor.Darkened(0.6f), Metallic = 0.7f, Roughness = 0.5f };
+        var nostrilMesh = new SphereMesh { Radius = 0.006f * scale, Height = 0.012f * scale, RadialSegments = 4 };
+        var leftNostril = new MeshInstance3D { Mesh = nostrilMesh, MaterialOverride = nostrilMat };
+        leftNostril.Position = new Vector3(-0.01f * scale, -0.03f * scale, 0.11f * scale);
+        headNode.AddChild(leftNostril);
+        var rightNostril = new MeshInstance3D { Mesh = nostrilMesh, MaterialOverride = nostrilMat };
+        rightNostril.Position = new Vector3(0.01f * scale, -0.03f * scale, 0.11f * scale);
+        headNode.AddChild(rightNostril);
+
+        // Ears (audio receptor panels on sides of head)
+        var earMesh = new SphereMesh { Radius = 0.035f * scale, Height = 0.07f * scale, RadialSegments = radialSegs / 2 };
+        var leftEar = new MeshInstance3D { Mesh = earMesh, MaterialOverride = metalMat };
+        leftEar.Position = new Vector3(-0.11f * scale, 0.01f * scale, 0);
+        leftEar.Scale = new Vector3(0.25f, 1f, 0.6f); // Flat, tall audio receptor
+        headNode.AddChild(leftEar);
+        var rightEar = new MeshInstance3D { Mesh = earMesh, MaterialOverride = metalMat };
+        rightEar.Position = new Vector3(0.11f * scale, 0.01f * scale, 0);
+        rightEar.Scale = new Vector3(0.25f, 1f, 0.6f);
+        headNode.AddChild(rightEar);
+
+        // Inner ear detail (glowing audio sensor)
+        var innerEarMesh = new SphereMesh { Radius = 0.018f * scale, Height = 0.036f * scale, RadialSegments = 4 };
+        var leftInnerEar = new MeshInstance3D { Mesh = innerEarMesh, MaterialOverride = glowMat };
+        leftInnerEar.Position = new Vector3(-0.105f * scale, 0.01f * scale, 0.008f * scale);
+        leftInnerEar.Scale = new Vector3(0.3f, 0.7f, 0.5f);
+        headNode.AddChild(leftInnerEar);
+        var rightInnerEar = new MeshInstance3D { Mesh = innerEarMesh, MaterialOverride = glowMat };
+        rightInnerEar.Position = new Vector3(0.105f * scale, 0.01f * scale, 0.008f * scale);
+        rightInnerEar.Scale = new Vector3(0.3f, 0.7f, 0.5f);
+        headNode.AddChild(rightInnerEar);
+
+        // Mouth/speaker grille (horizontal slit below nose)
+        var mouthMesh = new BoxMesh { Size = new Vector3(0.04f * scale, 0.008f * scale, 0.01f * scale) };
+        var mouth = new MeshInstance3D { Mesh = mouthMesh, MaterialOverride = darkMetalMat };
+        mouth.Position = new Vector3(0, -0.055f * scale, 0.1f * scale);
+        headNode.AddChild(mouth);
+
+        // Arms - aggressive humanoid stance with arms spread to sides
         float shoulderY = 0.85f * scale;
         float shoulderX = 0.25f * scale;
+        float armHeight = 0.25f * scale;
 
-        var rightArmNode = new Node3D();
-        rightArmNode.Position = new Vector3(shoulderX, shoulderY, 0);
-        parent.AddChild(rightArmNode);
-        limbs.RightArm = rightArmNode;
+        // Shoulder joint spheres (smooth body-arm connection)
+        var shoulderJointMesh = new SphereMesh { Radius = 0.055f * scale, Height = 0.11f * scale, RadialSegments = radialSegs };
 
-        var rightUpperArm = new MeshInstance3D();
-        rightUpperArm.Mesh = new CylinderMesh { TopRadius = 0.04f * scale, BottomRadius = 0.05f * scale, Height = 0.25f * scale, RadialSegments = radialSegs };
-        rightUpperArm.MaterialOverride = metalMat;
-        rightUpperArm.Position = new Vector3(0, -0.12f * scale, 0);
-        rightArmNode.AddChild(rightUpperArm);
-
-        // Servo joint at right elbow (cylinder with rings)
-        if (lod >= LODLevel.Medium)
-        {
-            var servoMat = new StandardMaterial3D { AlbedoColor = metalColor.Lightened(0.1f), Metallic = 0.95f, Roughness = 0.2f };
-            var servoMesh = new CylinderMesh { TopRadius = 0.035f * scale, BottomRadius = 0.035f * scale, Height = 0.04f * scale, RadialSegments = radialSegs };
-            var rightElbow = new MeshInstance3D { Mesh = servoMesh, MaterialOverride = servoMat };
-            rightElbow.Position = new Vector3(0, -0.26f * scale, 0);
-            rightElbow.RotationDegrees = new Vector3(90, 0, 0);
-            rightArmNode.AddChild(rightElbow);
-            // Servo ring detail
-            if (lod == LODLevel.High)
-            {
-                var ringMesh = new CylinderMesh { TopRadius = 0.04f * scale, BottomRadius = 0.04f * scale, Height = 0.008f * scale, RadialSegments = radialSegs };
-                var elbowRing = new MeshInstance3D { Mesh = ringMesh, MaterialOverride = darkMetalMat };
-                elbowRing.Position = new Vector3(0, -0.26f * scale, 0);
-                elbowRing.RotationDegrees = new Vector3(90, 0, 0);
-                rightArmNode.AddChild(elbowRing);
-            }
-        }
-
+        // Left arm - spread out to left side (Z=-30)
         var leftArmNode = new Node3D();
         leftArmNode.Position = new Vector3(-shoulderX, shoulderY, 0);
+        leftArmNode.RotationDegrees = new Vector3(0, 0, -30); // Spread to left side
         parent.AddChild(leftArmNode);
         limbs.LeftArm = leftArmNode;
 
+        var leftShoulderJoint = new MeshInstance3D { Mesh = shoulderJointMesh, MaterialOverride = metalMat };
+        leftShoulderJoint.Position = new Vector3(0, 0, 0); // At shoulder pivot
+        leftArmNode.AddChild(leftShoulderJoint);
+
         var leftUpperArm = new MeshInstance3D();
-        leftUpperArm.Mesh = new CylinderMesh { TopRadius = 0.04f * scale, BottomRadius = 0.05f * scale, Height = 0.25f * scale, RadialSegments = radialSegs };
+        leftUpperArm.Mesh = new CylinderMesh { TopRadius = 0.04f * scale, BottomRadius = 0.05f * scale, Height = armHeight, RadialSegments = radialSegs };
         leftUpperArm.MaterialOverride = metalMat;
-        leftUpperArm.Position = new Vector3(0, -0.12f * scale, 0);
+        leftUpperArm.Position = new Vector3(0, -armHeight / 2 - 0.02f * scale, 0); // Hang DOWN from shoulder
         leftArmNode.AddChild(leftUpperArm);
 
         // Servo joint at left elbow
@@ -8294,10 +8348,63 @@ public static class MonsterMeshFactory
             var servoMat = new StandardMaterial3D { AlbedoColor = metalColor.Lightened(0.1f), Metallic = 0.95f, Roughness = 0.2f };
             var servoMesh = new CylinderMesh { TopRadius = 0.035f * scale, BottomRadius = 0.035f * scale, Height = 0.04f * scale, RadialSegments = radialSegs };
             var leftElbow = new MeshInstance3D { Mesh = servoMesh, MaterialOverride = servoMat };
-            leftElbow.Position = new Vector3(0, -0.26f * scale, 0);
+            leftElbow.Position = new Vector3(0, -armHeight - 0.02f * scale, 0);
             leftElbow.RotationDegrees = new Vector3(90, 0, 0);
             leftArmNode.AddChild(leftElbow);
         }
+
+        // Right arm - spread out to right side (Z=+30)
+        var rightArmNode = new Node3D();
+        rightArmNode.Position = new Vector3(shoulderX, shoulderY, 0);
+        rightArmNode.RotationDegrees = new Vector3(0, 0, 30); // Spread to right side
+        parent.AddChild(rightArmNode);
+        limbs.RightArm = rightArmNode;
+
+        var rightShoulderJoint = new MeshInstance3D { Mesh = shoulderJointMesh, MaterialOverride = metalMat };
+        rightShoulderJoint.Position = new Vector3(0, 0, 0); // At shoulder pivot
+        rightArmNode.AddChild(rightShoulderJoint);
+
+        var rightUpperArm = new MeshInstance3D();
+        rightUpperArm.Mesh = new CylinderMesh { TopRadius = 0.04f * scale, BottomRadius = 0.05f * scale, Height = armHeight, RadialSegments = radialSegs };
+        rightUpperArm.MaterialOverride = metalMat;
+        rightUpperArm.Position = new Vector3(0, -armHeight / 2 - 0.02f * scale, 0); // Hang DOWN from shoulder
+        rightArmNode.AddChild(rightUpperArm);
+
+        // Servo joint at right elbow (cylinder with rings)
+        if (lod >= LODLevel.Medium)
+        {
+            var servoMat = new StandardMaterial3D { AlbedoColor = metalColor.Lightened(0.1f), Metallic = 0.95f, Roughness = 0.2f };
+            var servoMesh = new CylinderMesh { TopRadius = 0.035f * scale, BottomRadius = 0.035f * scale, Height = 0.04f * scale, RadialSegments = radialSegs };
+            var rightElbow = new MeshInstance3D { Mesh = servoMesh, MaterialOverride = servoMat };
+            rightElbow.Position = new Vector3(0, -armHeight - 0.02f * scale, 0);
+            rightElbow.RotationDegrees = new Vector3(90, 0, 0);
+            rightArmNode.AddChild(rightElbow);
+            // Servo ring detail
+            if (lod == LODLevel.High)
+            {
+                var ringMesh = new CylinderMesh { TopRadius = 0.04f * scale, BottomRadius = 0.04f * scale, Height = 0.008f * scale, RadialSegments = radialSegs };
+                var elbowRing = new MeshInstance3D { Mesh = ringMesh, MaterialOverride = darkMetalMat };
+                elbowRing.Position = new Vector3(0, -armHeight - 0.02f * scale, 0);
+                elbowRing.RotationDegrees = new Vector3(90, 0, 0);
+                rightArmNode.AddChild(elbowRing);
+            }
+        }
+
+        // Humanoid hands with grip pose
+        float armLengthForHands = 0.5f * scale; // Arm extends from shoulder to hand
+        var handMat = metalMat; // Use metal material for robotic hands
+
+        // Right hand with grip pose (for blade weapon)
+        var rightHandAttach = CreateHumanoidHand(
+            rightArmNode, armLengthForHands, scale, handMat,
+            isLeftHand: false, lod, HandPose.Grip, darkMetalMat
+        );
+
+        // Left hand with grip pose
+        var leftHandAttach = CreateHumanoidHand(
+            leftArmNode, armLengthForHands, scale, handMat,
+            isLeftHand: true, lod, HandPose.Grip, darkMetalMat
+        );
 
         // Legs
         float hipY = 0.45f * scale;
@@ -8351,16 +8458,16 @@ public static class MonsterMeshFactory
         leftFoot.Position = new Vector3(0, -0.42f * scale, 0.02f * scale);
         leftLegNode.AddChild(leftFoot);
 
-        // Shoulder armor plates
-        var shoulderMesh = new BoxMesh { Size = new Vector3(0.12f * scale, 0.06f * scale, 0.1f * scale) };
-        var rightShoulder = new MeshInstance3D { Mesh = shoulderMesh, MaterialOverride = darkMetalMat };
-        rightShoulder.Position = new Vector3(shoulderX + 0.05f * scale, shoulderY + 0.05f * scale, 0);
-        rightShoulder.RotationDegrees = new Vector3(0, 0, -15);
-        parent.AddChild(rightShoulder);
-        var leftShoulder = new MeshInstance3D { Mesh = shoulderMesh, MaterialOverride = darkMetalMat };
-        leftShoulder.Position = new Vector3(-shoulderX - 0.05f * scale, shoulderY + 0.05f * scale, 0);
-        leftShoulder.RotationDegrees = new Vector3(0, 0, 15);
-        parent.AddChild(leftShoulder);
+        // Shoulder armor plates (adjusted for spread arm position)
+        var shoulderArmorMesh = new BoxMesh { Size = new Vector3(0.12f * scale, 0.06f * scale, 0.1f * scale) };
+        var rightShoulderArmor = new MeshInstance3D { Mesh = shoulderArmorMesh, MaterialOverride = darkMetalMat };
+        rightShoulderArmor.Position = new Vector3(shoulderX + 0.08f * scale, shoulderY + 0.02f * scale, 0);
+        rightShoulderArmor.RotationDegrees = new Vector3(0, 0, 15); // Tilted with arm spread
+        parent.AddChild(rightShoulderArmor);
+        var leftShoulderArmor = new MeshInstance3D { Mesh = shoulderArmorMesh, MaterialOverride = darkMetalMat };
+        leftShoulderArmor.Position = new Vector3(-shoulderX - 0.08f * scale, shoulderY + 0.02f * scale, 0);
+        leftShoulderArmor.RotationDegrees = new Vector3(0, 0, -15); // Mirror tilt
+        parent.AddChild(leftShoulderArmor);
 
         // Antenna on head
         var antennaMesh = new CylinderMesh { TopRadius = 0.005f * scale, BottomRadius = 0.01f * scale, Height = 0.08f * scale, RadialSegments = radialSegs / 2 };
@@ -8373,36 +8480,43 @@ public static class MonsterMeshFactory
         antennaTip.Position = new Vector3(0, 0.2f * scale, 0);
         headNode.AddChild(antennaTip);
 
-        // Weapon arm blade - enhanced with multiple segments
+        // Weapon arm blade - attached to right hand attachment point
         var bladeMat = new StandardMaterial3D { AlbedoColor = new Color(0.5f, 0.52f, 0.55f), Metallic = 0.95f, Roughness = 0.15f };
+
+        // Create weapon node attached to right hand
+        var weaponNode = new Node3D();
+        weaponNode.Name = "Weapon";
+        rightHandAttach.AddChild(weaponNode);
+        limbs.Weapon = weaponNode;
+
         // Main blade
         var bladeMesh = new BoxMesh { Size = new Vector3(0.02f * scale, 0.25f * scale, 0.06f * scale) };
         var blade = new MeshInstance3D { Mesh = bladeMesh, MaterialOverride = bladeMat };
-        blade.Position = new Vector3(0, -0.3f * scale, 0.08f * scale);
-        rightArmNode.AddChild(blade);
+        blade.Position = new Vector3(0, 0.1f * scale, 0);
+        weaponNode.AddChild(blade);
+
         // Blade edge (sharper detail)
         if (lod >= LODLevel.Medium)
         {
             var edgeMesh = new BoxMesh { Size = new Vector3(0.005f * scale, 0.24f * scale, 0.07f * scale) };
             var bladeEdge = new MeshInstance3D { Mesh = edgeMesh, MaterialOverride = metalMat };
-            bladeEdge.Position = new Vector3(0, -0.3f * scale, 0.115f * scale);
-            rightArmNode.AddChild(bladeEdge);
+            bladeEdge.Position = new Vector3(0, 0.1f * scale, 0.035f * scale);
+            weaponNode.AddChild(bladeEdge);
             // Blade back reinforcement
             var backMesh = new BoxMesh { Size = new Vector3(0.025f * scale, 0.2f * scale, 0.02f * scale) };
             var bladeBack = new MeshInstance3D { Mesh = backMesh, MaterialOverride = darkMetalMat };
-            bladeBack.Position = new Vector3(0, -0.28f * scale, 0.045f * scale);
-            rightArmNode.AddChild(bladeBack);
+            bladeBack.Position = new Vector3(0, 0.08f * scale, -0.035f * scale);
+            weaponNode.AddChild(bladeBack);
         }
-        // Blade mounting point
+
+        // Blade tip (pointed)
         if (lod == LODLevel.High)
         {
-            var mountMesh = new CylinderMesh { TopRadius = 0.03f * scale, BottomRadius = 0.035f * scale, Height = 0.04f * scale, RadialSegments = radialSegs / 2 };
-            var bladeMount = new MeshInstance3D { Mesh = mountMesh, MaterialOverride = darkMetalMat };
-            bladeMount.Position = new Vector3(0, -0.16f * scale, 0.06f * scale);
-            bladeMount.RotationDegrees = new Vector3(90, 0, 0);
-            rightArmNode.AddChild(bladeMount);
+            var tipMesh = new PrismMesh { Size = new Vector3(0.02f * scale, 0.06f * scale, 0.06f * scale) };
+            var bladeTip = new MeshInstance3D { Mesh = tipMesh, MaterialOverride = bladeMat };
+            bladeTip.Position = new Vector3(0, 0.25f * scale, 0);
+            weaponNode.AddChild(bladeTip);
         }
-        limbs.Weapon = rightArmNode;
     }
 
     /// <summary>
@@ -14289,11 +14403,82 @@ public static class MonsterMeshFactory
         headNode.AddChild(scar);
 
         // Eyes - stern, experienced
-        CreateHumanoidEyes(headNode, skinMat, 0.14f * scale, scale, new Color(0.4f, 0.35f, 0.25f)); // Brown eyes
+        float headRadius = 0.14f * scale;
+        CreateHumanoidEyes(headNode, skinMat, headRadius, scale, new Color(0.4f, 0.35f, 0.25f)); // Brown eyes
+
+        // Hair material for eyebrows and hair
+        var hairMat = CreateSkinMaterial(new Color(0.15f, 0.12f, 0.1f)); // Dark hair
+
+        // === FACIAL FEATURES ===
+
+        // Stern eyebrows (box meshes above eyes)
+        float eyeSpacing = headRadius * 0.38f;
+        float eyeY = headRadius * 0.15f;
+        var browMesh = new BoxMesh { Size = new Vector3(0.045f * scale, 0.01f * scale, 0.015f * scale) };
+        var leftBrow = new MeshInstance3D { Mesh = browMesh, MaterialOverride = hairMat };
+        leftBrow.Position = new Vector3(-eyeSpacing, eyeY + 0.035f * scale, headRadius * 0.75f);
+        leftBrow.RotationDegrees = new Vector3(15, 0, -10); // Stern/furrowed angle
+        headNode.AddChild(leftBrow);
+        var rightBrow = new MeshInstance3D { Mesh = browMesh, MaterialOverride = hairMat };
+        rightBrow.Position = new Vector3(eyeSpacing, eyeY + 0.035f * scale, headRadius * 0.75f);
+        rightBrow.RotationDegrees = new Vector3(15, 0, 10); // Mirror angle
+        headNode.AddChild(rightBrow);
+
+        // Nose bridge (box)
+        var noseBridgeMesh = new BoxMesh { Size = new Vector3(0.022f * scale, 0.035f * scale, 0.025f * scale) };
+        var noseBridge = new MeshInstance3D { Mesh = noseBridgeMesh, MaterialOverride = skinMat };
+        noseBridge.Position = new Vector3(0, 0, headRadius * 0.85f);
+        headNode.AddChild(noseBridge);
+
+        // Nose tip (sphere - slightly bulbous for rugged look)
+        var noseTipMesh = new SphereMesh { Radius = 0.016f * scale, Height = 0.032f * scale, RadialSegments = 6 };
+        var noseTip = new MeshInstance3D { Mesh = noseTipMesh, MaterialOverride = skinMat };
+        noseTip.Position = new Vector3(0, -0.015f * scale, headRadius * 0.95f);
+        headNode.AddChild(noseTip);
+
+        // Nostrils (two small dark spheres)
+        var nostrilMat = CreateSkinMaterial(skinColor.Darkened(0.4f));
+        var nostrilMesh = new SphereMesh { Radius = 0.005f * scale, Height = 0.01f * scale, RadialSegments = 4 };
+        var leftNostril = new MeshInstance3D { Mesh = nostrilMesh, MaterialOverride = nostrilMat };
+        leftNostril.Position = new Vector3(-0.008f * scale, -0.022f * scale, headRadius * 0.92f);
+        headNode.AddChild(leftNostril);
+        var rightNostril = new MeshInstance3D { Mesh = nostrilMesh, MaterialOverride = nostrilMat };
+        rightNostril.Position = new Vector3(0.008f * scale, -0.022f * scale, headRadius * 0.92f);
+        headNode.AddChild(rightNostril);
+
+        // Ears (flattened spheres on sides of head)
+        var earMesh = new SphereMesh { Radius = 0.03f * scale, Height = 0.06f * scale, RadialSegments = 6 };
+        var leftEar = new MeshInstance3D { Mesh = earMesh, MaterialOverride = skinMat };
+        leftEar.Position = new Vector3(-headRadius * 0.9f, 0.01f * scale, 0);
+        leftEar.Scale = new Vector3(0.3f, 1f, 0.65f); // Flat, tall
+        headNode.AddChild(leftEar);
+        var rightEar = new MeshInstance3D { Mesh = earMesh, MaterialOverride = skinMat };
+        rightEar.Position = new Vector3(headRadius * 0.9f, 0.01f * scale, 0);
+        rightEar.Scale = new Vector3(0.3f, 1f, 0.65f);
+        headNode.AddChild(rightEar);
+
+        // Inner ear detail (slightly pink)
+        var innerEarMat = CreateSkinMaterial(skinColor.Lerp(new Color(0.8f, 0.6f, 0.6f), 0.3f));
+        var innerEarMesh = new SphereMesh { Radius = 0.015f * scale, Height = 0.03f * scale, RadialSegments = 4 };
+        var leftInnerEar = new MeshInstance3D { Mesh = innerEarMesh, MaterialOverride = innerEarMat };
+        leftInnerEar.Position = new Vector3(-headRadius * 0.85f, 0.01f * scale, 0.005f * scale);
+        leftInnerEar.Scale = new Vector3(0.3f, 0.8f, 0.5f);
+        headNode.AddChild(leftInnerEar);
+        var rightInnerEar = new MeshInstance3D { Mesh = innerEarMesh, MaterialOverride = innerEarMat };
+        rightInnerEar.Position = new Vector3(headRadius * 0.85f, 0.01f * scale, 0.005f * scale);
+        rightInnerEar.Scale = new Vector3(0.3f, 0.8f, 0.5f);
+        headNode.AddChild(rightInnerEar);
+
+        // Mouth line (subtle, stern expression)
+        var lipMat = CreateSkinMaterial(skinColor.Darkened(0.15f));
+        var lipMesh = new BoxMesh { Size = new Vector3(0.032f * scale, 0.006f * scale, 0.008f * scale) };
+        var lips = new MeshInstance3D { Mesh = lipMesh, MaterialOverride = lipMat };
+        lips.Position = new Vector3(0, -0.04f * scale, headRadius * 0.88f);
+        headNode.AddChild(lips);
 
         // Short military haircut
         var hairMesh = new SphereMesh { Radius = 0.13f * scale, Height = 0.1f * scale, RadialSegments = segments };
-        var hair = new MeshInstance3D { Mesh = hairMesh, MaterialOverride = CreateSkinMaterial(new Color(0.15f, 0.12f, 0.1f)) }; // Dark hair
+        var hair = new MeshInstance3D { Mesh = hairMesh, MaterialOverride = hairMat };
         hair.Position = new Vector3(0, 0.08f * scale, -0.02f * scale);
         headNode.AddChild(hair);
 
@@ -14303,25 +14488,46 @@ public static class MonsterMeshFactory
         neck.Position = new Vector3(0, 0.9f * scale, 0);
         parent.AddChild(neck);
 
-        // Muscular arms
-        float armY = 0.8f * scale;
-        float armX = 0.28f * scale;
-        var armMesh = new CapsuleMesh { Radius = 0.07f * scale, Height = 0.35f * scale, RadialSegments = segments };
+        // Muscular arms - aggressive combat stance, arms held forward and out
+        float armY = 0.82f * scale;  // Shoulder height
+        float armX = 0.26f * scale;  // Shoulder width (at body edge)
+        float armHeight = 0.35f * scale;
+        float armRadius = 0.07f * scale;
+        var armMesh = new CapsuleMesh { Radius = armRadius, Height = armHeight, RadialSegments = segments };
 
+        // Shoulder joints (smooth connection to body)
+        var shoulderMesh = new SphereMesh { Radius = 0.085f * scale, Height = 0.17f * scale, RadialSegments = segments };
+
+        // Left arm - torch arm, spread out to left side
         var leftArmNode = new Node3D();
         leftArmNode.Position = new Vector3(-armX, armY, 0);
+        // Z: -30 spreads arm out to LEFT side, no X rotation yet
+        leftArmNode.RotationDegrees = new Vector3(0, 0, -30);
         parent.AddChild(leftArmNode);
         limbs.LeftArm = leftArmNode;
+
+        var leftShoulder = new MeshInstance3D { Mesh = shoulderMesh, MaterialOverride = skinMat };
+        leftShoulder.Position = new Vector3(0, 0, 0); // At shoulder pivot
+        leftArmNode.AddChild(leftShoulder);
+
         var leftArm = new MeshInstance3D { Mesh = armMesh, MaterialOverride = skinMat };
-        leftArm.RotationDegrees = new Vector3(0, 0, 15);
+        leftArm.Position = new Vector3(0, -armHeight / 2 - 0.02f * scale, 0); // Hang down from shoulder
         leftArmNode.AddChild(leftArm);
 
+        // Right arm - weapon arm, spread out to right side
         var rightArmNode = new Node3D();
         rightArmNode.Position = new Vector3(armX, armY, 0);
+        // Z: 30 spreads arm out to RIGHT side, no X rotation yet
+        rightArmNode.RotationDegrees = new Vector3(0, 0, 30);
         parent.AddChild(rightArmNode);
         limbs.RightArm = rightArmNode;
+
+        var rightShoulder = new MeshInstance3D { Mesh = shoulderMesh, MaterialOverride = skinMat };
+        rightShoulder.Position = new Vector3(0, 0, 0); // At shoulder pivot
+        rightArmNode.AddChild(rightShoulder);
+
         var rightArm = new MeshInstance3D { Mesh = armMesh, MaterialOverride = skinMat };
-        rightArm.RotationDegrees = new Vector3(0, 0, -15);
+        rightArm.Position = new Vector3(0, -armHeight / 2 - 0.02f * scale, 0); // Hang down from shoulder
         rightArmNode.AddChild(rightArm);
 
         // Sturdy legs
@@ -14353,18 +14559,16 @@ public static class MonsterMeshFactory
         rightBoot.Position = new Vector3(0, -0.24f * scale, 0.02f * scale);
         rightLegNode.AddChild(rightBoot);
 
-        // === HAND ATTACHMENT POINTS ===
-        // Arms are 0.35 height capsules, arm mesh rotated 15 deg outward (Z rotation on mesh only)
-        // Hand positions at bottom of arm capsule, offset slightly forward
+        // === HUMANOID HANDS WITH FINGER ARTICULATION ===
+        // Arm extends from shoulder: offset (-0.195) + half height (-0.175) = -0.37 total
+        // Double this for the helper's calculation: 0.74
+        float armLengthForHands = 0.74f * scale;
 
-        // Right hand attachment point (for weapon)
-        var rightHandAttach = new Node3D();
-        rightHandAttach.Name = "Hand";
-        // Position at end of arm (0.35/2 = 0.175), slightly forward and outward
-        rightHandAttach.Position = new Vector3(0.04f * scale, -0.20f * scale, 0.06f * scale);
-        // Rotate so attached weapons point forward-up: -75 X tilts blade forward, 15 Z matches arm angle
-        rightHandAttach.RotationDegrees = new Vector3(-75f, 0f, 15f);
-        rightArmNode.AddChild(rightHandAttach);
+        // Right hand with grip pose (for weapon)
+        var rightHandAttach = CreateHumanoidHand(
+            rightArmNode, armLengthForHands, scale, skinMat,
+            isLeftHand: false, lod, HandPose.Grip
+        );
 
         // Longsword in right hand - blade extends along +Y in local space
         var weaponNode = new Node3D();
@@ -14394,18 +14598,16 @@ public static class MonsterMeshFactory
         weaponNode.AddChild(blade);
 
         // Blade tip (tapered)
-        var tipMesh = new PrismMesh { Size = new Vector3(0.03f * scale, 0.05f * scale, 0.008f * scale) };
-        var tip = new MeshInstance3D { Mesh = tipMesh, MaterialOverride = bladeMat };
-        tip.Position = new Vector3(0, 0.42f * scale, 0);
-        weaponNode.AddChild(tip);
+        var bladeTipMesh = new PrismMesh { Size = new Vector3(0.03f * scale, 0.05f * scale, 0.008f * scale) };
+        var bladeTip = new MeshInstance3D { Mesh = bladeTipMesh, MaterialOverride = bladeMat };
+        bladeTip.Position = new Vector3(0, 0.42f * scale, 0);
+        weaponNode.AddChild(bladeTip);
 
-        // Left hand attachment point (for torch/shield)
-        var leftHandAttach = new Node3D();
-        leftHandAttach.Name = "LeftHand";
-        leftHandAttach.Position = new Vector3(-0.04f * scale, -0.20f * scale, 0.06f * scale);
-        // Rotate torch to point upward and forward: -50 X for forward tilt, -15 Z matches arm
-        leftHandAttach.RotationDegrees = new Vector3(-50f, 0f, -15f);
-        leftArmNode.AddChild(leftHandAttach);
+        // Left hand with grip pose (for torch/shield)
+        var leftHandAttach = CreateHumanoidHand(
+            leftArmNode, armLengthForHands, scale, skinMat,
+            isLeftHand: true, lod, HandPose.Grip
+        );
 
         // Torch in left hand
         var torchNode = new Node3D();
@@ -14503,9 +14705,84 @@ public static class MonsterMeshFactory
         // Wide worried eyes
         CreateHumanoidEyes(headNode, skinMat, 0.12f * scale, scale, new Color(0.3f, 0.5f, 0.35f), true); // Green eyes, wide
 
-        // Messy ponytail
+        // === FACIAL FEATURES (nervous rookie look) ===
+        float headRadius = 0.12f * scale;
+
+        // Worried eyebrows (raised inner corners for anxious look)
         var hairColor = new Color(0.1f, 0.08f, 0.06f); // Dark brown
         var hairMat = CreateSkinMaterial(hairColor);
+        float eyeSpacing = headRadius * 0.38f;
+        float eyeY = headRadius * 0.15f;
+        var browMesh = new BoxMesh { Size = new Vector3(0.035f * scale, 0.008f * scale, 0.012f * scale) }; // Thinner brows
+        var leftBrow = new MeshInstance3D { Mesh = browMesh, MaterialOverride = hairMat };
+        leftBrow.Position = new Vector3(-eyeSpacing, eyeY + 0.032f * scale, headRadius * 0.75f);
+        leftBrow.RotationDegrees = new Vector3(10, 0, 15); // Raised inner corner (worried)
+        headNode.AddChild(leftBrow);
+        var rightBrow = new MeshInstance3D { Mesh = browMesh, MaterialOverride = hairMat };
+        rightBrow.Position = new Vector3(eyeSpacing, eyeY + 0.032f * scale, headRadius * 0.75f);
+        rightBrow.RotationDegrees = new Vector3(10, 0, -15); // Mirror - raised inner corner
+        headNode.AddChild(rightBrow);
+
+        // Small feminine nose bridge
+        var noseBridgeMesh = new BoxMesh { Size = new Vector3(0.016f * scale, 0.028f * scale, 0.018f * scale) };
+        var noseBridge = new MeshInstance3D { Mesh = noseBridgeMesh, MaterialOverride = skinMat };
+        noseBridge.Position = new Vector3(0, 0, headRadius * 0.85f);
+        headNode.AddChild(noseBridge);
+
+        // Small nose tip (petite, slightly upturned)
+        var noseTipMesh = new SphereMesh { Radius = 0.012f * scale, Height = 0.024f * scale, RadialSegments = 6 };
+        var noseTip = new MeshInstance3D { Mesh = noseTipMesh, MaterialOverride = skinMat };
+        noseTip.Position = new Vector3(0, -0.01f * scale, headRadius * 0.93f);
+        headNode.AddChild(noseTip);
+
+        // Nostrils (two small dark spots)
+        var nostrilMat = CreateSkinMaterial(skinColor.Darkened(0.35f));
+        var nostrilMesh = new SphereMesh { Radius = 0.004f * scale, Height = 0.008f * scale, RadialSegments = 4 };
+        var leftNostril = new MeshInstance3D { Mesh = nostrilMesh, MaterialOverride = nostrilMat };
+        leftNostril.Position = new Vector3(-0.006f * scale, -0.016f * scale, headRadius * 0.91f);
+        headNode.AddChild(leftNostril);
+        var rightNostril = new MeshInstance3D { Mesh = nostrilMesh, MaterialOverride = nostrilMat };
+        rightNostril.Position = new Vector3(0.006f * scale, -0.016f * scale, headRadius * 0.91f);
+        headNode.AddChild(rightNostril);
+
+        // Ears (smaller, feminine)
+        var earMesh = new SphereMesh { Radius = 0.025f * scale, Height = 0.05f * scale, RadialSegments = 6 };
+        var leftEar = new MeshInstance3D { Mesh = earMesh, MaterialOverride = skinMat };
+        leftEar.Position = new Vector3(-headRadius * 0.9f, 0.01f * scale, 0);
+        leftEar.Scale = new Vector3(0.3f, 1f, 0.6f); // Flat, delicate
+        headNode.AddChild(leftEar);
+        var rightEar = new MeshInstance3D { Mesh = earMesh, MaterialOverride = skinMat };
+        rightEar.Position = new Vector3(headRadius * 0.9f, 0.01f * scale, 0);
+        rightEar.Scale = new Vector3(0.3f, 1f, 0.6f);
+        headNode.AddChild(rightEar);
+
+        // Inner ear detail (slightly pink)
+        var innerEarMat = CreateSkinMaterial(skinColor.Lerp(new Color(0.85f, 0.65f, 0.65f), 0.3f));
+        var innerEarMesh = new SphereMesh { Radius = 0.012f * scale, Height = 0.024f * scale, RadialSegments = 4 };
+        var leftInnerEar = new MeshInstance3D { Mesh = innerEarMesh, MaterialOverride = innerEarMat };
+        leftInnerEar.Position = new Vector3(-headRadius * 0.85f, 0.01f * scale, 0.004f * scale);
+        leftInnerEar.Scale = new Vector3(0.3f, 0.8f, 0.5f);
+        headNode.AddChild(leftInnerEar);
+        var rightInnerEar = new MeshInstance3D { Mesh = innerEarMesh, MaterialOverride = innerEarMat };
+        rightInnerEar.Position = new Vector3(headRadius * 0.85f, 0.01f * scale, 0.004f * scale);
+        rightInnerEar.Scale = new Vector3(0.3f, 0.8f, 0.5f);
+        headNode.AddChild(rightInnerEar);
+
+        // Mouth (slightly open, nervous expression)
+        var lipMat = CreateSkinMaterial(skinColor.Darkened(0.12f));
+        var lipMesh = new BoxMesh { Size = new Vector3(0.024f * scale, 0.005f * scale, 0.006f * scale) };
+        var lips = new MeshInstance3D { Mesh = lipMesh, MaterialOverride = lipMat };
+        lips.Position = new Vector3(0, -0.035f * scale, headRadius * 0.88f);
+        headNode.AddChild(lips);
+
+        // Slight mouth opening (nervous/anxious)
+        var mouthOpenMat = CreateSkinMaterial(skinColor.Darkened(0.5f));
+        var mouthOpenMesh = new BoxMesh { Size = new Vector3(0.012f * scale, 0.004f * scale, 0.004f * scale) };
+        var mouthOpen = new MeshInstance3D { Mesh = mouthOpenMesh, MaterialOverride = mouthOpenMat };
+        mouthOpen.Position = new Vector3(0, -0.04f * scale, headRadius * 0.87f);
+        headNode.AddChild(mouthOpen);
+
+        // Messy ponytail
         var hairMesh = new SphereMesh { Radius = 0.11f * scale, Height = 0.15f * scale, RadialSegments = segments };
         var hair = new MeshInstance3D { Mesh = hairMesh, MaterialOverride = hairMat };
         hair.Position = new Vector3(0, 0.06f * scale, 0);
@@ -14524,26 +14801,63 @@ public static class MonsterMeshFactory
         neck.Position = new Vector3(0, 0.85f * scale, 0);
         parent.AddChild(neck);
 
-        // Slim arms (slightly hunched posture)
-        float armY = 0.7f * scale;
-        float armX = 0.18f * scale;
-        var armMesh = new CapsuleMesh { Radius = 0.04f * scale, Height = 0.28f * scale, RadialSegments = segments };
+        // Slim arms - aggressive humanoid stance with arms spread to sides
+        float armY = 0.7f * scale;  // Shoulder height
+        float armX = 0.18f * scale; // Shoulder width (at body edge)
+        float armHeight = 0.28f * scale;
+        float armRadius = 0.04f * scale;
+        var armMesh = new CapsuleMesh { Radius = armRadius, Height = armHeight, RadialSegments = segments };
 
+        // Shoulder joints (smooth connection to body)
+        var shoulderMesh = new SphereMesh { Radius = 0.055f * scale, Height = 0.11f * scale, RadialSegments = segments };
+
+        // Left arm - spread out to left side
         var leftArmNode = new Node3D();
-        leftArmNode.Position = new Vector3(-armX, armY, 0.02f * scale);
-        leftArmNode.RotationDegrees = new Vector3(10, 0, 20); // Nervous posture
+        leftArmNode.Position = new Vector3(-armX, armY, 0);
+        // Z: -30 spreads arm out to LEFT side
+        leftArmNode.RotationDegrees = new Vector3(0, 0, -30);
         parent.AddChild(leftArmNode);
         limbs.LeftArm = leftArmNode;
+
+        var leftShoulder = new MeshInstance3D { Mesh = shoulderMesh, MaterialOverride = skinMat };
+        leftShoulder.Position = new Vector3(0, 0, 0); // At shoulder pivot
+        leftArmNode.AddChild(leftShoulder);
+
         var leftArm = new MeshInstance3D { Mesh = armMesh, MaterialOverride = skinMat };
+        leftArm.Position = new Vector3(0, -armHeight / 2 - 0.02f * scale, 0); // Hang down from shoulder
         leftArmNode.AddChild(leftArm);
 
+        // Right arm - spread out to right side
         var rightArmNode = new Node3D();
-        rightArmNode.Position = new Vector3(armX, armY, 0.02f * scale);
-        rightArmNode.RotationDegrees = new Vector3(10, 0, -20);
+        rightArmNode.Position = new Vector3(armX, armY, 0);
+        // Z: 30 spreads arm out to RIGHT side
+        rightArmNode.RotationDegrees = new Vector3(0, 0, 30);
         parent.AddChild(rightArmNode);
         limbs.RightArm = rightArmNode;
+
+        var rightShoulder = new MeshInstance3D { Mesh = shoulderMesh, MaterialOverride = skinMat };
+        rightShoulder.Position = new Vector3(0, 0, 0); // At shoulder pivot
+        rightArmNode.AddChild(rightShoulder);
+
         var rightArm = new MeshInstance3D { Mesh = armMesh, MaterialOverride = skinMat };
+        rightArm.Position = new Vector3(0, -armHeight / 2 - 0.02f * scale, 0); // Hang down from shoulder
         rightArmNode.AddChild(rightArm);
+
+        // === HUMANOID HANDS WITH FINGER ARTICULATION ===
+        // Arm extends from shoulder: offset + half height
+        float armLengthForHands = (armHeight / 2 + 0.02f * scale) * 2 + armHeight;
+
+        // Left hand with relaxed pose (nervous rookie, no weapon)
+        CreateHumanoidHand(
+            leftArmNode, armLengthForHands, scale, skinMat,
+            isLeftHand: true, lod, HandPose.Relaxed
+        );
+
+        // Right hand with relaxed pose (nervous rookie, no weapon)
+        CreateHumanoidHand(
+            rightArmNode, armLengthForHands, scale, skinMat,
+            isLeftHand: false, lod, HandPose.Relaxed
+        );
 
         // Slim legs
         float legY = 0.25f * scale;
@@ -14617,6 +14931,71 @@ public static class MonsterMeshFactory
         // Confident eyes
         CreateHumanoidEyes(headNode, skinMat, 0.13f * scale, scale, new Color(0.3f, 0.4f, 0.6f)); // Blue eyes
 
+        // === FACIAL FEATURES ===
+        float headRadius = 0.13f * scale;
+
+        // Hair material for eyebrows (defined early for use below)
+        var hairColor = new Color(0.6f, 0.45f, 0.2f); // Blonde
+        var hairMat = CreateSkinMaterial(hairColor);
+
+        // Cocky raised eyebrows (box meshes above eyes - outer edges tilted up for arrogant look)
+        float eyeSpacing = headRadius * 0.38f;
+        float eyeY = headRadius * 0.15f;
+        var browMesh = new BoxMesh { Size = new Vector3(0.045f * scale, 0.01f * scale, 0.015f * scale) };
+        var leftBrow = new MeshInstance3D { Mesh = browMesh, MaterialOverride = hairMat };
+        leftBrow.Position = new Vector3(-eyeSpacing, eyeY + 0.04f * scale, headRadius * 0.75f);
+        leftBrow.RotationDegrees = new Vector3(-10, 0, 8); // Raised/cocky angle (outer edge up)
+        headNode.AddChild(leftBrow);
+        var rightBrow = new MeshInstance3D { Mesh = browMesh, MaterialOverride = hairMat };
+        rightBrow.Position = new Vector3(eyeSpacing, eyeY + 0.04f * scale, headRadius * 0.75f);
+        rightBrow.RotationDegrees = new Vector3(-10, 0, -8); // Mirror angle
+        headNode.AddChild(rightBrow);
+
+        // Nose bridge (box)
+        var noseBridgeMesh = new BoxMesh { Size = new Vector3(0.02f * scale, 0.03f * scale, 0.022f * scale) };
+        var noseBridge = new MeshInstance3D { Mesh = noseBridgeMesh, MaterialOverride = skinMat };
+        noseBridge.Position = new Vector3(0, 0, headRadius * 0.85f);
+        headNode.AddChild(noseBridge);
+
+        // Nose tip (sphere - refined look for pretty boy)
+        var noseTipMesh = new SphereMesh { Radius = 0.014f * scale, Height = 0.028f * scale, RadialSegments = 6 };
+        var noseTip = new MeshInstance3D { Mesh = noseTipMesh, MaterialOverride = skinMat };
+        noseTip.Position = new Vector3(0, -0.012f * scale, headRadius * 0.95f);
+        headNode.AddChild(noseTip);
+
+        // Nostrils (two small dark spheres)
+        var nostrilMat = CreateSkinMaterial(skinColor.Darkened(0.4f));
+        var nostrilMesh = new SphereMesh { Radius = 0.004f * scale, Height = 0.008f * scale, RadialSegments = 4 };
+        var leftNostril = new MeshInstance3D { Mesh = nostrilMesh, MaterialOverride = nostrilMat };
+        leftNostril.Position = new Vector3(-0.007f * scale, -0.018f * scale, headRadius * 0.92f);
+        headNode.AddChild(leftNostril);
+        var rightNostril = new MeshInstance3D { Mesh = nostrilMesh, MaterialOverride = nostrilMat };
+        rightNostril.Position = new Vector3(0.007f * scale, -0.018f * scale, headRadius * 0.92f);
+        headNode.AddChild(rightNostril);
+
+        // Ears (flattened spheres on sides of head)
+        var earMesh = new SphereMesh { Radius = 0.028f * scale, Height = 0.056f * scale, RadialSegments = 6 };
+        var leftEar = new MeshInstance3D { Mesh = earMesh, MaterialOverride = skinMat };
+        leftEar.Position = new Vector3(-headRadius * 0.9f, 0.01f * scale, 0);
+        leftEar.Scale = new Vector3(0.3f, 1f, 0.65f); // Flat, tall
+        headNode.AddChild(leftEar);
+        var rightEar = new MeshInstance3D { Mesh = earMesh, MaterialOverride = skinMat };
+        rightEar.Position = new Vector3(headRadius * 0.9f, 0.01f * scale, 0);
+        rightEar.Scale = new Vector3(0.3f, 1f, 0.65f);
+        headNode.AddChild(rightEar);
+
+        // Inner ear detail (slightly pink)
+        var innerEarMat = CreateSkinMaterial(skinColor.Lerp(new Color(0.8f, 0.6f, 0.6f), 0.3f));
+        var innerEarMesh = new SphereMesh { Radius = 0.014f * scale, Height = 0.028f * scale, RadialSegments = 4 };
+        var leftInnerEar = new MeshInstance3D { Mesh = innerEarMesh, MaterialOverride = innerEarMat };
+        leftInnerEar.Position = new Vector3(-headRadius * 0.85f, 0.01f * scale, 0.005f * scale);
+        leftInnerEar.Scale = new Vector3(0.3f, 0.8f, 0.5f);
+        headNode.AddChild(leftInnerEar);
+        var rightInnerEar = new MeshInstance3D { Mesh = innerEarMesh, MaterialOverride = innerEarMat };
+        rightInnerEar.Position = new Vector3(headRadius * 0.85f, 0.01f * scale, 0.005f * scale);
+        rightInnerEar.Scale = new Vector3(0.3f, 0.8f, 0.5f);
+        headNode.AddChild(rightInnerEar);
+
         // Smug smile (small curved cylinder)
         var smileMesh = new CylinderMesh { TopRadius = 0.04f * scale, BottomRadius = 0.04f * scale, Height = 0.01f * scale, RadialSegments = 8 };
         var smile = new MeshInstance3D { Mesh = smileMesh, MaterialOverride = CreateSkinMaterial(new Color(0.6f, 0.3f, 0.3f)) };
@@ -14626,8 +15005,6 @@ public static class MonsterMeshFactory
         headNode.AddChild(smile);
 
         // Styled hair (spiky)
-        var hairColor = new Color(0.6f, 0.45f, 0.2f); // Blonde
-        var hairMat = CreateSkinMaterial(hairColor);
         var hairMesh = new SphereMesh { Radius = 0.12f * scale, Height = 0.12f * scale, RadialSegments = segments };
         var hair = new MeshInstance3D { Mesh = hairMesh, MaterialOverride = hairMat };
         hair.Position = new Vector3(0, 0.08f * scale, 0);
@@ -14657,26 +15034,63 @@ public static class MonsterMeshFactory
         neck.Position = new Vector3(0, 0.92f * scale, 0);
         parent.AddChild(neck);
 
-        // Buff arms (flexing position)
-        float armY = 0.8f * scale;
-        float armX = 0.26f * scale;
-        var armMesh = new CapsuleMesh { Radius = 0.065f * scale, Height = 0.32f * scale, RadialSegments = segments };
+        // Buff arms - aggressive combat stance, arms held forward and out
+        float armY = 0.8f * scale;  // Shoulder height
+        float armX = 0.26f * scale;  // Shoulder width (at body edge)
+        float armHeight = 0.32f * scale;
+        float armRadius = 0.065f * scale;
+        var armMesh = new CapsuleMesh { Radius = armRadius, Height = armHeight, RadialSegments = segments };
 
+        // Shoulder joints (smooth connection to body)
+        var shoulderMesh = new SphereMesh { Radius = 0.08f * scale, Height = 0.16f * scale, RadialSegments = segments };
+
+        // Left arm - spread out to left side
         var leftArmNode = new Node3D();
         leftArmNode.Position = new Vector3(-armX, armY, 0);
-        leftArmNode.RotationDegrees = new Vector3(0, 0, 25);
+        // Z: -30 spreads arm out to LEFT side
+        leftArmNode.RotationDegrees = new Vector3(0, 0, -30);
         parent.AddChild(leftArmNode);
         limbs.LeftArm = leftArmNode;
+
+        var leftShoulder = new MeshInstance3D { Mesh = shoulderMesh, MaterialOverride = skinMat };
+        leftShoulder.Position = new Vector3(0, 0, 0); // At shoulder pivot
+        leftArmNode.AddChild(leftShoulder);
+
         var leftArm = new MeshInstance3D { Mesh = armMesh, MaterialOverride = skinMat };
+        leftArm.Position = new Vector3(0, -armHeight / 2 - 0.02f * scale, 0); // Hang down from shoulder
         leftArmNode.AddChild(leftArm);
 
+        // Right arm - spread out to right side
         var rightArmNode = new Node3D();
         rightArmNode.Position = new Vector3(armX, armY, 0);
-        rightArmNode.RotationDegrees = new Vector3(0, 0, -25);
+        // Z: 30 spreads arm out to RIGHT side
+        rightArmNode.RotationDegrees = new Vector3(0, 0, 30);
         parent.AddChild(rightArmNode);
         limbs.RightArm = rightArmNode;
+
+        var rightShoulder = new MeshInstance3D { Mesh = shoulderMesh, MaterialOverride = skinMat };
+        rightShoulder.Position = new Vector3(0, 0, 0); // At shoulder pivot
+        rightArmNode.AddChild(rightShoulder);
+
         var rightArm = new MeshInstance3D { Mesh = armMesh, MaterialOverride = skinMat };
+        rightArm.Position = new Vector3(0, -armHeight / 2 - 0.02f * scale, 0); // Hang down from shoulder
         rightArmNode.AddChild(rightArm);
+
+        // === HUMANOID HANDS WITH FINGER ARTICULATION ===
+        // Arm extends from shoulder: offset + half height
+        float armLengthForHands = 0.68f * scale;
+
+        // Right hand with grip pose (Chad holds weapons confidently)
+        var rightHandAttach = CreateHumanoidHand(
+            rightArmNode, armLengthForHands, scale, skinMat,
+            isLeftHand: false, lod, HandPose.Grip
+        );
+
+        // Left hand with grip pose
+        var leftHandAttach = CreateHumanoidHand(
+            leftArmNode, armLengthForHands, scale, skinMat,
+            isLeftHand: true, lod, HandPose.Grip
+        );
 
         // Athletic legs
         float legY = 0.28f * scale;
@@ -14779,6 +15193,75 @@ public static class MonsterMeshFactory
         rightEye.Position = new Vector3(0.04f * scale, -0.01f * scale, 0.1f * scale);
         headNode.AddChild(rightEye);
 
+        // === FACIAL FEATURES (subtle, mysterious) ===
+
+        // Thin arched eyebrows (enigmatic expression)
+        float eyeSpacing = 0.04f * scale;
+        float eyeY = -0.01f * scale;
+        var browMat = CreateSkinMaterial(skinColor.Darkened(0.3f));
+        var browMesh = new BoxMesh { Size = new Vector3(0.035f * scale, 0.006f * scale, 0.01f * scale) };
+        var leftBrow = new MeshInstance3D { Mesh = browMesh, MaterialOverride = browMat };
+        leftBrow.Position = new Vector3(-eyeSpacing, eyeY + 0.035f * scale, 0.1f * scale);
+        leftBrow.RotationDegrees = new Vector3(10, 0, 5); // Slightly raised, enigmatic
+        headNode.AddChild(leftBrow);
+        var rightBrow = new MeshInstance3D { Mesh = browMesh, MaterialOverride = browMat };
+        rightBrow.Position = new Vector3(eyeSpacing, eyeY + 0.035f * scale, 0.1f * scale);
+        rightBrow.RotationDegrees = new Vector3(10, 0, -5); // Mirror angle
+        headNode.AddChild(rightBrow);
+
+        // Thin nose bridge (angular, gaunt)
+        var noseBridgeMesh = new BoxMesh { Size = new Vector3(0.015f * scale, 0.03f * scale, 0.018f * scale) };
+        var noseBridge = new MeshInstance3D { Mesh = noseBridgeMesh, MaterialOverride = skinMat };
+        noseBridge.Position = new Vector3(0, -0.02f * scale, 0.1f * scale);
+        headNode.AddChild(noseBridge);
+
+        // Thin pointed nose tip
+        var noseTipMesh = new SphereMesh { Radius = 0.01f * scale, Height = 0.02f * scale, RadialSegments = 6 };
+        var noseTip = new MeshInstance3D { Mesh = noseTipMesh, MaterialOverride = skinMat };
+        noseTip.Position = new Vector3(0, -0.04f * scale, 0.11f * scale);
+        noseTip.Scale = new Vector3(0.8f, 1f, 1.2f); // Slightly pointed
+        headNode.AddChild(noseTip);
+
+        // Small nostrils (dark shadows)
+        var nostrilMat = CreateSkinMaterial(skinColor.Darkened(0.5f));
+        var nostrilMesh = new SphereMesh { Radius = 0.004f * scale, Height = 0.008f * scale, RadialSegments = 4 };
+        var leftNostril = new MeshInstance3D { Mesh = nostrilMesh, MaterialOverride = nostrilMat };
+        leftNostril.Position = new Vector3(-0.006f * scale, -0.048f * scale, 0.105f * scale);
+        headNode.AddChild(leftNostril);
+        var rightNostril = new MeshInstance3D { Mesh = nostrilMesh, MaterialOverride = nostrilMat };
+        rightNostril.Position = new Vector3(0.006f * scale, -0.048f * scale, 0.105f * scale);
+        headNode.AddChild(rightNostril);
+
+        // Ears (partially hidden by hood, pale and gaunt)
+        var earMesh = new SphereMesh { Radius = 0.025f * scale, Height = 0.05f * scale, RadialSegments = 6 };
+        var leftEar = new MeshInstance3D { Mesh = earMesh, MaterialOverride = skinMat };
+        leftEar.Position = new Vector3(-0.1f * scale, -0.01f * scale, 0);
+        leftEar.Scale = new Vector3(0.25f, 1f, 0.6f); // Thin, elongated
+        headNode.AddChild(leftEar);
+        var rightEar = new MeshInstance3D { Mesh = earMesh, MaterialOverride = skinMat };
+        rightEar.Position = new Vector3(0.1f * scale, -0.01f * scale, 0);
+        rightEar.Scale = new Vector3(0.25f, 1f, 0.6f);
+        headNode.AddChild(rightEar);
+
+        // Inner ear detail (darker shadow within hood)
+        var innerEarMat = CreateSkinMaterial(skinColor.Darkened(0.25f));
+        var innerEarMesh = new SphereMesh { Radius = 0.012f * scale, Height = 0.024f * scale, RadialSegments = 4 };
+        var leftInnerEar = new MeshInstance3D { Mesh = innerEarMesh, MaterialOverride = innerEarMat };
+        leftInnerEar.Position = new Vector3(-0.095f * scale, -0.01f * scale, 0.004f * scale);
+        leftInnerEar.Scale = new Vector3(0.3f, 0.75f, 0.5f);
+        headNode.AddChild(leftInnerEar);
+        var rightInnerEar = new MeshInstance3D { Mesh = innerEarMesh, MaterialOverride = innerEarMat };
+        rightInnerEar.Position = new Vector3(0.095f * scale, -0.01f * scale, 0.004f * scale);
+        rightInnerEar.Scale = new Vector3(0.3f, 0.75f, 0.5f);
+        headNode.AddChild(rightInnerEar);
+
+        // Thin neutral lips (mysterious, neither smiling nor frowning)
+        var lipMat = CreateSkinMaterial(skinColor.Darkened(0.2f));
+        var lipMesh = new BoxMesh { Size = new Vector3(0.025f * scale, 0.004f * scale, 0.006f * scale) };
+        var lips = new MeshInstance3D { Mesh = lipMesh, MaterialOverride = lipMat };
+        lips.Position = new Vector3(0, -0.06f * scale, 0.1f * scale);
+        headNode.AddChild(lips);
+
         // Thin arms hidden in sleeves
         float armY = 0.65f * scale;
         float armX = 0.2f * scale;
@@ -14872,6 +15355,74 @@ public static class MonsterMeshFactory
         // Big friendly eyes
         CreateHumanoidEyes(headNode, skinMat, 0.14f * scale, scale, new Color(0.4f, 0.55f, 0.4f), true); // Green eyes, big
 
+        // Hair material for eyebrows (defined early, reused for messy hair below)
+        var hairColor = new Color(0.45f, 0.3f, 0.2f); // Light brown
+        var hairMat = CreateSkinMaterial(hairColor);
+
+        // === FACIAL FEATURES (Comedic/Surprised look for Hank) ===
+        float headRadius = 0.14f * scale;
+
+        // Raised eyebrows (surprised/comedic look - angled up in center)
+        float eyeSpacing = headRadius * 0.38f;
+        float eyeY = headRadius * 0.15f;
+        var browMesh = new BoxMesh { Size = new Vector3(0.04f * scale, 0.012f * scale, 0.014f * scale) };
+        var leftBrow = new MeshInstance3D { Mesh = browMesh, MaterialOverride = hairMat };
+        leftBrow.Position = new Vector3(-eyeSpacing, eyeY + 0.045f * scale, headRadius * 0.72f); // Higher up for surprised look
+        leftBrow.RotationDegrees = new Vector3(10, 0, 8); // Raised on inner edge (surprised)
+        headNode.AddChild(leftBrow);
+        var rightBrow = new MeshInstance3D { Mesh = browMesh, MaterialOverride = hairMat };
+        rightBrow.Position = new Vector3(eyeSpacing, eyeY + 0.045f * scale, headRadius * 0.72f);
+        rightBrow.RotationDegrees = new Vector3(10, 0, -8); // Mirror angle
+        headNode.AddChild(rightBrow);
+
+        // Round button nose bridge (shorter, rounder for comedic look)
+        var noseBridgeMesh = new BoxMesh { Size = new Vector3(0.02f * scale, 0.025f * scale, 0.02f * scale) };
+        var noseBridge = new MeshInstance3D { Mesh = noseBridgeMesh, MaterialOverride = skinMat };
+        noseBridge.Position = new Vector3(0, -0.005f * scale, headRadius * 0.82f);
+        headNode.AddChild(noseBridge);
+
+        // Round button nose tip (larger, rounder for goofy look)
+        var noseTipMesh = new SphereMesh { Radius = 0.022f * scale, Height = 0.044f * scale, RadialSegments = 8 };
+        var noseTip = new MeshInstance3D { Mesh = noseTipMesh, MaterialOverride = skinMat };
+        noseTip.Position = new Vector3(0, -0.018f * scale, headRadius * 0.92f);
+        noseTip.Scale = new Vector3(1.1f, 0.9f, 1f); // Slightly wider than tall
+        headNode.AddChild(noseTip);
+
+        // Nostrils (two small dark spheres)
+        var nostrilMat = CreateSkinMaterial(skinColor.Darkened(0.35f));
+        var nostrilMesh = new SphereMesh { Radius = 0.006f * scale, Height = 0.012f * scale, RadialSegments = 4 };
+        var leftNostril = new MeshInstance3D { Mesh = nostrilMesh, MaterialOverride = nostrilMat };
+        leftNostril.Position = new Vector3(-0.01f * scale, -0.028f * scale, headRadius * 0.88f);
+        headNode.AddChild(leftNostril);
+        var rightNostril = new MeshInstance3D { Mesh = nostrilMesh, MaterialOverride = nostrilMat };
+        rightNostril.Position = new Vector3(0.01f * scale, -0.028f * scale, headRadius * 0.88f);
+        headNode.AddChild(rightNostril);
+
+        // Ears (slightly larger, floppy-looking for comedic character)
+        var earMesh = new SphereMesh { Radius = 0.035f * scale, Height = 0.07f * scale, RadialSegments = 6 };
+        var leftEar = new MeshInstance3D { Mesh = earMesh, MaterialOverride = skinMat };
+        leftEar.Position = new Vector3(-headRadius * 0.92f, 0.01f * scale, 0);
+        leftEar.Scale = new Vector3(0.35f, 1.1f, 0.7f); // Slightly larger, floppy
+        leftEar.RotationDegrees = new Vector3(0, 0, 5); // Slight outward tilt
+        headNode.AddChild(leftEar);
+        var rightEar = new MeshInstance3D { Mesh = earMesh, MaterialOverride = skinMat };
+        rightEar.Position = new Vector3(headRadius * 0.92f, 0.01f * scale, 0);
+        rightEar.Scale = new Vector3(0.35f, 1.1f, 0.7f);
+        rightEar.RotationDegrees = new Vector3(0, 0, -5); // Mirror tilt
+        headNode.AddChild(rightEar);
+
+        // Inner ear detail (pinkish)
+        var innerEarMat = CreateSkinMaterial(skinColor.Lerp(new Color(0.85f, 0.65f, 0.65f), 0.35f));
+        var innerEarMesh = new SphereMesh { Radius = 0.018f * scale, Height = 0.036f * scale, RadialSegments = 4 };
+        var leftInnerEar = new MeshInstance3D { Mesh = innerEarMesh, MaterialOverride = innerEarMat };
+        leftInnerEar.Position = new Vector3(-headRadius * 0.87f, 0.01f * scale, 0.006f * scale);
+        leftInnerEar.Scale = new Vector3(0.3f, 0.85f, 0.55f);
+        headNode.AddChild(leftInnerEar);
+        var rightInnerEar = new MeshInstance3D { Mesh = innerEarMesh, MaterialOverride = innerEarMat };
+        rightInnerEar.Position = new Vector3(headRadius * 0.87f, 0.01f * scale, 0.006f * scale);
+        rightInnerEar.Scale = new Vector3(0.3f, 0.85f, 0.55f);
+        headNode.AddChild(rightInnerEar);
+
         // Big goofy smile
         var smileMesh = new TorusMesh { InnerRadius = 0.04f * scale, OuterRadius = 0.06f * scale, Rings = 8, RingSegments = 8 };
         var smile = new MeshInstance3D { Mesh = smileMesh, MaterialOverride = CreateSkinMaterial(new Color(0.7f, 0.4f, 0.4f)) };
@@ -14880,9 +15431,7 @@ public static class MonsterMeshFactory
         smile.Scale = new Vector3(1f, 1f, 0.5f);
         headNode.AddChild(smile);
 
-        // Messy curly hair
-        var hairColor = new Color(0.45f, 0.3f, 0.2f); // Light brown
-        var hairMat = CreateSkinMaterial(hairColor);
+        // Messy curly hair (hairColor and hairMat already defined above)
         for (int i = 0; i < 8; i++)
         {
             var curlMesh = new SphereMesh { Radius = 0.04f * scale, Height = 0.08f * scale, RadialSegments = 6 };
@@ -14902,35 +15451,63 @@ public static class MonsterMeshFactory
         neck.Position = new Vector3(0, 0.8f * scale, 0);
         parent.AddChild(neck);
 
-        // Stubby arms
-        float armY = 0.65f * scale;
-        float armX = 0.25f * scale;
-        var armMesh = new CapsuleMesh { Radius = 0.06f * scale, Height = 0.25f * scale, RadialSegments = segments };
+        // Stubby arms - aggressive humanoid stance with arms spread to sides
+        float armY = 0.65f * scale;  // Shoulder height
+        float armX = 0.25f * scale;  // Shoulder width
+        float armHeight = 0.25f * scale;
+        float armRadius = 0.06f * scale;
+        var armMesh = new CapsuleMesh { Radius = armRadius, Height = armHeight, RadialSegments = segments };
 
+        // Shoulder joints (smooth connection to body)
+        var shoulderMesh = new SphereMesh { Radius = 0.075f * scale, Height = 0.15f * scale, RadialSegments = segments };
+
+        // Left arm - spread out to left side
         var leftArmNode = new Node3D();
         leftArmNode.Position = new Vector3(-armX, armY, 0);
-        leftArmNode.RotationDegrees = new Vector3(0, 0, 20);
+        // Z: -30 spreads arm out to LEFT side
+        leftArmNode.RotationDegrees = new Vector3(0, 0, -30);
         parent.AddChild(leftArmNode);
         limbs.LeftArm = leftArmNode;
+
+        var leftShoulder = new MeshInstance3D { Mesh = shoulderMesh, MaterialOverride = skinMat };
+        leftShoulder.Position = new Vector3(0, 0, 0); // At shoulder pivot
+        leftArmNode.AddChild(leftShoulder);
+
         var leftArm = new MeshInstance3D { Mesh = armMesh, MaterialOverride = skinMat };
+        leftArm.Position = new Vector3(0, -armHeight / 2 - 0.02f * scale, 0); // Hang down from shoulder
         leftArmNode.AddChild(leftArm);
 
+        // Right arm - spread out to right side
         var rightArmNode = new Node3D();
         rightArmNode.Position = new Vector3(armX, armY, 0);
-        rightArmNode.RotationDegrees = new Vector3(0, 0, -20);
+        // Z: 30 spreads arm out to RIGHT side
+        rightArmNode.RotationDegrees = new Vector3(0, 0, 30);
         parent.AddChild(rightArmNode);
         limbs.RightArm = rightArmNode;
+
+        var rightShoulder = new MeshInstance3D { Mesh = shoulderMesh, MaterialOverride = skinMat };
+        rightShoulder.Position = new Vector3(0, 0, 0); // At shoulder pivot
+        rightArmNode.AddChild(rightShoulder);
+
         var rightArm = new MeshInstance3D { Mesh = armMesh, MaterialOverride = skinMat };
+        rightArm.Position = new Vector3(0, -armHeight / 2 - 0.02f * scale, 0); // Hang down from shoulder
         rightArmNode.AddChild(rightArm);
 
-        // Mismatched gloves
-        var gloveMesh = new SphereMesh { Radius = 0.05f * scale, Height = 0.08f * scale, RadialSegments = 8 };
-        var leftGlove = new MeshInstance3D { Mesh = gloveMesh, MaterialOverride = gear1Mat };
-        leftGlove.Position = new Vector3(0, -0.15f * scale, 0);
-        leftArmNode.AddChild(leftGlove);
-        var rightGlove = new MeshInstance3D { Mesh = gloveMesh, MaterialOverride = gear2Mat }; // Different color!
-        rightGlove.Position = new Vector3(0, -0.15f * scale, 0);
-        rightArmNode.AddChild(rightGlove);
+        // === HUMANOID HANDS WITH RELAXED POSE (Hank is comedic/clumsy) ===
+        // Arm extends from shoulder: offset + half height for positioning
+        float armLengthForHands = 0.5f * scale;
+
+        // Left hand with relaxed pose and mismatched glove
+        var leftHandAttach = CreateHumanoidHand(
+            leftArmNode, armLengthForHands, scale, skinMat,
+            isLeftHand: true, lod, HandPose.Relaxed, gear1Mat
+        );
+
+        // Right hand with relaxed pose and different colored glove
+        var rightHandAttach = CreateHumanoidHand(
+            rightArmNode, armLengthForHands, scale, skinMat,
+            isLeftHand: false, lod, HandPose.Relaxed, gear2Mat
+        );
 
         // Short stubby legs
         float legY = 0.22f * scale;
@@ -15024,6 +15601,199 @@ public static class MonsterMeshFactory
             Roughness = 0.8f,
             Metallic = 0f
         };
+    }
+
+    // ========================================================================
+    // HUMANOID HAND HELPERS
+    // ========================================================================
+
+    /// <summary>
+    /// Creates a single finger segment (phalanx) as a tapered cylinder.
+    /// </summary>
+    private static MeshInstance3D CreateFingerSegment(float length, float radius, StandardMaterial3D material, float scale = 1f)
+    {
+        var mesh = new CylinderMesh
+        {
+            TopRadius = radius * 0.85f * scale,
+            BottomRadius = radius * scale,
+            Height = length * scale,
+            RadialSegments = 6
+        };
+        var segment = new MeshInstance3D { Mesh = mesh, MaterialOverride = material };
+        return segment;
+    }
+
+    /// <summary>
+    /// Creates an anatomically correct humanoid hand with palm, 4 fingers, thumb, and attachment point.
+    /// Returns the "Hand" or "LeftHand" attachment node for weapons/items.
+    /// </summary>
+    /// <param name="armNode">Parent arm node to attach hand to</param>
+    /// <param name="armLength">Length of the arm capsule (for positioning)</param>
+    /// <param name="scale">Overall scale factor</param>
+    /// <param name="skinMat">Material for skin</param>
+    /// <param name="isLeftHand">True for left hand, false for right</param>
+    /// <param name="lod">Level of detail</param>
+    /// <param name="pose">Hand pose (affects finger curl)</param>
+    /// <param name="gloveMat">Optional glove material (null for bare skin)</param>
+    /// <returns>Hand attachment node for weapons</returns>
+    private static Node3D CreateHumanoidHand(
+        Node3D armNode,
+        float armLength,
+        float scale,
+        StandardMaterial3D skinMat,
+        bool isLeftHand,
+        LODLevel lod,
+        HandPose pose = HandPose.Relaxed,
+        StandardMaterial3D? gloveMat = null)
+    {
+        var handMat = gloveMat ?? skinMat;
+        float xSign = isLeftHand ? -1f : 1f;
+
+        // Get curl angles based on pose
+        float fingerCurl = pose switch
+        {
+            HandPose.Relaxed => 15f,
+            HandPose.Grip => 70f,
+            HandPose.Open => 0f,
+            HandPose.Pointing => 70f, // Default curl for non-index fingers
+            _ => 15f
+        };
+
+        float thumbCurl = pose switch
+        {
+            HandPose.Relaxed => 20f,
+            HandPose.Grip => 45f,
+            HandPose.Open => 10f,
+            HandPose.Pointing => 40f,
+            _ => 20f
+        };
+
+        // Hand attachment node (for weapons)
+        var handAttach = new Node3D();
+        handAttach.Name = isLeftHand ? "LeftHand" : "Hand";
+        // Position at palm center, accounting for arm length
+        handAttach.Position = new Vector3(xSign * 0.01f * scale, -armLength / 2 - 0.03f * scale, 0.06f * scale);
+        // Rotation for natural weapon grip (blade extends forward from hand, +Y becomes +Z forward)
+        // -70° X tilts blade forward, 180° Y flips direction
+        // Z rotation: positive sign so weapons point OUTWARD from body
+        handAttach.RotationDegrees = new Vector3(-70f, 180f, xSign * 45f);
+        armNode.AddChild(handAttach);
+
+        // LOD handling - simpler hands for lower detail
+        if (lod == LODLevel.Low)
+        {
+            // Low LOD: Simple sphere hand
+            var simpleHandMesh = new SphereMesh { Radius = 0.04f * scale, Height = 0.08f * scale, RadialSegments = 6 };
+            var simpleHand = new MeshInstance3D { Mesh = simpleHandMesh, MaterialOverride = handMat };
+            simpleHand.Position = new Vector3(xSign * 0.02f * scale, -armLength / 2 - 0.02f * scale, 0.02f * scale);
+            armNode.AddChild(simpleHand);
+            return handAttach;
+        }
+
+        // Palm geometry (flattened box)
+        var palmMesh = new BoxMesh { Size = new Vector3(0.06f * scale, 0.03f * scale, 0.07f * scale) };
+        var palm = new MeshInstance3D { Mesh = palmMesh, MaterialOverride = handMat };
+        float palmY = armLength / 2 + 0.015f * scale;
+        palm.Position = new Vector3(xSign * 0.02f * scale, -palmY, 0.03f * scale);
+        armNode.AddChild(palm);
+
+        // Medium LOD: Palm + finger stubs (no articulation)
+        if (lod == LODLevel.Medium)
+        {
+            // 4 finger stubs
+            var stubMesh = new CylinderMesh { TopRadius = 0.008f * scale, BottomRadius = 0.01f * scale, Height = 0.05f * scale, RadialSegments = 4 };
+            for (int f = 0; f < 4; f++)
+            {
+                float spreadX = (-0.02f + f * 0.013f) * scale;
+                var stub = new MeshInstance3D { Mesh = stubMesh, MaterialOverride = handMat };
+                stub.Position = new Vector3(xSign * (0.02f * scale + spreadX), -palmY - 0.04f * scale, 0.055f * scale);
+                stub.RotationDegrees = new Vector3(fingerCurl, 0, 0);
+                armNode.AddChild(stub);
+            }
+            // Thumb stub
+            var thumbStub = new MeshInstance3D { Mesh = stubMesh, MaterialOverride = handMat };
+            thumbStub.Position = new Vector3(xSign * 0.05f * scale, -palmY - 0.01f * scale, 0.02f * scale);
+            thumbStub.RotationDegrees = new Vector3(-20, xSign * 45, xSign * 30);
+            armNode.AddChild(thumbStub);
+            return handAttach;
+        }
+
+        // High LOD: Full finger articulation
+        // 4 fingers (index, middle, ring, pinky)
+        float[] fingerLengths = { 0.045f, 0.055f, 0.052f, 0.04f }; // Index, middle, ring, pinky
+        float[] fingerRadii = { 0.010f, 0.011f, 0.010f, 0.009f };
+        float[] fingerSpread = { -0.018f, -0.006f, 0.006f, 0.018f }; // X offsets
+
+        for (int f = 0; f < 4; f++)
+        {
+            float currentCurl = (pose == HandPose.Pointing && f == 0) ? 5f : fingerCurl;
+            float length1 = fingerLengths[f] * 0.55f;
+            float length2 = fingerLengths[f] * 0.45f;
+            float rad = fingerRadii[f];
+
+            // Knuckle node (for rotation)
+            var knuckleNode = new Node3D();
+            knuckleNode.Position = new Vector3(
+                xSign * (0.02f * scale + fingerSpread[f] * scale),
+                -palmY - 0.025f * scale,
+                0.06f * scale
+            );
+            // Finger curl + slight spread
+            float spreadAngle = (f - 1.5f) * 3f * xSign;
+            knuckleNode.RotationDegrees = new Vector3(currentCurl, 0, spreadAngle);
+            armNode.AddChild(knuckleNode);
+
+            // Proximal phalanx
+            var proximal = CreateFingerSegment(length1, rad, handMat, scale);
+            proximal.Position = new Vector3(0, -length1 * scale / 2, 0);
+            knuckleNode.AddChild(proximal);
+
+            // Distal phalanx
+            var distalNode = new Node3D();
+            distalNode.Position = new Vector3(0, -length1 * scale, 0);
+            distalNode.RotationDegrees = new Vector3(currentCurl * 0.6f, 0, 0);
+            knuckleNode.AddChild(distalNode);
+
+            var distal = CreateFingerSegment(length2, rad * 0.9f, handMat, scale);
+            distal.Position = new Vector3(0, -length2 * scale / 2, 0);
+            distalNode.AddChild(distal);
+
+            // Fingertip (small sphere)
+            var tipMesh = new SphereMesh { Radius = rad * 0.8f * scale, Height = rad * 1.6f * scale, RadialSegments = 4 };
+            var tip = new MeshInstance3D { Mesh = tipMesh, MaterialOverride = handMat };
+            tip.Position = new Vector3(0, -length2 * scale, 0);
+            distalNode.AddChild(tip);
+        }
+
+        // Thumb (2 segments, positioned at side of palm)
+        var thumbNode = new Node3D();
+        thumbNode.Position = new Vector3(xSign * 0.05f * scale, -palmY, 0.02f * scale);
+        thumbNode.RotationDegrees = new Vector3(-thumbCurl * 0.5f, xSign * 50, xSign * 35);
+        armNode.AddChild(thumbNode);
+
+        // Thumb base (metacarpal)
+        var thumbBase = CreateFingerSegment(0.03f, 0.012f, handMat, scale);
+        thumbBase.Position = new Vector3(0, -0.015f * scale, 0);
+        thumbNode.AddChild(thumbBase);
+
+        // Thumb tip node
+        var thumbTipNode = new Node3D();
+        thumbTipNode.Position = new Vector3(0, -0.03f * scale, 0);
+        thumbTipNode.RotationDegrees = new Vector3(thumbCurl * 0.4f, 0, 0);
+        thumbNode.AddChild(thumbTipNode);
+
+        // Thumb distal
+        var thumbDistal = CreateFingerSegment(0.025f, 0.010f, handMat, scale);
+        thumbDistal.Position = new Vector3(0, -0.0125f * scale, 0);
+        thumbTipNode.AddChild(thumbDistal);
+
+        // Thumb tip sphere
+        var thumbTipMesh = new SphereMesh { Radius = 0.009f * scale, Height = 0.018f * scale, RadialSegments = 4 };
+        var thumbTip = new MeshInstance3D { Mesh = thumbTipMesh, MaterialOverride = handMat };
+        thumbTip.Position = new Vector3(0, -0.025f * scale, 0);
+        thumbTipNode.AddChild(thumbTip);
+
+        return handAttach;
     }
 
     // ========================================================================
