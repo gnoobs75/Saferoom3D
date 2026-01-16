@@ -186,6 +186,10 @@ public partial class GameManager3D : Node
             ScheduleDungeonStartSound();
         }
 
+        // Create Kill Cam system
+        var killCam = new KillCam3D();
+        AddChild(killCam);
+
         GD.Print("[GameManager3D] Game initialized successfully");
     }
 

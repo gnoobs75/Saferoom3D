@@ -429,7 +429,7 @@ public partial class FPSController : CharacterBody3D
         _weaponNode.AddChild(weaponMesh);
         _weaponHolder?.AddChild(_weaponNode);
 
-        GD.Print($"[FPSController] First-person weapon created: {weaponType}");
+        GD.Print($"[FPSController] First-person weapon created: {weaponType} at pos={_weaponRestPos}, rot={restRotation}, scale={scale}, holder={_weaponHolder?.Name ?? "NULL"}");
     }
 
     /// <summary>
@@ -471,10 +471,10 @@ public partial class FPSController : CharacterBody3D
                 0.8f                                 // Smaller scale for dagger
             ),
             Core.WeaponType.ShortSword => (
-                new Vector3(0.65f, -0.2f, -0.35f),  // Rest
-                new Vector3(-0.2f, 0.0f, -0.5f),   // Swing
-                new Vector3(-35, 25, 55),          // Classic sword angle
-                0.9f
+                new Vector3(0.45f, -0.35f, -0.45f),  // Rest: more centered and visible
+                new Vector3(-0.15f, 0.0f, -0.55f),   // Swing
+                new Vector3(-30, 15, 45),           // Classic sword angle
+                1.0f                                 // Full scale for visibility
             ),
             Core.WeaponType.LongSword => (
                 new Vector3(0.7f, -0.15f, -0.4f),   // Rest: slightly further out

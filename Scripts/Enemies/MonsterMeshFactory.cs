@@ -14353,17 +14353,23 @@ public static class MonsterMeshFactory
         rightBoot.Position = new Vector3(0, -0.24f * scale, 0.02f * scale);
         rightLegNode.AddChild(rightBoot);
 
-        // === EQUIPMENT ===
-        // Arms are 0.35 height capsules rotated 15 deg outward, so hands are at:
-        // Right hand: ~(+0.045, -0.17, 0) from rightArmNode (arm rotated -15 deg Z)
-        // Left hand: ~(-0.045, -0.17, 0) from leftArmNode (arm rotated +15 deg Z)
+        // === HAND ATTACHMENT POINTS ===
+        // Arms are 0.35 height capsules, arm mesh rotated 15 deg outward (Z rotation on mesh only)
+        // Hand positions at bottom of arm capsule, offset slightly forward
 
-        // Longsword in right hand
+        // Right hand attachment point (for weapon)
+        var rightHandAttach = new Node3D();
+        rightHandAttach.Name = "Hand";
+        // Position at end of arm (0.35/2 = 0.175), slightly forward and outward
+        rightHandAttach.Position = new Vector3(0.04f * scale, -0.20f * scale, 0.06f * scale);
+        // Rotate so attached weapons point forward-up: -75 X tilts blade forward, 15 Z matches arm angle
+        rightHandAttach.RotationDegrees = new Vector3(-75f, 0f, 15f);
+        rightArmNode.AddChild(rightHandAttach);
+
+        // Longsword in right hand - blade extends along +Y in local space
         var weaponNode = new Node3D();
-        // Position at hand location, accounting for arm's -15 degree Z rotation
-        weaponNode.Position = new Vector3(0.05f * scale, -0.22f * scale, 0.02f * scale);
-        weaponNode.RotationDegrees = new Vector3(30, 0, 15); // Sword pointing forward-up, matching arm angle
-        rightArmNode.AddChild(weaponNode);
+        weaponNode.Name = "Weapon";
+        rightHandAttach.AddChild(weaponNode);
         limbs.Weapon = weaponNode;
 
         // Sword handle (leather wrapped)
@@ -14393,12 +14399,18 @@ public static class MonsterMeshFactory
         tip.Position = new Vector3(0, 0.42f * scale, 0);
         weaponNode.AddChild(tip);
 
+        // Left hand attachment point (for torch/shield)
+        var leftHandAttach = new Node3D();
+        leftHandAttach.Name = "LeftHand";
+        leftHandAttach.Position = new Vector3(-0.04f * scale, -0.20f * scale, 0.06f * scale);
+        // Rotate torch to point upward and forward: -50 X for forward tilt, -15 Z matches arm
+        leftHandAttach.RotationDegrees = new Vector3(-50f, 0f, -15f);
+        leftArmNode.AddChild(leftHandAttach);
+
         // Torch in left hand
         var torchNode = new Node3D();
-        // Position at hand location, accounting for arm's +15 degree Z rotation
-        torchNode.Position = new Vector3(-0.05f * scale, -0.22f * scale, 0.02f * scale);
-        torchNode.RotationDegrees = new Vector3(40, 0, -15); // Torch held up, matching arm angle
-        leftArmNode.AddChild(torchNode);
+        torchNode.Name = "Torch";
+        leftHandAttach.AddChild(torchNode);
         limbs.Torch = torchNode;
 
         // Torch handle (wooden stick)

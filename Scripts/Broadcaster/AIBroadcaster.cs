@@ -36,7 +36,10 @@ public enum BroadcastEvent
     // System events
     GameStarted,
     PlayerMutedAI,
-    PlayerUnmutedAI
+    PlayerUnmutedAI,
+
+    // Cinematic events
+    KillCam
 }
 
 /// <summary>

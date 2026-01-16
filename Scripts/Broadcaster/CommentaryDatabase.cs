@@ -125,6 +125,7 @@ public class CommentaryDatabase
             BroadcastEvent.Comeback => ComebackLines,
             BroadcastEvent.PlayerMutedAI => MutedLines,
             BroadcastEvent.PlayerUnmutedAI => UnmutedLines,
+            BroadcastEvent.KillCam => KillCamLines,
             _ => null
         };
     }
@@ -472,6 +473,26 @@ public class CommentaryDatabase
         "Welcome back to the land of actually hearing wisdom.",
         "I knew you couldn't stay away. They never can.",
         "Unmuted! The natural order is restored!",
+    };
+
+    // === KILL CAM ===
+    private readonly List<string> KillCamLines = new()
+    {
+        "OH! Let's see that again in slow motion!",
+        "Now THAT'S what I call a finishing blow!",
+        "Beautiful! The sponsors are going to LOVE that one!",
+        "And THAT is how it's done, folks!",
+        "Wow, instant replay material right there!",
+        "Did everyone catch that? Because I'm showing it again anyway!",
+        "The {monster} never saw it coming!",
+        "Poetry in motion! Violent, deadly poetry!",
+        "That kill deserves its own highlight reel!",
+        "Someone clip that! Oh wait, I already did!",
+        "SPECTACULAR! The audience is going WILD!",
+        "Ladies and gentlemen, THIS is why you tune in!",
+        "Absolute PERFECTION. Chef's kiss. Mwah!",
+        "The {monster}'s last moment... captured forever. You're welcome.",
+        "OHHH! That was BRUTAL! I love it!",
     };
 
     // === STAT-BASED COMMENTARY ===
