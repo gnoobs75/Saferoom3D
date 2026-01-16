@@ -76,6 +76,17 @@ public partial class BasicEnemy3D : CharacterBody3D
     private const float WakeDistance = 35f;
     private const float SleepCheckInterval = 0.5f;
 
+    // Stuck detection and recovery
+    private Vector3 _lastStuckCheckPosition;
+    private float _stuckTimer;
+    private const float StuckCheckInterval = 1.5f;
+    private const float StuckMovementThreshold = 0.3f;
+    private int _stuckRecoveryAttempts;
+
+    // Circle-strafe for obstacle avoidance during aggro
+    private float _circleDirection = 1f;
+    private float _circleTimer;
+
     // Idle interaction system (for goblins interacting with props)
     private Node3D? _interactionTarget;
     private float _interactionTimer;
@@ -1424,6 +1435,9 @@ public partial class BasicEnemy3D : CharacterBody3D
 
         // Apply movement
         MoveAndSlide();
+
+        // Check for stuck condition and recover
+        CheckAndRecoverFromStuck(dt);
     }
 
     private void ProcessIdle(float dt)
@@ -1784,6 +1798,7 @@ public partial class BasicEnemy3D : CharacterBody3D
         if (dist > DeaggroRange)
         {
             ChangeState(State.Tracking);
+            _circleTimer = 0;
             return;
         }
 
@@ -1791,6 +1806,7 @@ public partial class BasicEnemy3D : CharacterBody3D
         if (dist <= AttackRange && _attackTimer <= 0)
         {
             ChangeState(State.Attacking);
+            _circleTimer = 0;
             return;
         }
 
@@ -1800,6 +1816,32 @@ public partial class BasicEnemy3D : CharacterBody3D
             Vector3 direction = (_player.GlobalPosition - GlobalPosition).Normalized();
             direction.Y = 0;
 
+            // Circle-strafe mode: move sideways to get around obstacles while approaching
+            if (_circleTimer > 0)
+            {
+                _circleTimer -= dt;
+
+                // Calculate circle direction (perpendicular to player direction)
+                Vector3 perpendicular = new Vector3(-direction.Z, 0, direction.X) * _circleDirection;
+
+                // Combine forward and sideways movement (weighted toward forward)
+                Vector3 circleDir = (direction * 0.6f + perpendicular * 0.4f).Normalized();
+                circleDir = AvoidObstacles(circleDir);
+
+                float slowMult = EngineOfTomorrow3D.GetGlobalSlowMultiplier();
+                float speed = MoveSpeed * slowMult;
+                Velocity = new Vector3(circleDir.X * speed, Velocity.Y, circleDir.Z * speed);
+
+                // Still face the player while circling
+                if (direction.LengthSquared() > 0.01f)
+                {
+                    float targetAngle = Mathf.Atan2(direction.X, direction.Z);
+                    Rotation = new Vector3(0, targetAngle, 0);
+                }
+                return;
+            }
+
+            // Normal aggro movement
             // Only move if we're further than the minimum stop distance
             if (dist > MinStopDistance)
             {
@@ -1981,11 +2023,83 @@ public partial class BasicEnemy3D : CharacterBody3D
         );
     }
 
+    #region Stuck Detection and Recovery
+
+    /// <summary>
+    /// Check if the enemy is stuck and attempt recovery.
+    /// </summary>
+    private void CheckAndRecoverFromStuck(float dt)
+    {
+        // Only check during active movement states
+        if (CurrentState != State.Patrolling && CurrentState != State.Tracking &&
+            CurrentState != State.Aggro)
+        {
+            _stuckTimer = 0;
+            _stuckRecoveryAttempts = 0;
+            return;
+        }
+
+        _stuckTimer += dt;
+        if (_stuckTimer >= StuckCheckInterval)
+        {
+            float movedDistance = GlobalPosition.DistanceTo(_lastStuckCheckPosition);
+            if (movedDistance < StuckMovementThreshold)
+            {
+                RecoverFromStuck();
+            }
+            else
+            {
+                // Not stuck, reset attempts
+                _stuckRecoveryAttempts = 0;
+            }
+            _stuckTimer = 0;
+            _lastStuckCheckPosition = GlobalPosition;
+        }
+    }
+
+    /// <summary>
+    /// Attempt to recover from being stuck.
+    /// </summary>
+    private void RecoverFromStuck()
+    {
+        _stuckRecoveryAttempts++;
+        GD.Print($"[{MonsterType}] Stuck detected (attempt {_stuckRecoveryAttempts})");
+
+        if (_stuckRecoveryAttempts >= 3)
+        {
+            // Teleport nudge as last resort - move in a random direction
+            Vector3 nudgeDir = new Vector3(
+                (float)GD.RandRange(-1.0, 1.0),
+                0,
+                (float)GD.RandRange(-1.0, 1.0)
+            ).Normalized();
+            GlobalPosition += nudgeDir * 0.5f;
+            _stuckRecoveryAttempts = 0;
+            GD.Print($"[{MonsterType}] Applied nudge to escape");
+        }
+        else
+        {
+            // Pick a new patrol target in a different direction
+            PickNewPatrolTarget();
+
+            // If in aggro or tracking, try circling around the obstacle
+            if (CurrentState == State.Aggro || CurrentState == State.Tracking)
+            {
+                // Alternate direction each attempt
+                _circleDirection = (_stuckRecoveryAttempts % 2 == 0) ? 1f : -1f;
+                _circleTimer = 1.0f;
+            }
+        }
+    }
+
+    #endregion
+
     #region Obstacle Avoidance
 
     /// <summary>
     /// Apply obstacle avoidance to a desired movement direction.
     /// Returns adjusted direction that steers around obstacles.
+    /// Uses dynamic ray length based on speed and checks multiple angles.
     /// </summary>
     private Vector3 AvoidObstacles(Vector3 desiredDirection)
     {
@@ -1994,7 +2108,11 @@ public partial class BasicEnemy3D : CharacterBody3D
 
         var spaceState = GetWorld3D().DirectSpaceState;
         Vector3 origin = GlobalPosition + Vector3.Up * 0.5f;  // Waist height
-        float rayLength = 1.2f;  // Look ahead distance
+
+        // Scale ray length with current speed (min 1.2, max 2.5)
+        // This helps fast-moving enemies detect obstacles earlier
+        float currentSpeed = new Vector2(Velocity.X, Velocity.Z).Length();
+        float rayLength = Mathf.Clamp(1.2f + currentSpeed * 0.2f, 1.2f, 2.5f);
 
         // Collision mask: Obstacle (layer 5) + Wall (layer 8)
         uint obstacleMask = (1u << 4) | (1u << 7);
@@ -2007,48 +2125,49 @@ public partial class BasicEnemy3D : CharacterBody3D
             return desiredDirection;  // Path is clear
         }
 
-        // Forward is blocked - try to steer around
-        // Calculate left and right directions (45 degrees from forward)
-        Vector3 leftDir = new Vector3(
-            desiredDirection.X * 0.707f - desiredDirection.Z * 0.707f,
+        // Forward is blocked - try multiple steering angles (30°, 60°, 90°, 120°, 150°)
+        float[] angles = { 30f, 60f, 90f, 120f, 150f };
+        foreach (float angleDeg in angles)
+        {
+            float angle = Mathf.DegToRad(angleDeg);
+            Vector3 leftDir = RotateDirectionY(desiredDirection, angle);
+            Vector3 rightDir = RotateDirectionY(desiredDirection, -angle);
+
+            bool leftBlocked = CastObstacleRay(spaceState, origin, leftDir, rayLength, obstacleMask);
+            bool rightBlocked = CastObstacleRay(spaceState, origin, rightDir, rayLength, obstacleMask);
+
+            // Return first clear direction found
+            if (!leftBlocked) return leftDir;
+            if (!rightBlocked) return rightDir;
+        }
+
+        // All forward angles blocked - try wall sliding (perpendicular movement)
+        Vector3 slideDir = new Vector3(-desiredDirection.Z, 0, desiredDirection.X);
+        if (!CastObstacleRay(spaceState, origin, slideDir, rayLength * 0.5f, obstacleMask))
+        {
+            return slideDir * 0.5f;  // Slide along wall at half speed
+        }
+        if (!CastObstacleRay(spaceState, origin, -slideDir, rayLength * 0.5f, obstacleMask))
+        {
+            return -slideDir * 0.5f;  // Slide other direction
+        }
+
+        // Completely blocked - reverse slowly as last resort (instead of stopping)
+        return -desiredDirection * 0.3f;
+    }
+
+    /// <summary>
+    /// Rotate a direction vector around the Y axis by the given angle in radians.
+    /// </summary>
+    private Vector3 RotateDirectionY(Vector3 direction, float angle)
+    {
+        float cos = Mathf.Cos(angle);
+        float sin = Mathf.Sin(angle);
+        return new Vector3(
+            direction.X * cos - direction.Z * sin,
             0,
-            desiredDirection.X * 0.707f + desiredDirection.Z * 0.707f
+            direction.X * sin + direction.Z * cos
         ).Normalized();
-
-        Vector3 rightDir = new Vector3(
-            desiredDirection.X * 0.707f + desiredDirection.Z * 0.707f,
-            0,
-            -desiredDirection.X * 0.707f + desiredDirection.Z * 0.707f
-        ).Normalized();
-
-        bool leftBlocked = CastObstacleRay(spaceState, origin, leftDir, rayLength, obstacleMask);
-        bool rightBlocked = CastObstacleRay(spaceState, origin, rightDir, rayLength, obstacleMask);
-
-        // Choose the clearer path
-        if (!leftBlocked && !rightBlocked)
-        {
-            // Both sides clear, pick one based on position for consistency
-            return ((int)(GlobalPosition.X + GlobalPosition.Z) % 2 == 0) ? leftDir : rightDir;
-        }
-        else if (!leftBlocked)
-        {
-            return leftDir;
-        }
-        else if (!rightBlocked)
-        {
-            return rightDir;
-        }
-        else
-        {
-            // All directions blocked - try perpendicular or reverse
-            Vector3 perpDir = new Vector3(-desiredDirection.Z, 0, desiredDirection.X);
-            if (!CastObstacleRay(spaceState, origin, perpDir, rayLength, obstacleMask))
-            {
-                return perpDir;
-            }
-            // Completely stuck - stay put
-            return Vector3.Zero;
-        }
     }
 
     /// <summary>

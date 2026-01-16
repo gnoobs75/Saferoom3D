@@ -59,6 +59,32 @@ public static class ItemDatabase
             ItemType.Consumable, 5);
     }
 
+    /// <summary>
+    /// Create monster meat that can transform Steve into that monster type.
+    /// </summary>
+    public static InventoryItem CreateMonsterMeat(string monsterType)
+    {
+        string meatId = $"{monsterType.ToLower()}_meat";
+        string displayName = FormatMeatName(monsterType);
+        string description = $"Raw meat from a {monsterType.Replace("_", " ")}. Feed to Steve to transform him for 5 minutes!";
+
+        return new InventoryItem(meatId, displayName, description, ItemType.Consumable, 5);
+    }
+
+    /// <summary>
+    /// Format monster type into readable meat name (e.g., "goblin_shaman" -> "Goblin Shaman Meat")
+    /// </summary>
+    private static string FormatMeatName(string monsterType)
+    {
+        var words = monsterType.Split('_');
+        for (int i = 0; i < words.Length; i++)
+        {
+            if (words[i].Length > 0)
+                words[i] = char.ToUpper(words[i][0]) + words[i][1..].ToLower();
+        }
+        return string.Join(" ", words) + " Meat";
+    }
+
     // === LOOT ITEMS ===
 
     public static InventoryItem CreateGoldCoins()

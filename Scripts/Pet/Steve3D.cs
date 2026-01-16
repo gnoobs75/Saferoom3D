@@ -69,6 +69,20 @@ public partial class Steve3D : Node3D
     [Signal] public delegate void HealedPlayerEventHandler(float amount);
     [Signal] public delegate void FiredMissileEventHandler(Node3D target);
 
+    // === TRANSFORMATION STATE ===
+    public string CurrentForm { get; private set; } = "steve";
+    public bool IsTransformed => CurrentForm != "steve";
+
+    // Attack stats (modified when transformed)
+    public float AttackDamage { get; private set; } = MagicMissileDamage;
+    public float AttackRange { get; private set; } = 10f;
+    public float AttackCooldown { get; private set; } = AbilityCooldown;
+    public bool IsRangedAttacker { get; private set; } = true;
+    private float _transformAttackTimer;
+
+    // LimbNodes for transformed monster mesh (for animation)
+    private MonsterMeshFactory.LimbNodes? _transformLimbs;
+
     public override void _Ready()
     {
         Instance = this;
@@ -107,15 +121,136 @@ public partial class Steve3D : Node3D
         // Clear existing model
         ClearModel();
 
-        // Recreate
+        // Recreate based on current form
+        if (IsTransformed)
+        {
+            CreateTransformedMesh(CurrentForm);
+        }
+        else
+        {
+            CreateMesh();
+        }
+        CreateGlowLight();
+
+        GD.Print($"[Steve3D] Model reloaded, UseGlb: {UseGlbModel}, Form: {CurrentForm}");
+    }
+
+    /// <summary>
+    /// Transform Steve into a monster form
+    /// </summary>
+    public void TransformInto(string monsterType)
+    {
+        CurrentForm = monsterType.ToLower();
+        SetAttackStats(CurrentForm);
+
+        // Clear current mesh and create monster mesh
+        ClearModel();
+        CreateTransformedMesh(CurrentForm);
+        CreateGlowLight();
+
+        // Flash the glow light to indicate transformation
+        if (_glowLight != null)
+        {
+            _glowLight.LightColor = new Color(1f, 0.8f, 0.2f); // Golden flash
+            _glowLight.LightEnergy = 5f;
+        }
+
+        GD.Print($"[Steve3D] Transformed into {CurrentForm}!");
+    }
+
+    /// <summary>
+    /// Revert Steve back to normal chihuahua form
+    /// </summary>
+    public void RevertToNormal()
+    {
+        CurrentForm = "steve";
+
+        // Reset to normal attack stats
+        AttackDamage = MagicMissileDamage;
+        AttackRange = 10f;
+        AttackCooldown = AbilityCooldown;
+        IsRangedAttacker = true;
+        _transformLimbs = null;
+
+        // Recreate normal Steve mesh
+        ClearModel();
         CreateMesh();
         CreateGlowLight();
 
-        GD.Print($"[Steve3D] Model reloaded, UseGlb: {UseGlbModel}");
+        // Flash the glow light
+        if (_glowLight != null)
+        {
+            _glowLight.LightColor = HealGlowColor;
+            _glowLight.LightEnergy = 3f;
+        }
+
+        GD.Print("[Steve3D] Reverted to normal form!");
+    }
+
+    /// <summary>
+    /// Set attack stats based on monster type
+    /// </summary>
+    private void SetAttackStats(string monsterType)
+    {
+        // Configure attack behavior based on monster type
+        (AttackDamage, AttackRange, AttackCooldown, IsRangedAttacker) = monsterType switch
+        {
+            // Ranged attackers
+            "goblin_shaman" => (15f, 12f, 2.5f, true),
+            "goblin_thrower" => (12f, 10f, 1.8f, true),
+            "eye" => (10f, 15f, 2f, true),
+
+            // Strong melee
+            "dragon" or "dragon_king" => (35f, 3f, 2f, false),
+            "the_butcher" => (40f, 3f, 2.5f, false),
+            "badlama" => (30f, 3f, 1.8f, false),
+            "mongo" or "mongo_the_destroyer" => (45f, 4f, 3f, false),
+
+            // Fast melee
+            "spider" or "spider_queen" => (12f, 2f, 0.8f, false),
+            "wolf" => (14f, 2.5f, 0.9f, false),
+            "bat" => (8f, 1.5f, 0.6f, false),
+            "dungeon_rat" => (6f, 1.5f, 0.5f, false),
+
+            // Standard melee
+            "goblin" => (10f, 2f, 1f, false),
+            "goblin_warlord" => (18f, 2.5f, 1.5f, false),
+            "skeleton" or "skeleton_lord" => (12f, 2f, 1.2f, false),
+            "slime" or "slime_king" => (8f, 1.5f, 1f, false),
+            "mushroom" or "sporeling_elder" => (10f, 2f, 1.3f, false),
+            "lizard" => (14f, 2f, 1.1f, false),
+            "mimic" => (20f, 2f, 1.5f, false),
+            "rabbidd" => (8f, 2f, 0.7f, false),
+
+            // Default melee for unknown types
+            _ => (15f, 2f, 1.2f, false)
+        };
+
+        GD.Print($"[Steve3D] Attack stats set for {monsterType}: Dmg={AttackDamage}, Range={AttackRange}, CD={AttackCooldown}, Ranged={IsRangedAttacker}");
+    }
+
+    /// <summary>
+    /// Create a monster mesh for transformed Steve
+    /// </summary>
+    private void CreateTransformedMesh(string monsterType)
+    {
+        // Use MonsterMeshFactory to create monster appearance
+        _transformLimbs = MonsterMeshFactory.CreateMonsterMesh(this, monsterType);
+
+        // Scale down to pet size (40% of normal monster size)
+        Scale = new Vector3(0.4f, 0.4f, 0.4f);
+
+        GD.Print($"[Steve3D] Created transformed mesh for {monsterType}");
     }
 
     private void ClearModel()
     {
+        // Reset scale to normal
+        Scale = Vector3.One;
+
+        // Clear transform limbs reference
+        _transformLimbs = null;
+
         // Remove GLB instance if exists
         if (_glbModelInstance != null)
         {
@@ -137,7 +272,7 @@ public partial class Steve3D : Node3D
         _glowLight?.QueueFree();
         _glowLight = null;
 
-        // Remove all other mesh children (snout, nose, eyes, tongue, legs)
+        // Remove all other mesh children (snout, nose, eyes, tongue, legs, monster parts)
         foreach (var child in GetChildren())
         {
             if (child is MeshInstance3D || child is Node3D)
@@ -322,6 +457,7 @@ public partial class Steve3D : Node3D
         // Update cooldowns
         if (_healCooldown > 0) _healCooldown -= dt;
         if (_missileCooldown > 0) _missileCooldown -= dt;
+        if (_transformAttackTimer > 0) _transformAttackTimer -= dt;
 
         // Follow player
         UpdateFollowing(dt);
@@ -329,8 +465,15 @@ public partial class Steve3D : Node3D
         // Animate
         UpdateAnimation(dt);
 
-        // Check for enemies attacking player
-        CheckForThreats(dt);
+        // Check for enemies - behavior differs when transformed
+        if (IsTransformed)
+        {
+            CheckForThreatsTransformed(dt);
+        }
+        else
+        {
+            CheckForThreats(dt);
+        }
 
         // Fade glow light
         if (_glowLight != null && _glowLight.LightEnergy > 0)
@@ -553,6 +696,165 @@ public partial class Steve3D : Node3D
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// Aggressive combat behavior when transformed into a monster.
+    /// Actively seeks and attacks nearby enemies.
+    /// </summary>
+    private void CheckForThreatsTransformed(float dt)
+    {
+        if (_transformAttackTimer > 0 || _player == null) return;
+
+        // Don't attack during edit mode
+        if (_player is FPSController fps && fps.IsEditMode) return;
+
+        // Find nearest enemy within attack range
+        Node3D? nearestTarget = null;
+        float nearestDist = float.MaxValue;
+
+        var enemies = GetTree().GetNodesInGroup("Enemies");
+        foreach (var node in enemies)
+        {
+            if (node is Node3D enemy && GodotObject.IsInstanceValid(enemy))
+            {
+                float dist = GlobalPosition.DistanceTo(enemy.GlobalPosition);
+
+                // Check if within attack range and closer than current target
+                if (dist <= AttackRange && dist < nearestDist)
+                {
+                    // Skip dead enemies
+                    if (enemy is BasicEnemy3D basic && basic.CurrentState == BasicEnemy3D.State.Dead) continue;
+                    if (enemy is BossEnemy3D boss && boss.CurrentState == BossEnemy3D.State.Dead) continue;
+
+                    nearestTarget = enemy;
+                    nearestDist = dist;
+                }
+            }
+        }
+
+        // Attack nearest target
+        if (nearestTarget != null)
+        {
+            PerformTransformedAttack(nearestTarget);
+        }
+    }
+
+    /// <summary>
+    /// Execute an attack as the transformed monster form.
+    /// </summary>
+    private void PerformTransformedAttack(Node3D target)
+    {
+        _transformAttackTimer = AttackCooldown;
+
+        // Get attack color based on form
+        Color attackColor = GetTransformAttackColor();
+
+        // Visual glow effect
+        if (_glowLight != null)
+        {
+            _glowLight.LightColor = attackColor;
+            _glowLight.LightEnergy = 2.5f;
+        }
+
+        // Get target name for combat log
+        string targetName = target.Name;
+        if (target is BasicEnemy3D enemy)
+            targetName = enemy.MonsterType;
+        else if (target is BossEnemy3D boss)
+            targetName = boss.BossName;
+
+        if (IsRangedAttacker)
+        {
+            // Fire a projectile at the target
+            Vector3 spawnPos = GlobalPosition + new Vector3(0, 0.25f, 0);
+            Vector3 direction = (target.GlobalPosition + new Vector3(0, 0.5f, 0) - spawnPos).Normalized();
+
+            var projectile = Projectile3D.Create(
+                spawnPos,
+                direction,
+                AttackDamage,
+                isPlayerProjectile: true,
+                color: attackColor,
+                source: $"Steve ({CurrentForm})"
+            );
+
+            GetTree().Root.AddChild(projectile);
+            projectile.Fire(direction);
+
+            SoundManager3D.Instance?.PlayMagicSound(GlobalPosition);
+            GD.Print($"[Steve3D] ({CurrentForm}) Fired at {targetName} for {AttackDamage} damage!");
+        }
+        else
+        {
+            // Melee attack - deal damage directly
+            if (target.HasMethod("TakeDamage"))
+            {
+                target.Call("TakeDamage", AttackDamage, GlobalPosition, $"Steve ({CurrentForm})");
+            }
+
+            SoundManager3D.Instance?.PlayHitSound(GlobalPosition);
+            SpawnMeleeAttackEffect(target.GlobalPosition);
+            GD.Print($"[Steve3D] ({CurrentForm}) Melee attacked {targetName} for {AttackDamage} damage!");
+        }
+
+        // Combat log message
+        HUD3D.Instance?.AddCombatLogMessage(
+            $"Steve ({CurrentForm}) attacks [color=#ff6666]{targetName}[/color] for [color=#ffaa44]{(int)AttackDamage}[/color]!",
+            attackColor);
+    }
+
+    /// <summary>
+    /// Get attack color based on current monster form.
+    /// </summary>
+    private Color GetTransformAttackColor()
+    {
+        return CurrentForm switch
+        {
+            "goblin_shaman" => new Color(0.5f, 1f, 0.5f),      // Green magic
+            "goblin_thrower" => new Color(0.9f, 0.6f, 0.3f),   // Orange thrown
+            "eye" => new Color(1f, 0.3f, 0.3f),                // Red eye beam
+            "dragon" or "dragon_king" => new Color(1f, 0.5f, 0.1f),  // Fire orange
+            "spider" or "spider_queen" => new Color(0.6f, 0.8f, 0.3f), // Poison green
+            "slime" or "slime_king" => new Color(0.3f, 0.9f, 0.4f),   // Slime green
+            "skeleton" or "skeleton_lord" => new Color(0.8f, 0.8f, 0.9f), // Bone white
+            _ => new Color(0.8f, 0.4f, 0.4f)                    // Default red
+        };
+    }
+
+    /// <summary>
+    /// Create a visual effect for melee attacks.
+    /// </summary>
+    private void SpawnMeleeAttackEffect(Vector3 targetPos)
+    {
+        // Create slash effect toward target
+        Vector3 midPoint = (GlobalPosition + targetPos) / 2f + new Vector3(0, 0.5f, 0);
+
+        var particles = new GpuParticles3D();
+        particles.Amount = 8;
+        particles.Lifetime = 0.3f;
+        particles.OneShot = true;
+        particles.Explosiveness = 1f;
+
+        var mat = new ParticleProcessMaterial();
+        mat.Direction = (targetPos - GlobalPosition).Normalized();
+        mat.Spread = 20f;
+        mat.InitialVelocityMin = 3f;
+        mat.InitialVelocityMax = 5f;
+        mat.Gravity = Vector3.Zero;
+        mat.Color = GetTransformAttackColor();
+        particles.ProcessMaterial = mat;
+
+        var sphereMesh = new SphereMesh { Radius = 0.08f, Height = 0.16f };
+        particles.DrawPass1 = sphereMesh;
+
+        particles.GlobalPosition = midPoint;
+        GetTree().Root.AddChild(particles);
+        particles.Emitting = true;
+
+        // Auto-cleanup
+        var timer = GetTree().CreateTimer(1.0);
+        timer.Timeout += () => particles.QueueFree();
     }
 
     private void FireMagicMissile(Node3D target)

@@ -138,6 +138,17 @@ public class LootBag
             bag.AddItem(monsterPart);
         }
 
+        // 15% chance to drop monster meat (transforms Steve into that monster)
+        if (GD.Randf() < 0.15f)
+        {
+            var meat = ItemDatabase.CreateMonsterMeat(monsterType);
+            if (meat != null)
+            {
+                bag.AddItem(meat);
+                GD.Print($"[LootBag] {monsterType} dropped meat!");
+            }
+        }
+
         // Add random items
         for (int i = 0; i < itemCount; i++)
         {

@@ -1,6 +1,7 @@
 using Godot;
 using SafeRoom3D.Core;
 using SafeRoom3D.Player;
+using SafeRoom3D.Pet;
 
 namespace SafeRoom3D.Items;
 
@@ -14,6 +15,12 @@ public static class ConsumableItems3D
     /// </summary>
     public static bool UseItem(string itemType, FPSController player)
     {
+        // Handle monster meat items (pattern: {monstertype}_meat)
+        if (itemType.EndsWith("_meat"))
+        {
+            return UseMonsterMeat(itemType, player);
+        }
+
         return itemType switch
         {
             "health_potion" => UseHealthPotion(player),
@@ -173,6 +180,59 @@ public static class ConsumableItems3D
         SoundManager3D.Instance?.PlayMagicSound(player.GlobalPosition);
 
         return true;
+    }
+
+    /// <summary>
+    /// Feed monster meat to Steve to transform him into that monster type.
+    /// </summary>
+    private static bool UseMonsterMeat(string meatId, FPSController player)
+    {
+        // Extract monster type from meat ID (e.g., "goblin_meat" -> "goblin")
+        string monsterType = meatId[..^5]; // Remove "_meat" suffix
+
+        // Check if Steve exists
+        if (Steve3D.Instance == null)
+        {
+            GD.Print("[ConsumableItems3D] Steve not found - cannot use monster meat");
+            UI.HUD3D.Instance?.AddCombatLogMessage(
+                "[color=#ff6666]Steve is not with you![/color]",
+                new Color(1f, 0.4f, 0.4f));
+            return false;
+        }
+
+        // Cancel existing transformation if any
+        SteveTransformEffect.Active?.Expire();
+
+        // Create new transformation effect
+        var effect = new SteveTransformEffect();
+        player.GetTree().Root.AddChild(effect);
+        effect.Initialize(monsterType);
+
+        // Play sound and notify player
+        SoundManager3D.Instance?.PlayMagicSound(player.GlobalPosition);
+        player.RequestScreenShake(0.15f, 0.15f);
+
+        string displayName = FormatMonsterName(monsterType);
+        UI.HUD3D.Instance?.AddCombatLogMessage(
+            $"[color=#aaffaa]Steve transforms into a {displayName}![/color]",
+            new Color(0.67f, 1f, 0.67f));
+
+        GD.Print($"[ConsumableItems3D] Used {meatId} - Steve transformed into {monsterType}");
+        return true;
+    }
+
+    /// <summary>
+    /// Format monster type for display
+    /// </summary>
+    private static string FormatMonsterName(string monsterType)
+    {
+        var words = monsterType.Split('_');
+        for (int i = 0; i < words.Length; i++)
+        {
+            if (words[i].Length > 0)
+                words[i] = char.ToUpper(words[i][0]) + words[i][1..].ToLower();
+        }
+        return string.Join(" ", words);
     }
 
     private static bool IsInstanceValid(GodotObject obj)
