@@ -295,9 +295,17 @@ public partial class Steve3D : Node3D
                 _glbModelInstance = scene.Instantiate<Node3D>();
                 // Scale the GLB model appropriately (adjust as needed for your model)
                 _glbModelInstance.Scale = new Vector3(0.15f, 0.15f, 0.15f);
+
+                // Apply Y offset to fix models with origin at center instead of feet
+                float yOffset = GlbModelConfig.GetNpcYOffset("steve");
+                if (yOffset != 0f)
+                {
+                    _glbModelInstance.Position = new Vector3(0, yOffset, 0);
+                }
+
                 AddChild(_glbModelInstance);
                 _glbAnimPlayer = GlbModelConfig.FindAnimationPlayer(_glbModelInstance);
-                GD.Print($"[Steve3D] Using GLB model: {GlbModelPath}, AnimPlayer: {_glbAnimPlayer != null}");
+                GD.Print($"[Steve3D] Using GLB model: {GlbModelPath}, AnimPlayer: {_glbAnimPlayer != null}, YOffset: {yOffset}");
                 return;
             }
         }

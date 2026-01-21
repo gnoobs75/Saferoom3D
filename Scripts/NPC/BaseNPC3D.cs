@@ -132,12 +132,19 @@ public abstract partial class BaseNPC3D : Node3D
         var glbModel = GlbModelConfig.LoadGlbModel(glbPath, scale);
         if (glbModel == null) return false;
 
+        // Apply Y offset to fix models with origin at center instead of feet
+        float yOffset = GlbModelConfig.GetNpcYOffset(npcType);
+        if (yOffset != 0f)
+        {
+            glbModel.Position = new Vector3(0, yOffset, 0);
+        }
+
         _glbModelInstance = glbModel;
         _meshRoot?.AddChild(glbModel);
         _glbAnimPlayer = GlbModelConfig.FindAnimationPlayer(glbModel);
         _limbs = null; // GLB models don't have procedural limbs
 
-        GD.Print($"[{npcType}] Loaded GLB, AnimPlayer: {_glbAnimPlayer != null}");
+        GD.Print($"[{npcType}] Loaded GLB, AnimPlayer: {_glbAnimPlayer != null}, YOffset: {yOffset}");
         return true;
     }
 

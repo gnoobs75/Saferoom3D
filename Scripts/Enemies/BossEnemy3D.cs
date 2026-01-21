@@ -308,11 +308,18 @@ public partial class BossEnemy3D : CharacterBody3D
             var glbModel = GlbModelConfig.LoadGlbModel(glbPath, 1f);
             if (glbModel != null)
             {
+                // Apply Y offset to fix models with origin at center instead of feet
+                float yOffset = GlbModelConfig.GetMonsterYOffset(meshType);
+                if (yOffset != 0f)
+                {
+                    glbModel.Position = new Vector3(0, yOffset, 0);
+                }
+
                 _meshInstance.AddChild(glbModel);
                 _limbNodes = null; // GLB models don't have procedural LimbNodes
                 _glbAnimPlayer = GlbModelConfig.FindAnimationPlayer(glbModel);
                 usedGlbModel = true;
-                GD.Print($"[BossEnemy3D] Loaded GLB for {BossName}, AnimPlayer: {_glbAnimPlayer != null}");
+                GD.Print($"[BossEnemy3D] Loaded GLB for {BossName}, AnimPlayer: {_glbAnimPlayer != null}, YOffset: {yOffset}");
             }
             else
             {

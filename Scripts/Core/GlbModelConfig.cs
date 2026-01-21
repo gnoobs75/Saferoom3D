@@ -28,6 +28,22 @@ public static class GlbModelConfig
     /// </summary>
     public static Dictionary<string, string> NpcGlbPaths { get; private set; } = new();
 
+    /// <summary>
+    /// Y offset for monster GLB models. Key = monster type (lowercase), Value = Y offset.
+    /// Use this to adjust models whose origin is not at their feet.
+    /// </summary>
+    public static Dictionary<string, float> MonsterGlbOffsets { get; private set; } = new();
+
+    /// <summary>
+    /// Y offset for prop GLB models. Key = prop type (lowercase), Value = Y offset.
+    /// </summary>
+    public static Dictionary<string, float> PropGlbOffsets { get; private set; } = new();
+
+    /// <summary>
+    /// Y offset for NPC GLB models. Key = NPC type (lowercase), Value = Y offset.
+    /// </summary>
+    public static Dictionary<string, float> NpcGlbOffsets { get; private set; } = new();
+
     private static bool _initialized;
 
     /// <summary>
@@ -212,6 +228,93 @@ public static class GlbModelConfig
     }
 
     /// <summary>
+    /// Get Y offset for a monster type (default 0).
+    /// </summary>
+    public static float GetMonsterYOffset(string monsterType)
+    {
+        if (!_initialized) Initialize();
+        return MonsterGlbOffsets.GetValueOrDefault(monsterType.ToLower(), 0f);
+    }
+
+    /// <summary>
+    /// Get Y offset for a prop type (default 0).
+    /// </summary>
+    public static float GetPropYOffset(string propType)
+    {
+        if (!_initialized) Initialize();
+        return PropGlbOffsets.GetValueOrDefault(propType.ToLower(), 0f);
+    }
+
+    /// <summary>
+    /// Get Y offset for an NPC type (default 0).
+    /// </summary>
+    public static float GetNpcYOffset(string npcType)
+    {
+        if (!_initialized) Initialize();
+        return NpcGlbOffsets.GetValueOrDefault(npcType.ToLower(), 0f);
+    }
+
+    /// <summary>
+    /// Set Y offset for a monster GLB model.
+    /// </summary>
+    public static void SetMonsterYOffset(string monsterType, float offset)
+    {
+        if (!_initialized) Initialize();
+        string key = monsterType.ToLower();
+
+        if (offset == 0f)
+        {
+            MonsterGlbOffsets.Remove(key);
+        }
+        else
+        {
+            MonsterGlbOffsets[key] = offset;
+        }
+
+        SaveConfig();
+    }
+
+    /// <summary>
+    /// Set Y offset for a prop GLB model.
+    /// </summary>
+    public static void SetPropYOffset(string propType, float offset)
+    {
+        if (!_initialized) Initialize();
+        string key = propType.ToLower();
+
+        if (offset == 0f)
+        {
+            PropGlbOffsets.Remove(key);
+        }
+        else
+        {
+            PropGlbOffsets[key] = offset;
+        }
+
+        SaveConfig();
+    }
+
+    /// <summary>
+    /// Set Y offset for an NPC GLB model.
+    /// </summary>
+    public static void SetNpcYOffset(string npcType, float offset)
+    {
+        if (!_initialized) Initialize();
+        string key = npcType.ToLower();
+
+        if (offset == 0f)
+        {
+            NpcGlbOffsets.Remove(key);
+        }
+        else
+        {
+            NpcGlbOffsets[key] = offset;
+        }
+
+        SaveConfig();
+    }
+
+    /// <summary>
     /// Save config to user://glb_config.json
     /// </summary>
     public static void SaveConfig()
@@ -222,7 +325,10 @@ public static class GlbModelConfig
             {
                 Monsters = MonsterGlbPaths,
                 Props = PropGlbPaths,
-                Npcs = NpcGlbPaths
+                Npcs = NpcGlbPaths,
+                MonsterOffsets = MonsterGlbOffsets,
+                PropOffsets = PropGlbOffsets,
+                NpcOffsets = NpcGlbOffsets
             };
 
             var options = new JsonSerializerOptions
@@ -282,6 +388,9 @@ public static class GlbModelConfig
                 MonsterGlbPaths = configData.Monsters ?? new Dictionary<string, string>();
                 PropGlbPaths = configData.Props ?? new Dictionary<string, string>();
                 NpcGlbPaths = configData.Npcs ?? new Dictionary<string, string>();
+                MonsterGlbOffsets = configData.MonsterOffsets ?? new Dictionary<string, float>();
+                PropGlbOffsets = configData.PropOffsets ?? new Dictionary<string, float>();
+                NpcGlbOffsets = configData.NpcOffsets ?? new Dictionary<string, float>();
                 GD.Print($"[GlbModelConfig] Loaded config: {MonsterGlbPaths.Count} monsters, {PropGlbPaths.Count} props, {NpcGlbPaths.Count} NPCs");
             }
         }
@@ -291,6 +400,9 @@ public static class GlbModelConfig
             MonsterGlbPaths = new Dictionary<string, string>();
             PropGlbPaths = new Dictionary<string, string>();
             NpcGlbPaths = new Dictionary<string, string>();
+            MonsterGlbOffsets = new Dictionary<string, float>();
+            PropGlbOffsets = new Dictionary<string, float>();
+            NpcGlbOffsets = new Dictionary<string, float>();
         }
     }
 
@@ -391,5 +503,14 @@ public static class GlbModelConfig
 
         [JsonPropertyName("npcs")]
         public Dictionary<string, string>? Npcs { get; set; }
+
+        [JsonPropertyName("monsterOffsets")]
+        public Dictionary<string, float>? MonsterOffsets { get; set; }
+
+        [JsonPropertyName("propOffsets")]
+        public Dictionary<string, float>? PropOffsets { get; set; }
+
+        [JsonPropertyName("npcOffsets")]
+        public Dictionary<string, float>? NpcOffsets { get; set; }
     }
 }

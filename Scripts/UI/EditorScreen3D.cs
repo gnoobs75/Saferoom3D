@@ -45,8 +45,8 @@ public partial class EditorScreen3D : Control
     private int _currentAnimationIndex = 0;
     private float _animationTimer = 0f;
     private float _animationCycleDuration = 2f;
-    // All 18 animations: 6 types × 3 variants each
-    private string[] _monsterAnimations = {
+    // All 18 procedural animations: 6 types × 3 variants each
+    private static readonly string[] _proceduralAnimations = {
         "idle_0", "idle_1", "idle_2",
         "walk_0", "walk_1", "walk_2",
         "run_0", "run_1", "run_2",
@@ -54,6 +54,8 @@ public partial class EditorScreen3D : Control
         "hit_0", "hit_1", "hit_2",
         "die_0", "die_1", "die_2"
     };
+    // Current animation list (procedural or GLB-specific)
+    private string[] _currentAnimationList = _proceduralAnimations;
     private string _currentAnimation = "idle_0";
 
     // AnimationPlayer for preview
@@ -80,6 +82,8 @@ public partial class EditorScreen3D : Control
     private ColorPickerButton? _monsterSkinColorPicker;
     private CheckBox? _monsterUseGlbCheckbox;
     private Label? _monsterGlbPathLabel;
+    private SpinBox? _monsterYOffsetSpinBox;
+    private HBoxContainer? _monsterYOffsetRow;
 
     // Ability editor
     private Dictionary<string, Button> _abilityButtons = new();
@@ -149,6 +153,8 @@ public partial class EditorScreen3D : Control
     private SpinBox? _npcScaleSpinBox;
     private CheckBox? _npcUseGlbCheckbox;
     private Label? _npcGlbPathLabel;
+    private SpinBox? _npcYOffsetSpinBox;
+    private HBoxContainer? _npcYOffsetRow;
 
     // Close button
     private Button? _closeButton;
@@ -203,13 +209,13 @@ public partial class EditorScreen3D : Control
             return;
         }
 
-        // Switch to the Map tab (which is the last tab, index 5)
+        // Switch to the Map tab (which is the last tab, index 6)
         if (_tabContainer != null && _mapEditorOverlay != null)
         {
             // Hide normal content, show map editor
             if (_mainContentArea != null) _mainContentArea.Visible = false;
             _mapEditorOverlay.Visible = true;
-            _currentTab = 5; // Map tab
+            _currentTab = 6; // Map tab
 
             // Load the map in the map editor
             _mapEditorOverlay.RefreshFromFile(mapPath);
@@ -240,8 +246,8 @@ public partial class EditorScreen3D : Control
             if (_animationTimer >= _animationCycleDuration)
             {
                 _animationTimer = 0f;
-                _currentAnimationIndex = (_currentAnimationIndex + 1) % _monsterAnimations.Length;
-                _currentAnimation = _monsterAnimations[_currentAnimationIndex];
+                _currentAnimationIndex = (_currentAnimationIndex + 1) % _currentAnimationList.Length;
+                _currentAnimation = _currentAnimationList[_currentAnimationIndex];
                 if (_animationDropdown != null)
                 {
                     _animationDropdown.Selected = _currentAnimationIndex;
@@ -394,7 +400,35 @@ public partial class EditorScreen3D : Control
             _monsterButtons[type] = btn;
         }
 
-        // Abilities tab
+        // Spells tab (mana cost + cooldown)
+        var spellsScroll = new ScrollContainer();
+        spellsScroll.Name = "Spells";
+        spellsScroll.SizeFlagsVertical = SizeFlags.ExpandFill;
+        spellsScroll.HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled;
+        _tabContainer.AddChild(spellsScroll);
+
+        var spellsVBox = new VBoxContainer();
+        spellsVBox.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        spellsVBox.AddThemeConstantOverride("separation", 4);
+        spellsScroll.AddChild(spellsVBox);
+
+        // All spells (mana-based) - ordered by required level
+        string[] spells = {
+            "fireball", "chain_lightning", "soul_leech", "infernal_ground",
+            "gravity_well", "banshees_wail", "timestop_bubble", "berserk",
+            "frost_nova", "arcane_missiles", "poison_cloud", "meteor_strike",
+            "lightning_storm", "death_coil", "mana_burn"
+        };
+        foreach (var spell in spells)
+        {
+            var displayName = spell.Replace("_", " ").Capitalize();
+            var btn = CreateListButton(displayName);
+            btn.Pressed += () => SelectAbility(spell);
+            spellsVBox.AddChild(btn);
+            _abilityButtons[spell] = btn;
+        }
+
+        // Abilities tab (cooldown only, no mana)
         var abilitiesScroll = new ScrollContainer();
         abilitiesScroll.Name = "Abilities";
         abilitiesScroll.SizeFlagsVertical = SizeFlags.ExpandFill;
@@ -406,9 +440,13 @@ public partial class EditorScreen3D : Control
         abilitiesVBox.AddThemeConstantOverride("separation", 4);
         abilitiesScroll.AddChild(abilitiesVBox);
 
-        string[] abilities = { "fireball", "chain_lightning", "soul_leech", "protective_shell",
-                              "gravity_well", "timestop_bubble", "infernal_ground", "banshees_wail",
-                              "berserk", "mirror_image", "dead_mans_rally", "engine_of_tomorrow" };
+        // All abilities (cooldown-only) - ordered by required level
+        string[] abilities = {
+            "protective_shell", "sponsor_blessing", "mirror_image", "dead_mans_rally",
+            "audience_favorite", "engine_of_tomorrow", "dodge_roll", "war_cry",
+            "feign_death", "second_wind", "bloodlust", "taunt",
+            "smoke_bomb", "adrenaline_rush", "marked_for_death"
+        };
         foreach (var ability in abilities)
         {
             var displayName = ability.Replace("_", " ").Capitalize();
@@ -635,7 +673,7 @@ public partial class EditorScreen3D : Control
         _animationDropdown = new OptionButton();
         _animationDropdown.CustomMinimumSize = new Vector2(140, 35);
         _animationDropdown.AddThemeFontSizeOverride("font_size", 14);
-        foreach (var anim in _monsterAnimations)
+        foreach (var anim in _currentAnimationList)
         {
             // Format: "Idle 0", "Idle 1", etc.
             string[] parts = anim.Split('_');
@@ -922,6 +960,25 @@ public partial class EditorScreen3D : Control
         monsterGlbPathRow.AddChild(_monsterGlbPathLabel);
         _monsterStatsSection.AddChild(monsterGlbPathRow);
 
+        // Y Offset row (only shown when GLB is enabled)
+        _monsterYOffsetRow = new HBoxContainer();
+        _monsterYOffsetRow.AddThemeConstantOverride("separation", 10);
+        var yOffsetLabel = new Label { Text = "Y Offset" };
+        yOffsetLabel.AddThemeFontSizeOverride("font_size", 14);
+        yOffsetLabel.CustomMinimumSize = new Vector2(100, 0);
+        _monsterYOffsetRow.AddChild(yOffsetLabel);
+        _monsterYOffsetSpinBox = new SpinBox();
+        _monsterYOffsetSpinBox.MinValue = -5;
+        _monsterYOffsetSpinBox.MaxValue = 5;
+        _monsterYOffsetSpinBox.Step = 0.1;
+        _monsterYOffsetSpinBox.Value = 0;
+        _monsterYOffsetSpinBox.CustomMinimumSize = new Vector2(80, 30);
+        _monsterYOffsetSpinBox.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        _monsterYOffsetSpinBox.ValueChanged += OnMonsterYOffsetChanged;
+        _monsterYOffsetRow.AddChild(_monsterYOffsetSpinBox);
+        _monsterYOffsetRow.Visible = false; // Hidden by default, shown when GLB is enabled
+        _monsterStatsSection.AddChild(_monsterYOffsetRow);
+
         _monsterHealthSpinBox = CreateAttributeRow(_monsterStatsSection, "Max Health", 10, 500, 75);
         _monsterDamageSpinBox = CreateAttributeRow(_monsterStatsSection, "Damage", 1, 100, 10);
         _monsterSpeedSpinBox = CreateAttributeRow(_monsterStatsSection, "Move Speed", 0.5, 10, 3);
@@ -1153,6 +1210,25 @@ public partial class EditorScreen3D : Control
         _npcGlbPathLabel.AddThemeColorOverride("font_color", new Color(0.5f, 0.7f, 0.9f));
         glbPathRow.AddChild(_npcGlbPathLabel);
         _npcStatsSection.AddChild(glbPathRow);
+
+        // Y Offset row for NPC GLB models (only shown when GLB is enabled)
+        _npcYOffsetRow = new HBoxContainer();
+        _npcYOffsetRow.AddThemeConstantOverride("separation", 10);
+        var npcYOffsetLabel = new Label { Text = "Y Offset" };
+        npcYOffsetLabel.AddThemeFontSizeOverride("font_size", 14);
+        npcYOffsetLabel.CustomMinimumSize = new Vector2(100, 0);
+        _npcYOffsetRow.AddChild(npcYOffsetLabel);
+        _npcYOffsetSpinBox = new SpinBox();
+        _npcYOffsetSpinBox.MinValue = -5;
+        _npcYOffsetSpinBox.MaxValue = 5;
+        _npcYOffsetSpinBox.Step = 0.1;
+        _npcYOffsetSpinBox.Value = 0;
+        _npcYOffsetSpinBox.CustomMinimumSize = new Vector2(80, 30);
+        _npcYOffsetSpinBox.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        _npcYOffsetSpinBox.ValueChanged += OnNpcYOffsetChanged;
+        _npcYOffsetRow.AddChild(_npcYOffsetSpinBox);
+        _npcYOffsetRow.Visible = Pet.Steve3D.UseGlbModel; // Match current GLB state
+        _npcStatsSection.AddChild(_npcYOffsetRow);
 
         var npcSkinRow = new HBoxContainer();
         npcSkinRow.AddThemeConstantOverride("separation", 10);
@@ -1662,8 +1738,8 @@ public partial class EditorScreen3D : Control
         ClearPreview();
 
         // Show/hide map editor overlay based on tab
-        // Tab indices: 0=Monsters, 1=Abilities, 2=Props, 3=NPCs, 4=Equipment, 5=Maps
-        bool isMapTab = (tab == 5);
+        // Tab indices: 0=Monsters, 1=Spells, 2=Abilities, 3=Props, 4=NPCs, 5=Equipment, 6=Maps
+        bool isMapTab = (tab == 6);
 
         if (_mapEditorOverlay != null)
             _mapEditorOverlay.Visible = isMapTab;
@@ -1682,15 +1758,16 @@ public partial class EditorScreen3D : Control
     {
         if (_titleLabel == null) return;
 
-        // Tab indices: 0=Monsters, 1=Abilities, 2=Props, 3=NPCs, 4=Equipment, 5=Maps
+        // Tab indices: 0=Monsters, 1=Spells, 2=Abilities, 3=Props, 4=NPCs, 5=Equipment, 6=Maps
         string title = _currentTab switch
         {
             0 => "MONSTER EDITOR",
-            1 => "ABILITY EDITOR",
-            2 => "PROPS EDITOR",
-            3 => "NPC EDITOR",
-            4 => "EQUIPMENT EDITOR",
-            5 => GetMapEditorTitle(),
+            1 => "SPELL EDITOR",
+            2 => "ABILITY EDITOR",
+            3 => "PROPS EDITOR",
+            4 => "NPC EDITOR",
+            5 => "EQUIPMENT EDITOR",
+            6 => GetMapEditorTitle(),
             _ => "EDITOR"
         };
 
@@ -1711,15 +1788,16 @@ public partial class EditorScreen3D : Control
 
     /// <summary>
     /// Updates visibility of UI sections based on the active tab.
-    /// Tab indices: 0=Monsters, 1=Abilities, 2=Props, 3=NPCs, 4=Equipment, 5=Maps
+    /// Tab indices: 0=Monsters, 1=Spells, 2=Abilities, 3=Props, 4=NPCs, 5=Equipment, 6=Maps
     /// </summary>
     private void UpdateTabVisibility()
     {
         bool isMonsters = _currentTab == 0;
-        bool isAbilities = _currentTab == 1;
-        bool isProps = _currentTab == 2;
-        bool isNpcs = _currentTab == 3;
-        bool isEquipment = _currentTab == 4;
+        bool isSpells = _currentTab == 1;
+        bool isAbilities = _currentTab == 2;
+        bool isProps = _currentTab == 3;
+        bool isNpcs = _currentTab == 4;
+        bool isEquipment = _currentTab == 5;
 
         // Top bar controls - only show on Monsters tab
         if (_animationControlsContainer != null)
@@ -1733,7 +1811,7 @@ public partial class EditorScreen3D : Control
         if (_soundSection != null)
             _soundSection.Visible = isMonsters;
         if (_abilityStatsSection != null)
-            _abilityStatsSection.Visible = isAbilities;
+            _abilityStatsSection.Visible = isSpells || isAbilities; // Show for both Spells and Abilities
         if (_cosmeticPropsSection != null)
             _cosmeticPropsSection.Visible = isProps;
         if (_npcStatsSection != null)
@@ -1754,16 +1832,17 @@ public partial class EditorScreen3D : Control
 
         string baseHint = "Drag to rotate | Scroll to zoom | Right-click to reset";
 
-        // Tab 4 = Equipment (combined Weapons + Shields)
+        // Tab 5 = Equipment (combined Weapons + Shields)
         bool hasEquipmentSelected = _selectedWeaponType != null || _selectedShieldType != null;
 
         string contextHint = _currentTab switch
         {
             0 => _selectedMonsterId == null ? "Select a monster to preview" : baseHint,
-            1 => _selectedAbilityId == null ? "Select an ability to preview" : baseHint,
-            2 => _selectedCosmeticType == null ? "Select a prop to preview" : baseHint,
-            3 => _selectedNpcId == null ? "Select an NPC to preview" : baseHint,
-            4 => !hasEquipmentSelected ? "Select a weapon or shield to preview" : baseHint,
+            1 => _selectedAbilityId == null ? "Select a spell to preview" : baseHint,
+            2 => _selectedAbilityId == null ? "Select an ability to preview" : baseHint,
+            3 => _selectedCosmeticType == null ? "Select a prop to preview" : baseHint,
+            4 => _selectedNpcId == null ? "Select an NPC to preview" : baseHint,
+            5 => !hasEquipmentSelected ? "Select a weapon or shield to preview" : baseHint,
             _ => baseHint
         };
 
@@ -1807,6 +1886,17 @@ public partial class EditorScreen3D : Control
             _monsterGlbPathLabel.AddThemeColorOverride("font_color",
                 hasGlb ? (fileExists ? new Color(0.5f, 0.9f, 0.5f) : new Color(0.9f, 0.5f, 0.5f))
                        : new Color(0.5f, 0.5f, 0.5f));
+        }
+
+        // Show/hide Y offset row and load value
+        if (_monsterYOffsetRow != null)
+        {
+            _monsterYOffsetRow.Visible = hasGlb;
+        }
+        if (_monsterYOffsetSpinBox != null && hasGlb)
+        {
+            float offset = Core.GlbModelConfig.GetMonsterYOffset(monsterId);
+            _monsterYOffsetSpinBox.SetValueNoSignal(offset);
         }
 
         // Create preview
@@ -1917,6 +2007,29 @@ public partial class EditorScreen3D : Control
             style.SetCornerRadiusAll(4);
             style.ContentMarginLeft = 12;
             btn.AddThemeStyleboxOverride("normal", style);
+        }
+
+        // Update GLB checkbox and Y offset for Steve
+        if (npcId == "steve")
+        {
+            if (_npcUseGlbCheckbox != null)
+            {
+                _npcUseGlbCheckbox.SetPressedNoSignal(Pet.Steve3D.UseGlbModel);
+                _npcUseGlbCheckbox.Text = Pet.Steve3D.UseGlbModel ? "GLB Model" : "Procedural";
+            }
+
+            // Show/hide Y offset row based on GLB mode
+            if (_npcYOffsetRow != null)
+            {
+                _npcYOffsetRow.Visible = Pet.Steve3D.UseGlbModel;
+            }
+
+            // Load current Y offset value
+            if (_npcYOffsetSpinBox != null && Pet.Steve3D.UseGlbModel)
+            {
+                float offset = Core.GlbModelConfig.GetNpcYOffset("steve");
+                _npcYOffsetSpinBox.SetValueNoSignal(offset);
+            }
         }
 
         // Create preview
@@ -2128,7 +2241,7 @@ public partial class EditorScreen3D : Control
         {
             _animationTimer = 0f;
             _currentAnimationIndex = 0;
-            _currentAnimation = _monsterAnimations[0];
+            _currentAnimation = _currentAnimationList[0];
             if (_animationDropdown != null)
             {
                 _animationDropdown.Selected = 0;
@@ -2140,7 +2253,7 @@ public partial class EditorScreen3D : Control
     private void OnAnimationSelected(long index)
     {
         _currentAnimationIndex = (int)index;
-        _currentAnimation = _monsterAnimations[_currentAnimationIndex];
+        _currentAnimation = _currentAnimationList[_currentAnimationIndex];
         _animationTimer = 0f;
         _previewAnimTime = 0f;
 
@@ -2163,6 +2276,37 @@ public partial class EditorScreen3D : Control
             string displayName = parts.Length == 2 ? $"{parts[0].Capitalize()} {parts[1]}" : _currentAnimation.Capitalize();
             _animationLabel.Text = $"[{displayName}]";
         }
+    }
+
+    /// <summary>
+    /// Update the animation dropdown with a new list of animations.
+    /// Called when switching between procedural and GLB models.
+    /// </summary>
+    private void UpdateAnimationDropdown(string[] animations)
+    {
+        if (_animationDropdown == null) return;
+
+        _currentAnimationList = animations;
+        _animationDropdown.Clear();
+
+        foreach (var anim in animations)
+        {
+            // Format animation name for display: "idle_0" -> "Idle 0", "walk" -> "Walk"
+            string[] parts = anim.Split('_');
+            string displayName = parts.Length == 2
+                ? $"{parts[0].Capitalize()} {parts[1]}"
+                : anim.Capitalize();
+            _animationDropdown.AddItem(displayName);
+        }
+
+        // Reset to first animation
+        _currentAnimationIndex = 0;
+        _currentAnimation = animations.Length > 0 ? animations[0] : "idle";
+        _animationDropdown.Selected = 0;
+        _animationTimer = 0f;
+
+        UpdateAnimationLabel();
+        GD.Print($"[EditorScreen3D] Animation dropdown updated with {animations.Length} animations");
     }
 
     private void OnStatusEffectSelected(long index)
@@ -2433,14 +2577,22 @@ public partial class EditorScreen3D : Control
 
         MonsterMeshFactory.LimbNodes limbs = new();
 
+        Node3D? glbModel = null;
         if (useGlb && ResourceLoader.Exists(glbPath))
         {
             // Load GLB model
-            var glbModel = Core.GlbModelConfig.LoadGlbModel(glbPath, 1f);
+            glbModel = Core.GlbModelConfig.LoadGlbModel(glbPath, 1f);
             if (glbModel != null)
             {
+                // Apply Y offset to fix models with origin at center instead of feet
+                float yOffset = Core.GlbModelConfig.GetMonsterYOffset(monsterId);
+                if (yOffset != 0f)
+                {
+                    glbModel.Position = new Vector3(0, yOffset, 0);
+                }
+
                 _previewObject.AddChild(glbModel);
-                GD.Print($"[EditorScreen3D] Loaded GLB model for {monsterId}: {glbPath}");
+                GD.Print($"[EditorScreen3D] Loaded GLB model for {monsterId}: {glbPath}, YOffset: {yOffset}");
             }
             else
             {
@@ -2467,9 +2619,44 @@ public partial class EditorScreen3D : Control
 
         _previewScene?.AddChild(_previewObject);
 
-        // Create AnimationPlayer with all 18 animations (only for procedural meshes)
-        if (!useGlb || !ResourceLoader.Exists(glbPath))
+        // Set up animation handling based on model type
+        if (glbModel != null)
         {
+            // GLB model - find embedded AnimationPlayer and populate dropdown with its animations
+            _previewAnimPlayer = Core.GlbModelConfig.FindAnimationPlayer(glbModel);
+
+            if (_previewAnimPlayer != null)
+            {
+                // Get animation list from GLB
+                var glbAnimations = _previewAnimPlayer.GetAnimationList();
+                if (glbAnimations.Length > 0)
+                {
+                    UpdateAnimationDropdown(glbAnimations);
+
+                    // Start playing the first animation
+                    _currentAnimation = glbAnimations[0];
+                    _previewAnimPlayer.Play(_currentAnimation);
+                    GD.Print($"[EditorScreen3D] GLB has {glbAnimations.Length} animations: {string.Join(", ", glbAnimations)}");
+                }
+                else
+                {
+                    // GLB has AnimationPlayer but no animations
+                    UpdateAnimationDropdown(new[] { "(no animations)" });
+                    GD.Print($"[EditorScreen3D] GLB AnimationPlayer found but has no animations");
+                }
+            }
+            else
+            {
+                // GLB has no AnimationPlayer - static model
+                UpdateAnimationDropdown(new[] { "(static model)" });
+                GD.Print($"[EditorScreen3D] GLB is a static model (no AnimationPlayer)");
+            }
+        }
+        else
+        {
+            // Procedural mesh - create procedural animations and restore dropdown
+            UpdateAnimationDropdown(_proceduralAnimations);
+
             try
             {
                 _previewAnimPlayer = MonsterAnimationSystem.CreateAnimationPlayer(_previewObject, monsterId, limbs);
@@ -2486,17 +2673,13 @@ public partial class EditorScreen3D : Control
                     _previewAnimPlayer.Play("idle_0");
                 }
 
-                GD.Print($"[EditorScreen3D] Created AnimationPlayer for {monsterId} with {_previewAnimPlayer.GetAnimationList().Length} animations");
+                GD.Print($"[EditorScreen3D] Created procedural AnimationPlayer for {monsterId} with {_previewAnimPlayer.GetAnimationList().Length} animations");
             }
             catch (System.Exception e)
             {
                 GD.PrintErr($"[EditorScreen3D] Failed to create AnimationPlayer: {e.Message}");
                 _previewAnimPlayer = null;
             }
-        }
-        else
-        {
-            _previewAnimPlayer = null;
         }
 
         // Reset camera view for this monster
@@ -3522,15 +3705,38 @@ public partial class EditorScreen3D : Control
 
         mat.AlbedoColor = abilityId switch
         {
+            // Spells (mana-based)
             "fireball" => new Color(1f, 0.4f, 0.1f),
             "chain_lightning" => new Color(0.3f, 0.5f, 1f),
             "soul_leech" => new Color(0.3f, 0.8f, 0.3f),
-            "protective_shell" => new Color(0.5f, 0.7f, 1f),
             "gravity_well" => new Color(0.5f, 0.2f, 0.8f),
             "timestop_bubble" => new Color(0.4f, 0.9f, 0.9f),
             "infernal_ground" => new Color(1f, 0.3f, 0.1f),
             "banshees_wail" => new Color(0.7f, 0.5f, 0.9f),
             "berserk" => new Color(1f, 0.2f, 0.2f),
+            "frost_nova" => new Color(0.6f, 0.9f, 1f),
+            "arcane_missiles" => new Color(0.8f, 0.3f, 0.9f),
+            "poison_cloud" => new Color(0.4f, 0.8f, 0.2f),
+            "meteor_strike" => new Color(1f, 0.5f, 0f),
+            "lightning_storm" => new Color(0.4f, 0.6f, 1f),
+            "death_coil" => new Color(0.5f, 0.2f, 0.5f),
+            "mana_burn" => new Color(0.2f, 0.5f, 1f),
+            // Abilities (cooldown-only)
+            "protective_shell" => new Color(0.5f, 0.7f, 1f),
+            "sponsor_blessing" => new Color(0.9f, 0.8f, 0.3f),
+            "mirror_image" => new Color(0.6f, 0.6f, 0.8f),
+            "dead_mans_rally" => new Color(0.8f, 0.2f, 0.2f),
+            "audience_favorite" => new Color(0.9f, 0.7f, 0.1f),
+            "engine_of_tomorrow" => new Color(0.3f, 0.8f, 0.8f),
+            "dodge_roll" => new Color(0.7f, 0.8f, 1f),
+            "war_cry" => new Color(1f, 0.6f, 0.2f),
+            "feign_death" => new Color(0.5f, 0.5f, 0.6f),
+            "second_wind" => new Color(0.4f, 1f, 0.5f),
+            "bloodlust" => new Color(0.8f, 0.1f, 0.1f),
+            "taunt" => new Color(1f, 0.3f, 0.1f),
+            "smoke_bomb" => new Color(0.4f, 0.4f, 0.45f),
+            "adrenaline_rush" => new Color(1f, 0.8f, 0.2f),
+            "marked_for_death" => new Color(0.9f, 0.1f, 0.1f),
             _ => new Color(0.8f, 0.8f, 0.8f)
         };
 
@@ -3718,8 +3924,16 @@ public partial class EditorScreen3D : Control
                     var glbInstance = scene.Instantiate<Node3D>();
                     // Scale the GLB model appropriately (adjust as needed)
                     glbInstance.Scale = new Vector3(0.3f, 0.3f, 0.3f);
+
+                    // Apply Y offset to fix models with origin at center instead of feet
+                    float yOffset = Core.GlbModelConfig.GetNpcYOffset("steve");
+                    if (yOffset != 0f)
+                    {
+                        glbInstance.Position = new Vector3(0, yOffset, 0);
+                    }
+
                     _previewObject.AddChild(glbInstance);
-                    GD.Print($"[EditorScreen3D] Loaded GLB model for Steve: {glbPath}");
+                    GD.Print($"[EditorScreen3D] Loaded GLB model for Steve: {glbPath}, YOffset: {yOffset}");
                     return;
                 }
             }
@@ -3887,6 +4101,19 @@ public partial class EditorScreen3D : Control
                         : new Color(0.5f, 0.5f, 0.5f));
         }
 
+        // Show/hide Y offset row based on GLB mode
+        if (_npcYOffsetRow != null)
+        {
+            _npcYOffsetRow.Visible = pressed;
+        }
+
+        // Load current Y offset value when enabling GLB
+        if (pressed && _npcYOffsetSpinBox != null && _selectedNpcId != null)
+        {
+            float offset = Core.GlbModelConfig.GetNpcYOffset(_selectedNpcId);
+            _npcYOffsetSpinBox.Value = offset;
+        }
+
         // Refresh preview
         if (_selectedNpcId == "steve")
         {
@@ -3900,6 +4127,30 @@ public partial class EditorScreen3D : Control
         }
 
         GD.Print($"[EditorScreen3D] Steve model: {(pressed ? "GLB" : "Procedural")}");
+    }
+
+    private void OnNpcYOffsetChanged(double value)
+    {
+        if (_selectedNpcId == null) return;
+
+        // Save the Y offset
+        Core.GlbModelConfig.SetNpcYOffset(_selectedNpcId, (float)value);
+
+        // Update the preview model's position
+        if (_previewObject != null)
+        {
+            // Find the GLB model child and update its position
+            foreach (var child in _previewObject.GetChildren())
+            {
+                if (child is Node3D glbModel && child.Name != "ProceduralMesh")
+                {
+                    glbModel.Position = new Vector3(0, (float)value, 0);
+                    break;
+                }
+            }
+        }
+
+        GD.Print($"[EditorScreen3D] NPC {_selectedNpcId} Y offset: {value}");
     }
 
     private void OnMonsterGlbToggled(bool pressed)
@@ -3935,10 +4186,47 @@ public partial class EditorScreen3D : Control
                         : new Color(0.5f, 0.5f, 0.5f));
         }
 
+        // Show/hide Y offset row based on GLB mode
+        if (_monsterYOffsetRow != null)
+        {
+            _monsterYOffsetRow.Visible = pressed;
+        }
+
+        // Load current Y offset value when enabling GLB
+        if (pressed && _monsterYOffsetSpinBox != null)
+        {
+            float offset = Core.GlbModelConfig.GetMonsterYOffset(_selectedMonsterId);
+            _monsterYOffsetSpinBox.Value = offset;
+        }
+
         // Refresh preview
         UpdatePreviewMonster(_selectedMonsterId);
 
         GD.Print($"[EditorScreen3D] Monster {_selectedMonsterId} model: {(pressed ? "GLB" : "Procedural")} -> {glbPath}");
+    }
+
+    private void OnMonsterYOffsetChanged(double value)
+    {
+        if (_selectedMonsterId == null) return;
+
+        // Save the Y offset
+        Core.GlbModelConfig.SetMonsterYOffset(_selectedMonsterId, (float)value);
+
+        // Update the preview model's position
+        if (_previewObject != null)
+        {
+            // Find the GLB model child and update its position
+            foreach (var child in _previewObject.GetChildren())
+            {
+                if (child is Node3D glbModel && child.Name != "ProceduralMesh")
+                {
+                    glbModel.Position = new Vector3(0, (float)value, 0);
+                    break;
+                }
+            }
+        }
+
+        GD.Print($"[EditorScreen3D] Monster {_selectedMonsterId} Y offset: {value}");
     }
 
     private void OnApplyChanges()
@@ -4090,8 +4378,8 @@ public partial class EditorScreen3D : Control
             return;
         }
 
-        // Skip viewport handling when on Maps tab (tab 5) - let MapEditorTab handle input
-        if (_currentTab == 5)
+        // Skip viewport handling when on Maps tab (tab 6) - let MapEditorTab handle input
+        if (_currentTab == 6)
         {
             return;
         }

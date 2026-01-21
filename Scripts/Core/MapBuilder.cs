@@ -1006,17 +1006,44 @@ public partial class DungeonGenerator3D
         _spawnedPropIds?.Add(propId);
 
         var position = new Vector3(propData.X, propData.Y, propData.Z);
+        Node3D? prop = null;
 
-        // Create the prop using Cosmetic3D
-        var prop = SafeRoom3D.Environment.Cosmetic3D.Create(
-            propData.Type,
-            new Color(0.6f, 0.4f, 0.3f),  // Default primary color
-            new Color(0.4f, 0.3f, 0.2f),  // Default secondary color
-            new Color(0.5f, 0.5f, 0.5f),  // Default accent color
-            0f,
-            propData.Scale,
-            true  // Enable light
-        );
+        // Check for GLB model override first
+        string propType = propData.Type.ToLower();
+        if (GlbModelConfig.TryGetPropGlbPath(propType, out string? glbPath) && !string.IsNullOrWhiteSpace(glbPath))
+        {
+            var glbModel = GlbModelConfig.LoadGlbModel(glbPath, propData.Scale);
+            if (glbModel != null)
+            {
+                // Apply Y offset to fix models with origin at center instead of feet
+                float yOffset = GlbModelConfig.GetPropYOffset(propType);
+                if (yOffset != 0f)
+                {
+                    glbModel.Position = new Vector3(0, yOffset, 0);
+                }
+
+                prop = glbModel;
+                GD.Print($"[MapBuilder] Loaded GLB model for prop {propData.Type}: {glbPath}, YOffset: {yOffset}");
+            }
+            else
+            {
+                GD.PrintErr($"[MapBuilder] Failed to load GLB for prop {propData.Type}, falling back to procedural");
+            }
+        }
+
+        // Fall back to procedural mesh if no GLB or GLB failed
+        if (prop == null)
+        {
+            prop = SafeRoom3D.Environment.Cosmetic3D.Create(
+                propData.Type,
+                new Color(0.6f, 0.4f, 0.3f),  // Default primary color
+                new Color(0.4f, 0.3f, 0.2f),  // Default secondary color
+                new Color(0.5f, 0.5f, 0.5f),  // Default accent color
+                0f,
+                propData.Scale,
+                true  // Enable light
+            );
+        }
 
         if (prop != null)
         {
