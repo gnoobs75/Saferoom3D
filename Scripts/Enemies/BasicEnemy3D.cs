@@ -39,6 +39,13 @@ public partial class BasicEnemy3D : CharacterBody3D
     private Vector3 _spawnPosition;
     private const float RoamerPatrolRadius = 25f;
 
+    // Roam waypoints - for group-to-group patrol
+    private List<Vector3>? _roamWaypoints;
+    private int _currentWaypointIndex;
+    private float _waypointIdleTimer;
+    private const float MinWaypointIdleTime = 0f;
+    private const float MaxWaypointIdleTime = 5f;
+
     // State machine
     public enum State { Idle, IdleInteracting, Patrolling, Tracking, Aggro, Attacking, Dead, Sleeping, Stasis }
     public State CurrentState { get; private set; } = State.Idle;
@@ -141,6 +148,7 @@ public partial class BasicEnemy3D : CharacterBody3D
     // AnimationPlayer system (new)
     private AnimationPlayer? _animPlayer;
     private AnimationPlayer? _glbAnimPlayer;  // AnimationPlayer from GLB model
+    private Dictionary<AnimationType, string>? _glbAnimationNames;  // Cached animation name mapping for GLB
     private MonsterMeshFactory.LimbNodes? _limbNodes;
     private string _currentAnimName = "";
     private int _currentAnimVariant;
@@ -209,6 +217,28 @@ public partial class BasicEnemy3D : CharacterBody3D
     /// Check if this enemy is a roamer.
     /// </summary>
     public bool IsRoamer => _isRoamer;
+
+    /// <summary>
+    /// Set waypoints for roaming monsters to patrol between monster groups.
+    /// </summary>
+    public void SetRoamWaypoints(List<Vector3> waypoints)
+    {
+        if (waypoints == null || waypoints.Count == 0)
+        {
+            _roamWaypoints = null;
+            return;
+        }
+
+        // Sort waypoints by distance from spawn for efficient patrol route
+        _roamWaypoints = new List<Vector3>(waypoints);
+        _roamWaypoints.Sort((a, b) =>
+            _spawnPosition.DistanceTo(a).CompareTo(_spawnPosition.DistanceTo(b)));
+
+        _currentWaypointIndex = 0;
+        _waypointIdleTimer = 0;
+
+        GD.Print($"[BasicEnemy3D] {MonsterType} roamer has {_roamWaypoints.Count} waypoints");
+    }
 
     private void LoadMonsterConfig()
     {
@@ -308,6 +338,12 @@ public partial class BasicEnemy3D : CharacterBody3D
                 _limbNodes = null; // GLB models don't have procedural LimbNodes
                 _glbAnimPlayer = GlbModelConfig.FindAnimationPlayer(glbModel);
                 usedGlbModel = true;
+
+                // Detect and cache animation names from GLB
+                if (_glbAnimPlayer != null)
+                {
+                    CacheGlbAnimationNames();
+                }
                 GD.Print($"[BasicEnemy3D] Loaded GLB for {MonsterType}, AnimPlayer: {_glbAnimPlayer != null}, YOffset: {yOffset}");
             }
             else
@@ -549,25 +585,101 @@ public partial class BasicEnemy3D : CharacterBody3D
     }
 
     /// <summary>
+    /// Cache animation names from GLB model by trying common variants.
+    /// GLB files often use different naming conventions: Idle, idle, IDLE, Armature|idle, etc.
+    /// </summary>
+    private void CacheGlbAnimationNames()
+    {
+        if (_glbAnimPlayer == null) return;
+
+        _glbAnimationNames = new Dictionary<AnimationType, string>();
+        var availableAnims = _glbAnimPlayer.GetAnimationList();
+
+        // Log all available animations for debugging
+        GD.Print($"[BasicEnemy3D] {MonsterType} GLB animations: {string.Join(", ", availableAnims)}");
+
+        // Map each animation type to available animations
+        _glbAnimationNames[AnimationType.Idle] = FindMatchingAnimation(availableAnims, "idle", "Idle", "IDLE", "rest", "Rest", "breathing", "Breathing");
+        _glbAnimationNames[AnimationType.Walk] = FindMatchingAnimation(availableAnims, "walk", "Walk", "WALK", "walking", "Walking");
+        _glbAnimationNames[AnimationType.Run] = FindMatchingAnimation(availableAnims, "run", "Run", "RUN", "running", "Running", "sprint", "Sprint");
+        _glbAnimationNames[AnimationType.Attack] = FindMatchingAnimation(availableAnims, "attack", "Attack", "ATTACK", "Attack1", "attack1", "bite", "Bite", "hit", "Hit", "slash", "Slash");
+        _glbAnimationNames[AnimationType.Hit] = FindMatchingAnimation(availableAnims, "hit", "Hit", "HIT", "damage", "Damage", "hurt", "Hurt", "react", "React");
+        _glbAnimationNames[AnimationType.Die] = FindMatchingAnimation(availableAnims, "die", "Die", "DIE", "death", "Death", "dead", "Dead");
+
+        // Log resolved mappings
+        foreach (var kvp in _glbAnimationNames)
+        {
+            if (!string.IsNullOrEmpty(kvp.Value))
+            {
+                GD.Print($"[BasicEnemy3D] {MonsterType} {kvp.Key} -> '{kvp.Value}'");
+            }
+        }
+    }
+
+    /// <summary>
+    /// Find the first matching animation name from a list of variants.
+    /// Also checks for Armature| prefix which is common in Blender exports.
+    /// </summary>
+    private string FindMatchingAnimation(string[] availableAnims, params string[] variants)
+    {
+        foreach (var variant in variants)
+        {
+            // Try exact match first
+            foreach (var anim in availableAnims)
+            {
+                if (anim == variant)
+                    return anim;
+            }
+
+            // Try with Armature| prefix (common in Blender exports)
+            foreach (var anim in availableAnims)
+            {
+                if (anim == $"Armature|{variant}")
+                    return anim;
+            }
+
+            // Try case-insensitive contains match as last resort
+            foreach (var anim in availableAnims)
+            {
+                if (anim.ToLower().Contains(variant.ToLower()))
+                    return anim;
+            }
+        }
+        return "";
+    }
+
+    /// <summary>
     /// Play animation from GLB model's embedded AnimationPlayer.
-    /// Uses standard animation names: idle, walk, run, attack, hit, die
+    /// Uses cached animation name mapping to handle different naming conventions.
     /// </summary>
     private void PlayGlbAnimation(AnimationType animType)
     {
-        string animName = animType switch
+        if (_glbAnimPlayer == null) return;
+
+        // Get cached animation name or fall back to defaults
+        string animName = "";
+        if (_glbAnimationNames?.TryGetValue(animType, out var cached) == true && !string.IsNullOrEmpty(cached))
         {
-            AnimationType.Idle => "idle",
-            AnimationType.Walk => "walk",
-            AnimationType.Run => "run",
-            AnimationType.Attack => "attack",
-            AnimationType.Hit => "hit",
-            AnimationType.Die => "die",
-            _ => "idle"
-        };
+            animName = cached;
+        }
+        else
+        {
+            // Fallback to lowercase defaults
+            animName = animType switch
+            {
+                AnimationType.Idle => "idle",
+                AnimationType.Walk => "walk",
+                AnimationType.Run => "run",
+                AnimationType.Attack => "attack",
+                AnimationType.Hit => "hit",
+                AnimationType.Die => "die",
+                _ => "idle"
+            };
+        }
 
         _currentAnimType = animType;
 
-        if (_glbAnimPlayer!.HasAnimation(animName))
+        if (!string.IsNullOrEmpty(animName) && _glbAnimPlayer.HasAnimation(animName))
         {
             // For non-looping animations (attack, hit, die), play from start
             if (animType == AnimationType.Attack || animType == AnimationType.Hit || animType == AnimationType.Die)
@@ -1765,6 +1877,20 @@ public partial class BasicEnemy3D : CharacterBody3D
             return;
         }
 
+        // Roamer waypoint idle timer (pausing at monster groups)
+        if (_isRoamer && _waypointIdleTimer > 0)
+        {
+            _waypointIdleTimer -= dt;
+            Velocity = new Vector3(0, Velocity.Y, 0);
+            PlayAnimation(AnimationType.Idle);
+            if (_waypointIdleTimer <= 0)
+            {
+                PickNewPatrolTarget();
+                PlayAnimation(AnimationType.Walk);
+            }
+            return;
+        }
+
         // Wait at patrol point
         if (_patrolWaitTimer > 0)
         {
@@ -2065,6 +2191,30 @@ public partial class BasicEnemy3D : CharacterBody3D
 
     private void PickNewPatrolTarget()
     {
+        // Roamers with waypoints use group-to-group patrol
+        if (_isRoamer && _roamWaypoints != null && _roamWaypoints.Count > 1)
+        {
+            // Check if we should idle at this waypoint (random mix behavior)
+            if (_waypointIdleTimer > 0)
+            {
+                return; // Still idling at waypoint
+            }
+
+            // Move to next waypoint
+            _currentWaypointIndex = (_currentWaypointIndex + 1) % _roamWaypoints.Count;
+            _patrolTarget = _roamWaypoints[_currentWaypointIndex];
+
+            // Random chance to idle at next waypoint (50% chance, 3-5 seconds)
+            if (GD.Randf() < 0.5f)
+            {
+                _waypointIdleTimer = (float)(MinWaypointIdleTime + GD.Randf() * (MaxWaypointIdleTime - MinWaypointIdleTime));
+            }
+
+            GD.Print($"[BasicEnemy3D] {MonsterType} roaming to waypoint {_currentWaypointIndex}: {_patrolTarget}");
+            return;
+        }
+
+        // Standard patrol logic: random point within radius
         float angle = GD.Randf() * Mathf.Tau;
         float dist = GD.Randf() * PatrolRadius;
 

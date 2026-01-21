@@ -1,4 +1,5 @@
 using Godot;
+using System.Collections.Generic;
 using SafeRoom3D.Core;
 using SafeRoom3D.Player;
 using SafeRoom3D.UI;
@@ -69,6 +70,7 @@ public partial class BossEnemy3D : CharacterBody3D
     private MonsterMeshFactory.LimbNodes? _limbNodes;
     private AnimationPlayer? _animPlayer;
     private AnimationPlayer? _glbAnimPlayer;  // AnimationPlayer from GLB model
+    private Dictionary<AnimationType, string>? _glbAnimationNames;  // Cached animation name mapping for GLB
     private AnimationType _currentAnimType = AnimationType.Idle;
     private string _currentAnimName = "";
     private int _currentAnimVariant = 0;
@@ -319,6 +321,12 @@ public partial class BossEnemy3D : CharacterBody3D
                 _limbNodes = null; // GLB models don't have procedural LimbNodes
                 _glbAnimPlayer = GlbModelConfig.FindAnimationPlayer(glbModel);
                 usedGlbModel = true;
+
+                // Detect and cache animation names from GLB
+                if (_glbAnimPlayer != null)
+                {
+                    CacheGlbAnimationNames();
+                }
                 GD.Print($"[BossEnemy3D] Loaded GLB for {BossName}, AnimPlayer: {_glbAnimPlayer != null}, YOffset: {yOffset}");
             }
             else
@@ -1163,25 +1171,101 @@ public partial class BossEnemy3D : CharacterBody3D
     }
 
     /// <summary>
+    /// Cache animation names from GLB model by trying common variants.
+    /// GLB files often use different naming conventions: Idle, idle, IDLE, Armature|idle, etc.
+    /// </summary>
+    private void CacheGlbAnimationNames()
+    {
+        if (_glbAnimPlayer == null) return;
+
+        _glbAnimationNames = new Dictionary<AnimationType, string>();
+        var availableAnims = _glbAnimPlayer.GetAnimationList();
+
+        // Log all available animations for debugging
+        GD.Print($"[BossEnemy3D] {BossName} GLB animations: {string.Join(", ", availableAnims)}");
+
+        // Map each animation type to available animations
+        _glbAnimationNames[AnimationType.Idle] = FindMatchingAnimation(availableAnims, "idle", "Idle", "IDLE", "rest", "Rest", "breathing", "Breathing");
+        _glbAnimationNames[AnimationType.Walk] = FindMatchingAnimation(availableAnims, "walk", "Walk", "WALK", "walking", "Walking");
+        _glbAnimationNames[AnimationType.Run] = FindMatchingAnimation(availableAnims, "run", "Run", "RUN", "running", "Running", "sprint", "Sprint");
+        _glbAnimationNames[AnimationType.Attack] = FindMatchingAnimation(availableAnims, "attack", "Attack", "ATTACK", "Attack1", "attack1", "bite", "Bite", "hit", "Hit", "slash", "Slash");
+        _glbAnimationNames[AnimationType.Hit] = FindMatchingAnimation(availableAnims, "hit", "Hit", "HIT", "damage", "Damage", "hurt", "Hurt", "react", "React");
+        _glbAnimationNames[AnimationType.Die] = FindMatchingAnimation(availableAnims, "die", "Die", "DIE", "death", "Death", "dead", "Dead");
+
+        // Log resolved mappings
+        foreach (var kvp in _glbAnimationNames)
+        {
+            if (!string.IsNullOrEmpty(kvp.Value))
+            {
+                GD.Print($"[BossEnemy3D] {BossName} {kvp.Key} -> '{kvp.Value}'");
+            }
+        }
+    }
+
+    /// <summary>
+    /// Find the first matching animation name from a list of variants.
+    /// Also checks for Armature| prefix which is common in Blender exports.
+    /// </summary>
+    private string FindMatchingAnimation(string[] availableAnims, params string[] variants)
+    {
+        foreach (var variant in variants)
+        {
+            // Try exact match first
+            foreach (var anim in availableAnims)
+            {
+                if (anim == variant)
+                    return anim;
+            }
+
+            // Try with Armature| prefix (common in Blender exports)
+            foreach (var anim in availableAnims)
+            {
+                if (anim == $"Armature|{variant}")
+                    return anim;
+            }
+
+            // Try case-insensitive contains match as last resort
+            foreach (var anim in availableAnims)
+            {
+                if (anim.ToLower().Contains(variant.ToLower()))
+                    return anim;
+            }
+        }
+        return "";
+    }
+
+    /// <summary>
     /// Play animation from GLB model's embedded AnimationPlayer.
-    /// Uses standard animation names: idle, walk, run, attack, hit, die
+    /// Uses cached animation name mapping to handle different naming conventions.
     /// </summary>
     private void PlayGlbAnimation(AnimationType animType)
     {
-        string animName = animType switch
+        if (_glbAnimPlayer == null) return;
+
+        // Get cached animation name or fall back to defaults
+        string animName = "";
+        if (_glbAnimationNames?.TryGetValue(animType, out var cached) == true && !string.IsNullOrEmpty(cached))
         {
-            AnimationType.Idle => "idle",
-            AnimationType.Walk => "walk",
-            AnimationType.Run => "run",
-            AnimationType.Attack => "attack",
-            AnimationType.Hit => "hit",
-            AnimationType.Die => "die",
-            _ => "idle"
-        };
+            animName = cached;
+        }
+        else
+        {
+            // Fallback to lowercase defaults
+            animName = animType switch
+            {
+                AnimationType.Idle => "idle",
+                AnimationType.Walk => "walk",
+                AnimationType.Run => "run",
+                AnimationType.Attack => "attack",
+                AnimationType.Hit => "hit",
+                AnimationType.Die => "die",
+                _ => "idle"
+            };
+        }
 
         _currentAnimType = animType;
 
-        if (_glbAnimPlayer!.HasAnimation(animName))
+        if (!string.IsNullOrEmpty(animName) && _glbAnimPlayer.HasAnimation(animName))
         {
             // For one-shot animations (attack, hit, die), always restart
             if (animType == AnimationType.Attack || animType == AnimationType.Hit || animType == AnimationType.Die)

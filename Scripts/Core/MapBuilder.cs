@@ -63,6 +63,9 @@ public partial class DungeonGenerator3D
     private float _deferredSpawnTimer = 0f;
     private List<EnemyPlacement>? _pendingEnemies;
     private List<(Vector3 Center, List<GroupMonster> Monsters, int RoomId)>? _pendingGroups;
+
+    // Roamer waypoints - all enemy positions for group-to-group patrol
+    private List<Vector3>? _roamerWaypoints;
     private HashSet<string>? _spawnedEnemyIds;
 
     // Deferred tile building system (for large maps)
@@ -516,7 +519,19 @@ public partial class DungeonGenerator3D
         _pendingGroups = new List<(Vector3, List<GroupMonster>, int)>();
         _spawnedEnemyIds = new HashSet<string>();
 
-        // Convert monster groups to pending list
+        // Collect all enemy positions for roamer waypoints FIRST
+        _roamerWaypoints = new List<Vector3>();
+        foreach (var enemy in map.Enemies)
+        {
+            Vector3 position = new Vector3(
+                enemy.Position.X * TileSize + TileSize / 2f,
+                0,
+                enemy.Position.Z * TileSize + TileSize / 2f
+            );
+            _roamerWaypoints.Add(position);
+        }
+
+        // Convert monster groups to pending list and collect positions
         foreach (var group in map.MonsterGroups)
         {
             Vector3 groupCenter = new Vector3(
@@ -525,13 +540,23 @@ public partial class DungeonGenerator3D
                 group.Center.Z * TileSize + TileSize / 2f
             );
             _pendingGroups.Add((groupCenter, group.Monsters, group.RoomId));
+
+            // Add each monster in group to waypoints
+            foreach (var monster in group.Monsters)
+            {
+                Vector3 position = groupCenter + new Vector3(monster.OffsetX, 0, monster.OffsetZ);
+                _roamerWaypoints.Add(position);
+            }
         }
+
+        GD.Print($"[DungeonGenerator3D] Collected {_roamerWaypoints.Count} waypoints for roamers");
 
         // Get spawn position for initial radius check
         Vector3 spawnPos = GetSpawnPosition();
 
         int spawnedCount = 0;
         int deferredCount = 0;
+        var spawnedRoamers = new List<Enemies.BasicEnemy3D>();
 
         // Spawn enemies within initial radius
         for (int i = _pendingEnemies.Count - 1; i >= 0; i--)
@@ -554,6 +579,11 @@ public partial class DungeonGenerator3D
                     if (enemy.RoomId >= 0 && enemy.RoomId < Rooms.Count)
                     {
                         Rooms[enemy.RoomId].Enemies.Add(spawnedEnemy);
+                    }
+                    // Track spawned roamers to set waypoints later
+                    if (enemy.IsRoamer && spawnedEnemy is Enemies.BasicEnemy3D basicEnemy)
+                    {
+                        spawnedRoamers.Add(basicEnemy);
                     }
                 }
                 _pendingEnemies.RemoveAt(i);
@@ -591,6 +621,16 @@ public partial class DungeonGenerator3D
             {
                 deferredCount += monsters.Count;
             }
+        }
+
+        // Pass waypoints to all spawned roamers
+        if (_roamerWaypoints.Count > 1)
+        {
+            foreach (var roamer in spawnedRoamers)
+            {
+                roamer.SetRoamWaypoints(_roamerWaypoints);
+            }
+            GD.Print($"[DungeonGenerator3D] Set waypoints for {spawnedRoamers.Count} roamers");
         }
 
         GD.Print($"[DungeonGenerator3D] Spawned {spawnedCount} enemies initially, {deferredCount} deferred for later");
@@ -702,6 +742,11 @@ public partial class DungeonGenerator3D
                         if (enemy.RoomId >= 0 && enemy.RoomId < Rooms.Count)
                         {
                             Rooms[enemy.RoomId].Enemies.Add(spawnedEnemy);
+                        }
+                        // Pass waypoints to roamers
+                        if (enemy.IsRoamer && spawnedEnemy is Enemies.BasicEnemy3D basicEnemy && _roamerWaypoints?.Count > 1)
+                        {
+                            basicEnemy.SetRoamWaypoints(_roamerWaypoints);
                         }
                     }
                     _pendingEnemies.RemoveAt(i);

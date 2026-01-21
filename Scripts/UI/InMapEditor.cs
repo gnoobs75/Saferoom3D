@@ -4,6 +4,7 @@ using SafeRoom3D.Core;
 using SafeRoom3D.Environment;
 using SafeRoom3D.Enemies;
 using SafeRoom3D.NPC;
+using SafeRoom3D.NPC.AI;
 using SafeRoom3D.Player;
 
 namespace SafeRoom3D.UI;
@@ -58,9 +59,27 @@ public partial class InMapEditor : Control
     private CheckBox? _proceduralPropsToggle;
     private CheckBox? _roamerToggle;
 
+    // GLB model UI components (per-type toggle)
+    private CheckBox? _monsterGlbToggle;
+    private LineEdit? _monsterGlbPath;
+    private CheckBox? _propGlbToggle;
+    private LineEdit? _propGlbPath;
+    private CheckBox? _npcGlbToggle;
+    private LineEdit? _npcGlbPath;
+    private VBoxContainer? _monsterGlbContainer;
+    private VBoxContainer? _propGlbContainer;
+    private VBoxContainer? _npcGlbContainer;
+
     // Hotbar for quick prop access
     private string?[] _hotbarProps = new string?[10];
     private Button?[] _hotbarButtons = new Button?[10];
+
+    // Monster config popup (shown when clicking on placed monsters)
+    private PanelContainer? _monsterConfigPopup;
+    private Label? _monsterConfigTitle;
+    private CheckBox? _monsterConfigRoamerToggle;
+    private BasicEnemy3D? _selectedMonster;
+    private EnemyPlacement? _selectedMonsterPlacement;
 
     // Available prop types (alphabetical)
     private static readonly string[] PropTypes = {
@@ -80,7 +99,8 @@ public partial class InMapEditor : Control
         "mushroom", "spider", "lizard", "skeleton", "wolf", "badlama", "bat", "dragon",
         "crawler_killer", "shadow_stalker", "flesh_golem", "plague_bearer", "living_armor",
         "camera_drone", "shock_drone", "advertiser_bot", "clockwork_spider",
-        "lava_elemental", "ice_wraith", "gelatinous_cube", "void_spawn", "mimic", "dungeon_rat"
+        "lava_elemental", "ice_wraith", "gelatinous_cube", "void_spawn", "mimic", "dungeon_rat",
+        "rabbidd"
     };
 
     private static readonly string[] BossTypes = {
@@ -181,40 +201,67 @@ public partial class InMapEditor : Control
     /// </summary>
     public void ExitEditMode(bool save = true)
     {
-        if (save && _currentMap != null)
+        try
         {
-            SavePlacedObjects();
+            if (save && _currentMap != null)
+            {
+                SavePlacedObjects();
+            }
+
+            // Clear preview
+            ClearPlacementPreview();
+
+            // Re-enable player combat
+            if (FPSController.Instance != null)
+            {
+                FPSController.Instance.SetEditMode(false);
+            }
+
+            // Clear global edit mode flag and release all enemies from stasis
+            GameManager3D.SetEditMode(false);
+            ReleaseAllEnemiesFromStasis();
+
+            Visible = false;
+
+            // Return to map editor or continue gameplay
+            if (_enteredFromEditor)
+            {
+                // Return to map editor via splash screen redirect
+                ReturnToMapEditor();
+            }
+            else
+            {
+                // Just hide the editor and continue gameplay
+                Input.MouseMode = Input.MouseModeEnum.Captured;
+                GD.Print("[InMapEditor] Exited edit mode - returning to gameplay");
+            }
+
+            GD.Print("[InMapEditor] Exited edit mode");
         }
-
-        // Clear preview
-        ClearPlacementPreview();
-
-        // Re-enable player combat
-        if (FPSController.Instance != null)
+        catch (System.Exception ex)
         {
-            FPSController.Instance.SetEditMode(false);
+            GD.PrintErr($"[InMapEditor] Exception during ExitEditMode: {ex.Message}");
+            // Try to recover by returning to splash
+            ReturnToSplashMenu();
         }
+    }
 
-        // Clear global edit mode flag and release all enemies from stasis
-        GameManager3D.SetEditMode(false);
-        ReleaseAllEnemiesFromStasis();
-
-        Visible = false;
-
-        // Return to map editor or continue gameplay
-        if (_enteredFromEditor)
+    /// <summary>
+    /// Force exit to splash menu (for when other exit paths fail).
+    /// </summary>
+    public void ForceExitToSplash()
+    {
+        try
         {
-            // Return to map editor via splash screen redirect
-            ReturnToMapEditor();
+            ClearPlacementPreview();
+            if (FPSController.Instance != null)
+                FPSController.Instance.SetEditMode(false);
+            GameManager3D.SetEditMode(false);
+            Visible = false;
         }
-        else
-        {
-            // Just hide the editor and continue gameplay
-            Input.MouseMode = Input.MouseModeEnum.Captured;
-            GD.Print("[InMapEditor] Exited edit mode - returning to gameplay");
-        }
+        catch { }
 
-        GD.Print("[InMapEditor] Exited edit mode");
+        ReturnToSplashMenu();
     }
 
     private void PutAllEnemiesInStasis()
@@ -327,12 +374,39 @@ public partial class InMapEditor : Control
         CallDeferred(nameof(ChangeToSplashScreen));
     }
 
+    private void ReturnToSplashMenu()
+    {
+        // Clear any editor state
+        SplashScreen3D.CustomMapPath = null;
+        SplashScreen3D.ReturnToEditorAfterPlay = false;
+
+        // Return to splash screen
+        CallDeferred(nameof(ChangeToSplashScreen));
+    }
+
     private void ChangeToSplashScreen()
     {
-        var error = GetTree().ChangeSceneToFile("res://Scenes/Splash3D.tscn");
-        if (error != Error.Ok)
+        try
         {
-            GD.PrintErr($"[InMapEditor] Failed to change to splash screen: {error}");
+            // Ensure mouse is visible before scene change
+            Input.MouseMode = Input.MouseModeEnum.Visible;
+
+            var tree = GetTree();
+            if (tree == null)
+            {
+                GD.PrintErr("[InMapEditor] GetTree() returned null");
+                return;
+            }
+
+            var error = tree.ChangeSceneToFile("res://Scenes/Splash3D.tscn");
+            if (error != Error.Ok)
+            {
+                GD.PrintErr($"[InMapEditor] Failed to change to splash screen: {error}");
+            }
+        }
+        catch (System.Exception ex)
+        {
+            GD.PrintErr($"[InMapEditor] Exception during scene change: {ex.Message}");
         }
     }
 
@@ -402,6 +476,9 @@ public partial class InMapEditor : Control
         // Prop palette (floating, hidden by default)
         CreatePropPalette();
 
+        // Monster config popup (shown when clicking on placed monsters)
+        CreateMonsterConfigPopup();
+
         // Hotbar for props (bottom center)
         CreateHotbar();
     }
@@ -463,6 +540,33 @@ public partial class InMapEditor : Control
         PopulatePropList("");
         paletteVBox.AddChild(_propList);
 
+        // Prop GLB model toggle (visible when props tab is active)
+        _propGlbContainer = new VBoxContainer();
+        _propGlbContainer.Visible = true; // Props tab is default
+        _propGlbContainer.AddThemeConstantOverride("separation", 4);
+
+        _propGlbToggle = new CheckBox();
+        _propGlbToggle.Text = "Use GLB Model";
+        _propGlbToggle.TooltipText = "Use a custom GLB model instead of procedural mesh for this prop type";
+        _propGlbToggle.Toggled += OnPropGlbToggled;
+        _propGlbContainer.AddChild(_propGlbToggle);
+
+        // Path label (read-only, shows expected path)
+        var propGlbPathRow = new HBoxContainer();
+        propGlbPathRow.AddThemeConstantOverride("separation", 4);
+        var propGlbLabel = new Label { Text = "Path:" };
+        propGlbLabel.AddThemeColorOverride("font_color", new Color(0.6f, 0.6f, 0.6f));
+        propGlbPathRow.AddChild(propGlbLabel);
+        _propGlbPath = new LineEdit();
+        _propGlbPath.Text = "Assets/Models/<prop>.glb";
+        _propGlbPath.Editable = false;
+        _propGlbPath.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        _propGlbPath.AddThemeColorOverride("font_color", new Color(0.5f, 0.5f, 0.5f));
+        propGlbPathRow.AddChild(_propGlbPath);
+        _propGlbContainer.AddChild(propGlbPathRow);
+
+        paletteVBox.AddChild(_propGlbContainer);
+
         // Monsters list (hidden by default)
         _monsterList = new ItemList();
         _monsterList.CustomMinimumSize = new Vector2(0, 300);
@@ -479,6 +583,33 @@ public partial class InMapEditor : Control
         _roamerToggle.Visible = false;
         paletteVBox.AddChild(_roamerToggle);
 
+        // Monster GLB model toggle (hidden by default, shows when monster tab is active)
+        _monsterGlbContainer = new VBoxContainer();
+        _monsterGlbContainer.Visible = false;
+        _monsterGlbContainer.AddThemeConstantOverride("separation", 4);
+
+        _monsterGlbToggle = new CheckBox();
+        _monsterGlbToggle.Text = "Use GLB Model";
+        _monsterGlbToggle.TooltipText = "Use a custom GLB model instead of procedural mesh for this monster type";
+        _monsterGlbToggle.Toggled += OnMonsterGlbToggled;
+        _monsterGlbContainer.AddChild(_monsterGlbToggle);
+
+        // Path label (read-only, shows expected path)
+        var monsterGlbPathRow = new HBoxContainer();
+        monsterGlbPathRow.AddThemeConstantOverride("separation", 4);
+        var monsterGlbLabel = new Label { Text = "Path:" };
+        monsterGlbLabel.AddThemeColorOverride("font_color", new Color(0.6f, 0.6f, 0.6f));
+        monsterGlbPathRow.AddChild(monsterGlbLabel);
+        _monsterGlbPath = new LineEdit();
+        _monsterGlbPath.Text = "Assets/Models/<monster>.glb";
+        _monsterGlbPath.Editable = false;
+        _monsterGlbPath.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        _monsterGlbPath.AddThemeColorOverride("font_color", new Color(0.5f, 0.5f, 0.5f));
+        monsterGlbPathRow.AddChild(_monsterGlbPath);
+        _monsterGlbContainer.AddChild(monsterGlbPathRow);
+
+        paletteVBox.AddChild(_monsterGlbContainer);
+
         // NPCs list (hidden by default)
         _npcList = new ItemList();
         _npcList.CustomMinimumSize = new Vector2(0, 300);
@@ -487,6 +618,33 @@ public partial class InMapEditor : Control
         _npcList.Visible = false;
         PopulateNpcList("");
         paletteVBox.AddChild(_npcList);
+
+        // NPC GLB toggle container
+        _npcGlbContainer = new VBoxContainer();
+        _npcGlbContainer.Visible = false;
+        _npcGlbContainer.AddThemeConstantOverride("separation", 4);
+
+        _npcGlbToggle = new CheckBox();
+        _npcGlbToggle.Text = "Use GLB Model";
+        _npcGlbToggle.TooltipText = "Use a custom GLB model instead of procedural mesh for this NPC type";
+        _npcGlbToggle.Toggled += OnNpcGlbToggled;
+        _npcGlbContainer.AddChild(_npcGlbToggle);
+
+        // Path label (read-only, shows expected path)
+        var npcGlbPathRow = new HBoxContainer();
+        npcGlbPathRow.AddThemeConstantOverride("separation", 4);
+        var npcGlbLabel = new Label { Text = "Path:" };
+        npcGlbLabel.AddThemeColorOverride("font_color", new Color(0.6f, 0.6f, 0.6f));
+        npcGlbPathRow.AddChild(npcGlbLabel);
+        _npcGlbPath = new LineEdit();
+        _npcGlbPath.Text = "Assets/Models/<npc>.glb";
+        _npcGlbPath.Editable = false;
+        _npcGlbPath.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+        _npcGlbPath.AddThemeColorOverride("font_color", new Color(0.5f, 0.5f, 0.5f));
+        npcGlbPathRow.AddChild(_npcGlbPath);
+        _npcGlbContainer.AddChild(npcGlbPathRow);
+
+        paletteVBox.AddChild(_npcGlbContainer);
 
         // Close button
         var closeBtn = new Button();
@@ -639,6 +797,142 @@ public partial class InMapEditor : Control
         }
     }
 
+    private void CreateMonsterConfigPopup()
+    {
+        // Centered popup for configuring placed monsters
+        _monsterConfigPopup = new PanelContainer();
+        _monsterConfigPopup.SetAnchorsPreset(LayoutPreset.Center);
+        _monsterConfigPopup.CustomMinimumSize = new Vector2(280, 150);
+        _monsterConfigPopup.Visible = false;
+        _monsterConfigPopup.MouseFilter = MouseFilterEnum.Stop;
+
+        var popupStyle = new StyleBoxFlat();
+        popupStyle.BgColor = new Color(0.1f, 0.1f, 0.15f, 0.95f);
+        popupStyle.SetCornerRadiusAll(8);
+        popupStyle.SetContentMarginAll(16);
+        popupStyle.BorderWidthTop = 2;
+        popupStyle.BorderWidthBottom = 2;
+        popupStyle.BorderWidthLeft = 2;
+        popupStyle.BorderWidthRight = 2;
+        popupStyle.BorderColor = new Color(0.4f, 0.5f, 0.7f);
+        _monsterConfigPopup.AddThemeStyleboxOverride("panel", popupStyle);
+        AddChild(_monsterConfigPopup);
+
+        var vbox = new VBoxContainer();
+        vbox.AddThemeConstantOverride("separation", 12);
+        _monsterConfigPopup.AddChild(vbox);
+
+        // Title label (shows monster type)
+        _monsterConfigTitle = new Label();
+        _monsterConfigTitle.Text = "Monster Config";
+        _monsterConfigTitle.AddThemeFontSizeOverride("font_size", 18);
+        _monsterConfigTitle.AddThemeColorOverride("font_color", new Color(1f, 0.9f, 0.5f));
+        _monsterConfigTitle.HorizontalAlignment = HorizontalAlignment.Center;
+        vbox.AddChild(_monsterConfigTitle);
+
+        // Roamer toggle
+        _monsterConfigRoamerToggle = new CheckBox();
+        _monsterConfigRoamerToggle.Text = "Roaming";
+        _monsterConfigRoamerToggle.TooltipText = "Roaming monsters patrol between monster groups throughout the dungeon";
+        _monsterConfigRoamerToggle.AddThemeFontSizeOverride("font_size", 14);
+        _monsterConfigRoamerToggle.Toggled += OnMonsterConfigRoamerToggled;
+        vbox.AddChild(_monsterConfigRoamerToggle);
+
+        // Description label
+        var descLabel = new Label();
+        descLabel.Text = "Patrols between monster groups";
+        descLabel.AddThemeFontSizeOverride("font_size", 12);
+        descLabel.AddThemeColorOverride("font_color", new Color(0.6f, 0.6f, 0.6f));
+        vbox.AddChild(descLabel);
+
+        // Close button
+        var closeBtn = new Button();
+        closeBtn.Text = "Close";
+        closeBtn.Pressed += CloseMonsterConfigPopup;
+        var btnStyle = new StyleBoxFlat();
+        btnStyle.BgColor = new Color(0.3f, 0.3f, 0.4f);
+        btnStyle.SetCornerRadiusAll(4);
+        closeBtn.AddThemeStyleboxOverride("normal", btnStyle);
+        var btnHover = new StyleBoxFlat();
+        btnHover.BgColor = new Color(0.4f, 0.4f, 0.5f);
+        btnHover.SetCornerRadiusAll(4);
+        closeBtn.AddThemeStyleboxOverride("hover", btnHover);
+        vbox.AddChild(closeBtn);
+    }
+
+    private void ShowMonsterConfigPopup(BasicEnemy3D monster)
+    {
+        if (_monsterConfigPopup == null || _currentMap == null) return;
+
+        _selectedMonster = monster;
+
+        // Find matching EnemyPlacement by position
+        var monsterPos = monster.GlobalPosition;
+        int tileX = (int)(monsterPos.X / Constants.TileSize);
+        int tileZ = (int)(monsterPos.Z / Constants.TileSize);
+
+        _selectedMonsterPlacement = null;
+        foreach (var placement in _currentMap.Enemies)
+        {
+            if (placement.Position.X == tileX && placement.Position.Z == tileZ)
+            {
+                _selectedMonsterPlacement = placement;
+                break;
+            }
+        }
+
+        // Update popup UI
+        if (_monsterConfigTitle != null)
+        {
+            string displayName = monster.MonsterType.Replace("_", " ");
+            displayName = char.ToUpper(displayName[0]) + displayName.Substring(1);
+            _monsterConfigTitle.Text = displayName;
+        }
+
+        if (_monsterConfigRoamerToggle != null)
+        {
+            _monsterConfigRoamerToggle.SetPressedNoSignal(monster.IsRoamer);
+        }
+
+        // Show popup and release mouse
+        _monsterConfigPopup.Visible = true;
+        Input.MouseMode = Input.MouseModeEnum.Visible;
+
+        GD.Print($"[InMapEditor] Showing config for {monster.MonsterType} at ({tileX}, {tileZ}), IsRoamer: {monster.IsRoamer}");
+    }
+
+    private void CloseMonsterConfigPopup()
+    {
+        if (_monsterConfigPopup != null)
+        {
+            _monsterConfigPopup.Visible = false;
+        }
+
+        _selectedMonster = null;
+        _selectedMonsterPlacement = null;
+
+        // Recapture mouse if selector pane is closed
+        if (_propPalette?.Visible != true)
+        {
+            Input.MouseMode = Input.MouseModeEnum.Captured;
+        }
+    }
+
+    private void OnMonsterConfigRoamerToggled(bool pressed)
+    {
+        if (_selectedMonster == null) return;
+
+        // Update the live monster
+        _selectedMonster.SetRoamer(pressed);
+
+        // Update the EnemyPlacement in the map definition
+        if (_selectedMonsterPlacement != null)
+        {
+            _selectedMonsterPlacement.IsRoamer = pressed;
+            GD.Print($"[InMapEditor] Set {_selectedMonster.MonsterType} roamer: {pressed}");
+        }
+    }
+
     private void HandleKeyInput(InputEventKey keyEvent)
     {
         var keycode = keyEvent.Keycode;
@@ -651,7 +945,12 @@ public partial class InMapEditor : Control
         // Escape - Cancel placement or exit
         else if (keycode == Key.Escape)
         {
-            if (_propPalette != null && _propPalette.Visible)
+            // Close monster config popup first
+            if (_monsterConfigPopup?.Visible == true)
+            {
+                CloseMonsterConfigPopup();
+            }
+            else if (_propPalette != null && _propPalette.Visible)
             {
                 _propPalette.Visible = false;
                 Input.MouseMode = Input.MouseModeEnum.Captured;
@@ -762,8 +1061,10 @@ public partial class InMapEditor : Control
     private Node3D? FindDeletableRoot(Node node)
     {
         // Check if this is a prop, enemy, or NPC
+        // Note: CrawlerAIBase extends CharacterBody3D (not BaseNPC3D) so check it separately
         if (node is Cosmetic3D || node is BasicEnemy3D || node is BossEnemy3D ||
-            node is GoblinShaman || node is GoblinThrower || node is BaseNPC3D)
+            node is GoblinShaman || node is GoblinThrower || node is BaseNPC3D ||
+            node is CrawlerAIBase)
         {
             return node as Node3D;
         }
@@ -839,6 +1140,20 @@ public partial class InMapEditor : Control
                 _roamerToggle.Visible = (tab == 1);
             }
 
+            // Show GLB containers based on tab
+            if (_propGlbContainer != null)
+            {
+                _propGlbContainer.Visible = (tab == 0);
+            }
+            if (_monsterGlbContainer != null)
+            {
+                _monsterGlbContainer.Visible = (tab == 1);
+            }
+            if (_npcGlbContainer != null)
+            {
+                _npcGlbContainer.Visible = (tab == 2);
+            }
+
             // Re-apply search filter for the new tab
             string filter = _searchBox?.Text ?? "";
             if (tab == 0)
@@ -857,6 +1172,9 @@ public partial class InMapEditor : Control
             _selectedPropType = PropTypes[index];
             _selectedMonsterType = null;
             _currentState = EditState.PlacingProp;
+
+            // Update GLB UI for the selected prop type
+            UpdatePropGlbUI(_selectedPropType);
 
             CreatePlacementPreview();
             _propPalette!.Visible = false;
@@ -882,6 +1200,9 @@ public partial class InMapEditor : Control
         _selectedPropType = null;
         _currentState = EditState.PlacingMonster;
 
+        // Update GLB UI for the selected monster type
+        UpdateMonsterGlbUI(_selectedMonsterType);
+
         CreatePlacementPreview();
         _propPalette!.Visible = false;
         Input.MouseMode = Input.MouseModeEnum.Captured;
@@ -901,6 +1222,8 @@ public partial class InMapEditor : Control
             CreatePlacementPreview();
             _propPalette!.Visible = false;
             Input.MouseMode = Input.MouseModeEnum.Captured;
+
+            UpdateNpcGlbUI(_selectedNpcType);
 
             GD.Print($"[InMapEditor] Selected NPC: {_selectedNpcType}");
         }
@@ -1389,6 +1712,12 @@ public partial class InMapEditor : Control
                     _selectedObject = root;
                     _currentState = EditState.Selecting;
                     GD.Print($"[InMapEditor] Selected object: {root.Name}");
+
+                    // If it's a monster, show the config popup
+                    if (root is BasicEnemy3D monster)
+                    {
+                        ShowMonsterConfigPopup(monster);
+                    }
                 }
             }
         }
@@ -1481,5 +1810,162 @@ public partial class InMapEditor : Control
             };
             _instructionsLabel.Text = instructions;
         }
+    }
+
+    // ========================================================================
+    // GLB Model Handlers
+    // ========================================================================
+
+    /// <summary>
+    /// Updates the GLB UI to reflect the current state for a prop type.
+    /// </summary>
+    private void UpdatePropGlbUI(string? propType)
+    {
+        if (_propGlbToggle == null || _propGlbPath == null || propType == null) return;
+
+        bool hasGlb = GlbModelConfig.HasPropGlb(propType);
+        string glbPath = $"res://Assets/Models/{propType}.glb";
+
+        _propGlbToggle.SetPressedNoSignal(hasGlb);
+        _propGlbPath.Text = $"Assets/Models/{propType}.glb";
+
+        // Update color based on file existence
+        bool fileExists = ResourceLoader.Exists(glbPath);
+        _propGlbPath.AddThemeColorOverride("font_color",
+            hasGlb ? (fileExists ? new Color(0.5f, 0.9f, 0.5f) : new Color(0.9f, 0.5f, 0.5f))
+                   : new Color(0.5f, 0.5f, 0.5f));
+    }
+
+    /// <summary>
+    /// Updates the GLB UI to reflect the current state for a monster type.
+    /// </summary>
+    private void UpdateMonsterGlbUI(string? monsterType)
+    {
+        if (_monsterGlbToggle == null || _monsterGlbPath == null || monsterType == null) return;
+
+        bool hasGlb = GlbModelConfig.HasMonsterGlb(monsterType);
+        string glbPath = $"res://Assets/Models/{monsterType}.glb";
+
+        _monsterGlbToggle.SetPressedNoSignal(hasGlb);
+        _monsterGlbPath.Text = $"Assets/Models/{monsterType}.glb";
+
+        // Update color based on file existence
+        bool fileExists = ResourceLoader.Exists(glbPath);
+        _monsterGlbPath.AddThemeColorOverride("font_color",
+            hasGlb ? (fileExists ? new Color(0.5f, 0.9f, 0.5f) : new Color(0.9f, 0.5f, 0.5f))
+                   : new Color(0.5f, 0.5f, 0.5f));
+    }
+
+    /// <summary>
+    /// Called when the prop GLB toggle is changed.
+    /// </summary>
+    private void OnPropGlbToggled(bool pressed)
+    {
+        if (_selectedPropType == null) return;
+
+        // Auto-generate path: Assets/Models/<prop_type>.glb
+        string glbPath = $"res://Assets/Models/{_selectedPropType}.glb";
+
+        if (pressed)
+        {
+            GlbModelConfig.SetPropGlbPath(_selectedPropType, glbPath);
+        }
+        else
+        {
+            GlbModelConfig.ClearPropGlbPath(_selectedPropType);
+        }
+
+        // Update path label color based on file existence
+        if (_propGlbPath != null)
+        {
+            bool fileExists = ResourceLoader.Exists(glbPath);
+            _propGlbPath.AddThemeColorOverride("font_color",
+                pressed ? (fileExists ? new Color(0.5f, 0.9f, 0.5f) : new Color(0.9f, 0.5f, 0.5f))
+                        : new Color(0.5f, 0.5f, 0.5f));
+        }
+
+        GD.Print($"[InMapEditor] Prop {_selectedPropType} GLB: {(pressed ? glbPath : "disabled")}");
+    }
+
+    /// <summary>
+    /// Called when the monster GLB toggle is changed.
+    /// </summary>
+    private void OnMonsterGlbToggled(bool pressed)
+    {
+        if (_selectedMonsterType == null) return;
+
+        // Auto-generate path: Assets/Models/<monster_type>.glb
+        string glbPath = $"res://Assets/Models/{_selectedMonsterType}.glb";
+
+        if (pressed)
+        {
+            GlbModelConfig.SetMonsterGlbPath(_selectedMonsterType, glbPath);
+        }
+        else
+        {
+            GlbModelConfig.ClearMonsterGlbPath(_selectedMonsterType);
+        }
+
+        // Update path label color based on file existence
+        if (_monsterGlbPath != null)
+        {
+            bool fileExists = ResourceLoader.Exists(glbPath);
+            _monsterGlbPath.AddThemeColorOverride("font_color",
+                pressed ? (fileExists ? new Color(0.5f, 0.9f, 0.5f) : new Color(0.9f, 0.5f, 0.5f))
+                        : new Color(0.5f, 0.5f, 0.5f));
+        }
+
+        GD.Print($"[InMapEditor] Monster {_selectedMonsterType} GLB: {(pressed ? glbPath : "disabled")}");
+    }
+
+    /// <summary>
+    /// Update NPC GLB UI based on selected NPC type.
+    /// </summary>
+    private void UpdateNpcGlbUI(string? npcType)
+    {
+        if (_npcGlbToggle == null || _npcGlbPath == null || npcType == null) return;
+
+        bool hasGlb = GlbModelConfig.HasNpcGlb(npcType);
+        string glbPath = $"res://Assets/Models/{npcType}.glb";
+
+        _npcGlbToggle.SetPressedNoSignal(hasGlb);
+        _npcGlbPath.Text = $"Assets/Models/{npcType}.glb";
+
+        // Update color based on file existence
+        bool fileExists = ResourceLoader.Exists(glbPath);
+        _npcGlbPath.AddThemeColorOverride("font_color",
+            hasGlb ? (fileExists ? new Color(0.5f, 0.9f, 0.5f) : new Color(0.9f, 0.5f, 0.5f))
+                   : new Color(0.5f, 0.5f, 0.5f));
+    }
+
+    /// <summary>
+    /// Called when the NPC GLB toggle is changed.
+    /// </summary>
+    private void OnNpcGlbToggled(bool pressed)
+    {
+        if (_selectedNpcType == null) return;
+
+        // Auto-generate path: Assets/Models/<npc_type>.glb
+        string glbPath = $"res://Assets/Models/{_selectedNpcType}.glb";
+
+        if (pressed)
+        {
+            GlbModelConfig.SetNpcGlbPath(_selectedNpcType, glbPath);
+        }
+        else
+        {
+            GlbModelConfig.ClearNpcGlbPath(_selectedNpcType);
+        }
+
+        // Update path label color based on file existence
+        if (_npcGlbPath != null)
+        {
+            bool fileExists = ResourceLoader.Exists(glbPath);
+            _npcGlbPath.AddThemeColorOverride("font_color",
+                pressed ? (fileExists ? new Color(0.5f, 0.9f, 0.5f) : new Color(0.9f, 0.5f, 0.5f))
+                        : new Color(0.5f, 0.5f, 0.5f));
+        }
+
+        GD.Print($"[InMapEditor] NPC {_selectedNpcType} GLB: {(pressed ? glbPath : "disabled")}");
     }
 }
