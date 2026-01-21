@@ -105,6 +105,13 @@ public partial class BasicEnemy3D : CharacterBody3D
     private static bool _propCacheInitialized;
     private static float _propCacheRefreshTimer;
 
+    // Kill slow-motion effect (shared across all enemies)
+    private static bool _killSlowMoActive;
+    private static float _killSlowMoCooldown;
+    private const float KillSlowMoDuration = 0.3f;  // Duration of slow-mo
+    private const float KillSlowMoCooldownTime = 1.0f;  // Cooldown between slow-mos
+    private const float KillSlowMoScale = 0.3f;  // Time scale during slow-mo
+
     // Social chat system (monsters chatting with each other)
     private BasicEnemy3D? _socialChatPartner;
     private MonsterChatBubble? _chatBubble;
@@ -123,6 +130,12 @@ public partial class BasicEnemy3D : CharacterBody3D
     private Vector3 _hitShakeOffset;
     private const float HitShakeDuration = 0.25f;
     private const float HitShakeBaseIntensity = 0.08f;
+
+    // Stagger effect (brief movement interruption on massive hits)
+    private float _staggerTimer;
+
+    // Aggro glow effect
+    private bool _isAggroGlowActive;
 
     // Health bar and floating text
     private Node3D? _healthBarContainer;
@@ -154,12 +167,59 @@ public partial class BasicEnemy3D : CharacterBody3D
     private int _currentAnimVariant;
     private AnimationType _currentAnimType = AnimationType.Idle;
 
+    // Death Effects (works for both GLB and procedural meshes)
+    private enum DeathEffectType { None, Melt, Explode, InflatePop, SpinIntoGround, FreezeShatter, BurnAway, Disintegrate }
+    private bool _isGlbModel;
+    private Node3D? _glbModelNode;
+    private DeathEffectType _deathEffectType = DeathEffectType.None;
+    private float _deathEffectTimer;
+    private const float DeathEffectDuration = 1.5f;
+    private const float InflatePopDuration = 0.6f;  // Faster for comedic effect
+    private const float SpinIntoDuration = 1.0f;
+    private const float FreezeShatterDuration = 1.2f;  // Freeze then shatter
+    private const float BurnAwayDuration = 2.0f;  // Slower burn
+    private const float DisintegrateDuration = 1.8f;  // Thanos snap dissolve
+    private Vector3 _deathOriginalScale;
+    private float _deathOriginalY;
+    private float _deathOriginalRotationY;
+    private GpuParticles3D? _deathParticles;
+    private ShaderMaterial? _dissolveShader;
+    private static Shader? _cachedDissolveShader;
+    private static NoiseTexture2D? _cachedNoiseTexture;
+
     // Torch (for torchbearer variant)
     private bool _hasTorch;
     private bool _canHaveWeapon;
     private OmniLight3D? _torchLight;
     private Node3D? _torchNode;
     private float _torchFlickerTimer;
+
+    // Glowing Eyes
+    private List<MeshInstance3D> _eyeMeshes = new();
+    private float _eyeGlowTimer;
+    private const float EyeGlowPulseSpeed = 2f;  // Cycles per second
+    private const float EyeGlowMinEnergy = 1.8f;
+    private const float EyeGlowMaxEnergy = 2.5f;
+
+    // Footstep Dust
+    private Vector3 _lastFootstepPos;
+    private const float FootstepDustDistance = 0.5f;  // Distance between dust puffs
+    private const float FootstepDustLifetime = 0.8f;
+
+    // Attack Charge-up
+    private GpuParticles3D? _attackChargeParticles;
+    private bool _attackChargeActive;
+
+    // Head Tracking
+    private float _headTrackingYaw;   // Current head yaw offset
+    private float _headTrackingPitch; // Current head pitch offset
+    private const float HeadTrackMaxYaw = 45f;    // Max horizontal rotation (degrees)
+    private const float HeadTrackMaxPitch = 30f;  // Max vertical rotation (degrees)
+    private const float HeadTrackSpeed = 5f;      // Interpolation speed
+
+    // Damage Visuals (progressive blood/damage)
+    private float _lastDamagePercent;  // Last applied damage visual percentage
+    private bool _damageVisualsApplied;
 
     // Signals
     [Signal] public delegate void DiedEventHandler(BasicEnemy3D enemy);
@@ -339,6 +399,12 @@ public partial class BasicEnemy3D : CharacterBody3D
                 _glbAnimPlayer = GlbModelConfig.FindAnimationPlayer(glbModel);
                 usedGlbModel = true;
 
+                // Track GLB model for death effects
+                _isGlbModel = true;
+                _glbModelNode = glbModel;
+                _deathOriginalScale = glbModel.Scale;
+                _deathOriginalY = glbModel.Position.Y;
+
                 // Detect and cache animation names from GLB
                 if (_glbAnimPlayer != null)
                 {
@@ -419,6 +485,9 @@ public partial class BasicEnemy3D : CharacterBody3D
 
         // Create AnimationPlayer with procedural animations
         SetupAnimationPlayer();
+
+        // Set up glowing eyes
+        SetupGlowingEyes();
 
         // Create collision
         _collider = new CollisionShape3D();
@@ -1466,6 +1535,15 @@ public partial class BasicEnemy3D : CharacterBody3D
         // Update global chat cooldown (once per frame, any enemy can do this)
         MonsterChatDatabase.UpdateCooldown(dt);
 
+        // Update kill slow-mo cooldown
+        UpdateKillSlowMoCooldown(dt);
+
+        // Update glowing eyes pulse (always runs for ambient effect)
+        UpdateEyeGlowPulse(delta);
+
+        // Update head tracking toward player
+        UpdateHeadTracking(dt);
+
         // Stasis mode - only play idle animation, no AI processing
         if (_isInStasis)
         {
@@ -1485,13 +1563,19 @@ public partial class BasicEnemy3D : CharacterBody3D
             return;
         }
 
-        // Dead enemies only decay hit flash
+        // Dead enemies only decay hit flash and process death effects
         if (CurrentState == State.Dead)
         {
             if (_hitFlashTimer > 0)
             {
                 _hitFlashTimer -= dt;
                 UpdateVisuals();
+            }
+
+            // Process death effect animation
+            if (_deathEffectType != DeathEffectType.None)
+            {
+                ProcessDeathEffect(dt);
             }
             return;
         }
@@ -1574,6 +1658,21 @@ public partial class BasicEnemy3D : CharacterBody3D
             return;
         }
 
+        // Process stagger timer - enemy can't pursue while staggering
+        if (_staggerTimer > 0)
+        {
+            _staggerTimer -= dt;
+            // Apply gravity and knockback physics but no intentional movement
+            if (!IsOnFloor())
+            {
+                Velocity += new Vector3(0, -Constants.Gravity * dt, 0);
+            }
+            // Slow down knockback velocity
+            Velocity = Velocity.MoveToward(Vector3.Zero, dt * 10f);
+            MoveAndSlide();
+            return;
+        }
+
         // Get speed multiplier from Engine of Tomorrow
         float speedMultiplier = EngineOfTomorrow3D.GetGlobalSlowMultiplier();
 
@@ -1602,6 +1701,12 @@ public partial class BasicEnemy3D : CharacterBody3D
 
         // Apply movement
         MoveAndSlide();
+
+        // Check for footstep dust (only when moving on ground)
+        if (IsOnFloor() && Velocity.LengthSquared() > 0.5f)
+        {
+            UpdateFootstepDust();
+        }
 
         // Check for stuck condition and recover
         CheckAndRecoverFromStuck(dt);
@@ -2083,6 +2188,9 @@ public partial class BasicEnemy3D : CharacterBody3D
 
         if (_stateTimer <= 0)
         {
+            // End charge-up effect
+            EndAttackChargeUp();
+
             // Perform attack
             PerformAttack();
             _attackTimer = AttackCooldown;
@@ -2143,18 +2251,22 @@ public partial class BasicEnemy3D : CharacterBody3D
                 Velocity = new Vector3(0, Velocity.Y, 0);
                 // Play idle animation (variant 0=breathing, 1=alert, 2=aggressive)
                 PlayAnimation(AnimationType.Idle, GD.RandRange(0, 1)); // Mostly calm idles
+                // Disable aggro glow when returning to idle
+                DisableAggroGlow();
                 break;
 
             case State.Sleeping:
                 Velocity = new Vector3(0, Velocity.Y, 0);
                 // Sleeping uses breathing idle
                 PlayAnimation(AnimationType.Idle, 0);
+                DisableAggroGlow();
                 break;
 
             case State.Patrolling:
                 PickNewPatrolTarget();
                 // Play walk animation
                 PlayAnimation(AnimationType.Walk);
+                DisableAggroGlow();
                 break;
 
             case State.Tracking:
@@ -2171,7 +2283,8 @@ public partial class BasicEnemy3D : CharacterBody3D
                 }
                 // Play run animation when in aggro (chasing player)
                 PlayAnimation(AnimationType.Run);
-                // Use aggressive idle variant (2) when stationary but aggro'd
+                // Enable aggro glow (red emission)
+                EnableAggroGlow();
                 break;
 
             case State.Attacking:
@@ -2179,6 +2292,8 @@ public partial class BasicEnemy3D : CharacterBody3D
                 Velocity = new Vector3(0, Velocity.Y, 0);
                 // Play attack animation
                 PlayAnimation(AnimationType.Attack);
+                // Start charge-up effect (visual telegraph)
+                StartAttackChargeUp();
                 break;
 
             case State.Dead:
@@ -2888,10 +3003,31 @@ public partial class BasicEnemy3D : CharacterBody3D
         _hitShakeTimer = HitShakeDuration;
         _hitShakeIntensity = HitShakeBaseIntensity * (0.5f + damageRatio * 0.5f) * Mathf.Clamp(pushbackMultiplier, 0.5f, 1.5f);
 
-        // Play hit reaction animation (doesn't change state)
+        // Trigger camera screen shake based on hit type
+        if (isCrit)
+        {
+            FPSController.Instance?.RequestScreenShake(Player.ScreenShakeType.Critical);
+        }
+        else if (damageRatio > 0.5f)
+        {
+            FPSController.Instance?.RequestScreenShake(Player.ScreenShakeType.Heavy);
+        }
+        else
+        {
+            FPSController.Instance?.RequestScreenShake(Player.ScreenShakeType.Light);
+        }
+
+        // Calculate hit intensity based on damage dealt
+        float hitPercent = damage / MaxHealth;
+        bool isHeavyHit = hitPercent > 0.15f || isCrit;  // >15% HP or critical
+        bool isMassiveHit = hitPercent > 0.3f;  // >30% HP
+
+        // Play hit reaction animation with variant based on hit intensity
         if (_animPlayer != null && CurrentState != State.Dead)
         {
-            PlayAnimation(AnimationType.Hit);
+            // Use variant 1 (knockdown) for massive hits, variant 0 (stagger) for normal
+            int hitVariant = isMassiveHit ? 1 : 0;
+            PlayAnimation(AnimationType.Hit, hitVariant);
         }
 
         // Update health bar visuals (not billboard - that's updated periodically)
@@ -2903,10 +3039,41 @@ public partial class BasicEnemy3D : CharacterBody3D
         // Play monster-specific hit sound
         PlayMonsterSound("hit");
 
-        // Knockback with weapon pushback multiplier
+        // Knockback with weapon pushback multiplier - enhanced for heavy/massive hits
         Vector3 knockDir = (GlobalPosition - fromPosition).Normalized();
         knockDir.Y = 0;
-        Velocity += knockDir * Constants.KnockbackForce * pushbackMultiplier;
+
+        // Base knockback
+        float knockbackMult = pushbackMultiplier;
+
+        // Enhanced knockback for heavy hits
+        if (isMassiveHit)
+        {
+            knockbackMult *= 2.0f;  // Double knockback for massive hits
+            knockDir.Y = 0.3f;  // Slight upward component for stumble
+        }
+        else if (isHeavyHit)
+        {
+            knockbackMult *= 1.5f;  // 50% more knockback for heavy hits
+        }
+
+        Velocity += knockDir * Constants.KnockbackForce * knockbackMult;
+
+        // Stagger state for massive hits - brief interruption
+        if (isMassiveHit && CurrentState != State.Dead)
+        {
+            _staggerTimer = 0.4f;  // 0.4 second stagger
+        }
+
+        // Gore chunks on heavy hits (>15% HP or crit)
+        if (isHeavyHit)
+        {
+            int chunkCount = isMassiveHit ? 5 : 3;  // More chunks for bigger hits
+            SpawnGoreChunks(fromPosition, chunkCount);
+        }
+
+        // Update progressive damage visuals
+        UpdateDamageVisuals();
 
         EmitSignal(SignalName.Damaged, intDamage, CurrentHealth);
 
@@ -2925,6 +3092,12 @@ public partial class BasicEnemy3D : CharacterBody3D
         CollisionMask = 0;
 
         EmitSignal(SignalName.Died, this);
+
+        // Trigger slow-motion kill effect
+        TriggerKillSlowMo();
+
+        // Trigger kill screen shake
+        FPSController.Instance?.RequestScreenShake(Player.ScreenShakeType.Kill);
 
         // Spawn blood splatter effect
         SpawnBloodSplatter();
@@ -2961,14 +3134,21 @@ public partial class BasicEnemy3D : CharacterBody3D
             Core.QuestManager.Instance?.OnMonsterKilled(MonsterType, isBoss);
         }
 
-        // Wait for death animation to complete before spawning corpse
-        // Death animations are 2.0-3.0 seconds, use 2.5s as safe delay
+        // Use special death effects for both GLB and procedural models (70% chance)
+        // Otherwise fall back to corpse spawn for procedural
+        bool useFancyDeath = _isGlbModel || GD.Randf() < 0.7f;
+
+        if (useFancyDeath)
+        {
+            StartDeathEffect();
+            return;
+        }
+
+        // Fallback: Wait for death animation then spawn corpse (procedural only)
         float deathAnimDuration = 2.5f;
 
         var tween = CreateTween();
-        // Wait for death animation to finish
         tween.TweenInterval(deathAnimDuration);
-        // Then spawn corpse and remove enemy
         tween.TweenCallback(Callable.From(() =>
         {
             SpawnCorpse();
@@ -2984,12 +3164,1630 @@ public partial class BasicEnemy3D : CharacterBody3D
     }
 
     /// <summary>
+    /// Starts a special death effect - works for both GLB and procedural models.
+    /// </summary>
+    private void StartDeathEffect()
+    {
+        // Randomly choose from available death effects (7 types)
+        float rand = GD.Randf();
+        if (rand < 0.143f)
+            _deathEffectType = DeathEffectType.Melt;
+        else if (rand < 0.286f)
+            _deathEffectType = DeathEffectType.Explode;
+        else if (rand < 0.429f)
+            _deathEffectType = DeathEffectType.InflatePop;
+        else if (rand < 0.572f)
+            _deathEffectType = DeathEffectType.SpinIntoGround;
+        else if (rand < 0.715f)
+            _deathEffectType = DeathEffectType.FreezeShatter;
+        else if (rand < 0.858f)
+            _deathEffectType = DeathEffectType.BurnAway;
+        else
+            _deathEffectType = DeathEffectType.Disintegrate;
+
+        _deathEffectTimer = 0f;
+
+        // Store original values for animation
+        var modelNode = GetDeathModelNode();
+        if (modelNode != null)
+        {
+            _deathOriginalScale = modelNode.Scale;
+            _deathOriginalY = modelNode.Position.Y;
+            _deathOriginalRotationY = modelNode.Rotation.Y;
+        }
+
+        if (_deathEffectType == DeathEffectType.Explode)
+        {
+            // Create particle explosion
+            CreateDeathParticles();
+            // Hide the model immediately for explosion
+            if (modelNode != null)
+            {
+                modelNode.Visible = false;
+            }
+        }
+        else if (_deathEffectType == DeathEffectType.InflatePop)
+        {
+            // Will inflate then pop - particles created at pop moment
+        }
+        else if (_deathEffectType == DeathEffectType.FreezeShatter)
+        {
+            // Turn model blue/ice immediately
+            SetModelTint(new Color(0.6f, 0.85f, 1f));  // Ice blue
+            SetModelEmission(new Color(0.3f, 0.5f, 0.8f), 0.5f);  // Blue glow
+        }
+        else if (_deathEffectType == DeathEffectType.BurnAway)
+        {
+            // Start fire particles at feet
+            StartBurnParticles();
+        }
+        else if (_deathEffectType == DeathEffectType.Disintegrate)
+        {
+            // Apply dissolve shader to all meshes
+            ApplyDissolveShader();
+        }
+
+        GD.Print($"[BasicEnemy3D] {MonsterType} death effect: {_deathEffectType}");
+    }
+
+    /// <summary>
+    /// Gets the model node for death effects (GLB model or procedural mesh instance).
+    /// </summary>
+    private Node3D? GetDeathModelNode()
+    {
+        if (_isGlbModel && _glbModelNode != null)
+            return _glbModelNode;
+        return _meshInstance;
+    }
+
+    /// <summary>
+    /// Creates GPU particles for the explosion death effect.
+    /// </summary>
+    private void CreateDeathParticles()
+    {
+        _deathParticles = new GpuParticles3D();
+        _deathParticles.Emitting = true;
+        _deathParticles.OneShot = true;
+        _deathParticles.Explosiveness = 1.0f;
+        _deathParticles.Amount = 50;
+        _deathParticles.Lifetime = 1.2f;
+        _deathParticles.SpeedScale = 1.5f;
+
+        // Create particle material
+        var particleMat = new ParticleProcessMaterial();
+        particleMat.EmissionShape = ParticleProcessMaterial.EmissionShapeEnum.Sphere;
+        particleMat.EmissionSphereRadius = 0.5f;
+        particleMat.Direction = new Vector3(0, 1, 0);
+        particleMat.Spread = 180f;
+        particleMat.InitialVelocityMin = 3f;
+        particleMat.InitialVelocityMax = 8f;
+        particleMat.Gravity = new Vector3(0, -15f, 0);
+        particleMat.DampingMin = 2f;
+        particleMat.DampingMax = 4f;
+
+        // Scale particles down over time
+        particleMat.ScaleMin = 0.1f;
+        particleMat.ScaleMax = 0.3f;
+        var scaleCurve = new Curve();
+        scaleCurve.AddPoint(new Vector2(0, 1));
+        scaleCurve.AddPoint(new Vector2(1, 0));
+        var scaleCurveTex = new CurveTexture();
+        scaleCurveTex.Curve = scaleCurve;
+        particleMat.ScaleCurve = scaleCurveTex;
+
+        // Use monster's base color for particles
+        particleMat.Color = _baseColor;
+
+        // Add color variation - fade out over lifetime
+        var colorRamp = new Gradient();
+        colorRamp.SetColor(0, new Color(_baseColor.R, _baseColor.G, _baseColor.B, 1f));
+        colorRamp.SetColor(1, new Color(_baseColor.R * 0.5f, _baseColor.G * 0.3f, _baseColor.B * 0.3f, 0f));
+        var gradientTex = new GradientTexture1D();
+        gradientTex.Gradient = colorRamp;
+        particleMat.ColorRamp = gradientTex;
+
+        _deathParticles.ProcessMaterial = particleMat;
+
+        // Simple box mesh for particles (chunks of monster)
+        var drawPass = new BoxMesh();
+        drawPass.Size = new Vector3(0.15f, 0.15f, 0.15f);
+        _deathParticles.DrawPass1 = drawPass;
+
+        // Set material for visibility
+        var meshMat = new StandardMaterial3D();
+        meshMat.AlbedoColor = _baseColor;
+        meshMat.EmissionEnabled = true;
+        meshMat.Emission = _baseColor * 0.3f;
+        drawPass.Material = meshMat;
+
+        _deathParticles.Position = GlobalPosition + new Vector3(0, 0.5f, 0);
+        GetTree().Root.AddChild(_deathParticles);
+
+        // Auto-cleanup particles after they finish
+        var timer = GetTree().CreateTimer(2.0);
+        timer.Timeout += () =>
+        {
+            if (IsInstanceValid(_deathParticles))
+            {
+                _deathParticles.QueueFree();
+            }
+        };
+    }
+
+    /// <summary>
+    /// Process death effect animation each frame.
+    /// </summary>
+    private void ProcessDeathEffect(float delta)
+    {
+        if (_deathEffectType == DeathEffectType.None) return;
+
+        var modelNode = GetDeathModelNode();
+        if (modelNode == null) return;
+
+        _deathEffectTimer += delta;
+
+        // Different durations for different effects
+        float duration = _deathEffectType switch
+        {
+            DeathEffectType.InflatePop => InflatePopDuration,
+            DeathEffectType.SpinIntoGround => SpinIntoDuration,
+            DeathEffectType.FreezeShatter => FreezeShatterDuration,
+            DeathEffectType.BurnAway => BurnAwayDuration,
+            DeathEffectType.Disintegrate => DisintegrateDuration,
+            _ => DeathEffectDuration
+        };
+
+        float progress = Mathf.Clamp(_deathEffectTimer / duration, 0f, 1f);
+
+        switch (_deathEffectType)
+        {
+            case DeathEffectType.Melt:
+                ProcessMeltEffect(modelNode, progress);
+                break;
+
+            case DeathEffectType.InflatePop:
+                ProcessInflatePopEffect(modelNode, progress);
+                break;
+
+            case DeathEffectType.SpinIntoGround:
+                ProcessSpinIntoGroundEffect(modelNode, progress);
+                break;
+
+            case DeathEffectType.Explode:
+                // Explode effect just waits for particles to finish
+                break;
+
+            case DeathEffectType.FreezeShatter:
+                ProcessFreezeShatterEffect(modelNode, progress);
+                break;
+
+            case DeathEffectType.BurnAway:
+                ProcessBurnAwayEffect(modelNode, progress);
+                break;
+
+            case DeathEffectType.Disintegrate:
+                ProcessDisintegrateEffect(modelNode, progress);
+                break;
+        }
+
+        // Check if effect is complete
+        if (progress >= 1f)
+        {
+            FinishDeathEffect();
+        }
+    }
+
+    /// <summary>
+    /// Melt effect: sink into floor + shrink Y scale + spread out + fade
+    /// </summary>
+    private void ProcessMeltEffect(Node3D modelNode, float progress)
+    {
+        float sinkAmount = Mathf.Lerp(0f, 1.0f, progress);
+        float scaleY = Mathf.Lerp(1f, 0.1f, progress);
+        float scaleXZ = Mathf.Lerp(1f, 1.3f, Mathf.Min(progress * 2f, 1f)); // Spread out
+
+        modelNode.Position = new Vector3(0, _deathOriginalY - sinkAmount, 0);
+        modelNode.Scale = new Vector3(
+            _deathOriginalScale.X * scaleXZ,
+            _deathOriginalScale.Y * scaleY,
+            _deathOriginalScale.Z * scaleXZ
+        );
+
+        // Fade out in second half
+        if (progress > 0.5f)
+        {
+            float alpha = Mathf.Lerp(1f, 0f, (progress - 0.5f) * 2f);
+            SetModelAlpha(modelNode, alpha);
+        }
+    }
+
+    /// <summary>
+    /// Inflate & Pop: balloon up then burst into colorful particles
+    /// </summary>
+    private void ProcessInflatePopEffect(Node3D modelNode, float progress)
+    {
+        if (progress < 0.8f)
+        {
+            // Inflate phase (0-80% of duration)
+            float inflateProgress = progress / 0.8f;
+            // Use ease-out curve for comical ballooning
+            float eased = 1f - Mathf.Pow(1f - inflateProgress, 3);
+            float scale = Mathf.Lerp(1f, 1.5f, eased);
+
+            modelNode.Scale = _deathOriginalScale * scale;
+
+            // Slight upward float as it inflates
+            float floatHeight = Mathf.Lerp(0f, 0.3f, eased);
+            modelNode.Position = new Vector3(0, _deathOriginalY + floatHeight, 0);
+
+            // Bulge outward more on X/Z than Y for balloon look
+            modelNode.Scale = new Vector3(
+                _deathOriginalScale.X * scale * 1.1f,
+                _deathOriginalScale.Y * scale * 0.9f,
+                _deathOriginalScale.Z * scale * 1.1f
+            );
+        }
+        else
+        {
+            // Pop phase (80-100% of duration)
+            if (modelNode.Visible)
+            {
+                // Hide model and spawn pop particles
+                modelNode.Visible = false;
+                CreatePopParticles();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Creates colorful pop particles for InflatePop death effect.
+    /// </summary>
+    private void CreatePopParticles()
+    {
+        var particles = new GpuParticles3D();
+        particles.Emitting = true;
+        particles.OneShot = true;
+        particles.Explosiveness = 1.0f;
+        particles.Amount = 40;
+        particles.Lifetime = 0.8f;
+        particles.SpeedScale = 2.0f;
+
+        var particleMat = new ParticleProcessMaterial();
+        particleMat.EmissionShape = ParticleProcessMaterial.EmissionShapeEnum.Sphere;
+        particleMat.EmissionSphereRadius = 0.3f;
+        particleMat.Direction = new Vector3(0, 0, 0);  // Outward from center
+        particleMat.Spread = 180f;
+        particleMat.InitialVelocityMin = 5f;
+        particleMat.InitialVelocityMax = 12f;
+        particleMat.Gravity = new Vector3(0, -20f, 0);
+        particleMat.DampingMin = 3f;
+        particleMat.DampingMax = 5f;
+
+        // Scale down quickly
+        particleMat.ScaleMin = 0.08f;
+        particleMat.ScaleMax = 0.2f;
+        var scaleCurve = new Curve();
+        scaleCurve.AddPoint(new Vector2(0, 1));
+        scaleCurve.AddPoint(new Vector2(0.5f, 0.5f));
+        scaleCurve.AddPoint(new Vector2(1, 0));
+        var scaleCurveTex = new CurveTexture();
+        scaleCurveTex.Curve = scaleCurve;
+        particleMat.ScaleCurve = scaleCurveTex;
+
+        // Monster color with variation
+        var colorRamp = new Gradient();
+        colorRamp.SetColor(0, _baseColor);
+        colorRamp.SetColor(1, new Color(_baseColor.R * 0.3f, _baseColor.G * 0.3f, _baseColor.B * 0.3f, 0f));
+        var gradientTex = new GradientTexture1D();
+        gradientTex.Gradient = colorRamp;
+        particleMat.ColorRamp = gradientTex;
+
+        particles.ProcessMaterial = particleMat;
+
+        // Small spheres for pop effect
+        var sphereMesh = new SphereMesh();
+        sphereMesh.Radius = 0.1f;
+        sphereMesh.Height = 0.2f;
+        var meshMat = new StandardMaterial3D();
+        meshMat.AlbedoColor = _baseColor;
+        sphereMesh.Material = meshMat;
+        particles.DrawPass1 = sphereMesh;
+
+        particles.Position = GlobalPosition + new Vector3(0, 0.7f, 0);
+        GetTree().Root.AddChild(particles);
+
+        // Auto-cleanup
+        var timer = GetTree().CreateTimer(1.5);
+        timer.Timeout += () =>
+        {
+            if (IsInstanceValid(particles))
+                particles.QueueFree();
+        };
+    }
+
+    /// <summary>
+    /// Spin Into Ground: corkscrew rotation while sinking into floor
+    /// </summary>
+    private void ProcessSpinIntoGroundEffect(Node3D modelNode, float progress)
+    {
+        // Spin 2 full rotations (720 degrees)
+        float spin = Mathf.Lerp(0f, Mathf.Pi * 4f, progress);
+
+        // Sink into ground
+        float sinkAmount = Mathf.Lerp(0f, 1.5f, progress);
+
+        // Shrink as it sinks
+        float scale = Mathf.Lerp(1f, 0.3f, progress);
+
+        modelNode.Rotation = new Vector3(0, _deathOriginalRotationY + spin, 0);
+        modelNode.Position = new Vector3(0, _deathOriginalY - sinkAmount, 0);
+        modelNode.Scale = _deathOriginalScale * scale;
+
+        // Spawn dust particles at ground level during sink
+        if (progress > 0.1f && progress < 0.9f && GD.Randf() < 0.15f)
+        {
+            SpawnDustPuff(GlobalPosition);
+        }
+    }
+
+    /// <summary>
+    /// Spawns a small dust puff particle effect.
+    /// </summary>
+    private void SpawnDustPuff(Vector3 position)
+    {
+        var dust = new GpuParticles3D();
+        dust.Emitting = true;
+        dust.OneShot = true;
+        dust.Explosiveness = 0.8f;
+        dust.Amount = 8;
+        dust.Lifetime = 0.6f;
+
+        var dustMat = new ParticleProcessMaterial();
+        dustMat.EmissionShape = ParticleProcessMaterial.EmissionShapeEnum.Sphere;
+        dustMat.EmissionSphereRadius = 0.2f;
+        dustMat.Direction = new Vector3(0, 1, 0);
+        dustMat.Spread = 45f;
+        dustMat.InitialVelocityMin = 0.5f;
+        dustMat.InitialVelocityMax = 1.5f;
+        dustMat.Gravity = new Vector3(0, -1f, 0);
+
+        dustMat.ScaleMin = 0.05f;
+        dustMat.ScaleMax = 0.15f;
+        dustMat.Color = new Color(0.6f, 0.5f, 0.4f, 0.7f);  // Brown dust
+
+        dust.ProcessMaterial = dustMat;
+
+        var sphereMesh = new SphereMesh();
+        sphereMesh.Radius = 0.05f;
+        sphereMesh.Height = 0.1f;
+        dust.DrawPass1 = sphereMesh;
+
+        dust.Position = position;
+        GetTree().Root.AddChild(dust);
+
+        // Auto-cleanup
+        var timer = GetTree().CreateTimer(1.0);
+        timer.Timeout += () =>
+        {
+            if (IsInstanceValid(dust))
+                dust.QueueFree();
+        };
+    }
+
+    /// <summary>
+    /// Freeze & Shatter: Turn blue/ice, add crack lines, then explode into ice shards.
+    /// </summary>
+    private void ProcessFreezeShatterEffect(Node3D modelNode, float progress)
+    {
+        if (progress < 0.6f)
+        {
+            // Freeze phase (0-60%): Intensify ice color, add slight shake
+            float freezeProgress = progress / 0.6f;
+
+            // Increase emission intensity as it freezes
+            float emissionIntensity = Mathf.Lerp(0.5f, 2.0f, freezeProgress);
+            SetModelEmission(new Color(0.4f, 0.6f, 1f), emissionIntensity);
+
+            // Slight shake as ice forms
+            if (GD.Randf() < 0.1f)
+            {
+                modelNode.Position += new Vector3(
+                    (GD.Randf() - 0.5f) * 0.02f,
+                    0,
+                    (GD.Randf() - 0.5f) * 0.02f
+                );
+            }
+        }
+        else if (progress >= 0.6f && modelNode.Visible)
+        {
+            // Shatter phase (60-100%): Hide model, spawn ice shards
+            modelNode.Visible = false;
+            CreateIceShardParticles();
+        }
+    }
+
+    /// <summary>
+    /// Creates ice shard particles for freeze shatter effect.
+    /// </summary>
+    private void CreateIceShardParticles()
+    {
+        var particles = new GpuParticles3D();
+        particles.Emitting = true;
+        particles.OneShot = true;
+        particles.Explosiveness = 1.0f;
+        particles.Amount = 30;
+        particles.Lifetime = 1.0f;
+        particles.SpeedScale = 1.5f;
+
+        var particleMat = new ParticleProcessMaterial();
+        particleMat.EmissionShape = ParticleProcessMaterial.EmissionShapeEnum.Sphere;
+        particleMat.EmissionSphereRadius = 0.4f;
+        particleMat.Direction = new Vector3(0, 0.5f, 0);
+        particleMat.Spread = 180f;
+        particleMat.InitialVelocityMin = 4f;
+        particleMat.InitialVelocityMax = 10f;
+        particleMat.Gravity = new Vector3(0, -20f, 0);
+        particleMat.DampingMin = 1f;
+        particleMat.DampingMax = 3f;
+
+        // Angular particles (tumbling shards)
+        particleMat.AngularVelocityMin = -720f;
+        particleMat.AngularVelocityMax = 720f;
+
+        particleMat.ScaleMin = 0.05f;
+        particleMat.ScaleMax = 0.15f;
+
+        // Ice blue color
+        var colorRamp = new Gradient();
+        colorRamp.SetColor(0, new Color(0.7f, 0.9f, 1f, 1f));
+        colorRamp.SetColor(1, new Color(0.5f, 0.7f, 1f, 0f));
+        var gradientTex = new GradientTexture1D();
+        gradientTex.Gradient = colorRamp;
+        particleMat.ColorRamp = gradientTex;
+
+        particles.ProcessMaterial = particleMat;
+
+        // Angular box mesh for ice shards
+        var shardMesh = new BoxMesh();
+        shardMesh.Size = new Vector3(0.1f, 0.15f, 0.05f);  // Flat shard shape
+        var meshMat = new StandardMaterial3D();
+        meshMat.AlbedoColor = new Color(0.8f, 0.95f, 1f);
+        meshMat.EmissionEnabled = true;
+        meshMat.Emission = new Color(0.3f, 0.5f, 0.8f);
+        meshMat.EmissionEnergyMultiplier = 1.5f;
+        meshMat.Transparency = BaseMaterial3D.TransparencyEnum.Alpha;
+        shardMesh.Material = meshMat;
+        particles.DrawPass1 = shardMesh;
+
+        particles.Position = GlobalPosition + new Vector3(0, 0.5f, 0);
+        GetTree().Root.AddChild(particles);
+
+        // Auto-cleanup
+        var timer = GetTree().CreateTimer(2.0);
+        timer.Timeout += () =>
+        {
+            if (IsInstanceValid(particles))
+                particles.QueueFree();
+        };
+    }
+
+    /// <summary>
+    /// Burn Away: Fire consumes from feet up, leave ash pile.
+    /// </summary>
+    private void ProcessBurnAwayEffect(Node3D modelNode, float progress)
+    {
+        // Burn up from bottom to top using Y clip
+        float burnHeight = Mathf.Lerp(0f, 2.0f, progress);
+
+        // Shrink model as it burns (like being consumed)
+        float scaleY = Mathf.Lerp(1f, 0.1f, progress);
+        modelNode.Scale = new Vector3(
+            _deathOriginalScale.X,
+            _deathOriginalScale.Y * scaleY,
+            _deathOriginalScale.Z
+        );
+
+        // Sink as it burns
+        modelNode.Position = new Vector3(0, _deathOriginalY - progress * 0.5f, 0);
+
+        // Tint orange/red as it burns
+        float orangeness = Mathf.Sin(progress * Mathf.Pi);  // Peaks in middle
+        SetModelTint(new Color(
+            Mathf.Lerp(_baseColor.R, 1f, orangeness),
+            Mathf.Lerp(_baseColor.G, 0.4f, orangeness),
+            Mathf.Lerp(_baseColor.B, 0.1f, orangeness)
+        ));
+
+        // Fade out in final phase
+        if (progress > 0.7f)
+        {
+            float alpha = Mathf.Lerp(1f, 0f, (progress - 0.7f) / 0.3f);
+            SetModelAlpha(modelNode, alpha);
+        }
+
+        // Spawn ash particles at end
+        if (progress > 0.9f && modelNode.Visible)
+        {
+            SpawnAshPile();
+        }
+    }
+
+    /// <summary>
+    /// Starts fire particles for burn away effect.
+    /// </summary>
+    private GpuParticles3D? _burnParticles;
+
+    private void StartBurnParticles()
+    {
+        _burnParticles = new GpuParticles3D();
+        _burnParticles.Emitting = true;
+        _burnParticles.Amount = 30;
+        _burnParticles.Lifetime = 0.8f;
+
+        var fireMat = new ParticleProcessMaterial();
+        fireMat.EmissionShape = ParticleProcessMaterial.EmissionShapeEnum.Box;
+        fireMat.EmissionBoxExtents = new Vector3(0.3f, 0.1f, 0.3f);
+        fireMat.Direction = new Vector3(0, 1, 0);
+        fireMat.Spread = 20f;
+        fireMat.InitialVelocityMin = 1f;
+        fireMat.InitialVelocityMax = 3f;
+        fireMat.Gravity = new Vector3(0, 2f, 0);  // Fire rises
+
+        fireMat.ScaleMin = 0.1f;
+        fireMat.ScaleMax = 0.3f;
+
+        // Fire color gradient
+        var fireGradient = new Gradient();
+        fireGradient.SetColor(0, new Color(1f, 0.9f, 0.3f, 1f));  // Yellow
+        fireGradient.AddPoint(0.3f, new Color(1f, 0.5f, 0.1f, 1f));  // Orange
+        fireGradient.AddPoint(0.7f, new Color(0.8f, 0.2f, 0.1f, 0.8f));  // Red
+        fireGradient.SetColor(1, new Color(0.3f, 0.1f, 0.1f, 0f));  // Dark smoke
+        var gradientTex = new GradientTexture1D();
+        gradientTex.Gradient = fireGradient;
+        fireMat.ColorRamp = gradientTex;
+
+        _burnParticles.ProcessMaterial = fireMat;
+
+        var sphereMesh = new SphereMesh();
+        sphereMesh.Radius = 0.1f;
+        sphereMesh.Height = 0.2f;
+        var meshMat = new StandardMaterial3D();
+        meshMat.AlbedoColor = Colors.White;
+        meshMat.EmissionEnabled = true;
+        meshMat.Emission = new Color(1f, 0.6f, 0.2f);
+        meshMat.EmissionEnergyMultiplier = 2f;
+        sphereMesh.Material = meshMat;
+        _burnParticles.DrawPass1 = sphereMesh;
+
+        AddChild(_burnParticles);
+        _burnParticles.Position = new Vector3(0, 0.2f, 0);  // Start at feet
+    }
+
+    /// <summary>
+    /// Spawns ash pile particles on the ground.
+    /// </summary>
+    private void SpawnAshPile()
+    {
+        var ash = new GpuParticles3D();
+        ash.Emitting = true;
+        ash.OneShot = true;
+        ash.Explosiveness = 0.5f;
+        ash.Amount = 20;
+        ash.Lifetime = 3.0f;  // Ash lingers
+
+        var ashMat = new ParticleProcessMaterial();
+        ashMat.EmissionShape = ParticleProcessMaterial.EmissionShapeEnum.Sphere;
+        ashMat.EmissionSphereRadius = 0.5f;
+        ashMat.Direction = new Vector3(0, -1, 0);
+        ashMat.InitialVelocityMin = 0.1f;
+        ashMat.InitialVelocityMax = 0.3f;
+        ashMat.Gravity = new Vector3(0, -0.5f, 0);
+
+        ashMat.ScaleMin = 0.05f;
+        ashMat.ScaleMax = 0.1f;
+        ashMat.Color = new Color(0.2f, 0.15f, 0.1f, 0.8f);  // Dark ash
+
+        ash.ProcessMaterial = ashMat;
+
+        var sphereMesh = new SphereMesh();
+        sphereMesh.Radius = 0.03f;
+        sphereMesh.Height = 0.06f;
+        ash.DrawPass1 = sphereMesh;
+
+        ash.Position = GlobalPosition;
+        GetTree().Root.AddChild(ash);
+
+        // Longer cleanup for lingering ash
+        var timer = GetTree().CreateTimer(4.0);
+        timer.Timeout += () =>
+        {
+            if (IsInstanceValid(ash))
+                ash.QueueFree();
+        };
+    }
+
+    // ===================
+    // DISINTEGRATE (THANOS SNAP) EFFECT
+    // ===================
+
+    /// <summary>
+    /// Apply dissolve shader to all meshes for disintegration effect.
+    /// </summary>
+    private void ApplyDissolveShader()
+    {
+        // Load or create cached shader
+        if (_cachedDissolveShader == null)
+        {
+            _cachedDissolveShader = GD.Load<Shader>("res://Assets/Shaders/dissolve.gdshader");
+            if (_cachedDissolveShader == null)
+            {
+                GD.PrintErr("[BasicEnemy3D] Failed to load dissolve shader");
+                return;
+            }
+        }
+
+        // Create noise texture if not cached
+        if (_cachedNoiseTexture == null)
+        {
+            _cachedNoiseTexture = new NoiseTexture2D();
+            var noise = new FastNoiseLite();
+            noise.NoiseType = FastNoiseLite.NoiseTypeEnum.Simplex;
+            noise.Frequency = 0.05f;
+            _cachedNoiseTexture.Noise = noise;
+            _cachedNoiseTexture.Width = 256;
+            _cachedNoiseTexture.Height = 256;
+        }
+
+        // Create shader material
+        _dissolveShader = new ShaderMaterial();
+        _dissolveShader.Shader = _cachedDissolveShader;
+        _dissolveShader.SetShaderParameter("dissolve_amount", 0f);
+        _dissolveShader.SetShaderParameter("noise_texture", _cachedNoiseTexture);
+        _dissolveShader.SetShaderParameter("noise_scale", 2f);
+        _dissolveShader.SetShaderParameter("edge_color", new Vector3(1f, 0.5f, 0.2f));  // Orange edge
+        _dissolveShader.SetShaderParameter("edge_width", 0.1f);
+        _dissolveShader.SetShaderParameter("edge_glow", 3f);
+        _dissolveShader.SetShaderParameter("albedo_color", new Color(_baseColor.R, _baseColor.G, _baseColor.B, 1f));
+
+        // Apply shader to all meshes
+        var modelNode = GetDeathModelNode();
+        if (modelNode != null)
+        {
+            ApplyShaderRecursive(modelNode, _dissolveShader);
+        }
+
+        // Start disintegration particles
+        StartDisintegrateParticles();
+    }
+
+    /// <summary>
+    /// Apply shader material to all mesh instances recursively.
+    /// </summary>
+    private void ApplyShaderRecursive(Node node, ShaderMaterial shaderMat)
+    {
+        if (node is MeshInstance3D meshInstance)
+        {
+            // Replace each surface material with shader
+            for (int i = 0; i < meshInstance.GetSurfaceOverrideMaterialCount(); i++)
+            {
+                meshInstance.SetSurfaceOverrideMaterial(i, shaderMat);
+            }
+            // Also set material override for simple meshes
+            meshInstance.MaterialOverride = shaderMat;
+        }
+
+        foreach (var child in node.GetChildren())
+        {
+            ApplyShaderRecursive(child, shaderMat);
+        }
+    }
+
+    /// <summary>
+    /// Process disintegrate effect - animate shader dissolve parameter.
+    /// </summary>
+    private void ProcessDisintegrateEffect(Node3D modelNode, float progress)
+    {
+        // Update shader dissolve amount
+        if (_dissolveShader != null)
+        {
+            // Use eased progress for more dramatic effect
+            float easedProgress = EaseInOutCubic(progress);
+            _dissolveShader.SetShaderParameter("dissolve_amount", easedProgress);
+
+            // Increase edge glow as effect progresses
+            float glow = Mathf.Lerp(2f, 5f, progress);
+            _dissolveShader.SetShaderParameter("edge_glow", glow);
+        }
+    }
+
+    /// <summary>
+    /// Cubic ease in/out for smooth dissolve progression.
+    /// </summary>
+    private static float EaseInOutCubic(float t)
+    {
+        return t < 0.5f
+            ? 4f * t * t * t
+            : 1f - Mathf.Pow(-2f * t + 2f, 3f) / 2f;
+    }
+
+    /// <summary>
+    /// Start floating particles at dissolve edges.
+    /// </summary>
+    private void StartDisintegrateParticles()
+    {
+        var particles = new GpuParticles3D();
+        particles.Name = "DisintegrateParticles";
+        particles.Emitting = true;
+        particles.Amount = 40;
+        particles.Lifetime = 1.5f;
+
+        var mat = new ParticleProcessMaterial();
+        mat.EmissionShape = ParticleProcessMaterial.EmissionShapeEnum.Box;
+        mat.EmissionBoxExtents = new Vector3(0.4f, 0.8f, 0.4f);
+
+        // Float upward and outward
+        mat.Direction = new Vector3(0, 1, 0);
+        mat.Spread = 60f;
+        mat.InitialVelocityMin = 0.5f;
+        mat.InitialVelocityMax = 1.5f;
+        mat.Gravity = new Vector3(0, 0.5f, 0);  // Rise gently
+
+        mat.ScaleMin = 0.02f;
+        mat.ScaleMax = 0.05f;
+
+        // Orange/gold color matching dissolve edge
+        mat.Color = new Color(1f, 0.6f, 0.2f, 0.8f);
+
+        // Fade out
+        var alphaCurve = new Curve();
+        alphaCurve.AddPoint(new Vector2(0, 0.8f));
+        alphaCurve.AddPoint(new Vector2(0.5f, 0.6f));
+        alphaCurve.AddPoint(new Vector2(1, 0));
+        var alphaTexture = new CurveTexture();
+        alphaTexture.Curve = alphaCurve;
+        mat.AlphaCurve = alphaTexture;
+
+        particles.ProcessMaterial = mat;
+
+        // Glowing small spheres
+        var drawPass = new SphereMesh();
+        drawPass.Radius = 0.02f;
+        drawPass.Height = 0.04f;
+        var drawMat = new StandardMaterial3D();
+        drawMat.AlbedoColor = new Color(1f, 0.7f, 0.3f);
+        drawMat.EmissionEnabled = true;
+        drawMat.Emission = new Color(1f, 0.5f, 0.2f);
+        drawMat.EmissionEnergyMultiplier = 2f;
+        drawPass.Material = drawMat;
+        particles.DrawPass1 = drawPass;
+
+        particles.Position = new Vector3(0, 0.5f, 0);
+        AddChild(particles);
+    }
+
+    /// <summary>
+    /// Set tint color on all materials in the model.
+    /// </summary>
+    private void SetModelTint(Color tint)
+    {
+        if (_material != null && !_isGlbModel)
+        {
+            _material.AlbedoColor = tint;
+        }
+
+        var modelNode = GetDeathModelNode();
+        if (modelNode != null)
+        {
+            SetNodeTintRecursive(modelNode, tint);
+        }
+    }
+
+    private void SetNodeTintRecursive(Node node, Color tint)
+    {
+        if (node is MeshInstance3D meshInstance)
+        {
+            for (int i = 0; i < meshInstance.GetSurfaceOverrideMaterialCount(); i++)
+            {
+                var mat = meshInstance.GetSurfaceOverrideMaterial(i) ?? meshInstance.Mesh?.SurfaceGetMaterial(i);
+                if (mat is StandardMaterial3D stdMat)
+                {
+                    if (meshInstance.GetSurfaceOverrideMaterial(i) == null)
+                    {
+                        var newMat = (StandardMaterial3D)stdMat.Duplicate();
+                        meshInstance.SetSurfaceOverrideMaterial(i, newMat);
+                        mat = newMat;
+                    }
+                    if (mat is StandardMaterial3D overrideMat)
+                    {
+                        overrideMat.AlbedoColor = tint;
+                    }
+                }
+            }
+        }
+
+        foreach (var child in node.GetChildren())
+        {
+            SetNodeTintRecursive(child, tint);
+        }
+    }
+
+    /// <summary>
+    /// Set emission on all materials in the model.
+    /// </summary>
+    private void SetModelEmission(Color emissionColor, float intensity)
+    {
+        if (_material != null && !_isGlbModel)
+        {
+            _material.EmissionEnabled = true;
+            _material.Emission = emissionColor;
+            _material.EmissionEnergyMultiplier = intensity;
+        }
+
+        var modelNode = GetDeathModelNode();
+        if (modelNode != null)
+        {
+            SetNodeEmissionRecursive(modelNode, emissionColor, intensity);
+        }
+    }
+
+    private void SetNodeEmissionRecursive(Node node, Color emissionColor, float intensity)
+    {
+        if (node is MeshInstance3D meshInstance)
+        {
+            for (int i = 0; i < meshInstance.GetSurfaceOverrideMaterialCount(); i++)
+            {
+                var mat = meshInstance.GetSurfaceOverrideMaterial(i) ?? meshInstance.Mesh?.SurfaceGetMaterial(i);
+                if (mat is StandardMaterial3D stdMat)
+                {
+                    if (meshInstance.GetSurfaceOverrideMaterial(i) == null)
+                    {
+                        var newMat = (StandardMaterial3D)stdMat.Duplicate();
+                        meshInstance.SetSurfaceOverrideMaterial(i, newMat);
+                        mat = newMat;
+                    }
+                    if (mat is StandardMaterial3D overrideMat)
+                    {
+                        overrideMat.EmissionEnabled = true;
+                        overrideMat.Emission = emissionColor;
+                        overrideMat.EmissionEnergyMultiplier = intensity;
+                    }
+                }
+            }
+        }
+
+        foreach (var child in node.GetChildren())
+        {
+            SetNodeEmissionRecursive(child, emissionColor, intensity);
+        }
+    }
+
+    /// <summary>
+    /// Set alpha on all materials in a model hierarchy.
+    /// </summary>
+    private void SetModelAlpha(Node3D modelNode, float alpha)
+    {
+        if (modelNode == null) return;
+
+        // Also handle procedural mesh directly
+        if (_material != null && !_isGlbModel)
+        {
+            _material.Transparency = BaseMaterial3D.TransparencyEnum.Alpha;
+            var color = _material.AlbedoColor;
+            _material.AlbedoColor = new Color(color.R, color.G, color.B, alpha);
+        }
+
+        // Handle all MeshInstance3D nodes in hierarchy
+        SetNodeAlphaRecursive(modelNode, alpha);
+    }
+
+    private void SetNodeAlphaRecursive(Node node, float alpha)
+    {
+        if (node is MeshInstance3D meshInstance)
+        {
+            for (int i = 0; i < meshInstance.GetSurfaceOverrideMaterialCount(); i++)
+            {
+                var mat = meshInstance.GetSurfaceOverrideMaterial(i) ?? meshInstance.Mesh?.SurfaceGetMaterial(i);
+                if (mat is StandardMaterial3D stdMat)
+                {
+                    // Create override material if needed
+                    if (meshInstance.GetSurfaceOverrideMaterial(i) == null)
+                    {
+                        var newMat = (StandardMaterial3D)stdMat.Duplicate();
+                        newMat.Transparency = BaseMaterial3D.TransparencyEnum.Alpha;
+                        meshInstance.SetSurfaceOverrideMaterial(i, newMat);
+                        mat = newMat;
+                    }
+                    if (mat is StandardMaterial3D overrideMat)
+                    {
+                        overrideMat.Transparency = BaseMaterial3D.TransparencyEnum.Alpha;
+                        var color = overrideMat.AlbedoColor;
+                        overrideMat.AlbedoColor = new Color(color.R, color.G, color.B, alpha);
+                    }
+                }
+            }
+        }
+
+        foreach (var child in node.GetChildren())
+        {
+            SetNodeAlphaRecursive(child, alpha);
+        }
+    }
+
+    // ===================
+    // GLOWING EYES EFFECT
+    // ===================
+
+    /// <summary>
+    /// Find eye meshes and set up glowing emission.
+    /// </summary>
+    private void SetupGlowingEyes()
+    {
+        _eyeMeshes.Clear();
+
+        // Search for eye meshes in the hierarchy
+        Node3D searchRoot = _glbModelNode ?? _meshInstance;
+        if (searchRoot == null) return;
+
+        FindEyeMeshesRecursive(searchRoot);
+
+        // Set up emission on found eyes
+        Color eyeGlowColor = GetEyeGlowColor();
+        foreach (var eyeMesh in _eyeMeshes)
+        {
+            SetEyeEmission(eyeMesh, eyeGlowColor, EyeGlowMinEnergy);
+        }
+
+        if (_eyeMeshes.Count > 0)
+        {
+            GD.Print($"[BasicEnemy3D] {MonsterType}: Set up {_eyeMeshes.Count} glowing eyes");
+        }
+    }
+
+    /// <summary>
+    /// Recursively find mesh instances with "eye" in the name.
+    /// </summary>
+    private void FindEyeMeshesRecursive(Node node)
+    {
+        if (node is MeshInstance3D meshInstance)
+        {
+            string nodeName = node.Name.ToString().ToLower();
+            // Match common eye naming patterns
+            if (nodeName.Contains("eye") && !nodeName.Contains("eyelid") && !nodeName.Contains("eyebrow"))
+            {
+                _eyeMeshes.Add(meshInstance);
+            }
+        }
+
+        foreach (var child in node.GetChildren())
+        {
+            FindEyeMeshesRecursive(child);
+        }
+    }
+
+    /// <summary>
+    /// Get eye glow color based on monster type.
+    /// </summary>
+    private Color GetEyeGlowColor()
+    {
+        return MonsterType.ToLower() switch
+        {
+            "skeleton" or "skeleton_lord" => new Color(0.2f, 1f, 0.2f),  // Eerie green
+            "ghost" or "wraith" or "ice_wraith" => new Color(0.6f, 0.8f, 1f),  // Pale blue
+            "shadow_stalker" => new Color(1f, 0.1f, 0.1f),  // Demonic red
+            "void_spawn" => new Color(0.8f, 0.2f, 1f),  // Purple
+            "lava_elemental" => new Color(1f, 0.5f, 0.1f),  // Fiery orange
+            "dragon" or "dragon_king" => new Color(1f, 0.8f, 0.2f),  // Golden yellow
+            "clockwork_spider" or "camera_drone" or "shock_drone" => new Color(0.2f, 0.8f, 1f),  // Electric blue
+            _ => new Color(1f, 0.9f, 0.4f)  // Default warm yellow
+        };
+    }
+
+    /// <summary>
+    /// Set emission on an eye mesh.
+    /// </summary>
+    private void SetEyeEmission(MeshInstance3D eyeMesh, Color color, float energy)
+    {
+        var mat = eyeMesh.MaterialOverride as StandardMaterial3D;
+        if (mat == null)
+        {
+            // Try to get from mesh surface
+            mat = eyeMesh.Mesh?.SurfaceGetMaterial(0) as StandardMaterial3D;
+            if (mat != null)
+            {
+                // Create override material
+                mat = (StandardMaterial3D)mat.Duplicate();
+                eyeMesh.MaterialOverride = mat;
+            }
+        }
+
+        if (mat != null)
+        {
+            mat.EmissionEnabled = true;
+            mat.Emission = color;
+            mat.EmissionEnergyMultiplier = energy;
+        }
+    }
+
+    /// <summary>
+    /// Update eye glow pulse effect.
+    /// </summary>
+    private void UpdateEyeGlowPulse(double delta)
+    {
+        if (_eyeMeshes.Count == 0) return;
+
+        _eyeGlowTimer += (float)delta * EyeGlowPulseSpeed * Mathf.Pi * 2f;
+
+        // Smooth pulse between min and max energy
+        float pulse = (Mathf.Sin(_eyeGlowTimer) + 1f) * 0.5f;  // 0 to 1
+        float energy = Mathf.Lerp(EyeGlowMinEnergy, EyeGlowMaxEnergy, pulse);
+
+        foreach (var eyeMesh in _eyeMeshes)
+        {
+            if (IsInstanceValid(eyeMesh) && eyeMesh.MaterialOverride is StandardMaterial3D mat)
+            {
+                mat.EmissionEnergyMultiplier = energy;
+            }
+        }
+    }
+
+    // ===================
+    // HEAD TRACKING
+    // ===================
+
+    /// <summary>
+    /// Update head rotation to track player position.
+    /// </summary>
+    private void UpdateHeadTracking(float delta)
+    {
+        // Skip if dead, sleeping, or no head node
+        if (CurrentState == State.Dead || _isSleeping) return;
+
+        var headNode = _limbNodes?.Head;
+        if (headNode == null) return;
+
+        // Calculate target look direction
+        float targetYaw = 0f;
+        float targetPitch = 0f;
+
+        if (_player != null)
+        {
+            // Get direction to player in local space
+            Vector3 toPlayer = _player.GlobalPosition - GlobalPosition;
+            toPlayer.Y = 0;  // Horizontal direction only for yaw check
+
+            // Check if player is roughly in front (within ~120 degree cone)
+            Vector3 forward = -GlobalTransform.Basis.Z;
+            float dot = forward.Dot(toPlayer.Normalized());
+
+            if (dot > 0.3f && toPlayer.LengthSquared() < 100f)  // In front and within 10m
+            {
+                // Convert to local space
+                Vector3 localDir = GlobalTransform.Basis.Inverse() * (_player.GlobalPosition - GlobalPosition);
+
+                // Calculate target yaw (horizontal rotation)
+                targetYaw = Mathf.RadToDeg(Mathf.Atan2(localDir.X, -localDir.Z));
+                targetYaw = Mathf.Clamp(targetYaw, -HeadTrackMaxYaw, HeadTrackMaxYaw);
+
+                // Calculate target pitch (vertical rotation)
+                float dist = new Vector2(localDir.X, localDir.Z).Length();
+                float heightDiff = localDir.Y - 0.5f;  // Offset for eye height
+                targetPitch = Mathf.RadToDeg(Mathf.Atan2(-heightDiff, dist));
+                targetPitch = Mathf.Clamp(targetPitch, -HeadTrackMaxPitch, HeadTrackMaxPitch);
+            }
+        }
+
+        // Smoothly interpolate current rotation toward target
+        _headTrackingYaw = Mathf.Lerp(_headTrackingYaw, targetYaw, delta * HeadTrackSpeed);
+        _headTrackingPitch = Mathf.Lerp(_headTrackingPitch, targetPitch, delta * HeadTrackSpeed);
+
+        // Apply rotation to head
+        headNode.Rotation = new Vector3(
+            Mathf.DegToRad(_headTrackingPitch),
+            Mathf.DegToRad(_headTrackingYaw),
+            0
+        );
+    }
+
+    // ===================
+    // DAMAGE VISUALS (BLOOD/WOUNDS)
+    // ===================
+
+    /// <summary>
+    /// Update progressive damage visuals based on current health percentage.
+    /// Adds blood tint and wet appearance as damage increases.
+    /// </summary>
+    private void UpdateDamageVisuals()
+    {
+        // Calculate damage percentage (0 = full health, 1 = dead)
+        float damagePercent = 1f - ((float)CurrentHealth / MaxHealth);
+
+        // Only update at thresholds (25%, 50%, 75%) to avoid constant material changes
+        float threshold = damagePercent switch
+        {
+            >= 0.75f => 0.75f,
+            >= 0.50f => 0.50f,
+            >= 0.25f => 0.25f,
+            _ => 0f
+        };
+
+        // Skip if we've already applied this threshold
+        if (threshold <= _lastDamagePercent) return;
+        _lastDamagePercent = threshold;
+
+        // Skip for undamaged enemies
+        if (threshold == 0f) return;
+
+        // Apply progressive blood/damage visuals
+        ApplyDamageVisualsToModel(threshold);
+    }
+
+    /// <summary>
+    /// Apply blood tint and wet look to model based on damage level.
+    /// </summary>
+    private void ApplyDamageVisualsToModel(float damageLevel)
+    {
+        _damageVisualsApplied = true;
+
+        var modelNode = GetDeathModelNode();
+        if (modelNode == null) return;
+
+        // Blood color tint (progressively redder)
+        Color bloodTint = new Color(
+            Mathf.Lerp(_baseColor.R, 0.5f, damageLevel * 0.6f),  // Shift toward dark red
+            Mathf.Lerp(_baseColor.G, 0.1f, damageLevel * 0.8f),
+            Mathf.Lerp(_baseColor.B, 0.1f, damageLevel * 0.8f)
+        );
+
+        // Apply to all meshes
+        ApplyDamageVisualsRecursive(modelNode, bloodTint, damageLevel);
+
+        GD.Print($"[BasicEnemy3D] {MonsterType} damage visuals at {damageLevel * 100}%");
+    }
+
+    /// <summary>
+    /// Recursively apply damage visuals to all mesh materials.
+    /// </summary>
+    private void ApplyDamageVisualsRecursive(Node node, Color bloodTint, float damageLevel)
+    {
+        if (node is MeshInstance3D meshInstance)
+        {
+            for (int i = 0; i < meshInstance.GetSurfaceOverrideMaterialCount(); i++)
+            {
+                var mat = meshInstance.GetSurfaceOverrideMaterial(i) ?? meshInstance.Mesh?.SurfaceGetMaterial(i);
+                if (mat is StandardMaterial3D stdMat)
+                {
+                    // Create override if needed
+                    if (meshInstance.GetSurfaceOverrideMaterial(i) == null)
+                    {
+                        stdMat = (StandardMaterial3D)stdMat.Duplicate();
+                        meshInstance.SetSurfaceOverrideMaterial(i, stdMat);
+                    }
+                    else
+                    {
+                        stdMat = (StandardMaterial3D)meshInstance.GetSurfaceOverrideMaterial(i);
+                    }
+
+                    // Mix blood tint with current color
+                    var currentColor = stdMat.AlbedoColor;
+                    stdMat.AlbedoColor = currentColor.Lerp(bloodTint, damageLevel * 0.5f);
+
+                    // Decrease roughness (wet/bloody look)
+                    stdMat.Roughness = Mathf.Lerp(stdMat.Roughness, 0.2f, damageLevel * 0.5f);
+
+                    // Add slight red emission at high damage
+                    if (damageLevel >= 0.5f)
+                    {
+                        stdMat.EmissionEnabled = true;
+                        stdMat.Emission = new Color(0.3f, 0.05f, 0.05f);
+                        stdMat.EmissionEnergyMultiplier = damageLevel * 0.5f;
+                    }
+                }
+            }
+        }
+
+        foreach (var child in node.GetChildren())
+        {
+            ApplyDamageVisualsRecursive(child, bloodTint, damageLevel);
+        }
+    }
+
+    // ===================
+    // FOOTSTEP DUST EFFECT
+    // ===================
+
+    /// <summary>
+    /// Check distance traveled and spawn dust puff if needed.
+    /// </summary>
+    private void UpdateFootstepDust()
+    {
+        // Initialize last position on first call
+        if (_lastFootstepPos == Vector3.Zero)
+        {
+            _lastFootstepPos = GlobalPosition;
+            return;
+        }
+
+        float distanceTraveled = GlobalPosition.DistanceTo(_lastFootstepPos);
+        if (distanceTraveled >= FootstepDustDistance)
+        {
+            SpawnFootstepDust();
+            _lastFootstepPos = GlobalPosition;
+        }
+    }
+
+    /// <summary>
+    /// Spawn a small dust puff at the enemy's feet.
+    /// </summary>
+    private void SpawnFootstepDust()
+    {
+        var particles = new GpuParticles3D();
+        particles.Name = "FootstepDust";
+        particles.Amount = 8;
+        particles.Lifetime = FootstepDustLifetime;
+        particles.OneShot = true;
+        particles.Explosiveness = 0.9f;
+        particles.Emitting = true;
+
+        var mat = new ParticleProcessMaterial();
+        mat.EmissionShape = ParticleProcessMaterial.EmissionShapeEnum.Sphere;
+        mat.EmissionSphereRadius = 0.15f;
+
+        // Upward drift with spread
+        mat.Direction = new Vector3(0, 1, 0);
+        mat.Spread = 45f;
+        mat.InitialVelocityMin = 0.3f;
+        mat.InitialVelocityMax = 0.8f;
+        mat.Gravity = new Vector3(0, -0.5f, 0);  // Slight downward pull
+
+        // Scale down over time
+        mat.ScaleMin = 0.05f;
+        mat.ScaleMax = 0.1f;
+
+        // Dust brown/tan color with fade
+        mat.Color = new Color(0.6f, 0.5f, 0.4f, 0.6f);
+
+        // Fade out
+        var colorCurve = new Curve();
+        colorCurve.AddPoint(new Vector2(0, 1));
+        colorCurve.AddPoint(new Vector2(0.5f, 0.7f));
+        colorCurve.AddPoint(new Vector2(1, 0));
+        var colorTexture = new CurveTexture();
+        colorTexture.Curve = colorCurve;
+        mat.AlphaCurve = colorTexture;
+
+        particles.ProcessMaterial = mat;
+
+        // Simple sphere mesh for particles
+        var drawPass = new SphereMesh();
+        drawPass.Radius = 0.03f;
+        drawPass.Height = 0.06f;
+        drawPass.RadialSegments = 4;
+        drawPass.Rings = 2;
+        particles.DrawPass1 = drawPass;
+
+        // Position at feet
+        particles.GlobalPosition = GlobalPosition;
+
+        GetTree().Root.AddChild(particles);
+
+        // Auto-cleanup after lifetime
+        var timer = GetTree().CreateTimer(FootstepDustLifetime + 0.2);
+        timer.Timeout += () =>
+        {
+            if (IsInstanceValid(particles)) particles.QueueFree();
+        };
+    }
+
+    // ===================
+    // ATTACK CHARGE-UP EFFECT
+    // ===================
+
+    /// <summary>
+    /// Start the attack charge-up visual effect (telegraph for player to dodge).
+    /// </summary>
+    private void StartAttackChargeUp()
+    {
+        if (_attackChargeActive) return;
+        _attackChargeActive = true;
+
+        // Create charge-up particles at weapon/hand position
+        _attackChargeParticles = new GpuParticles3D();
+        _attackChargeParticles.Name = "AttackCharge";
+        _attackChargeParticles.Amount = 16;
+        _attackChargeParticles.Lifetime = 0.4f;
+        _attackChargeParticles.OneShot = false;  // Continuous while charging
+        _attackChargeParticles.Explosiveness = 0.3f;
+        _attackChargeParticles.Emitting = true;
+
+        var mat = new ParticleProcessMaterial();
+        mat.EmissionShape = ParticleProcessMaterial.EmissionShapeEnum.Sphere;
+        mat.EmissionSphereRadius = 0.1f;
+
+        // Particles swirl inward
+        mat.Direction = new Vector3(0, 0, 0);
+        mat.Spread = 180f;
+        mat.InitialVelocityMin = 0.5f;
+        mat.InitialVelocityMax = 1.0f;
+        mat.Gravity = Vector3.Zero;
+        mat.RadialAccelMin = -2f;  // Pull inward
+        mat.RadialAccelMax = -1f;
+
+        // Small, glowing particles
+        mat.ScaleMin = 0.03f;
+        mat.ScaleMax = 0.06f;
+
+        // Color based on monster type - red/orange for most, special for others
+        Color chargeColor = GetAttackChargeColor();
+        mat.Color = chargeColor;
+
+        // Scale up curve for dramatic effect
+        var scaleCurve = new Curve();
+        scaleCurve.AddPoint(new Vector2(0, 0.5f));
+        scaleCurve.AddPoint(new Vector2(0.5f, 1f));
+        scaleCurve.AddPoint(new Vector2(1f, 0.2f));
+        var scaleTexture = new CurveTexture();
+        scaleTexture.Curve = scaleCurve;
+        mat.ScaleCurve = scaleTexture;
+
+        _attackChargeParticles.ProcessMaterial = mat;
+
+        // Glowing sphere mesh for particles
+        var drawPass = new SphereMesh();
+        drawPass.Radius = 0.02f;
+        drawPass.Height = 0.04f;
+        drawPass.RadialSegments = 4;
+        drawPass.Rings = 2;
+
+        // Emissive material for glow
+        var drawMat = new StandardMaterial3D();
+        drawMat.AlbedoColor = chargeColor;
+        drawMat.EmissionEnabled = true;
+        drawMat.Emission = chargeColor;
+        drawMat.EmissionEnergyMultiplier = 2f;
+        drawPass.Material = drawMat;
+
+        _attackChargeParticles.DrawPass1 = drawPass;
+
+        // Position at right hand/weapon area
+        Vector3 handOffset = new Vector3(0.4f, 0.6f, 0.3f);  // Right side, mid-height, forward
+        _attackChargeParticles.Position = handOffset;
+
+        AddChild(_attackChargeParticles);
+
+        // Also boost weapon/hand emission
+        if (_limbNodes?.RightArm != null)
+        {
+            SetNodeEmissionRecursive(_limbNodes.RightArm, chargeColor, 2f);
+        }
+        if (_limbNodes?.Weapon != null)
+        {
+            SetNodeEmissionRecursive(_limbNodes.Weapon, chargeColor, 2f);
+        }
+    }
+
+    /// <summary>
+    /// End the attack charge-up effect.
+    /// </summary>
+    private void EndAttackChargeUp()
+    {
+        if (!_attackChargeActive) return;
+        _attackChargeActive = false;
+
+        // Clean up particles
+        if (_attackChargeParticles != null && IsInstanceValid(_attackChargeParticles))
+        {
+            _attackChargeParticles.Emitting = false;
+            // Delay removal so last particles fade out
+            var timer = GetTree().CreateTimer(0.5);
+            var particles = _attackChargeParticles;  // Capture reference
+            timer.Timeout += () =>
+            {
+                if (IsInstanceValid(particles)) particles.QueueFree();
+            };
+            _attackChargeParticles = null;
+        }
+
+        // Reset weapon/hand emission
+        if (_limbNodes?.RightArm != null)
+        {
+            SetNodeEmissionRecursive(_limbNodes.RightArm, Colors.Black, 0f);
+        }
+        if (_limbNodes?.Weapon != null)
+        {
+            SetNodeEmissionRecursive(_limbNodes.Weapon, Colors.Black, 0f);
+        }
+    }
+
+    /// <summary>
+    /// Get attack charge-up color based on monster type.
+    /// </summary>
+    private Color GetAttackChargeColor()
+    {
+        return MonsterType.ToLower() switch
+        {
+            "skeleton" or "skeleton_lord" => new Color(0.5f, 1f, 0.5f),  // Ghostly green
+            "lava_elemental" => new Color(1f, 0.5f, 0.1f),  // Fiery orange
+            "ice_wraith" => new Color(0.6f, 0.9f, 1f),  // Ice blue
+            "void_spawn" => new Color(0.8f, 0.2f, 1f),  // Purple void
+            "shock_drone" or "clockwork_spider" => new Color(0.3f, 0.8f, 1f),  // Electric blue
+            _ => new Color(1f, 0.3f, 0.2f)  // Default red-orange (danger!)
+        };
+    }
+
+    // ===================
+    // AGGRO GLOW EFFECT
+    // ===================
+
+    /// <summary>
+    /// Enable red-orange glow when enemy enters aggro state.
+    /// </summary>
+    private void EnableAggroGlow()
+    {
+        if (_isAggroGlowActive) return;
+        _isAggroGlowActive = true;
+
+        // Red-orange aggressive glow
+        SetModelEmission(new Color(1f, 0.3f, 0.2f), 1.5f);
+    }
+
+    /// <summary>
+    /// Disable aggro glow when enemy leaves aggro state.
+    /// </summary>
+    private void DisableAggroGlow()
+    {
+        if (!_isAggroGlowActive) return;
+        _isAggroGlowActive = false;
+
+        // Disable emission
+        SetModelEmission(Colors.Black, 0f);
+    }
+
+    /// <summary>
+    /// Finish the death effect and clean up.
+    /// </summary>
+    private void FinishDeathEffect()
+    {
+        _deathEffectType = DeathEffectType.None;
+
+        // Clean up - death effect replaces corpse spawn
+        QueueFree();
+
+        GD.Print($"[BasicEnemy3D] {MonsterType} death effect complete");
+    }
+
+    /// <summary>
     /// Spawns blood splatter effect at the monster's death location.
     /// </summary>
     private void SpawnBloodSplatter()
     {
         var splatter = BloodSplatter3D.Create(GlobalPosition, MonsterType, IsBossMonster(MonsterType));
         GetTree().Root.AddChild(splatter);
+    }
+
+    /// <summary>
+    /// Spawns gore chunks that fly off on heavy/critical hits.
+    /// </summary>
+    private void SpawnGoreChunks(Vector3 hitFromPosition, int count)
+    {
+        var random = new RandomNumberGenerator();
+        random.Randomize();
+
+        // Direction away from hit source
+        Vector3 hitDir = (GlobalPosition - hitFromPosition).Normalized();
+
+        // Blood/flesh color based on monster
+        Color goreColor = GetMonsterBloodColor();
+
+        for (int i = 0; i < count; i++)
+        {
+            // Create a small gore chunk
+            var chunk = new RigidBody3D();
+            chunk.Name = "GoreChunk";
+            chunk.Mass = 0.1f;
+            chunk.GravityScale = 1.5f;  // Fall faster than normal
+            chunk.CollisionLayer = 0;  // Don't collide with anything
+            chunk.CollisionMask = 8;   // Only collide with walls (layer 8)
+
+            // Random small mesh (box or sphere)
+            var meshInstance = new MeshInstance3D();
+            float size = random.RandfRange(0.05f, 0.12f);
+
+            if (random.Randf() > 0.5f)
+            {
+                var box = new BoxMesh();
+                box.Size = new Vector3(size, size * 0.7f, size * 0.5f);
+                meshInstance.Mesh = box;
+            }
+            else
+            {
+                var sphere = new SphereMesh();
+                sphere.Radius = size * 0.5f;
+                sphere.Height = size;
+                meshInstance.Mesh = sphere;
+            }
+
+            // Blood-colored material with slight gloss
+            var mat = new StandardMaterial3D();
+            mat.AlbedoColor = goreColor;
+            mat.Roughness = 0.4f;
+            mat.Metallic = 0.1f;
+            meshInstance.MaterialOverride = mat;
+
+            chunk.AddChild(meshInstance);
+
+            // Collision shape
+            var collisionShape = new CollisionShape3D();
+            var sphereShape = new SphereShape3D();
+            sphereShape.Radius = size * 0.5f;
+            collisionShape.Shape = sphereShape;
+            chunk.AddChild(collisionShape);
+
+            // Position at hit point (slightly randomized around monster center)
+            Vector3 spawnOffset = new Vector3(
+                random.RandfRange(-0.3f, 0.3f),
+                random.RandfRange(0.3f, 0.8f),  // Upper body area
+                random.RandfRange(-0.3f, 0.3f)
+            );
+            chunk.GlobalPosition = GlobalPosition + spawnOffset;
+
+            // Random velocity - mostly away from hit direction with upward component
+            Vector3 velocity = hitDir * random.RandfRange(4f, 8f);
+            velocity.Y = random.RandfRange(3f, 6f);  // Upward
+            // Add horizontal spread
+            velocity.X += random.RandfRange(-2f, 2f);
+            velocity.Z += random.RandfRange(-2f, 2f);
+            chunk.LinearVelocity = velocity;
+
+            // Random spin
+            chunk.AngularVelocity = new Vector3(
+                random.RandfRange(-10f, 10f),
+                random.RandfRange(-10f, 10f),
+                random.RandfRange(-10f, 10f)
+            );
+
+            GetTree().Root.AddChild(chunk);
+
+            // Fade and despawn after 2 seconds
+            var fadeTimer = GetTree().CreateTimer(1.5);
+            fadeTimer.Timeout += () =>
+            {
+                if (IsInstanceValid(chunk))
+                {
+                    // Start fade
+                    var fadeTween = chunk.CreateTween();
+                    fadeTween.TweenMethod(Callable.From<float>((alpha) =>
+                    {
+                        if (IsInstanceValid(meshInstance) && meshInstance.MaterialOverride is StandardMaterial3D fadeMat)
+                        {
+                            fadeMat.Transparency = BaseMaterial3D.TransparencyEnum.Alpha;
+                            var c = fadeMat.AlbedoColor;
+                            fadeMat.AlbedoColor = new Color(c.R, c.G, c.B, alpha);
+                        }
+                    }), 1f, 0f, 0.5f);
+                    fadeTween.TweenCallback(Callable.From(() =>
+                    {
+                        if (IsInstanceValid(chunk)) chunk.QueueFree();
+                    }));
+                }
+            };
+        }
+    }
+
+    /// <summary>
+    /// Get blood/flesh color based on monster type.
+    /// </summary>
+    private Color GetMonsterBloodColor()
+    {
+        return MonsterType.ToLower() switch
+        {
+            "skeleton" or "skeleton_lord" => new Color(0.9f, 0.9f, 0.8f),  // Bone white
+            "slime" or "slime_king" => new Color(0.3f, 0.8f, 0.3f),  // Green slime
+            "ghost" or "wraith" => new Color(0.7f, 0.7f, 0.9f, 0.5f),  // Spectral
+            "golem" or "stone_golem" => new Color(0.5f, 0.5f, 0.5f),  // Stone gray
+            "elemental" => new Color(1f, 0.5f, 0.2f),  // Fire orange
+            "ice_elemental" => new Color(0.6f, 0.8f, 1f),  // Ice blue
+            _ => new Color(0.5f, 0.1f, 0.1f)  // Default blood red
+        };
     }
 
     /// <summary>
@@ -3003,6 +4801,48 @@ public partial class BasicEnemy3D : CharacterBody3D
             "princess_donut" or "mongo" or "zev" or "mordecai" => true,
             _ => false
         };
+    }
+
+    /// <summary>
+    /// Triggers slow-motion effect on kill. Has cooldown to prevent overlap.
+    /// </summary>
+    private void TriggerKillSlowMo()
+    {
+        // Check cooldown
+        if (_killSlowMoActive || _killSlowMoCooldown > 0f) return;
+
+        _killSlowMoActive = true;
+        Engine.TimeScale = KillSlowMoScale;
+
+        // Use unscaled timer to restore time
+        var tree = GetTree();
+        if (tree != null)
+        {
+            var timer = tree.CreateTimer(KillSlowMoDuration, processAlways: true);
+            timer.Timeout += () =>
+            {
+                Engine.TimeScale = 1.0f;
+                _killSlowMoActive = false;
+                _killSlowMoCooldown = KillSlowMoCooldownTime;
+            };
+        }
+        else
+        {
+            // Fallback if tree not available
+            Engine.TimeScale = 1.0f;
+            _killSlowMoActive = false;
+        }
+    }
+
+    /// <summary>
+    /// Update the static kill slow-mo cooldown (call from any _Process).
+    /// </summary>
+    private static void UpdateKillSlowMoCooldown(float delta)
+    {
+        if (_killSlowMoCooldown > 0f)
+        {
+            _killSlowMoCooldown -= delta;
+        }
     }
 
     /// <summary>

@@ -479,8 +479,8 @@ public static class MonsterAnimationSystem
             int headTrack = breathingAnim.AddTrack(Animation.TrackType.Position3D);
             breathingAnim.TrackSetPath(headTrack, _currentPaths.Head);
 
-            // Subtle breathing motion - use base position + offset
-            float breatheAmount = 0.05f + 0.03f * personality.SquashStretchAmount;
+            // Enhanced breathing motion - 1.5x amplitude for more visible effect
+            float breatheAmount = (0.05f + 0.03f * personality.SquashStretchAmount) * 1.5f;
             breathingAnim.PositionTrackInsertKey(headTrack, 0.0f, headBasePos);
             breathingAnim.PositionTrackInsertKey(headTrack, IDLE_DURATION * 0.5f, headBasePos + new Vector3(0, breatheAmount, 0));
             breathingAnim.PositionTrackInsertKey(headTrack, IDLE_DURATION, headBasePos);
@@ -504,9 +504,10 @@ public static class MonsterAnimationSystem
             breathingAnim.TrackSetInterpolationType(tailTrack, Animation.InterpolationType.Cubic);
         }
 
-        // Body subtle sway (if present)
+        // Body subtle sway and chest breathing pulse (if present)
         if (limbs.Body != null && !_currentPaths.Body.IsEmpty)
         {
+            // Rotation sway
             int bodyTrack = breathingAnim.AddTrack(Animation.TrackType.Rotation3D);
             breathingAnim.TrackSetPath(bodyTrack, _currentPaths.Body);
 
@@ -514,8 +515,18 @@ public static class MonsterAnimationSystem
             breathingAnim.RotationTrackInsertKey(bodyTrack, 0.0f, Quaternion.Identity);
             breathingAnim.RotationTrackInsertKey(bodyTrack, IDLE_DURATION * 0.5f, EulerToQuat(bodySway, 0, bodySway * 0.5f));
             breathingAnim.RotationTrackInsertKey(bodyTrack, IDLE_DURATION, Quaternion.Identity);
-
             breathingAnim.TrackSetInterpolationType(bodyTrack, Animation.InterpolationType.Cubic);
+
+            // Chest scale pulse for breathing effect
+            int bodyScaleTrack = breathingAnim.AddTrack(Animation.TrackType.Scale3D);
+            breathingAnim.TrackSetPath(bodyScaleTrack, _currentPaths.Body);
+
+            float breathScale = 1.0f + 0.03f * (1f + personality.SquashStretchAmount);  // Slight chest expansion
+            breathingAnim.ScaleTrackInsertKey(bodyScaleTrack, 0.0f, Vector3.One);
+            breathingAnim.ScaleTrackInsertKey(bodyScaleTrack, IDLE_DURATION * 0.4f, new Vector3(breathScale, 1.0f, breathScale));  // Inhale
+            breathingAnim.ScaleTrackInsertKey(bodyScaleTrack, IDLE_DURATION * 0.6f, new Vector3(breathScale, 1.0f, breathScale));  // Hold
+            breathingAnim.ScaleTrackInsertKey(bodyScaleTrack, IDLE_DURATION, Vector3.One);  // Exhale
+            breathingAnim.TrackSetInterpolationType(bodyScaleTrack, Animation.InterpolationType.Cubic);
         }
 
         player.AddAnimationLibrary("", new AnimationLibrary());

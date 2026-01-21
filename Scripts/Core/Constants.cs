@@ -58,6 +58,16 @@ public static class Constants
     public const float DefaultScreenShakeDuration = 0.15f;
     public const float DefaultScreenShakeIntensity = 0.08f;
 
+    // Tiered screen shake for different hit types
+    public const float ShakeLightDuration = 0.1f;
+    public const float ShakeLightIntensity = 0.05f;
+    public const float ShakeHeavyDuration = 0.15f;
+    public const float ShakeHeavyIntensity = 0.1f;
+    public const float ShakeCriticalDuration = 0.2f;
+    public const float ShakeCriticalIntensity = 0.15f;
+    public const float ShakeKillDuration = 0.25f;
+    public const float ShakeKillIntensity = 0.2f;
+
     // ===================
     // CAMERA
     // ===================

@@ -10,6 +10,17 @@ using SafeRoom3D.Enemies;
 namespace SafeRoom3D.Player;
 
 /// <summary>
+/// Types of screen shake for different hit intensities.
+/// </summary>
+public enum ScreenShakeType
+{
+    Light,      // Light hit: 0.1s, 0.05 intensity
+    Heavy,      // Heavy hit: 0.15s, 0.1 intensity
+    Critical,   // Critical hit: 0.2s, 0.15 intensity
+    Kill        // Kill shot: 0.25s, 0.2 intensity
+}
+
+/// <summary>
 /// First-person player controller with mouse look, WASD movement, jumping, and sprinting.
 /// Skyrim-inspired immersive dungeon exploration.
 /// </summary>
@@ -2298,6 +2309,25 @@ public partial class FPSController : CharacterBody3D
     {
         _shakeTimer = duration;
         _shakeIntensity = intensity;
+    }
+
+    /// <summary>
+    /// Request tiered screen shake based on hit type.
+    /// </summary>
+    public void RequestScreenShake(ScreenShakeType type)
+    {
+        var (duration, intensity) = type switch
+        {
+            ScreenShakeType.Light => (Constants.ShakeLightDuration, Constants.ShakeLightIntensity),
+            ScreenShakeType.Heavy => (Constants.ShakeHeavyDuration, Constants.ShakeHeavyIntensity),
+            ScreenShakeType.Critical => (Constants.ShakeCriticalDuration, Constants.ShakeCriticalIntensity),
+            ScreenShakeType.Kill => (Constants.ShakeKillDuration, Constants.ShakeKillIntensity),
+            _ => (Constants.ShakeLightDuration, Constants.ShakeLightIntensity)
+        };
+
+        // Only upgrade shake, never downgrade
+        if (duration > _shakeTimer) _shakeTimer = duration;
+        if (intensity > _shakeIntensity) _shakeIntensity = intensity;
     }
 
     /// <summary>

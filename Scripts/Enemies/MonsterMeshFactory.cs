@@ -368,6 +368,7 @@ public static class MonsterMeshFactory
         public Node3D? Tail { get; set; }        // Tail for wag/sway animations
         public Node3D? Weapon { get; set; }
         public Node3D? Torch { get; set; }
+        public List<MeshInstance3D> Eyes { get; set; } = new();  // Eye meshes for glow effects
 
         /// <summary>
         /// Check if this is a quadruped (4 legs, no arms used for walking)
