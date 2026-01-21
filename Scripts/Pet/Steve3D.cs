@@ -21,6 +21,7 @@ public partial class Steve3D : Node3D
     public const string GlbModelPath = "res://Assets/Models/steve.glb";
     public static bool UseGlbModel { get; set; } = false;
     private Node3D? _glbModelInstance;
+    private AnimationPlayer? _glbAnimPlayer;
 
     // Stats
     public const float HealAmount = 50f;
@@ -257,6 +258,7 @@ public partial class Steve3D : Node3D
             _glbModelInstance.QueueFree();
             _glbModelInstance = null;
         }
+        _glbAnimPlayer = null;
 
         // Remove procedural meshes
         _bodyMesh?.QueueFree();
@@ -294,7 +296,8 @@ public partial class Steve3D : Node3D
                 // Scale the GLB model appropriately (adjust as needed for your model)
                 _glbModelInstance.Scale = new Vector3(0.15f, 0.15f, 0.15f);
                 AddChild(_glbModelInstance);
-                GD.Print($"[Steve3D] Using GLB model: {GlbModelPath}");
+                _glbAnimPlayer = GlbModelConfig.FindAnimationPlayer(_glbModelInstance);
+                GD.Print($"[Steve3D] Using GLB model: {GlbModelPath}, AnimPlayer: {_glbAnimPlayer != null}");
                 return;
             }
         }
@@ -570,6 +573,16 @@ public partial class Steve3D : Node3D
 
     private void UpdateAnimation(float dt)
     {
+        // GLB animation: use walk if moving, idle if stationary
+        if (_glbAnimPlayer != null)
+        {
+            Vector3 toTarget = _targetPosition - GlobalPosition;
+            toTarget.Y = 0;
+            bool isMoving = toTarget.Length() > 0.15f;
+            PlayGlbAnimation(isMoving ? "walk" : "idle");
+            return; // Skip procedural animation if using GLB
+        }
+
         _tailWagTimer += dt * 8f;
         _earWiggleTimer += dt * 3f;
 
@@ -590,6 +603,20 @@ public partial class Steve3D : Node3D
         {
             float wiggle = Mathf.Sin(_earWiggleTimer + 0.5f) * 5f;
             _earRight.RotationDegrees = new Vector3(15 + wiggle, 20, 30);
+        }
+    }
+
+    /// <summary>
+    /// Play animation from GLB model's embedded AnimationPlayer.
+    /// </summary>
+    private void PlayGlbAnimation(string animName)
+    {
+        if (_glbAnimPlayer?.HasAnimation(animName) == true)
+        {
+            if (_glbAnimPlayer.CurrentAnimation != animName)
+            {
+                _glbAnimPlayer.Play(animName);
+            }
         }
     }
 

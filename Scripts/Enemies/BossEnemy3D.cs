@@ -68,6 +68,7 @@ public partial class BossEnemy3D : CharacterBody3D
     // Animation support
     private MonsterMeshFactory.LimbNodes? _limbNodes;
     private AnimationPlayer? _animPlayer;
+    private AnimationPlayer? _glbAnimPlayer;  // AnimationPlayer from GLB model
     private AnimationType _currentAnimType = AnimationType.Idle;
     private string _currentAnimName = "";
     private int _currentAnimVariant = 0;
@@ -299,7 +300,28 @@ public partial class BossEnemy3D : CharacterBody3D
 
         // Create specialized mesh based on type using MonsterMeshFactory for animation support
         string meshType = MonsterType.ToLower();
-        switch (meshType)
+
+        // Check for GLB model override first
+        bool usedGlbModel = false;
+        if (GlbModelConfig.TryGetMonsterGlbPath(meshType, out string? glbPath) && !string.IsNullOrWhiteSpace(glbPath))
+        {
+            var glbModel = GlbModelConfig.LoadGlbModel(glbPath, 1f);
+            if (glbModel != null)
+            {
+                _meshInstance.AddChild(glbModel);
+                _limbNodes = null; // GLB models don't have procedural LimbNodes
+                _glbAnimPlayer = GlbModelConfig.FindAnimationPlayer(glbModel);
+                usedGlbModel = true;
+                GD.Print($"[BossEnemy3D] Loaded GLB for {BossName}, AnimPlayer: {_glbAnimPlayer != null}");
+            }
+            else
+            {
+                GD.PrintErr($"[BossEnemy3D] Failed to load GLB for {BossName}, falling back to procedural");
+            }
+        }
+
+        // Skip procedural mesh creation if GLB was loaded
+        if (!usedGlbModel) switch (meshType)
         {
             case "skeleton_lord":
             case "dragon_king":
@@ -1095,6 +1117,13 @@ public partial class BossEnemy3D : CharacterBody3D
     /// </summary>
     private void PlayAnimation(AnimationType animType, int variant = -1)
     {
+        // Try GLB AnimationPlayer first
+        if (_glbAnimPlayer != null)
+        {
+            PlayGlbAnimation(animType);
+            return;
+        }
+
         if (_animPlayer == null) return;
 
         // Pick a random variant if not specified
@@ -1127,12 +1156,51 @@ public partial class BossEnemy3D : CharacterBody3D
     }
 
     /// <summary>
+    /// Play animation from GLB model's embedded AnimationPlayer.
+    /// Uses standard animation names: idle, walk, run, attack, hit, die
+    /// </summary>
+    private void PlayGlbAnimation(AnimationType animType)
+    {
+        string animName = animType switch
+        {
+            AnimationType.Idle => "idle",
+            AnimationType.Walk => "walk",
+            AnimationType.Run => "run",
+            AnimationType.Attack => "attack",
+            AnimationType.Hit => "hit",
+            AnimationType.Die => "die",
+            _ => "idle"
+        };
+
+        _currentAnimType = animType;
+
+        if (_glbAnimPlayer!.HasAnimation(animName))
+        {
+            // For one-shot animations (attack, hit, die), always restart
+            if (animType == AnimationType.Attack || animType == AnimationType.Hit || animType == AnimationType.Die)
+            {
+                _glbAnimPlayer.Stop();
+                _glbAnimPlayer.Play(animName);
+            }
+            else
+            {
+                // For looping animations, only switch if different
+                if (_glbAnimPlayer.CurrentAnimation != animName)
+                {
+                    _glbAnimPlayer.Play(animName);
+                }
+            }
+        }
+    }
+
+    /// <summary>
     /// Check if current animation has finished playing
     /// </summary>
     private bool IsAnimationFinished()
     {
-        if (_animPlayer == null) return true;
-        return !_animPlayer.IsPlaying() || _animPlayer.CurrentAnimationPosition >= _animPlayer.CurrentAnimationLength - 0.05f;
+        var player = _glbAnimPlayer ?? _animPlayer;
+        if (player == null) return true;
+        return !player.IsPlaying() || player.CurrentAnimationPosition >= player.CurrentAnimationLength - 0.05f;
     }
 
     private void UpdateVisuals()

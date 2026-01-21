@@ -1,4 +1,5 @@
 using Godot;
+using SafeRoom3D.Core;
 using SafeRoom3D.Enemies;
 
 namespace SafeRoom3D.NPC;
@@ -35,6 +36,12 @@ public abstract partial class BaseNPC3D : Node3D
 
     /// <summary>Whether player is in interaction range</summary>
     protected bool _playerInRange;
+
+    /// <summary>GLB model instance if using custom model</summary>
+    protected Node3D? _glbModelInstance;
+
+    /// <summary>AnimationPlayer from GLB model</summary>
+    protected AnimationPlayer? _glbAnimPlayer;
 
     public override void _Ready()
     {
@@ -103,7 +110,50 @@ public abstract partial class BaseNPC3D : Node3D
     public abstract void Interact(Node3D player);
 
     /// <summary>Override for custom idle animations</summary>
-    protected virtual void AnimateIdle(double delta) { }
+    protected virtual void AnimateIdle(double delta)
+    {
+        // If GLB has idle animation, use it
+        if (_glbAnimPlayer != null)
+        {
+            PlayGlbAnimation("idle");
+        }
+    }
+
+    /// <summary>
+    /// Try to load GLB model for this NPC. Call from CreateMesh() in subclasses.
+    /// Returns true if GLB was loaded, false to use procedural mesh.
+    /// </summary>
+    protected bool TryLoadGlbModel(string npcType, float scale = 1f)
+    {
+        if (!GlbModelConfig.TryGetNpcGlbPath(npcType, out string? glbPath) ||
+            string.IsNullOrWhiteSpace(glbPath))
+            return false;
+
+        var glbModel = GlbModelConfig.LoadGlbModel(glbPath, scale);
+        if (glbModel == null) return false;
+
+        _glbModelInstance = glbModel;
+        _meshRoot?.AddChild(glbModel);
+        _glbAnimPlayer = GlbModelConfig.FindAnimationPlayer(glbModel);
+        _limbs = null; // GLB models don't have procedural limbs
+
+        GD.Print($"[{npcType}] Loaded GLB, AnimPlayer: {_glbAnimPlayer != null}");
+        return true;
+    }
+
+    /// <summary>
+    /// Play animation from GLB model's embedded AnimationPlayer.
+    /// </summary>
+    protected void PlayGlbAnimation(string animName)
+    {
+        if (_glbAnimPlayer?.HasAnimation(animName) == true)
+        {
+            if (_glbAnimPlayer.CurrentAnimation != animName)
+            {
+                _glbAnimPlayer.Play(animName);
+            }
+        }
+    }
 
     /// <summary>Create floating nameplate above NPC</summary>
     protected virtual void CreateNameplate()
