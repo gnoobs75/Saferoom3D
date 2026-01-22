@@ -94,6 +94,17 @@ public partial class BasicEnemy3D : CharacterBody3D
     private float _circleDirection = 1f;
     private float _circleTimer;
 
+    // Tactical retreat system - backup and repath when blocked
+    private enum RetreatState { None, BackingUp, Repositioning }
+    private RetreatState _retreatState = RetreatState.None;
+    private float _retreatTimer;
+    private Vector3 _retreatDirection;
+    private Vector3 _repositionTarget;
+    private float _blockedTimer;  // Track how long we've been blocked
+    private const float BackupDuration = 0.6f;  // Time to back up
+    private const float RepositionDuration = 1.2f;  // Time to move to side position
+    private const float BlockedThreshold = 0.4f;  // Time blocked before triggering retreat
+
     // Idle interaction system (for goblins interacting with props)
     private Node3D? _interactionTarget;
     private float _interactionTimer;
@@ -2098,71 +2109,182 @@ public partial class BasicEnemy3D : CharacterBody3D
         {
             ChangeState(State.Tracking);
             _circleTimer = 0;
+            _retreatState = RetreatState.None;
+            _blockedTimer = 0;
             return;
         }
 
-        // Attack if in range
+        // Attack if in range (cancel retreat if we can attack)
         if (dist <= AttackRange && _attackTimer <= 0)
         {
             ChangeState(State.Attacking);
             _circleTimer = 0;
+            _retreatState = RetreatState.None;
+            _blockedTimer = 0;
             return;
         }
 
-        // Chase player - but stop at MinStopDistance so player can see health bar and combat text
-        if (_player != null)
+        if (_player == null) return;
+
+        Vector3 toPlayer = _player.GlobalPosition - GlobalPosition;
+        toPlayer.Y = 0;
+        Vector3 direction = toPlayer.Normalized();
+        float slowMult = EngineOfTomorrow3D.GetGlobalSlowMultiplier();
+        float speed = MoveSpeed * slowMult;
+
+        // Handle tactical retreat states
+        if (_retreatState != RetreatState.None)
         {
-            Vector3 direction = (_player.GlobalPosition - GlobalPosition).Normalized();
-            direction.Y = 0;
+            ProcessTacticalRetreat(dt, direction, speed);
+            return;
+        }
 
-            // Circle-strafe mode: move sideways to get around obstacles while approaching
-            if (_circleTimer > 0)
-            {
-                _circleTimer -= dt;
+        // Circle-strafe mode: move sideways to get around obstacles while approaching
+        if (_circleTimer > 0)
+        {
+            _circleTimer -= dt;
 
-                // Calculate circle direction (perpendicular to player direction)
-                Vector3 perpendicular = new Vector3(-direction.Z, 0, direction.X) * _circleDirection;
+            // Calculate circle direction (perpendicular to player direction)
+            Vector3 perpendicular = new Vector3(-direction.Z, 0, direction.X) * _circleDirection;
 
-                // Combine forward and sideways movement (weighted toward forward)
-                Vector3 circleDir = (direction * 0.6f + perpendicular * 0.4f).Normalized();
-                circleDir = AvoidObstacles(circleDir);
+            // Combine forward and sideways movement (weighted toward forward)
+            Vector3 circleDir = (direction * 0.6f + perpendicular * 0.4f).Normalized();
+            circleDir = AvoidObstacles(circleDir);
 
-                float slowMult = EngineOfTomorrow3D.GetGlobalSlowMultiplier();
-                float speed = MoveSpeed * slowMult;
-                Velocity = new Vector3(circleDir.X * speed, Velocity.Y, circleDir.Z * speed);
+            Velocity = new Vector3(circleDir.X * speed, Velocity.Y, circleDir.Z * speed);
 
-                // Still face the player while circling
-                if (direction.LengthSquared() > 0.01f)
-                {
-                    float targetAngle = Mathf.Atan2(direction.X, direction.Z);
-                    Rotation = new Vector3(0, targetAngle, 0);
-                }
-                return;
-            }
-
-            // Normal aggro movement
-            // Only move if we're further than the minimum stop distance
-            if (dist > MinStopDistance)
-            {
-                // Apply obstacle avoidance
-                Vector3 moveDir = AvoidObstacles(direction);
-
-                float slowMult = EngineOfTomorrow3D.GetGlobalSlowMultiplier();
-                float speed = MoveSpeed * slowMult;
-                Velocity = new Vector3(moveDir.X * speed, Velocity.Y, moveDir.Z * speed);
-            }
-            else
-            {
-                // Stop moving but maintain facing
-                Velocity = new Vector3(0, Velocity.Y, 0);
-            }
-
-            // Face player - model's face is at +Z, so point +Z toward player
+            // Still face the player while circling
             if (direction.LengthSquared() > 0.01f)
             {
                 float targetAngle = Mathf.Atan2(direction.X, direction.Z);
                 Rotation = new Vector3(0, targetAngle, 0);
             }
+            return;
+        }
+
+        // Check if path to player is blocked
+        if (dist > MinStopDistance && IsPathToPlayerBlocked(out float obstacleDist))
+        {
+            // Obstacle is close - we're likely stuck against it
+            if (obstacleDist < 1.5f)
+            {
+                _blockedTimer += dt;
+
+                // If blocked for too long, initiate tactical retreat
+                if (_blockedTimer >= BlockedThreshold)
+                {
+                    StartTacticalRetreat(direction);
+                    return;
+                }
+            }
+            else
+            {
+                // Obstacle is further away, try normal avoidance
+                _blockedTimer = Mathf.Max(0, _blockedTimer - dt * 2f);
+            }
+        }
+        else
+        {
+            // Path is clear, reset blocked timer
+            _blockedTimer = 0;
+        }
+
+        // Normal aggro movement
+        // Only move if we're further than the minimum stop distance
+        if (dist > MinStopDistance)
+        {
+            // Apply obstacle avoidance
+            Vector3 moveDir = AvoidObstacles(direction);
+
+            Velocity = new Vector3(moveDir.X * speed, Velocity.Y, moveDir.Z * speed);
+        }
+        else
+        {
+            // Stop moving but maintain facing
+            Velocity = new Vector3(0, Velocity.Y, 0);
+        }
+
+        // Face player - model's face is at +Z, so point +Z toward player
+        if (direction.LengthSquared() > 0.01f)
+        {
+            float targetAngle = Mathf.Atan2(direction.X, direction.Z);
+            Rotation = new Vector3(0, targetAngle, 0);
+        }
+    }
+
+    /// <summary>
+    /// Start a tactical retreat - back up first, then reposition to the side.
+    /// </summary>
+    private void StartTacticalRetreat(Vector3 toPlayer)
+    {
+        _retreatState = RetreatState.BackingUp;
+        _retreatTimer = BackupDuration;
+        _retreatDirection = -toPlayer.Normalized();  // Opposite of player direction
+        _repositionTarget = FindRepositionTarget(toPlayer);
+        _blockedTimer = 0;
+
+        GD.Print($"[{MonsterType}] Starting tactical retreat - backing up");
+    }
+
+    /// <summary>
+    /// Process tactical retreat movement (backing up, then repositioning).
+    /// </summary>
+    private void ProcessTacticalRetreat(float dt, Vector3 toPlayer, float speed)
+    {
+        _retreatTimer -= dt;
+
+        switch (_retreatState)
+        {
+            case RetreatState.BackingUp:
+                // Back up away from player/obstacle
+                Vector3 backupDir = AvoidObstacles(_retreatDirection);
+                float backupSpeed = speed * 0.7f;  // Slightly slower when backing up
+                Velocity = new Vector3(backupDir.X * backupSpeed, Velocity.Y, backupDir.Z * backupSpeed);
+
+                // Keep facing the player while backing up
+                if (toPlayer.LengthSquared() > 0.01f)
+                {
+                    float targetAngle = Mathf.Atan2(toPlayer.X, toPlayer.Z);
+                    Rotation = new Vector3(0, targetAngle, 0);
+                }
+
+                // Transition to repositioning
+                if (_retreatTimer <= 0)
+                {
+                    _retreatState = RetreatState.Repositioning;
+                    _retreatTimer = RepositionDuration;
+                    GD.Print($"[{MonsterType}] Repositioning to side");
+                }
+                break;
+
+            case RetreatState.Repositioning:
+                // Move toward the reposition target (side position)
+                Vector3 toTarget = _repositionTarget - GlobalPosition;
+                toTarget.Y = 0;
+
+                if (toTarget.Length() < 0.5f || _retreatTimer <= 0)
+                {
+                    // Reached target or timeout - resume normal aggro
+                    _retreatState = RetreatState.None;
+                    GD.Print($"[{MonsterType}] Tactical retreat complete, resuming chase");
+                    return;
+                }
+
+                Vector3 repoDir = AvoidObstacles(toTarget.Normalized());
+                Velocity = new Vector3(repoDir.X * speed, Velocity.Y, repoDir.Z * speed);
+
+                // Face movement direction during reposition, with slight look toward player
+                Vector3 facingDir = (repoDir + toPlayer.Normalized() * 0.3f).Normalized();
+                if (facingDir.LengthSquared() > 0.01f)
+                {
+                    float targetAngle = Mathf.Atan2(facingDir.X, facingDir.Z);
+                    Rotation = new Vector3(0, targetAngle, 0);
+                }
+                break;
+
+            default:
+                _retreatState = RetreatState.None;
+                break;
         }
     }
 
@@ -2255,6 +2377,13 @@ public partial class BasicEnemy3D : CharacterBody3D
     {
         var previousState = CurrentState;
         CurrentState = newState;
+
+        // Reset tactical retreat when changing states
+        if (newState != State.Aggro && newState != State.Tracking)
+        {
+            _retreatState = RetreatState.None;
+            _blockedTimer = 0;
+        }
 
         switch (newState)
         {
@@ -2398,6 +2527,27 @@ public partial class BasicEnemy3D : CharacterBody3D
         _stuckRecoveryAttempts++;
         GD.Print($"[{MonsterType}] Stuck detected (attempt {_stuckRecoveryAttempts})");
 
+        // If in aggro/tracking and not already retreating, try tactical retreat first
+        if ((CurrentState == State.Aggro || CurrentState == State.Tracking) &&
+            _retreatState == RetreatState.None && _player != null)
+        {
+            if (_stuckRecoveryAttempts == 1)
+            {
+                // First attempt: Use tactical retreat (back up and reposition)
+                Vector3 toPlayer = _player.GlobalPosition - GlobalPosition;
+                toPlayer.Y = 0;
+                StartTacticalRetreat(toPlayer);
+                return;
+            }
+            else if (_stuckRecoveryAttempts == 2)
+            {
+                // Second attempt: Try circle strafing
+                _circleDirection = GD.Randf() > 0.5f ? 1f : -1f;
+                _circleTimer = 1.5f;
+                return;
+            }
+        }
+
         if (_stuckRecoveryAttempts >= 3)
         {
             // Teleport nudge as last resort - move in a random direction
@@ -2408,6 +2558,7 @@ public partial class BasicEnemy3D : CharacterBody3D
             ).Normalized();
             GlobalPosition += nudgeDir * 0.5f;
             _stuckRecoveryAttempts = 0;
+            _retreatState = RetreatState.None;
             GD.Print($"[{MonsterType}] Applied nudge to escape");
         }
         else
@@ -2428,6 +2579,115 @@ public partial class BasicEnemy3D : CharacterBody3D
     #endregion
 
     #region Obstacle Avoidance
+
+    /// <summary>
+    /// Check if the direct path to the player is blocked by an obstacle.
+    /// Returns true if blocked, false if clear.
+    /// </summary>
+    private bool IsPathToPlayerBlocked(out float obstacleDistance)
+    {
+        obstacleDistance = float.MaxValue;
+        if (_player == null) return false;
+
+        var spaceState = GetWorld3D().DirectSpaceState;
+        Vector3 origin = GlobalPosition + Vector3.Up * 0.5f;
+        Vector3 toPlayer = _player.GlobalPosition - GlobalPosition;
+        toPlayer.Y = 0;
+        float distToPlayer = toPlayer.Length();
+
+        if (distToPlayer < 0.1f) return false;
+
+        Vector3 direction = toPlayer.Normalized();
+
+        // Check up to the player or max 8 units
+        float checkDistance = Mathf.Min(distToPlayer, 8f);
+
+        // Collision mask: Obstacle (layer 5) + Wall (layer 8)
+        uint obstacleMask = (1u << 4) | (1u << 7);
+
+        var query = PhysicsRayQueryParameters3D.Create(
+            origin,
+            origin + direction * checkDistance,
+            obstacleMask
+        );
+        query.Exclude = new Godot.Collections.Array<Rid> { GetRid() };
+        var result = spaceState.IntersectRay(query);
+
+        if (result.Count > 0)
+        {
+            obstacleDistance = origin.DistanceTo((Vector3)result["position"]);
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Find a clear direction to reposition around an obstacle.
+    /// Checks left and right perpendicular directions and picks the clearer one.
+    /// Returns a target position to move towards.
+    /// </summary>
+    private Vector3 FindRepositionTarget(Vector3 toPlayer)
+    {
+        var spaceState = GetWorld3D().DirectSpaceState;
+        Vector3 origin = GlobalPosition + Vector3.Up * 0.5f;
+        Vector3 forward = toPlayer.Normalized();
+
+        // Calculate perpendicular directions (left and right)
+        Vector3 leftDir = new Vector3(-forward.Z, 0, forward.X);
+        Vector3 rightDir = new Vector3(forward.Z, 0, -forward.X);
+
+        uint obstacleMask = (1u << 4) | (1u << 7);
+        float checkDist = 3.5f;
+
+        // Check how far we can go left and right
+        float leftClear = GetClearDistance(spaceState, origin, leftDir, checkDist, obstacleMask);
+        float rightClear = GetClearDistance(spaceState, origin, rightDir, checkDist, obstacleMask);
+
+        // Also check if the diagonal path (side + forward) is clear
+        Vector3 leftDiag = (leftDir + forward * 0.5f).Normalized();
+        Vector3 rightDiag = (rightDir + forward * 0.5f).Normalized();
+        float leftDiagClear = GetClearDistance(spaceState, origin, leftDiag, checkDist, obstacleMask);
+        float rightDiagClear = GetClearDistance(spaceState, origin, rightDiag, checkDist, obstacleMask);
+
+        // Pick the direction with more clearance
+        Vector3 bestDir;
+        float bestClear;
+
+        if (leftClear + leftDiagClear > rightClear + rightDiagClear)
+        {
+            bestDir = leftDir;
+            bestClear = Mathf.Min(leftClear, 2.5f);
+        }
+        else
+        {
+            bestDir = rightDir;
+            bestClear = Mathf.Min(rightClear, 2.5f);
+        }
+
+        // Return a target position to the side
+        return GlobalPosition + bestDir * bestClear;
+    }
+
+    /// <summary>
+    /// Get the clear distance in a direction before hitting an obstacle.
+    /// </summary>
+    private float GetClearDistance(PhysicsDirectSpaceState3D spaceState, Vector3 origin, Vector3 direction, float maxDist, uint mask)
+    {
+        var query = PhysicsRayQueryParameters3D.Create(
+            origin,
+            origin + direction * maxDist,
+            mask
+        );
+        query.Exclude = new Godot.Collections.Array<Rid> { GetRid() };
+        var result = spaceState.IntersectRay(query);
+
+        if (result.Count > 0)
+        {
+            return origin.DistanceTo((Vector3)result["position"]);
+        }
+        return maxDist;
+    }
 
     /// <summary>
     /// Apply obstacle avoidance to a desired movement direction.

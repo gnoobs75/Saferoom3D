@@ -929,7 +929,17 @@ public partial class BossEnemy3D : CharacterBody3D
         }
     }
 
-    public void TakeDamage(float damage, Vector3 fromPosition, string source = "Unknown")
+    public void TakeDamage(float damage, Vector3 fromPosition, string source)
+    {
+        TakeDamage(damage, fromPosition, source, false, 1.0f);
+    }
+
+    public void TakeDamage(float damage, Vector3 fromPosition, string source, bool isCrit)
+    {
+        TakeDamage(damage, fromPosition, source, isCrit, 1.0f);
+    }
+
+    public void TakeDamage(float damage, Vector3 fromPosition, string source, bool isCrit, float pushbackMultiplier)
     {
         if (CurrentState == State.Dead) return;
 
@@ -953,10 +963,10 @@ public partial class BossEnemy3D : CharacterBody3D
         // Play hit sound
         PlayMonsterSound("hit");
 
-        // Slight knockback (bosses resist more)
+        // Slight knockback (bosses resist more, apply pushback multiplier)
         Vector3 knockDir = (GlobalPosition - fromPosition).Normalized();
         knockDir.Y = 0;
-        Velocity += knockDir * Constants.KnockbackForce * 0.3f;
+        Velocity += knockDir * Constants.KnockbackForce * 0.3f * pushbackMultiplier;
 
         // Aggro on damage
         if (CurrentState == State.Idle)
@@ -967,12 +977,77 @@ public partial class BossEnemy3D : CharacterBody3D
         EmitSignal(SignalName.Damaged, intDamage, CurrentHealth);
         UpdateBossHealthBar();
 
-        GD.Print($"[BossEnemy3D] {BossName} took {intDamage} damage from {source}. HP: {CurrentHealth}/{MaxHealth}");
+        // Show floating damage text
+        SpawnFloatingDamageText(intDamage, isCrit);
+
+        string critText = isCrit ? " (CRIT)" : "";
+        GD.Print($"[BossEnemy3D] {BossName} took {intDamage}{critText} damage from {source}. HP: {CurrentHealth}/{MaxHealth}");
 
         if (CurrentHealth <= 0)
         {
             Die();
         }
+    }
+
+    /// <summary>
+    /// Spawn floating damage text above the boss (arc animation).
+    /// </summary>
+    private void SpawnFloatingDamageText(int damage, bool isCrit = false)
+    {
+        var spawnPosition = IsInsideTree() ? GlobalPosition : Position;
+
+        // Create floating damage number - bosses are bigger, start higher
+        var textContainer = new Node3D();
+        GetTree().Root.AddChild(textContainer);
+        textContainer.GlobalPosition = spawnPosition + new Vector3(0, 1.5f, 0);
+
+        // Create 3D label - bigger for bosses
+        var label = new Label3D();
+        label.Text = isCrit ? $"!{damage}!" : damage.ToString();
+        label.FontSize = isCrit ? 112 : 80;  // Bigger font for boss damage
+        label.OutlineSize = isCrit ? 14 : 10;
+        label.Modulate = new Color(1f, 0.15f, 0.1f);  // Red damage
+        label.Billboard = BaseMaterial3D.BillboardModeEnum.Enabled;
+        label.NoDepthTest = true;
+        textContainer.AddChild(label);
+
+        if (isCrit)
+        {
+            label.OutlineModulate = new Color(1f, 0.9f, 0.2f);  // Gold outline for crits
+        }
+
+        // Arc to left or right
+        bool goRight = GD.Randf() > 0.5f;
+        float arcDirection = goRight ? 1f : -1f;
+        float arcDistance = (float)GD.RandRange(1.5f, 2.2f);  // Wider arc for bosses
+
+        float duration = isCrit ? 1.2f : 0.9f;
+
+        var tween = textContainer.CreateTween();
+        tween.SetParallel(true);
+
+        float peakHeight = spawnPosition.Y + 3.5f;
+        float endHeight = spawnPosition.Y + 2.5f;
+
+        tween.TweenMethod(
+            Callable.From((float t) =>
+            {
+                float arcY = -4f * (t - 0.5f) * (t - 0.5f) + 1f;
+                float y = Mathf.Lerp(spawnPosition.Y + 1.5f, endHeight, t) + arcY * 1.0f;
+                float x = spawnPosition.X + arcDirection * t * arcDistance;
+                textContainer.GlobalPosition = new Vector3(x, y, spawnPosition.Z);
+            }),
+            0f, 1f, duration
+        );
+
+        if (isCrit)
+        {
+            label.Scale = new Vector3(1.3f, 1.3f, 1f);
+            tween.TweenProperty(label, "scale", new Vector3(1f, 1f, 1f), duration * 0.3f);
+        }
+
+        tween.TweenProperty(label, "modulate:a", 0f, duration * 0.4f).SetDelay(duration * 0.6f);
+        tween.Chain().TweenCallback(Callable.From(() => textContainer.QueueFree()));
     }
 
     public void Stun(float duration)

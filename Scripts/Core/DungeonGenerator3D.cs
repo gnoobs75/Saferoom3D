@@ -211,9 +211,13 @@ public partial class DungeonGenerator3D : Node3D
         _wallShaderMaterial.SetShaderParameter("albedo_color", new Color(0.38f, 0.33f, 0.28f, 1.0f));
         _wallShaderMaterial.SetShaderParameter("roughness", 0.88f);
         _wallShaderMaterial.SetShaderParameter("metallic", 0.0f);
-        _wallShaderMaterial.SetShaderParameter("normal_strength", 2.0f);
+        _wallShaderMaterial.SetShaderParameter("normal_strength", 1.5f);  // Reduced from 2.0 for softer lighting
         _wallShaderMaterial.SetShaderParameter("texture_scale", 0.5f); // Matches UV scale
         _wallShaderMaterial.SetShaderParameter("blend_sharpness", 4.0f);
+
+        // Distance-based normal fade for smooth distant appearance
+        _wallShaderMaterial.SetShaderParameter("normal_fade_start", 8.0f);
+        _wallShaderMaterial.SetShaderParameter("normal_fade_end", 20.0f);
 
         // Optional moss weathering on lower walls
         _wallShaderMaterial.SetShaderParameter("moss_amount", 0.15f);
@@ -244,18 +248,22 @@ public partial class DungeonGenerator3D : Node3D
         _floorShaderMaterial.SetShaderParameter("albedo_color", new Color(0.35f, 0.30f, 0.25f, 1.0f));
         _floorShaderMaterial.SetShaderParameter("roughness", 0.92f);
         _floorShaderMaterial.SetShaderParameter("metallic", 0.0f);
-        _floorShaderMaterial.SetShaderParameter("normal_strength", 2.5f);
+        _floorShaderMaterial.SetShaderParameter("normal_strength", 1.5f);  // Reduced from 2.5 for softer lighting
         _floorShaderMaterial.SetShaderParameter("texture_scale", 0.25f);
         _floorShaderMaterial.SetShaderParameter("blend_sharpness", 4.0f);
+
+        // Distance-based normal fade for smooth distant appearance
+        _floorShaderMaterial.SetShaderParameter("normal_fade_start", 8.0f);
+        _floorShaderMaterial.SetShaderParameter("normal_fade_end", 20.0f);
 
         // Add subtle dust/dirt accumulation
         _floorShaderMaterial.SetShaderParameter("dust_amount", 0.15f);
         _floorShaderMaterial.SetShaderParameter("dust_color", new Vector3(0.4f, 0.35f, 0.28f));
 
-        // Occasional wet patches
-        _floorShaderMaterial.SetShaderParameter("wet_amount", 0.08f);
+        // Subtle wet patches (reduced to prevent harsh specular at distance)
+        _floorShaderMaterial.SetShaderParameter("wet_amount", 0.05f);  // Reduced from 0.08
         _floorShaderMaterial.SetShaderParameter("wet_color", new Vector3(0.15f, 0.12f, 0.10f));
-        _floorShaderMaterial.SetShaderParameter("wet_roughness", 0.3f);
+        _floorShaderMaterial.SetShaderParameter("wet_roughness", 0.6f);  // Increased from 0.3 for less shine
 
         GD.Print("[DungeonGenerator3D] Created triplanar floor shader material");
     }
@@ -280,9 +288,13 @@ public partial class DungeonGenerator3D : Node3D
         _ceilingShaderMaterial.SetShaderParameter("albedo_color", new Color(0.25f, 0.22f, 0.18f, 1.0f));
         _ceilingShaderMaterial.SetShaderParameter("roughness", 0.95f);
         _ceilingShaderMaterial.SetShaderParameter("metallic", 0.0f);
-        _ceilingShaderMaterial.SetShaderParameter("normal_strength", 2.2f);
+        _ceilingShaderMaterial.SetShaderParameter("normal_strength", 1.5f);  // Reduced from 2.2 for softer lighting
         _ceilingShaderMaterial.SetShaderParameter("texture_scale", 0.25f);
         _ceilingShaderMaterial.SetShaderParameter("blend_sharpness", 4.0f);
+
+        // Distance-based normal fade for smooth distant appearance
+        _ceilingShaderMaterial.SetShaderParameter("normal_fade_start", 8.0f);
+        _ceilingShaderMaterial.SetShaderParameter("normal_fade_end", 20.0f);
 
         // Ceilings are dusty and dark
         _ceilingShaderMaterial.SetShaderParameter("dust_amount", 0.25f);
