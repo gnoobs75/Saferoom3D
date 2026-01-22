@@ -6,10 +6,10 @@
   "depth": 420,
   "spawnRoom": 0,
   "spawnPosition": {
-    "x": 22,
-    "z": 351
+    "x": 23,
+    "z": 320
   },
-  "tileData": "H4sIAAAAAAAAClvCyMCwhJGBoeH/fxAy1Alt8GIM5xqKZON8Rqrj0AZvxtBBS\u002B5nAQClsO3ovwEAAA==",
+  "tileData": "H4sIAAAAAAAACu3QTUsCQRzH8f\u002BGh4hYPMSOO07rQ2KikrVqSNBJzECyNNbVpEsdgjqkQUQoNXPqHXTt4qGO9QZ6aYbm2qyDT2QQ0WH\u002B/D7f47QkgJYEQNtt\u002BlyMeCP0XPq/f/m\u002BgIe\u002BQWc9QuZz7SZPUKq3FVaDzbG7Donv7Cx9FfcV6Nb2zG87Co7Il2kJlteHyQS3XXpmAvloaUAxLb2Upg995\u002BZ4m8B2YITLwDKT\u002B77Ii1UBc3axo5HGrNJzoFGzrLqqduMKb4KGm7AyEERMyxozgSDNsJxY9Rd4N30Y8aZV6DqMtjjTPIhGeTRVUenedCWVTQ0U/VAfKNHjNUTUpoGRsqJ0S\u002Bg0iohKzAWuBc/CQgtchJAcd9qa/zKI5KQ8vtUDQvNe\u002B8V2o6lCuyVW2\u002B\u002BVBv654l6cUZHjQtno/N5d384Yb6Jij2JzfvZCB6PFnqSZP4PmJOPX3nfHBzgZuLQICAAA",
   "rooms": [],
   "corridors": [],
   "enemies": [
@@ -22,7 +22,8 @@
       },
       "level": 1,
       "isBoss": false,
-      "rotationY": 0
+      "rotationY": 0,
+      "isRoamer": false
     },
     {
       "type": "goblin",
@@ -33,7 +34,8 @@
       },
       "level": 1,
       "isBoss": false,
-      "rotationY": 0
+      "rotationY": 0,
+      "isRoamer": false
     },
     {
       "type": "goblin_shaman",
@@ -44,7 +46,8 @@
       },
       "level": 1,
       "isBoss": false,
-      "rotationY": 0
+      "rotationY": 0,
+      "isRoamer": false
     },
     {
       "type": "goblin_thrower",
@@ -55,7 +58,8 @@
       },
       "level": 1,
       "isBoss": false,
-      "rotationY": 0
+      "rotationY": 0,
+      "isRoamer": false
     },
     {
       "type": "slime",
@@ -66,7 +70,8 @@
       },
       "level": 1,
       "isBoss": false,
-      "rotationY": 0
+      "rotationY": 0,
+      "isRoamer": false
     },
     {
       "type": "slime",
@@ -77,7 +82,8 @@
       },
       "level": 1,
       "isBoss": false,
-      "rotationY": 0
+      "rotationY": 0,
+      "isRoamer": false
     },
     {
       "type": "slime",
@@ -88,7 +94,8 @@
       },
       "level": 1,
       "isBoss": false,
-      "rotationY": 0
+      "rotationY": 0,
+      "isRoamer": false
     },
     {
       "type": "slime",
@@ -99,7 +106,8 @@
       },
       "level": 1,
       "isBoss": false,
-      "rotationY": 0
+      "rotationY": 0,
+      "isRoamer": false
     },
     {
       "type": "wolf",
@@ -110,7 +118,8 @@
       },
       "level": 1,
       "isBoss": false,
-      "rotationY": 0
+      "rotationY": 0,
+      "isRoamer": false
     },
     {
       "type": "wolf",
@@ -121,7 +130,8 @@
       },
       "level": 1,
       "isBoss": false,
-      "rotationY": 0
+      "rotationY": 0,
+      "isRoamer": false
     },
     {
       "type": "wolf",
@@ -132,7 +142,8 @@
       },
       "level": 1,
       "isBoss": false,
-      "rotationY": 0
+      "rotationY": 0,
+      "isRoamer": false
     },
     {
       "type": "dragon",
@@ -143,7 +154,8 @@
       },
       "level": 1,
       "isBoss": false,
-      "rotationY": 0
+      "rotationY": 0,
+      "isRoamer": false
     },
     {
       "type": "dragon",
@@ -154,7 +166,8 @@
       },
       "level": 1,
       "isBoss": false,
-      "rotationY": 0
+      "rotationY": 0,
+      "isRoamer": false
     },
     {
       "type": "living_armor",
@@ -165,7 +178,8 @@
       },
       "level": 1,
       "isBoss": false,
-      "rotationY": 0
+      "rotationY": 0,
+      "isRoamer": false
     },
     {
       "type": "shock_drone",
@@ -176,7 +190,8 @@
       },
       "level": 1,
       "isBoss": false,
-      "rotationY": 0
+      "rotationY": 0,
+      "isRoamer": false
     },
     {
       "type": "shock_drone",
@@ -187,7 +202,8 @@
       },
       "level": 1,
       "isBoss": false,
-      "rotationY": 0
+      "rotationY": 0,
+      "isRoamer": false
     },
     {
       "type": "shock_drone",
@@ -198,7 +214,8 @@
       },
       "level": 1,
       "isBoss": false,
-      "rotationY": 0
+      "rotationY": 0,
+      "isRoamer": false
     },
     {
       "type": "shock_drone",
@@ -209,7 +226,8 @@
       },
       "level": 1,
       "isBoss": false,
-      "rotationY": 0
+      "rotationY": 0,
+      "isRoamer": false
     },
     {
       "type": "shock_drone",
@@ -220,7 +238,8 @@
       },
       "level": 1,
       "isBoss": false,
-      "rotationY": 0
+      "rotationY": 0,
+      "isRoamer": false
     },
     {
       "type": "skeleton",
@@ -231,7 +250,8 @@
       },
       "level": 1,
       "isBoss": false,
-      "rotationY": 0
+      "rotationY": 0,
+      "isRoamer": false
     },
     {
       "type": "skeleton",
@@ -242,7 +262,8 @@
       },
       "level": 1,
       "isBoss": false,
-      "rotationY": 0
+      "rotationY": 0,
+      "isRoamer": false
     },
     {
       "type": "skeleton",
@@ -253,7 +274,8 @@
       },
       "level": 1,
       "isBoss": false,
-      "rotationY": 0
+      "rotationY": 0,
+      "isRoamer": false
     },
     {
       "type": "skeleton",
@@ -264,7 +286,8 @@
       },
       "level": 1,
       "isBoss": false,
-      "rotationY": 0
+      "rotationY": 0,
+      "isRoamer": false
     },
     {
       "type": "skeleton",
@@ -275,7 +298,8 @@
       },
       "level": 1,
       "isBoss": false,
-      "rotationY": 0
+      "rotationY": 0,
+      "isRoamer": false
     },
     {
       "type": "spider_queen",
@@ -286,7 +310,8 @@
       },
       "level": 1,
       "isBoss": true,
-      "rotationY": 0
+      "rotationY": 0,
+      "isRoamer": false
     },
     {
       "type": "dragon_king",
@@ -297,7 +322,320 @@
       },
       "level": 1,
       "isBoss": true,
-      "rotationY": 0
+      "rotationY": 0,
+      "isRoamer": false
+    },
+    {
+      "type": "skeleton",
+      "roomId": -1,
+      "position": {
+        "x": 109,
+        "z": 366
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0,
+      "isRoamer": false
+    },
+    {
+      "type": "skeleton",
+      "roomId": -1,
+      "position": {
+        "x": 118,
+        "z": 366
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0,
+      "isRoamer": false
+    },
+    {
+      "type": "skeleton",
+      "roomId": -1,
+      "position": {
+        "x": 113,
+        "z": 363
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0,
+      "isRoamer": false
+    },
+    {
+      "type": "skeleton",
+      "roomId": -1,
+      "position": {
+        "x": 109,
+        "z": 359
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0,
+      "isRoamer": false
+    },
+    {
+      "type": "skeleton",
+      "roomId": -1,
+      "position": {
+        "x": 118,
+        "z": 359
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0,
+      "isRoamer": false
+    },
+    {
+      "type": "skeleton",
+      "roomId": -1,
+      "position": {
+        "x": 113,
+        "z": 355
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0,
+      "isRoamer": false
+    },
+    {
+      "type": "skeleton",
+      "roomId": -1,
+      "position": {
+        "x": 108,
+        "z": 351
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0,
+      "isRoamer": false
+    },
+    {
+      "type": "skeleton",
+      "roomId": -1,
+      "position": {
+        "x": 118,
+        "z": 351
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0,
+      "isRoamer": false
+    },
+    {
+      "type": "gelatinous_cube",
+      "roomId": -1,
+      "position": {
+        "x": 109,
+        "z": 346
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0,
+      "isRoamer": false
+    },
+    {
+      "type": "gelatinous_cube",
+      "roomId": -1,
+      "position": {
+        "x": 117,
+        "z": 346
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0,
+      "isRoamer": false
+    },
+    {
+      "type": "flesh_golem",
+      "roomId": -1,
+      "position": {
+        "x": 110,
+        "z": 339
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0,
+      "isRoamer": false
+    },
+    {
+      "type": "flesh_golem",
+      "roomId": -1,
+      "position": {
+        "x": 117,
+        "z": 340
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": -5.960465E-08,
+      "isRoamer": false
+    },
+    {
+      "type": "plague_bearer",
+      "roomId": -1,
+      "position": {
+        "x": 113,
+        "z": 334
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0,
+      "isRoamer": false
+    },
+    {
+      "type": "skeleton_lord",
+      "roomId": -1,
+      "position": {
+        "x": 113,
+        "z": 326
+      },
+      "level": 1,
+      "isBoss": true,
+      "rotationY": 0,
+      "isRoamer": false
+    },
+    {
+      "type": "ice_wraith",
+      "roomId": -1,
+      "position": {
+        "x": 94,
+        "z": 325
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 1.5707964,
+      "isRoamer": false
+    },
+    {
+      "type": "ice_wraith",
+      "roomId": -1,
+      "position": {
+        "x": 77,
+        "z": 325
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 1.5707964,
+      "isRoamer": false
+    },
+    {
+      "type": "the_butcher",
+      "roomId": -1,
+      "position": {
+        "x": 61,
+        "z": 325
+      },
+      "level": 1,
+      "isBoss": true,
+      "rotationY": 1.5707964,
+      "isRoamer": false
+    },
+    {
+      "type": "dragon_king",
+      "roomId": -1,
+      "position": {
+        "x": 86,
+        "z": 348
+      },
+      "level": 1,
+      "isBoss": true,
+      "rotationY": -0.785398,
+      "isRoamer": false
+    },
+    {
+      "type": "mimic",
+      "roomId": -1,
+      "position": {
+        "x": 60,
+        "z": 354
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 2.3561945,
+      "isRoamer": false
+    },
+    {
+      "type": "spider_queen",
+      "roomId": -1,
+      "position": {
+        "x": 285,
+        "z": 343
+      },
+      "level": 1,
+      "isBoss": true,
+      "rotationY": 0,
+      "isRoamer": false
+    },
+    {
+      "type": "rabbidd",
+      "roomId": -1,
+      "position": {
+        "x": 23,
+        "z": 341
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": -3.1415925,
+      "isRoamer": false
+    },
+    {
+      "type": "slime",
+      "roomId": -1,
+      "position": {
+        "x": 24,
+        "z": 373
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0,
+      "isRoamer": false
+    },
+    {
+      "type": "mushroom",
+      "roomId": -1,
+      "position": {
+        "x": 18,
+        "z": 312
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 1.5707964,
+      "isRoamer": false
+    },
+    {
+      "type": "wolf",
+      "roomId": -1,
+      "position": {
+        "x": 34,
+        "z": 388
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0,
+      "isRoamer": false
+    },
+    {
+      "type": "wolf",
+      "roomId": -1,
+      "position": {
+        "x": 24,
+        "z": 387
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0,
+      "isRoamer": false
+    },
+    {
+      "type": "wolf",
+      "roomId": -1,
+      "position": {
+        "x": 11,
+        "z": 387
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0,
+      "isRoamer": false
     }
   ],
   "monsterGroups": [
@@ -447,6 +785,634 @@
           "offsetZ": -2,
           "level": 1,
           "isBoss": false
+        }
+      ]
+    },
+    {
+      "id": "e1a97e1d-352d-42dc-8ee1-ad91b8529943",
+      "name": "Goblin Patrol",
+      "roomId": -1,
+      "center": {
+        "x": 181,
+        "z": 363
+      },
+      "monsters": [
+        {
+          "type": "goblin",
+          "offsetX": -1.5,
+          "offsetZ": 0,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "goblin",
+          "offsetX": 1.5,
+          "offsetZ": 0,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "goblin_shaman",
+          "offsetX": 0,
+          "offsetZ": 2,
+          "level": 2,
+          "isBoss": false
+        }
+      ]
+    },
+    {
+      "id": "820ef610-714d-4f93-8adf-44dc8c658647",
+      "name": "Goblin Patrol",
+      "roomId": -1,
+      "center": {
+        "x": 190,
+        "z": 354
+      },
+      "monsters": [
+        {
+          "type": "goblin",
+          "offsetX": -1.5,
+          "offsetZ": 0,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "goblin",
+          "offsetX": 1.5,
+          "offsetZ": 0,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "goblin_shaman",
+          "offsetX": 0,
+          "offsetZ": 2,
+          "level": 2,
+          "isBoss": false
+        }
+      ]
+    },
+    {
+      "id": "501277b7-8245-4234-a6d2-4569556890a5",
+      "name": "Goblin Patrol",
+      "roomId": -1,
+      "center": {
+        "x": 180,
+        "z": 343
+      },
+      "monsters": [
+        {
+          "type": "goblin",
+          "offsetX": -1.5,
+          "offsetZ": 0,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "goblin",
+          "offsetX": 1.5,
+          "offsetZ": 0,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "goblin_shaman",
+          "offsetX": 0,
+          "offsetZ": 2,
+          "level": 2,
+          "isBoss": false
+        }
+      ]
+    },
+    {
+      "id": "19f55cff-2b23-4f55-8ae5-93ff6bcfe768",
+      "name": "Goblin Patrol",
+      "roomId": -1,
+      "center": {
+        "x": 189,
+        "z": 331
+      },
+      "monsters": [
+        {
+          "type": "goblin",
+          "offsetX": -1.5,
+          "offsetZ": 0,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "goblin",
+          "offsetX": 1.5,
+          "offsetZ": 0,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "goblin_shaman",
+          "offsetX": 0,
+          "offsetZ": 2,
+          "level": 2,
+          "isBoss": false
+        }
+      ]
+    },
+    {
+      "id": "64d1dc29-1417-422f-8b3c-f73b0d9d19f5",
+      "name": "Goblin Patrol",
+      "roomId": -1,
+      "center": {
+        "x": 180,
+        "z": 318
+      },
+      "monsters": [
+        {
+          "type": "goblin",
+          "offsetX": -1.5,
+          "offsetZ": 0,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "goblin",
+          "offsetX": 1.5,
+          "offsetZ": 0,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "goblin_shaman",
+          "offsetX": 0,
+          "offsetZ": 2,
+          "level": 2,
+          "isBoss": false
+        }
+      ]
+    },
+    {
+      "id": "d995e8b6-0a9b-4705-b39e-1b1c05e4e277",
+      "name": "Goblin Patrol",
+      "roomId": -1,
+      "center": {
+        "x": 189,
+        "z": 306
+      },
+      "monsters": [
+        {
+          "type": "goblin",
+          "offsetX": -1.5,
+          "offsetZ": 0,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "goblin",
+          "offsetX": 1.5,
+          "offsetZ": 0,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "goblin_shaman",
+          "offsetX": 0,
+          "offsetZ": 2,
+          "level": 2,
+          "isBoss": false
+        }
+      ]
+    },
+    {
+      "id": "66acaea4-8976-4f5e-be7e-9cd86c33a641",
+      "name": "Goblin Patrol",
+      "roomId": -1,
+      "center": {
+        "x": 180,
+        "z": 293
+      },
+      "monsters": [
+        {
+          "type": "goblin",
+          "offsetX": -1.5,
+          "offsetZ": 0,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "goblin",
+          "offsetX": 1.5,
+          "offsetZ": 0,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "goblin_shaman",
+          "offsetX": 0,
+          "offsetZ": 2,
+          "level": 2,
+          "isBoss": false
+        }
+      ]
+    },
+    {
+      "id": "d857f310-1ac5-4bc3-9b6a-37ef7315091e",
+      "name": "Goblin Patrol",
+      "roomId": -1,
+      "center": {
+        "x": 189,
+        "z": 280
+      },
+      "monsters": [
+        {
+          "type": "goblin",
+          "offsetX": -1.5,
+          "offsetZ": 0,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "goblin",
+          "offsetX": 1.5,
+          "offsetZ": 0,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "goblin_shaman",
+          "offsetX": 0,
+          "offsetZ": 2,
+          "level": 2,
+          "isBoss": false
+        }
+      ]
+    },
+    {
+      "id": "a68cb1b0-d1af-4f06-9021-bc2fed1dd738",
+      "name": "Goblin Patrol",
+      "roomId": -1,
+      "center": {
+        "x": 180,
+        "z": 268
+      },
+      "monsters": [
+        {
+          "type": "goblin",
+          "offsetX": -1.5,
+          "offsetZ": 0,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "goblin",
+          "offsetX": 1.5,
+          "offsetZ": 0,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "goblin_shaman",
+          "offsetX": 0,
+          "offsetZ": 2,
+          "level": 2,
+          "isBoss": false
+        }
+      ]
+    },
+    {
+      "id": "8d474109-677b-4c02-af9e-34ff079fb881",
+      "name": "Goblin Patrol",
+      "roomId": -1,
+      "center": {
+        "x": 190,
+        "z": 257
+      },
+      "monsters": [
+        {
+          "type": "goblin",
+          "offsetX": -1.5,
+          "offsetZ": 0,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "goblin",
+          "offsetX": 1.5,
+          "offsetZ": 0,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "goblin_shaman",
+          "offsetX": 0,
+          "offsetZ": 2,
+          "level": 2,
+          "isBoss": false
+        }
+      ]
+    },
+    {
+      "id": "f3798ac7-6e82-4f27-acd6-12e65a49a05b",
+      "name": "Goblin Patrol",
+      "roomId": -1,
+      "center": {
+        "x": 181,
+        "z": 245
+      },
+      "monsters": [
+        {
+          "type": "goblin",
+          "offsetX": -1.5,
+          "offsetZ": 0,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "goblin",
+          "offsetX": 1.5,
+          "offsetZ": 0,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "goblin_shaman",
+          "offsetX": 0,
+          "offsetZ": 2,
+          "level": 2,
+          "isBoss": false
+        }
+      ]
+    },
+    {
+      "id": "df766218-0566-492b-bc2e-ef96e7b57dee",
+      "name": "Spider Nest",
+      "roomId": -1,
+      "center": {
+        "x": 256,
+        "z": 349
+      },
+      "monsters": [
+        {
+          "type": "spider",
+          "offsetX": -1,
+          "offsetZ": -1,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "spider",
+          "offsetX": 1,
+          "offsetZ": -1,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "spider",
+          "offsetX": -1,
+          "offsetZ": 1,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "spider",
+          "offsetX": 1,
+          "offsetZ": 1,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "spider_queen",
+          "offsetX": 0,
+          "offsetZ": 0,
+          "level": 3,
+          "isBoss": true
+        }
+      ]
+    },
+    {
+      "id": "081124e8-604f-4da1-a0fb-827d02d5aa53",
+      "name": "Spider Nest",
+      "roomId": -1,
+      "center": {
+        "x": 263,
+        "z": 359
+      },
+      "monsters": [
+        {
+          "type": "spider",
+          "offsetX": -1,
+          "offsetZ": -1,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "spider",
+          "offsetX": 1,
+          "offsetZ": -1,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "spider",
+          "offsetX": -1,
+          "offsetZ": 1,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "spider",
+          "offsetX": 1,
+          "offsetZ": 1,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "spider_queen",
+          "offsetX": 0,
+          "offsetZ": 0,
+          "level": 3,
+          "isBoss": true
+        }
+      ]
+    },
+    {
+      "id": "877c12d6-d70e-4cd3-8257-63f60307e78f",
+      "name": "Spider Nest",
+      "roomId": -1,
+      "center": {
+        "x": 273,
+        "z": 348
+      },
+      "monsters": [
+        {
+          "type": "spider",
+          "offsetX": -1,
+          "offsetZ": -1,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "spider",
+          "offsetX": 1,
+          "offsetZ": -1,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "spider",
+          "offsetX": -1,
+          "offsetZ": 1,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "spider",
+          "offsetX": 1,
+          "offsetZ": 1,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "spider_queen",
+          "offsetX": 0,
+          "offsetZ": 0,
+          "level": 3,
+          "isBoss": true
+        }
+      ]
+    },
+    {
+      "id": "1182bf63-810d-4bd8-bbbd-db8b74ffde4a",
+      "name": "Spider Nest",
+      "roomId": -1,
+      "center": {
+        "x": 281,
+        "z": 357
+      },
+      "monsters": [
+        {
+          "type": "spider",
+          "offsetX": -1,
+          "offsetZ": -1,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "spider",
+          "offsetX": 1,
+          "offsetZ": -1,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "spider",
+          "offsetX": -1,
+          "offsetZ": 1,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "spider",
+          "offsetX": 1,
+          "offsetZ": 1,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "spider_queen",
+          "offsetX": 0,
+          "offsetZ": 0,
+          "level": 3,
+          "isBoss": true
+        }
+      ]
+    },
+    {
+      "id": "6a9a5b60-614e-455d-967b-8473d50c38fb",
+      "name": "Spider Nest",
+      "roomId": -1,
+      "center": {
+        "x": 298,
+        "z": 350
+      },
+      "monsters": [
+        {
+          "type": "spider",
+          "offsetX": -1,
+          "offsetZ": -1,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "spider",
+          "offsetX": 1,
+          "offsetZ": -1,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "spider",
+          "offsetX": -1,
+          "offsetZ": 1,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "spider",
+          "offsetX": 1,
+          "offsetZ": 1,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "spider_queen",
+          "offsetX": 0,
+          "offsetZ": 0,
+          "level": 3,
+          "isBoss": true
+        }
+      ]
+    },
+    {
+      "id": "473c016c-6559-4887-8a30-aa4d8482cc0c",
+      "name": "Spider Nest",
+      "roomId": -1,
+      "center": {
+        "x": 300,
+        "z": 362
+      },
+      "monsters": [
+        {
+          "type": "spider",
+          "offsetX": -1,
+          "offsetZ": -1,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "spider",
+          "offsetX": 1,
+          "offsetZ": -1,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "spider",
+          "offsetX": -1,
+          "offsetZ": 1,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "spider",
+          "offsetX": 1,
+          "offsetZ": 1,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "spider_queen",
+          "offsetX": 0,
+          "offsetZ": 0,
+          "level": 3,
+          "isBoss": true
         }
       ]
     }
@@ -812,14 +1778,6 @@
       "y": 0,
       "z": 372.52133,
       "rotationY": 1.5707964,
-      "scale": 1
-    },
-    {
-      "type": "brazier_fire",
-      "x": 111.46159,
-      "y": 0,
-      "z": 372.50595,
-      "rotationY": 0,
       "scale": 1
     },
     {
@@ -3749,6 +4707,3528 @@
       "z": 373.30734,
       "rotationY": 0,
       "scale": 1
+    },
+    {
+      "type": "treasure_chest",
+      "x": 23.577845,
+      "y": 0,
+      "z": 311.98657,
+      "rotationY": 3.5762793E-07,
+      "scale": 1
+    },
+    {
+      "type": "treasure_chest",
+      "x": 24.410975,
+      "y": 0,
+      "z": 311.9705,
+      "rotationY": 3.5762793E-07,
+      "scale": 1
+    },
+    {
+      "type": "treasure_chest",
+      "x": 22.719744,
+      "y": 0,
+      "z": 311.94016,
+      "rotationY": 1.4901163E-07,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 22.293123,
+      "y": 0,
+      "z": 312.23062,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 22.577179,
+      "y": 0,
+      "z": 312.2237,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 22.770012,
+      "y": 0,
+      "z": 312.2654,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 22.593695,
+      "y": 0,
+      "z": 312.53317,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 22.32923,
+      "y": 0,
+      "z": 312.46756,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 22.70398,
+      "y": 0,
+      "z": 312.47577,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 23.274693,
+      "y": 0,
+      "z": 312.2915,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 23.492094,
+      "y": 0,
+      "z": 312.30988,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 23.734013,
+      "y": 0,
+      "z": 312.3457,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 23.698532,
+      "y": 0,
+      "z": 312.56854,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 23.30378,
+      "y": 0,
+      "z": 312.5075,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 24.175953,
+      "y": 0,
+      "z": 312.31625,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 24.379879,
+      "y": 0,
+      "z": 312.3257,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 24.753855,
+      "y": 0,
+      "z": 312.32767,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 24.761429,
+      "y": 0,
+      "z": 312.58118,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 24.347212,
+      "y": 0,
+      "z": 312.52884,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 24.078907,
+      "y": 0,
+      "z": 312.5432,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 22.310486,
+      "y": 0,
+      "z": 312.7196,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 22.69255,
+      "y": 0,
+      "z": 312.79938,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 23.272999,
+      "y": 0,
+      "z": 312.80865,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 23.713137,
+      "y": 0,
+      "z": 312.81564,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 24.228746,
+      "y": 0,
+      "z": 312.82663,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 24.53388,
+      "y": 0,
+      "z": 312.77972,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 24.71057,
+      "y": 0,
+      "z": 312.80753,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "crystal",
+      "x": 18.1,
+      "y": 2.677755,
+      "z": 327.49893,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "crystal",
+      "x": 28.9,
+      "y": 2.7961087,
+      "z": 327.48358,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "crystal",
+      "x": 23.60634,
+      "y": 2.8517165,
+      "z": 311,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "shattered_potion",
+      "x": 20.02899,
+      "y": 0,
+      "z": 317.0624,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "skull_pile",
+      "x": 21.07961,
+      "y": 0,
+      "z": 316.9298,
+      "rotationY": -1.5707961,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 29.75393,
+      "y": -0.007815823,
+      "z": 326,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 30.599081,
+      "y": 0,
+      "z": 325.9626,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 17.467825,
+      "y": 0,
+      "z": 326.1165,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 16.400234,
+      "y": 0,
+      "z": 326.03305,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 71.66498,
+      "y": 0,
+      "z": 377.564,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 71.82015,
+      "y": 0,
+      "z": 376.76343,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 71.78355,
+      "y": 0,
+      "z": 375.73618,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 71.8683,
+      "y": 0,
+      "z": 374.872,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 71.81639,
+      "y": 0,
+      "z": 373.47595,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 70.55931,
+      "y": 0,
+      "z": 377.60986,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 69.54758,
+      "y": 0,
+      "z": 377.67947,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 69.61874,
+      "y": 0,
+      "z": 376.8518,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 70.497345,
+      "y": 0,
+      "z": 376.93213,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 70.49998,
+      "y": 0,
+      "z": 375.9318,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 69.62616,
+      "y": 0,
+      "z": 375.98383,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 69.614494,
+      "y": 0,
+      "z": 374.91122,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 70.51795,
+      "y": 0,
+      "z": 375.15054,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 70.6576,
+      "y": 0,
+      "z": 373.9035,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 69.71745,
+      "y": 0,
+      "z": 373.53296,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 71.57553,
+      "y": 0,
+      "z": 383.47974,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 71.49771,
+      "y": 0,
+      "z": 384.2929,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 70.6185,
+      "y": 0,
+      "z": 384.25803,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 70.65681,
+      "y": 0,
+      "z": 383.36993,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 69.60627,
+      "y": 0,
+      "z": 383.39493,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 69.63254,
+      "y": 0,
+      "z": 384.44806,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 69.625275,
+      "y": 0,
+      "z": 385.1263,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 70.573326,
+      "y": 0,
+      "z": 385.12003,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 71.43488,
+      "y": 0,
+      "z": 385.1341,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 71.50421,
+      "y": 0,
+      "z": 386.34015,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 70.54104,
+      "y": 0,
+      "z": 386.07315,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 69.54148,
+      "y": 0,
+      "z": 386.0885,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 69.6452,
+      "y": 0,
+      "z": 387.10037,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 70.56006,
+      "y": 0,
+      "z": 387.20023,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 71.48628,
+      "y": 0,
+      "z": 387.05032,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 71.55266,
+      "y": 0,
+      "z": 387.97012,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 70.60346,
+      "y": 0,
+      "z": 387.878,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 69.61576,
+      "y": 0,
+      "z": 387.82193,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "altar_stone",
+      "x": 88.99838,
+      "y": 0,
+      "z": 349.49582,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 88.31303,
+      "y": 0,
+      "z": 349.3385,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 88.261246,
+      "y": 0,
+      "z": 349.73264,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 88.26431,
+      "y": 0,
+      "z": 350.40216,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 88.32993,
+      "y": 0,
+      "z": 349.9337,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 88.66837,
+      "y": 0,
+      "z": 350.35907,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 88.94523,
+      "y": 0,
+      "z": 350.04178,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 89.35686,
+      "y": 0,
+      "z": 350.20374,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 88.671135,
+      "y": 0,
+      "z": 350.37384,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 89.58754,
+      "y": 0,
+      "z": 349.94476,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 89.32049,
+      "y": 0,
+      "z": 349.4701,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 89.32243,
+      "y": 0,
+      "z": 349.48737,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 89.77639,
+      "y": 0,
+      "z": 349.25708,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 89.1601,
+      "y": 0,
+      "z": 348.8113,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 89.607994,
+      "y": 0,
+      "z": 349.07855,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 89.605576,
+      "y": 0,
+      "z": 348.95923,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 89.547516,
+      "y": 0,
+      "z": 348.57303,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 88.38865,
+      "y": 0,
+      "z": 348.86774,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 89.26393,
+      "y": 0,
+      "z": 348.45953,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 88.45251,
+      "y": 0,
+      "z": 348.36404,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 88.73222,
+      "y": 0,
+      "z": 348.50153,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 88.64825,
+      "y": 0,
+      "z": 349.02206,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 89.61811,
+      "y": 0,
+      "z": 349.50232,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 89.49217,
+      "y": 0,
+      "z": 350.6898,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 88.60237,
+      "y": 0,
+      "z": 350.2951,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 89.14157,
+      "y": 0,
+      "z": 350.5968,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 89.84492,
+      "y": 0,
+      "z": 350.1878,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 88.27258,
+      "y": 0,
+      "z": 351.1108,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 89.41608,
+      "y": 0,
+      "z": 350.66666,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 88.745636,
+      "y": 0,
+      "z": 350.68033,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 88.02779,
+      "y": 0,
+      "z": 350.5289,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 88.36868,
+      "y": 0,
+      "z": 351.22754,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 88.575134,
+      "y": 0,
+      "z": 350.7963,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 88.040886,
+      "y": 0,
+      "z": 350.95248,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 87.81868,
+      "y": 0,
+      "z": 351.31595,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 87.86416,
+      "y": 0,
+      "z": 350.99582,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 87.40804,
+      "y": 0,
+      "z": 351.47684,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 86.81794,
+      "y": 0,
+      "z": 351.62585,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 86.30208,
+      "y": 0,
+      "z": 351.77606,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 86.17415,
+      "y": 0,
+      "z": 351.80505,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 86.00758,
+      "y": 0,
+      "z": 351.80228,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 85.45139,
+      "y": 0,
+      "z": 352.05463,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 84.48987,
+      "y": 0,
+      "z": 352.1742,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 83.62258,
+      "y": 0,
+      "z": 352.36948,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 82.623,
+      "y": 0,
+      "z": 352.5066,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 81.39674,
+      "y": 0,
+      "z": 352.619,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 80.255974,
+      "y": 0,
+      "z": 352.59384,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 79.220474,
+      "y": 0,
+      "z": 352.65067,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 78.04282,
+      "y": 0,
+      "z": 352.7233,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 77.00381,
+      "y": 0,
+      "z": 352.7909,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 76.05701,
+      "y": 0,
+      "z": 352.86472,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 75.0491,
+      "y": 0,
+      "z": 352.9605,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 74.11473,
+      "y": 0,
+      "z": 353.13208,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 73.25882,
+      "y": 0,
+      "z": 353.1057,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 72.330376,
+      "y": 0,
+      "z": 353.1128,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 71.395325,
+      "y": 0,
+      "z": 353.2188,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 70.67641,
+      "y": 0,
+      "z": 353.14682,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 69.76368,
+      "y": 0,
+      "z": 353.57483,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 68.988,
+      "y": 0,
+      "z": 353.56387,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 68.45076,
+      "y": 0,
+      "z": 353.24585,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 67.708824,
+      "y": 0,
+      "z": 353.05627,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 67.067116,
+      "y": 0,
+      "z": 352.4432,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 66.31936,
+      "y": 0,
+      "z": 352.00336,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 65.60592,
+      "y": 0,
+      "z": 351.29846,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 65.02738,
+      "y": 0,
+      "z": 350.47638,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 64.64665,
+      "y": 0,
+      "z": 349.6982,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 64.382,
+      "y": 0,
+      "z": 348.84076,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 64.04108,
+      "y": 0,
+      "z": 347.8613,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 63.720695,
+      "y": 0,
+      "z": 347.0669,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 63.686085,
+      "y": 0,
+      "z": 346.15866,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 63.57896,
+      "y": 0,
+      "z": 345.01822,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 63.25789,
+      "y": 0,
+      "z": 344.0296,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 63.078236,
+      "y": 0,
+      "z": 342.8335,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 63.106052,
+      "y": 0,
+      "z": 341.90427,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 63.153328,
+      "y": 0,
+      "z": 340.9779,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 63.542015,
+      "y": 0,
+      "z": 339.786,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 63.570786,
+      "y": 0,
+      "z": 338.77875,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 63.390816,
+      "y": 0,
+      "z": 337.9172,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 63.595028,
+      "y": 0,
+      "z": 337.015,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 64.04052,
+      "y": 0,
+      "z": 335.88654,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 64.031685,
+      "y": 0,
+      "z": 335.06473,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 63.68626,
+      "y": 0,
+      "z": 333.9761,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 63.39405,
+      "y": 0,
+      "z": 332.9447,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 63.159065,
+      "y": 0,
+      "z": 332.08237,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 62.954453,
+      "y": 0,
+      "z": 331.05887,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 63.235626,
+      "y": 0,
+      "z": 330.36084,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 63.580605,
+      "y": 0,
+      "z": 329.78067,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 63.945095,
+      "y": 0,
+      "z": 328.8794,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 64.185,
+      "y": 0,
+      "z": 328.40817,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 64.26909,
+      "y": 0,
+      "z": 327.69736,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 65.31041,
+      "y": 0,
+      "z": 327.36676,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 66.3964,
+      "y": 0,
+      "z": 327.13934,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 67.2906,
+      "y": 0,
+      "z": 326.60492,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 68.22853,
+      "y": 0,
+      "z": 326.00418,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 69.32726,
+      "y": 0,
+      "z": 326.00214,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 70.54826,
+      "y": 0,
+      "z": 325.90668,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 71.81573,
+      "y": 0,
+      "z": 325.8357,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 72.72868,
+      "y": 0,
+      "z": 325.7435,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 73.73163,
+      "y": 0,
+      "z": 325.62906,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 74.99905,
+      "y": 0,
+      "z": 325.57013,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 75.555824,
+      "y": 0,
+      "z": 325.2447,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 76.75898,
+      "y": 0,
+      "z": 325.30133,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 77.91788,
+      "y": 0,
+      "z": 325.50598,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 79.08856,
+      "y": 0,
+      "z": 325.40817,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 80.317055,
+      "y": 0,
+      "z": 325.3135,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 81.378296,
+      "y": 0,
+      "z": 325.40982,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 82.05844,
+      "y": 0,
+      "z": 324.96527,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 83.29803,
+      "y": 0,
+      "z": 325.20984,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 83.99221,
+      "y": 0,
+      "z": 325.93668,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 85.00685,
+      "y": 0,
+      "z": 326.19775,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 86.092476,
+      "y": 0,
+      "z": 325.8975,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 86.82931,
+      "y": 0,
+      "z": 325.1821,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 87.92551,
+      "y": 0,
+      "z": 325.1038,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 89.186356,
+      "y": 0,
+      "z": 325.20105,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 90.34279,
+      "y": 0,
+      "z": 325.4466,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 91.45459,
+      "y": 0,
+      "z": 325.5036,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 92.83567,
+      "y": 0,
+      "z": 325.4218,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 93.82778,
+      "y": 0,
+      "z": 325.2537,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 94.92333,
+      "y": 0,
+      "z": 325.22446,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 95.87442,
+      "y": 0,
+      "z": 325.5256,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 96.71205,
+      "y": 0,
+      "z": 325.74368,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 98.15998,
+      "y": 0,
+      "z": 325.3593,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 98.72127,
+      "y": 0,
+      "z": 324.86444,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 99.53619,
+      "y": 0,
+      "z": 324.52133,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 100.746704,
+      "y": 0,
+      "z": 324.5867,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 101.70128,
+      "y": 0,
+      "z": 324.8018,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 102.64145,
+      "y": 0,
+      "z": 325.01294,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 103.913246,
+      "y": 0,
+      "z": 325.11957,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 105.03512,
+      "y": 0,
+      "z": 324.77353,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 106.238266,
+      "y": 0,
+      "z": 324.7457,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 107.7157,
+      "y": 0,
+      "z": 324.83984,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 108.426186,
+      "y": 0,
+      "z": 325.5352,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 108.9205,
+      "y": 0,
+      "z": 326.3687,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 109.83858,
+      "y": 0,
+      "z": 326.61044,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 110.675,
+      "y": 0,
+      "z": 326.4755,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 111.213715,
+      "y": 0,
+      "z": 326.82626,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 111.6883,
+      "y": 0,
+      "z": 328.08737,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 111.41288,
+      "y": 0,
+      "z": 329.5428,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 111.132835,
+      "y": 0,
+      "z": 330.5902,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 110.97695,
+      "y": 0,
+      "z": 332.1104,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 111.93958,
+      "y": 0,
+      "z": 332.94882,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 112.823715,
+      "y": 0,
+      "z": 333.71228,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 113.432625,
+      "y": 0,
+      "z": 334.83862,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 112.78756,
+      "y": 0,
+      "z": 336.13733,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 112.195724,
+      "y": 0,
+      "z": 337.49118,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 111.62971,
+      "y": 0,
+      "z": 338.72116,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 111.43115,
+      "y": 0,
+      "z": 340.22427,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 111.92148,
+      "y": 0,
+      "z": 341.9686,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 112.61398,
+      "y": 0,
+      "z": 342.60965,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 113.35102,
+      "y": 0,
+      "z": 343.39032,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 114.02569,
+      "y": 0,
+      "z": 344.4422,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 114.242035,
+      "y": 0,
+      "z": 345.28647,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 114.14601,
+      "y": 0,
+      "z": 346.4911,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 113.42282,
+      "y": 0,
+      "z": 347.5931,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 112.54466,
+      "y": -0.0008184612,
+      "z": 348,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 111.573074,
+      "y": 0,
+      "z": 348.99936,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 111.32787,
+      "y": 0,
+      "z": 350.06662,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 111.40286,
+      "y": 0,
+      "z": 351.2767,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 111.28548,
+      "y": 0.0063120723,
+      "z": 353,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 111.81904,
+      "y": 0,
+      "z": 353.90674,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 112.58717,
+      "y": 0,
+      "z": 354.8757,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 113.4765,
+      "y": 0,
+      "z": 356.0939,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 114.00867,
+      "y": 0,
+      "z": 357.43808,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 114.42968,
+      "y": 0,
+      "z": 358.28317,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 114.35199,
+      "y": 0,
+      "z": 359.67627,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 113.985825,
+      "y": 0,
+      "z": 360.3718,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 113.47416,
+      "y": 0,
+      "z": 361.36444,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 113.08595,
+      "y": 0,
+      "z": 362.49295,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 112.98181,
+      "y": 0,
+      "z": 363.7698,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 113.03563,
+      "y": 0,
+      "z": 365.31912,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 113.17672,
+      "y": 0,
+      "z": 365.57278,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 113.1162,
+      "y": 0,
+      "z": 366.4273,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 112.24497,
+      "y": 0,
+      "z": 367.13077,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 111.52532,
+      "y": 0,
+      "z": 367.77502,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 110.52514,
+      "y": 0,
+      "z": 368.31946,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 111.44957,
+      "y": 0,
+      "z": 370.13007,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 111.987595,
+      "y": 0,
+      "z": 370.89917,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 112.5793,
+      "y": 0,
+      "z": 372.2214,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 108,
+      "y": 1.7556465,
+      "z": 369.40637,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 108,
+      "y": 1.7309666,
+      "z": 366.44302,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 108,
+      "y": 1.7759545,
+      "z": 362.46817,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 108,
+      "y": 1.8476508,
+      "z": 358.51068,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 108,
+      "y": 1.8098872,
+      "z": 354.5286,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 108,
+      "y": 1.7728164,
+      "z": 350.4722,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 108,
+      "y": 1.7633286,
+      "z": 346.3812,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 108,
+      "y": 1.817615,
+      "z": 342.50168,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 108,
+      "y": 1.7741761,
+      "z": 338.47037,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 108,
+      "y": 1.8368211,
+      "z": 334.42026,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 108.1,
+      "y": 1.8113039,
+      "z": 329.43143,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 107.28473,
+      "y": 1.7349834,
+      "z": 329,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 100.36278,
+      "y": 1.7914464,
+      "z": 329,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 93.220856,
+      "y": 1.78858,
+      "z": 329,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 85.15655,
+      "y": 1.8663621,
+      "z": 329,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 78.02286,
+      "y": 1.864311,
+      "z": 329,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 69.787254,
+      "y": 1.827553,
+      "z": 329,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 68.9,
+      "y": 1.8246446,
+      "z": 329.513,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 69,
+      "y": 1.8380396,
+      "z": 334.45276,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 69,
+      "y": 1.8901033,
+      "z": 339.4688,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 69,
+      "y": 1.9676788,
+      "z": 344.47922,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 68.9,
+      "y": 2.0106478,
+      "z": 349.5779,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 70.12751,
+      "y": 2.0099158,
+      "z": 350,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 74.30175,
+      "y": 1.937716,
+      "z": 350,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 79.11598,
+      "y": 1.9125965,
+      "z": 350,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 80.1,
+      "y": 1.9298167,
+      "z": 349.45343,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 80,
+      "y": 1.8705478,
+      "z": 345.38525,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 80,
+      "y": 1.8933916,
+      "z": 341.55655,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 83.801605,
+      "y": 1.8646662,
+      "z": 341,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 87.80487,
+      "y": 1.8781002,
+      "z": 341,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 91.96235,
+      "y": 1.8208606,
+      "z": 341,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 95.97424,
+      "y": 1.806539,
+      "z": 341,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 97,
+      "y": 1.6456487,
+      "z": 344.57043,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 97,
+      "y": 1.5771344,
+      "z": 347.45108,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 97,
+      "y": 1.5771105,
+      "z": 351.3725,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 97,
+      "y": 1.5721543,
+      "z": 354.34805,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 96.06994,
+      "y": 1.736402,
+      "z": 357,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 93.17629,
+      "y": 1.5775661,
+      "z": 357,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 89.87093,
+      "y": 1.5481868,
+      "z": 357,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 85.85407,
+      "y": 1.5402732,
+      "z": 357,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 83.06493,
+      "y": 1.5598722,
+      "z": 357,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 80.1694,
+      "y": 1.5965784,
+      "z": 357,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 75.83926,
+      "y": 1.6009595,
+      "z": 357,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 72.35164,
+      "y": 1.6012228,
+      "z": 357,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 68.27555,
+      "y": 1.6586685,
+      "z": 357,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 63.65586,
+      "y": 1.6742284,
+      "z": 357,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 58.90143,
+      "y": 1.6418302,
+      "z": 357,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 58.15,
+      "y": 1.6380768,
+      "z": 351.98157,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 58,
+      "y": 1.475256,
+      "z": 347.2748,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 58.15,
+      "y": 1.7424843,
+      "z": 343.9283,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 58,
+      "y": 1.6480122,
+      "z": 339.4898,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 58.15,
+      "y": 1.6332982,
+      "z": 335.14676,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 58,
+      "y": 1.6058974,
+      "z": 329.6926,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 58,
+      "y": 1.7484837,
+      "z": 323.48074,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 62.056675,
+      "y": 1.6937416,
+      "z": 322,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 67.03408,
+      "y": 1.6160088,
+      "z": 322,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 71.69097,
+      "y": 1.6003284,
+      "z": 322,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 77.000595,
+      "y": 1.5989282,
+      "z": 322,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 81.93955,
+      "y": 1.6130497,
+      "z": 322,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 86.015526,
+      "y": 1.6258874,
+      "z": 322,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 90.39058,
+      "y": 1.6813092,
+      "z": 322,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 95.77013,
+      "y": 1.6767001,
+      "z": 322,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 101.85994,
+      "y": 1.6501226,
+      "z": 322,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 108.07056,
+      "y": 1.5830941,
+      "z": 322,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 113.414375,
+      "y": 1.6089633,
+      "z": 322,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 118.85,
+      "y": 1.6208439,
+      "z": 322.85312,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 119,
+      "y": 1.5491226,
+      "z": 327.42917,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 119,
+      "y": 1.5863523,
+      "z": 332.241,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 119,
+      "y": 1.5645912,
+      "z": 337.2771,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 119,
+      "y": 1.6342819,
+      "z": 342.35226,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 119,
+      "y": 1.7000241,
+      "z": 347.40543,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 119,
+      "y": 1.7434359,
+      "z": 352.3604,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 119,
+      "y": 1.8053718,
+      "z": 357.36804,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 119,
+      "y": 1.8676674,
+      "z": 363.23172,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 119,
+      "y": 1.7700784,
+      "z": 369.71793,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 60.8395,
+      "y": 0,
+      "z": 353.72702,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 60.896378,
+      "y": 0,
+      "z": 353.77347,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 61.00769,
+      "y": 0,
+      "z": 353.96707,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 61.095554,
+      "y": 0,
+      "z": 354.08423,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 61.47098,
+      "y": 0,
+      "z": 353.99002,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 60.52832,
+      "y": 0,
+      "z": 353.10025,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 60.220196,
+      "y": 0,
+      "z": 353.93057,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 60.53028,
+      "y": 0,
+      "z": 353.6305,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 60.664814,
+      "y": 0,
+      "z": 353.4624,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 60.88843,
+      "y": 0,
+      "z": 353.34164,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 61.39496,
+      "y": 0,
+      "z": 353.96793,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 60.988174,
+      "y": 0,
+      "z": 354.0101,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 60.45448,
+      "y": 0,
+      "z": 353.759,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 59.90197,
+      "y": 0,
+      "z": 354.1995,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 60.287125,
+      "y": 0,
+      "z": 353.9549,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 59.844025,
+      "y": 0,
+      "z": 355.0879,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 59.634785,
+      "y": 0,
+      "z": 354.22794,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 59.644623,
+      "y": 0,
+      "z": 354.2632,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 60.018997,
+      "y": 0,
+      "z": 354.95218,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 60.13774,
+      "y": 0,
+      "z": 354.83066,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 59.6322,
+      "y": 0,
+      "z": 354.2933,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 59.33471,
+      "y": 0,
+      "z": 354.86237,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 60.273376,
+      "y": 0,
+      "z": 354.60977,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 60.835854,
+      "y": 0,
+      "z": 354.81714,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 61.463737,
+      "y": 0,
+      "z": 354.63947,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 61.54456,
+      "y": 0,
+      "z": 354.3515,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 60.889362,
+      "y": 0,
+      "z": 354.6739,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 61.047947,
+      "y": 0,
+      "z": 355.49377,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 60.36977,
+      "y": 0,
+      "z": 354.85364,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 60.275074,
+      "y": 0,
+      "z": 355.3213,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 61.34001,
+      "y": 0,
+      "z": 355.06317,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 61.460556,
+      "y": 0,
+      "z": 354.08426,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 61.11065,
+      "y": 0,
+      "z": 354.3898,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 61.287815,
+      "y": 0,
+      "z": 355.3624,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 60.862534,
+      "y": 0,
+      "z": 355.4605,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 60.710564,
+      "y": 0,
+      "z": 355.08,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 61.518288,
+      "y": 0,
+      "z": 355.1189,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 61.408825,
+      "y": 0,
+      "z": 354.73642,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 61.619545,
+      "y": 0,
+      "z": 354.345,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 60.75711,
+      "y": 0,
+      "z": 353.52475,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 60.118176,
+      "y": 0,
+      "z": 353.74838,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 60.008842,
+      "y": 0,
+      "z": 354.1521,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 59.899544,
+      "y": 0,
+      "z": 353.51776,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 60.78998,
+      "y": 0,
+      "z": 353.74503,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 60.549046,
+      "y": 0,
+      "z": 353.61877,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 59.949375,
+      "y": 0,
+      "z": 353.71292,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 59.354496,
+      "y": 0,
+      "z": 354.28964,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 60.260967,
+      "y": 0,
+      "z": 354.23294,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 60.310898,
+      "y": 0,
+      "z": 355.02087,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 59.843548,
+      "y": 0,
+      "z": 354.21948,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 59.913265,
+      "y": 0,
+      "z": 354.93304,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 59.80628,
+      "y": 0,
+      "z": 354.8802,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 59.55723,
+      "y": 0,
+      "z": 353.66086,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 59.843098,
+      "y": 0,
+      "z": 353.20334,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 60.594307,
+      "y": 0,
+      "z": 353.50275,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 60.540737,
+      "y": 0,
+      "z": 353.43744,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 60.559734,
+      "y": 0,
+      "z": 353.68338,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 61.272938,
+      "y": 0,
+      "z": 353.80154,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 59.95376,
+      "y": 0,
+      "z": 353.01846,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 60.27007,
+      "y": 0,
+      "z": 352.94238,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 59.682648,
+      "y": 0,
+      "z": 353.08575,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 59.00015,
+      "y": 0,
+      "z": 353.24692,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 58.94076,
+      "y": 0,
+      "z": 353.66278,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 58.58636,
+      "y": 0,
+      "z": 354.58667,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 58.54107,
+      "y": 0,
+      "z": 355.3415,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 58.58103,
+      "y": 0,
+      "z": 355.98218,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 59.26667,
+      "y": 0,
+      "z": 355.78824,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 59.36613,
+      "y": 0,
+      "z": 355.96555,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 59.181934,
+      "y": 0,
+      "z": 355.127,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 59.16877,
+      "y": 0,
+      "z": 354.79892,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 58.721386,
+      "y": 0,
+      "z": 355.79938,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 58.956615,
+      "y": 0,
+      "z": 356.05515,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 58.838383,
+      "y": 0,
+      "z": 356.95303,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 60.0487,
+      "y": 0,
+      "z": 356.56128,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 61.07465,
+      "y": 0,
+      "z": 356.54388,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 62.159378,
+      "y": 0,
+      "z": 356.46573,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 61.887825,
+      "y": 0,
+      "z": 356.23926,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 61.78878,
+      "y": 0,
+      "z": 355.3008,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 61.52615,
+      "y": 0,
+      "z": 355.5379,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 61.373383,
+      "y": 0,
+      "z": 356.1169,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 60.485203,
+      "y": 0.016614914,
+      "z": 357,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 59.85127,
+      "y": 0,
+      "z": 356.8325,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 59.322845,
+      "y": 0,
+      "z": 356.76532,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 58.749443,
+      "y": 0,
+      "z": 356.40982,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 58.370045,
+      "y": 0,
+      "z": 356.21814,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 58.33587,
+      "y": 0,
+      "z": 356.8678,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 59.35057,
+      "y": 0,
+      "z": 355.99658,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 60.298813,
+      "y": 0,
+      "z": 356.13843,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 61.17527,
+      "y": 0,
+      "z": 356.06516,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 61.130127,
+      "y": 0,
+      "z": 355.71927,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 60.656967,
+      "y": 0,
+      "z": 356.0162,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 60.027958,
+      "y": 0,
+      "z": 355.51395,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 59.544846,
+      "y": 0,
+      "z": 355.544,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 60.183804,
+      "y": 0,
+      "z": 355.78253,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 60.416946,
+      "y": 0,
+      "z": 356.0077,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 59.634033,
+      "y": 0,
+      "z": 356.9105,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 61.161655,
+      "y": 0,
+      "z": 356.6906,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 61.55506,
+      "y": 0,
+      "z": 356.0782,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 61.368748,
+      "y": 0,
+      "z": 355.0147,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 60.5364,
+      "y": 0,
+      "z": 354.83923,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 60.338284,
+      "y": 0,
+      "z": 353.1561,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 59.5761,
+      "y": 0,
+      "z": 353.01926,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 58.323982,
+      "y": 0,
+      "z": 354.16553,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 58.44093,
+      "y": 0,
+      "z": 354.24072,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 59.10858,
+      "y": 0,
+      "z": 353.89493,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 59.298912,
+      "y": 0,
+      "z": 353.221,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "treasure_chest",
+      "x": 61.128895,
+      "y": 0,
+      "z": 355.16364,
+      "rotationY": 2.356195,
+      "scale": 1
+    },
+    {
+      "type": "treasure_chest",
+      "x": 59.827263,
+      "y": 0,
+      "z": 353.923,
+      "rotationY": 2.3561945,
+      "scale": 1
+    },
+    {
+      "type": "crystal",
+      "x": 59.39632,
+      "y": 0,
+      "z": 355.66074,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "crystal",
+      "x": 64.766136,
+      "y": 0,
+      "z": 345.3293,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 8.145906,
+      "y": 0,
+      "z": 325.83936,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 23.59825,
+      "y": 0,
+      "z": 330.22714,
+      "rotationY": -3.1415925,
+      "scale": 1
+    }
+  ],
+  "npcs": [
+    {
+      "type": "bopca",
+      "x": 23.552063,
+      "z": 314.20554,
+      "rotationY": 0
+    },
+    {
+      "type": "mordecai",
+      "x": 10.075897,
+      "z": 319.9689,
+      "rotationY": 1.5707964
+    },
+    {
+      "type": "crawler_chad",
+      "x": 36.279476,
+      "z": 319.67563,
+      "rotationY": 0
+    },
+    {
+      "type": "crawler_shade",
+      "x": 38.008488,
+      "z": 325.6734,
+      "rotationY": -1.5707964
+    },
+    {
+      "type": "crawler_hank",
+      "x": 37.231194,
+      "z": 312.47256,
+      "rotationY": 0
+    },
+    {
+      "type": "crawler_lily",
+      "x": 38.104073,
+      "z": 314.3503,
+      "rotationY": -1.5707964
+    },
+    {
+      "type": "crawler_rex",
+      "x": 28,
+      "z": 311,
+      "rotationY": 0
+    },
+    {
+      "type": "steve",
+      "x": 13,
+      "z": 322,
+      "rotationY": 0
     }
   ],
   "useProceduralProps": false

@@ -4,10 +4,10 @@ using System.Collections.Generic;
 namespace SafeRoom3D.Abilities.Effects;
 
 /// <summary>
-/// Chain Lightning ability - Lightning that bounces between enemies.
+/// Chain Lightning spell - Lightning that bounces between enemies.
 /// Targeted spell that chains to 3 enemies with diminishing damage.
 /// </summary>
-public partial class ChainLightning3D : Ability3D, ITargetedAbility
+public partial class ChainLightning3D : Spell3D, ITargetedAbility
 {
     public override string AbilityId => "chain_lightning";
     public override string AbilityName => "Chain Lightning";
@@ -16,6 +16,7 @@ public partial class ChainLightning3D : Ability3D, ITargetedAbility
 
     public override float DefaultCooldown => 8f;
     public override int DefaultManaCost => 35;
+    public override int RequiredLevel => 2;
 
     // Chain lightning stats
     public float BaseDamage { get; private set; } = 50f;

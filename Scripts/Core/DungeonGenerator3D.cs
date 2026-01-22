@@ -33,6 +33,8 @@ public partial class DungeonGenerator3D : Node3D
     private Node3D? _propContainer;
     private Node3D? _lightContainer;
     private Node3D? _enemyContainer;
+    private DungeonDecals? _decalSystem;
+    private Node3D? _structuralContainer; // Ceiling beams, buttresses, etc.
     private OccluderInstance3D? _occluderInstance;
     private List<Vector3> _occluderVertices = new();
     private List<int> _occluderIndices = new();
@@ -47,8 +49,11 @@ public partial class DungeonGenerator3D : Node3D
 
     // Materials
     private StandardMaterial3D? _floorMaterial;
+    private ShaderMaterial? _floorShaderMaterial; // Triplanar shader for floors
     private StandardMaterial3D? _wallMaterial;
+    private ShaderMaterial? _wallShaderMaterial; // Triplanar shader for walls (no stretching)
     private StandardMaterial3D? _ceilingMaterial;
+    private ShaderMaterial? _ceilingShaderMaterial; // Triplanar shader for ceilings
     private StandardMaterial3D? _trimMaterial; // Baseboard/crown molding
 
     // Configuration - made larger for better gameplay
@@ -123,6 +128,15 @@ public partial class DungeonGenerator3D : Node3D
         AddChild(_propContainer);
         AddChild(_lightContainer);
         AddChild(_enemyContainer);
+
+        // Create structural props container (ceiling beams, buttresses)
+        _structuralContainer = new Node3D { Name = "StructuralProps" };
+        AddChild(_structuralContainer);
+
+        // Create decal system
+        _decalSystem = new DungeonDecals();
+        _decalSystem.Name = "Decals";
+        AddChild(_decalSystem);
     }
 
     private void CreateMaterials()
@@ -137,7 +151,7 @@ public partial class DungeonGenerator3D : Node3D
         _floorMaterial.Uv1Scale = new Vector3(0.25f, 0.25f, 1f); // Tile the texture
         _floorMaterial.NormalEnabled = true;
         _floorMaterial.NormalTexture = CreateStoneFloorNormalMap();
-        _floorMaterial.NormalScale = 1.8f; // Moderate depth - visible but not overdone
+        _floorMaterial.NormalScale = 2.5f; // Enhanced depth for visible stone texture
 
         // Walls: ancient brick/stone blocks - darker with moss undertones
         _wallMaterial = new StandardMaterial3D();
@@ -161,7 +175,7 @@ public partial class DungeonGenerator3D : Node3D
         _ceilingMaterial.Uv1Scale = new Vector3(0.25f, 0.25f, 1f);
         _ceilingMaterial.NormalEnabled = true;
         _ceilingMaterial.NormalTexture = CreateCeilingNormalMap();
-        _ceilingMaterial.NormalScale = 1.5f; // Subtle cave-like texture
+        _ceilingMaterial.NormalScale = 2.2f; // Enhanced cave-like bumpy texture
 
         // Trim/molding: darker accent for transitions between surfaces
         _trimMaterial = new StandardMaterial3D();
@@ -169,6 +183,115 @@ public partial class DungeonGenerator3D : Node3D
         _trimMaterial.Roughness = 0.75f; // Slightly smoother than walls
         _trimMaterial.Metallic = 0f;
         _trimMaterial.CullMode = BaseMaterial3D.CullModeEnum.Disabled;
+
+        // Create triplanar shader materials (eliminates texture stretching)
+        CreateWallShaderMaterial();
+        CreateFloorShaderMaterial();
+        CreateCeilingShaderMaterial();
+    }
+
+    private void CreateWallShaderMaterial()
+    {
+        var shader = GD.Load<Shader>("res://Assets/Shaders/triplanar.gdshader");
+        if (shader == null)
+        {
+            GD.PrintErr("[DungeonGenerator3D] Failed to load triplanar shader, falling back to standard material");
+            return;
+        }
+
+        _wallShaderMaterial = new ShaderMaterial();
+        _wallShaderMaterial.Shader = shader;
+
+        // Set shader parameters using existing procedural textures
+        var albedoTexture = CreateBrickWallTexture();
+        var normalTexture = CreateBrickWallNormalMap();
+
+        _wallShaderMaterial.SetShaderParameter("albedo_texture", albedoTexture);
+        _wallShaderMaterial.SetShaderParameter("normal_texture", normalTexture);
+        _wallShaderMaterial.SetShaderParameter("albedo_color", new Color(0.38f, 0.33f, 0.28f, 1.0f));
+        _wallShaderMaterial.SetShaderParameter("roughness", 0.88f);
+        _wallShaderMaterial.SetShaderParameter("metallic", 0.0f);
+        _wallShaderMaterial.SetShaderParameter("normal_strength", 2.0f);
+        _wallShaderMaterial.SetShaderParameter("texture_scale", 0.5f); // Matches UV scale
+        _wallShaderMaterial.SetShaderParameter("blend_sharpness", 4.0f);
+
+        // Optional moss weathering on lower walls
+        _wallShaderMaterial.SetShaderParameter("moss_amount", 0.15f);
+        _wallShaderMaterial.SetShaderParameter("moss_height_start", 0.0f);
+        _wallShaderMaterial.SetShaderParameter("moss_height_fade", 2.5f);
+        _wallShaderMaterial.SetShaderParameter("moss_color", new Vector3(0.15f, 0.25f, 0.12f));
+
+        GD.Print("[DungeonGenerator3D] Created triplanar wall shader material");
+    }
+
+    private void CreateFloorShaderMaterial()
+    {
+        var shader = GD.Load<Shader>("res://Assets/Shaders/triplanar_floor.gdshader");
+        if (shader == null)
+        {
+            GD.PrintErr("[DungeonGenerator3D] Failed to load floor shader, falling back to standard material");
+            return;
+        }
+
+        _floorShaderMaterial = new ShaderMaterial();
+        _floorShaderMaterial.Shader = shader;
+
+        var albedoTexture = CreateStoneFloorTexture();
+        var normalTexture = CreateStoneFloorNormalMap();
+
+        _floorShaderMaterial.SetShaderParameter("albedo_texture", albedoTexture);
+        _floorShaderMaterial.SetShaderParameter("normal_texture", normalTexture);
+        _floorShaderMaterial.SetShaderParameter("albedo_color", new Color(0.35f, 0.30f, 0.25f, 1.0f));
+        _floorShaderMaterial.SetShaderParameter("roughness", 0.92f);
+        _floorShaderMaterial.SetShaderParameter("metallic", 0.0f);
+        _floorShaderMaterial.SetShaderParameter("normal_strength", 2.5f);
+        _floorShaderMaterial.SetShaderParameter("texture_scale", 0.25f);
+        _floorShaderMaterial.SetShaderParameter("blend_sharpness", 4.0f);
+
+        // Add subtle dust/dirt accumulation
+        _floorShaderMaterial.SetShaderParameter("dust_amount", 0.15f);
+        _floorShaderMaterial.SetShaderParameter("dust_color", new Vector3(0.4f, 0.35f, 0.28f));
+
+        // Occasional wet patches
+        _floorShaderMaterial.SetShaderParameter("wet_amount", 0.08f);
+        _floorShaderMaterial.SetShaderParameter("wet_color", new Vector3(0.15f, 0.12f, 0.10f));
+        _floorShaderMaterial.SetShaderParameter("wet_roughness", 0.3f);
+
+        GD.Print("[DungeonGenerator3D] Created triplanar floor shader material");
+    }
+
+    private void CreateCeilingShaderMaterial()
+    {
+        var shader = GD.Load<Shader>("res://Assets/Shaders/triplanar_floor.gdshader");
+        if (shader == null)
+        {
+            GD.PrintErr("[DungeonGenerator3D] Failed to load ceiling shader, falling back to standard material");
+            return;
+        }
+
+        _ceilingShaderMaterial = new ShaderMaterial();
+        _ceilingShaderMaterial.Shader = shader;
+
+        var albedoTexture = CreateStoneCeilingTexture();
+        var normalTexture = CreateCeilingNormalMap();
+
+        _ceilingShaderMaterial.SetShaderParameter("albedo_texture", albedoTexture);
+        _ceilingShaderMaterial.SetShaderParameter("normal_texture", normalTexture);
+        _ceilingShaderMaterial.SetShaderParameter("albedo_color", new Color(0.25f, 0.22f, 0.18f, 1.0f));
+        _ceilingShaderMaterial.SetShaderParameter("roughness", 0.95f);
+        _ceilingShaderMaterial.SetShaderParameter("metallic", 0.0f);
+        _ceilingShaderMaterial.SetShaderParameter("normal_strength", 2.2f);
+        _ceilingShaderMaterial.SetShaderParameter("texture_scale", 0.25f);
+        _ceilingShaderMaterial.SetShaderParameter("blend_sharpness", 4.0f);
+
+        // Ceilings are dusty and dark
+        _ceilingShaderMaterial.SetShaderParameter("dust_amount", 0.25f);
+        _ceilingShaderMaterial.SetShaderParameter("dust_color", new Vector3(0.2f, 0.18f, 0.15f));
+
+        // No wet patches on ceiling
+        _ceilingShaderMaterial.SetShaderParameter("wet_amount", 0.0f);
+
+        GD.Print("[DungeonGenerator3D] Created triplanar ceiling shader material");
     }
 
     private ImageTexture CreateStoneFloorTexture()
@@ -826,6 +949,9 @@ public partial class DungeonGenerator3D : Node3D
         // Add ambient lighting
         AddAmbientLighting();
 
+        // Add environmental details (decals, structural props, lava rooms)
+        AddEnvironmentalDetails();
+
         GD.Print($"[DungeonGenerator3D] Generated {Rooms.Count} rooms");
         EmitSignal(SignalName.GenerationComplete);
     }
@@ -882,6 +1008,9 @@ public partial class DungeonGenerator3D : Node3D
         // Spawn monster groups in corners (but not too close to center spawn)
         SpawnTestRoomMonsters(size);
 
+        // Add environmental details (decals, structural props)
+        AddEnvironmentalDetails();
+
         GD.Print($"[DungeonGenerator3D] Test room generated: {size}x{size} with 4 side rooms");
         EmitSignal(SignalName.GenerationComplete);
     }
@@ -895,7 +1024,7 @@ public partial class DungeonGenerator3D : Node3D
         // Use subdivided mesh with height variation instead of flat plane
         // 2 subdivisions per unit gives good detail without too many triangles
         floor.Mesh = CreateUnevenFloorMesh(floorSize, floorSize, 2);
-        floor.MaterialOverride = _floorMaterial;
+        floor.MaterialOverride = GetFloorMaterial();
         floor.Position = new Vector3(size * TileSize / 2, 0, size * TileSize / 2);
         _floorContainer?.AddChild(floor);
 
@@ -922,7 +1051,7 @@ public partial class DungeonGenerator3D : Node3D
         var planeMesh = new PlaneMesh();
         planeMesh.Size = new Vector2(size * TileSize, size * TileSize);
         ceiling.Mesh = planeMesh;
-        ceiling.MaterialOverride = _ceilingMaterial;
+        ceiling.MaterialOverride = GetCeilingMaterial();
         ceiling.Position = new Vector3(size * TileSize / 2, WallHeight, size * TileSize / 2);
         ceiling.RotationDegrees = new Vector3(180, 0, 0); // Flip to face downward
         _floorContainer?.AddChild(ceiling);
@@ -1033,7 +1162,7 @@ public partial class DungeonGenerator3D : Node3D
 
         // Use uneven floor mesh for terrain feel
         hallwayFloor.Mesh = CreateUnevenFloorMesh(floorX, floorZ, 2);
-        hallwayFloor.MaterialOverride = _floorMaterial;
+        hallwayFloor.MaterialOverride = GetFloorMaterial();
         hallwayFloor.Position = hallwayCenter;
         _floorContainer?.AddChild(hallwayFloor);
 
@@ -1072,7 +1201,7 @@ public partial class DungeonGenerator3D : Node3D
         var roomFloor = new MeshInstance3D();
         // Use uneven floor mesh for terrain feel
         roomFloor.Mesh = CreateUnevenFloorMesh(extendedRoomSize, extendedRoomSize, 2);
-        roomFloor.MaterialOverride = _floorMaterial;
+        roomFloor.MaterialOverride = GetFloorMaterial();
         roomFloor.Position = roomCenter;
         _floorContainer?.AddChild(roomFloor);
 
@@ -1169,7 +1298,7 @@ public partial class DungeonGenerator3D : Node3D
         float floorX = hallwaySize.X + 6f;
         float floorZ = hallwaySize.Z + 2f;
         hallwayFloor.Mesh = CreateUnevenFloorMesh(floorX, floorZ, 2);
-        hallwayFloor.MaterialOverride = _floorMaterial;
+        hallwayFloor.MaterialOverride = GetFloorMaterial();
         hallwayFloor.Position = hallwayCenter;
         _floorContainer?.AddChild(hallwayFloor);
 
@@ -1196,7 +1325,7 @@ public partial class DungeonGenerator3D : Node3D
         float extendedRoomSize = roomSize + 4f;
         var roomFloor = new MeshInstance3D();
         roomFloor.Mesh = CreateUnevenFloorMesh(extendedRoomSize, extendedRoomSize, 2);
-        roomFloor.MaterialOverride = _floorMaterial;
+        roomFloor.MaterialOverride = GetFloorMaterial();
         roomFloor.Position = roomCenter;
         _floorContainer?.AddChild(roomFloor);
 
@@ -1395,7 +1524,7 @@ public partial class DungeonGenerator3D : Node3D
         // Build hallway floor
         var hallwayFloor = new MeshInstance3D();
         hallwayFloor.Mesh = CreateUnevenFloorMesh(hallwayLength + 4f, hallwayWidth + 2f, 2);
-        hallwayFloor.MaterialOverride = _floorMaterial;
+        hallwayFloor.MaterialOverride = GetFloorMaterial();
         hallwayFloor.Position = hallwayCenter;
         _floorContainer?.AddChild(hallwayFloor);
 
@@ -1421,7 +1550,7 @@ public partial class DungeonGenerator3D : Node3D
         float extendedSize = badlamaRoomSize + 4f;
         var roomFloor = new MeshInstance3D();
         roomFloor.Mesh = CreateUnevenFloorMesh(extendedSize, extendedSize, 2);
-        roomFloor.MaterialOverride = _floorMaterial;
+        roomFloor.MaterialOverride = GetFloorMaterial();
         roomFloor.Position = badlamaRoomCenter;
         _floorContainer?.AddChild(roomFloor);
 
@@ -1497,13 +1626,28 @@ public partial class DungeonGenerator3D : Node3D
         GD.Print($"[DungeonGenerator3D] Created Badlama area with {badlamaCount} Badlamas behind dragon gate");
     }
 
+    /// <summary>
+    /// Gets the best available wall material (triplanar shader if loaded, fallback to standard).
+    /// </summary>
+    private Material GetWallMaterial() => (Material?)_wallShaderMaterial ?? _wallMaterial!;
+
+    /// <summary>
+    /// Gets the best available floor material (triplanar shader if loaded, fallback to standard).
+    /// </summary>
+    private Material GetFloorMaterial() => (Material?)_floorShaderMaterial ?? _floorMaterial!;
+
+    /// <summary>
+    /// Gets the best available ceiling material (triplanar shader if loaded, fallback to standard).
+    /// </summary>
+    private Material GetCeilingMaterial() => (Material?)_ceilingShaderMaterial ?? _ceilingMaterial!;
+
     private void CreateTestWall(Vector3 position, Vector3 size)
     {
         var wall = new MeshInstance3D();
         var boxMesh = new BoxMesh();
         boxMesh.Size = size;
         wall.Mesh = boxMesh;
-        wall.MaterialOverride = _wallMaterial;
+        wall.MaterialOverride = GetWallMaterial();
         wall.Position = position;
         _wallContainer?.AddChild(wall);
 
@@ -1770,6 +1914,9 @@ public partial class DungeonGenerator3D : Node3D
         // Add atmospheric effects
         AddLargeDungeonAtmosphere();
 
+        // Add environmental details (decals, structural props, lava rooms)
+        AddEnvironmentalDetails();
+
         // Restore original dimensions
         DungeonWidth = origWidth;
         DungeonDepth = origDepth;
@@ -1957,7 +2104,7 @@ public partial class DungeonGenerator3D : Node3D
             var planeMesh = new PlaneMesh();
             planeMesh.Size = new Vector2(room.Size.X * TileSize, room.Size.Z * TileSize);
             ceiling.Mesh = planeMesh;
-            ceiling.MaterialOverride = _ceilingMaterial;
+            ceiling.MaterialOverride = GetCeilingMaterial();
 
             Vector3 center = new Vector3(
                 (room.Position.X + room.Size.X / 2f) * TileSize,
@@ -2903,7 +3050,7 @@ public partial class DungeonGenerator3D : Node3D
         var boxMesh = new BoxMesh();
         boxMesh.Size = new Vector3(0.25f, WallHeight, 0.25f);
         mesh.Mesh = boxMesh;
-        mesh.MaterialOverride = _wallMaterial;
+        mesh.MaterialOverride = GetWallMaterial();
         mesh.CastShadow = GeometryInstance3D.ShadowCastingSetting.On;
 
         // Position at corner
@@ -2934,7 +3081,7 @@ public partial class DungeonGenerator3D : Node3D
         var planeMesh = new PlaneMesh();
         planeMesh.Size = new Vector2(TileSize, TileSize);
         mesh.Mesh = planeMesh;
-        mesh.MaterialOverride = _floorMaterial;
+        mesh.MaterialOverride = GetFloorMaterial();
         mesh.Position = new Vector3(x * TileSize + TileSize / 2f, 0, z * TileSize + TileSize / 2f);
 
         // Add slight variation in height for worn stone look
@@ -2976,7 +3123,7 @@ public partial class DungeonGenerator3D : Node3D
 
         var mesh = new MeshInstance3D();
         mesh.Mesh = boxMesh;
-        mesh.MaterialOverride = _wallMaterial;
+        mesh.MaterialOverride = GetWallMaterial();
         mesh.CastShadow = GeometryInstance3D.ShadowCastingSetting.On;
 
         // Position wall at edge of tile - walls should block the tile boundary
@@ -3108,7 +3255,7 @@ public partial class DungeonGenerator3D : Node3D
         var planeMesh = new PlaneMesh();
         planeMesh.Size = new Vector2(DungeonWidth * TileSize, DungeonDepth * TileSize);
         mesh.Mesh = planeMesh;
-        mesh.MaterialOverride = _ceilingMaterial;
+        mesh.MaterialOverride = GetCeilingMaterial();
         mesh.Position = new Vector3(DungeonWidth * TileSize / 2f, WallHeight, DungeonDepth * TileSize / 2f);
         mesh.RotateX(Mathf.Pi); // Flip to face down
 
@@ -3348,6 +3495,256 @@ public partial class DungeonGenerator3D : Node3D
         fillLight.Rotation = new Vector3(Mathf.DegToRad(30), Mathf.DegToRad(-120), 0);
         fillLight.ShadowEnabled = false;
         _lightContainer?.AddChild(fillLight);
+    }
+
+    /// <summary>
+    /// Adds environmental details: decals, structural props, and special floor effects.
+    /// Called after main dungeon generation to add visual polish.
+    /// </summary>
+    private void AddEnvironmentalDetails()
+    {
+        if (_decalSystem == null || _structuralContainer == null) return;
+
+        GD.Print("[DungeonGenerator3D] Adding environmental details...");
+
+        // Track how many of each we add
+        int decalCount = 0;
+        int structuralCount = 0;
+        int lavaRoomCount = 0;
+
+        // Decal types for different areas
+        var floorDecalTypes = new[] {
+            DungeonDecals.DecalType.Crack,
+            DungeonDecals.DecalType.DirtPatch,
+            DungeonDecals.DecalType.WaterStain,
+            DungeonDecals.DecalType.BloodSplat
+        };
+        var wallDecalTypes = new[] {
+            DungeonDecals.DecalType.MossPatch,
+            DungeonDecals.DecalType.Crack,
+            DungeonDecals.DecalType.WaterStain
+        };
+
+        foreach (var room in Rooms)
+        {
+            Vector3 roomCenter = new Vector3(
+                (room.Position.X + room.Size.X / 2f) * TileSize,
+                0,
+                (room.Position.Z + room.Size.Z / 2f) * TileSize
+            );
+            float roomRadius = Mathf.Max(room.Size.X, room.Size.Z) * TileSize / 2f;
+
+            // Add floor decals (5-15 per room based on size)
+            int floorDecals = _rng.RandiRange(5, 15);
+            _decalSystem.PopulateArea(roomCenter, roomRadius * 0.8f, floorDecals, floorDecalTypes);
+            decalCount += floorDecals;
+
+            // Add ceiling beams (1-3 per large room)
+            if (room.Size.X >= 8 || room.Size.Z >= 8)
+            {
+                int numBeams = _rng.RandiRange(1, 3);
+                for (int i = 0; i < numBeams; i++)
+                {
+                    float beamX = roomCenter.X + _rng.RandfRange(-roomRadius * 0.5f, roomRadius * 0.5f);
+                    float beamZ = roomCenter.Z + _rng.RandfRange(-roomRadius * 0.5f, roomRadius * 0.5f);
+
+                    var beam = Cosmetic3D.Create("ceiling_beam",
+                        new Color(0.28f, 0.18f, 0.1f),
+                        new Color(0.35f, 0.24f, 0.14f),
+                        new Color(0.25f, 0.25f, 0.28f),
+                        _rng.Randf(), 1f, false);
+                    beam.Position = new Vector3(beamX, WallHeight - 0.3f, beamZ);
+                    beam.RotateY(_rng.RandfRange(0, Mathf.Tau)); // Random rotation
+                    _structuralContainer.AddChild(beam);
+                    structuralCount++;
+                }
+            }
+
+            // Add floor grates (0-2 per room, more common in "dungeon" type rooms)
+            int grateChance = room.Type == "crypt" || room.Type == "storage" ? 40 : 20;
+            if (_rng.RandiRange(0, 100) < grateChance)
+            {
+                int numGrates = _rng.RandiRange(1, 2);
+                for (int i = 0; i < numGrates; i++)
+                {
+                    float grateX = roomCenter.X + _rng.RandfRange(-roomRadius * 0.6f, roomRadius * 0.6f);
+                    float grateZ = roomCenter.Z + _rng.RandfRange(-roomRadius * 0.6f, roomRadius * 0.6f);
+
+                    string grateType = _rng.Randf() > 0.5f ? "floor_grate" : "drain_cover";
+                    var grate = Cosmetic3D.Create(grateType,
+                        new Color(0.25f, 0.25f, 0.28f),
+                        new Color(0.35f, 0.22f, 0.15f),
+                        new Color(0.2f, 0.2f, 0.22f),
+                        _rng.Randf(), _rng.RandfRange(0.8f, 1.2f), false);
+                    grate.Position = new Vector3(grateX, 0.01f, grateZ);
+                    _structuralContainer.AddChild(grate);
+                    structuralCount++;
+                }
+            }
+
+            // Add wall buttresses at room corners (larger rooms only)
+            if (room.Size.X >= 10 && room.Size.Z >= 10 && _rng.Randf() > 0.5f)
+            {
+                Vector3[] corners = {
+                    new Vector3(room.Position.X * TileSize + 0.5f, 0, room.Position.Z * TileSize + 0.5f),
+                    new Vector3((room.Position.X + room.Size.X) * TileSize - 0.5f, 0, room.Position.Z * TileSize + 0.5f),
+                    new Vector3(room.Position.X * TileSize + 0.5f, 0, (room.Position.Z + room.Size.Z) * TileSize - 0.5f),
+                    new Vector3((room.Position.X + room.Size.X) * TileSize - 0.5f, 0, (room.Position.Z + room.Size.Z) * TileSize - 0.5f)
+                };
+
+                foreach (var corner in corners)
+                {
+                    if (_rng.Randf() > 0.6f) continue; // Skip some corners
+
+                    var buttress = Cosmetic3D.Create("wall_buttress",
+                        new Color(0.35f, 0.30f, 0.25f),
+                        new Color(0.28f, 0.24f, 0.20f),
+                        new Color(0.2f, 0.18f, 0.15f),
+                        _rng.Randf(), 1f, true);
+                    buttress.Position = corner;
+                    _structuralContainer.AddChild(buttress);
+                    structuralCount++;
+                }
+            }
+
+            // Special: Create lava/crack room (rare, ~10% of non-spawn rooms)
+            if (room != _spawnRoom && _rng.Randf() < 0.10f && lavaRoomCount < 2)
+            {
+                CreateLavaRoomEffect(room);
+                lavaRoomCount++;
+            }
+        }
+
+        // Add wall sconces in corridors (sample some corridor positions)
+        AddCorridorSconces();
+
+        GD.Print($"[DungeonGenerator3D] Environmental details added: {decalCount} decals, {structuralCount} structural props, {lavaRoomCount} lava rooms");
+    }
+
+    /// <summary>
+    /// Creates an emissive lava crack effect on a room's floor.
+    /// </summary>
+    private void CreateLavaRoomEffect(Room room)
+    {
+        // Load the emissive cracks shader
+        var shader = GD.Load<Shader>("res://Assets/Shaders/emissive_cracks.gdshader");
+        if (shader == null) return;
+
+        // Create shader material
+        var lavaMaterial = new ShaderMaterial();
+        lavaMaterial.Shader = shader;
+
+        // Use existing floor textures
+        lavaMaterial.SetShaderParameter("albedo_texture", CreateStoneFloorTexture());
+        lavaMaterial.SetShaderParameter("normal_texture", CreateStoneFloorNormalMap());
+        lavaMaterial.SetShaderParameter("albedo_color", new Color(0.3f, 0.25f, 0.2f, 1f));
+        lavaMaterial.SetShaderParameter("roughness", 0.9f);
+        lavaMaterial.SetShaderParameter("normal_strength", 2.0f);
+        lavaMaterial.SetShaderParameter("texture_scale", 0.25f);
+
+        // Crack effect settings
+        lavaMaterial.SetShaderParameter("crack_color", new Vector3(1f, 0.4f, 0.1f));
+        lavaMaterial.SetShaderParameter("crack_core_color", new Vector3(1f, 0.9f, 0.5f));
+        lavaMaterial.SetShaderParameter("crack_intensity", 2.5f);
+        lavaMaterial.SetShaderParameter("crack_scale", 1.5f);
+        lavaMaterial.SetShaderParameter("crack_width", 0.12f);
+        lavaMaterial.SetShaderParameter("crack_density", 0.35f);
+        lavaMaterial.SetShaderParameter("animation_speed", 0.3f);
+
+        // Create floor overlay with crack effect
+        float roomWidth = room.Size.X * TileSize;
+        float roomDepth = room.Size.Z * TileSize;
+        Vector3 roomCenter = new Vector3(
+            (room.Position.X + room.Size.X / 2f) * TileSize,
+            0.02f, // Slightly above main floor
+            (room.Position.Z + room.Size.Z / 2f) * TileSize
+        );
+
+        var lavaFloor = new MeshInstance3D();
+        var planeMesh = new PlaneMesh();
+        planeMesh.Size = new Vector2(roomWidth * 0.9f, roomDepth * 0.9f);
+        lavaFloor.Mesh = planeMesh;
+        lavaFloor.MaterialOverride = lavaMaterial;
+        lavaFloor.Position = roomCenter;
+        lavaFloor.CastShadow = GeometryInstance3D.ShadowCastingSetting.Off;
+
+        _floorContainer?.AddChild(lavaFloor);
+
+        // Add ambient orange light for lava glow
+        var lavaLight = CreateOptimizedLight(
+            roomCenter + Vector3.Up * 0.5f,
+            new Color(1f, 0.5f, 0.2f),
+            1.5f,
+            Mathf.Max(roomWidth, roomDepth) * 0.6f,
+            false
+        );
+        _lightContainer?.AddChild(lavaLight);
+
+        GD.Print($"[DungeonGenerator3D] Created lava room at {room.Position}");
+    }
+
+    /// <summary>
+    /// Adds wall sconces with lights along corridors.
+    /// </summary>
+    private void AddCorridorSconces()
+    {
+        if (_mapData == null || _structuralContainer == null) return;
+
+        int sconcesAdded = 0;
+        int maxSconces = 20; // Limit for performance
+
+        // Sample corridor tiles and add sconces
+        for (int x = 2; x < DungeonWidth - 2 && sconcesAdded < maxSconces; x += 8)
+        {
+            for (int z = 2; z < DungeonDepth - 2 && sconcesAdded < maxSconces; z += 8)
+            {
+                // Check if this is a corridor tile (floor with wall nearby)
+                if (_mapData[x, 0, z] != 1) continue;
+
+                // Check for adjacent walls
+                bool wallLeft = x > 0 && _mapData[x - 1, 0, z] == 0;
+                bool wallRight = x < DungeonWidth - 1 && _mapData[x + 1, 0, z] == 0;
+                bool wallBack = z > 0 && _mapData[x, 0, z - 1] == 0;
+                bool wallFront = z < DungeonDepth - 1 && _mapData[x, 0, z + 1] == 0;
+
+                Vector3? sconcePos = null;
+                float sconceRotation = 0;
+
+                if (wallLeft && _rng.Randf() > 0.7f)
+                {
+                    sconcePos = new Vector3(x * TileSize - 0.1f, 0, z * TileSize + TileSize / 2f);
+                    sconceRotation = Mathf.Pi / 2f;
+                }
+                else if (wallRight && _rng.Randf() > 0.7f)
+                {
+                    sconcePos = new Vector3((x + 1) * TileSize + 0.1f, 0, z * TileSize + TileSize / 2f);
+                    sconceRotation = -Mathf.Pi / 2f;
+                }
+                else if (wallBack && _rng.Randf() > 0.7f)
+                {
+                    sconcePos = new Vector3(x * TileSize + TileSize / 2f, 0, z * TileSize - 0.1f);
+                    sconceRotation = 0;
+                }
+                else if (wallFront && _rng.Randf() > 0.7f)
+                {
+                    sconcePos = new Vector3(x * TileSize + TileSize / 2f, 0, (z + 1) * TileSize + 0.1f);
+                    sconceRotation = Mathf.Pi;
+                }
+
+                if (sconcePos.HasValue)
+                {
+                    var sconce = Cosmetic3D.Create("wall_sconce",
+                        new Color(0.2f, 0.2f, 0.22f),
+                        new Color(0.5f, 0.4f, 0.25f),
+                        new Color(0.4f, 0.28f, 0.15f),
+                        _rng.Randf(), 1f, false);
+                    sconce.Position = sconcePos.Value;
+                    sconce.RotateY(sconceRotation);
+                    _structuralContainer.AddChild(sconce);
+                    sconcesAdded++;
+                }
+            }
+        }
     }
 
     /// <summary>

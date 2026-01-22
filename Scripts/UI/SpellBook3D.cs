@@ -110,7 +110,7 @@ public partial class SpellBook3D : Control
 
         // Instruction label
         var instructions = new Label();
-        instructions.Text = "Drag spells to your action bar to equip them";
+        instructions.Text = "Drag unlocked spells to your action bar (locked ones shown greyed)";
         instructions.AddThemeFontSizeOverride("font_size", 12);
         instructions.AddThemeColorOverride("font_color", new Color(0.7f, 0.65f, 0.8f));
         instructions.HorizontalAlignment = HorizontalAlignment.Center;
@@ -169,13 +169,24 @@ public partial class SpellBook3D : Control
         entry.AbilityId = ability.AbilityId;
         entry.Ability = ability;
 
-        // Main container - draggable
+        bool isLocked = !ability.IsUnlocked;
+
+        // Main container - draggable only if unlocked
         entry.Container = new PanelContainer();
         entry.Container.CustomMinimumSize = new Vector2(0, 70);
 
         var containerStyle = new StyleBoxFlat();
-        containerStyle.BgColor = new Color(0.18f, 0.15f, 0.25f, 0.9f);
-        containerStyle.BorderColor = new Color(0.4f, 0.35f, 0.5f);
+        // Greyed out if locked
+        if (isLocked)
+        {
+            containerStyle.BgColor = new Color(0.1f, 0.1f, 0.12f, 0.9f);
+            containerStyle.BorderColor = new Color(0.25f, 0.25f, 0.3f);
+        }
+        else
+        {
+            containerStyle.BgColor = new Color(0.18f, 0.15f, 0.25f, 0.9f);
+            containerStyle.BorderColor = new Color(0.4f, 0.35f, 0.5f);
+        }
         containerStyle.SetBorderWidthAll(1);
         containerStyle.SetCornerRadiusAll(6);
         containerStyle.SetContentMarginAll(8);
@@ -201,7 +212,7 @@ public partial class SpellBook3D : Control
 
         var iconStyle = new StyleBoxFlat();
         iconStyle.BgColor = new Color(0.1f, 0.08f, 0.15f);
-        iconStyle.BorderColor = GetAbilityTypeColor(ability.Type);
+        iconStyle.BorderColor = isLocked ? new Color(0.3f, 0.3f, 0.3f) : GetAbilityTypeColor(ability.Type);
         iconStyle.SetBorderWidthAll(2);
         iconStyle.SetCornerRadiusAll(4);
         iconContainer.AddThemeStyleboxOverride("panel", iconStyle);
@@ -212,6 +223,11 @@ public partial class SpellBook3D : Control
         icon.StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered;
         icon.CustomMinimumSize = new Vector2(48, 48);
         icon.MouseFilter = MouseFilterEnum.Ignore;
+        // Desaturate locked icons
+        if (isLocked)
+        {
+            icon.Modulate = new Color(0.5f, 0.5f, 0.5f, 0.7f);
+        }
         iconContainer.AddChild(icon);
 
         hbox.AddChild(iconContainer);
@@ -222,22 +238,33 @@ public partial class SpellBook3D : Control
         infoVBox.AddThemeConstantOverride("separation", 2);
         infoVBox.MouseFilter = MouseFilterEnum.Ignore;
 
-        // Name row with type
+        // Name row with type and lock status
         var nameRow = new HBoxContainer();
         nameRow.MouseFilter = MouseFilterEnum.Ignore;
 
         var nameLabel = new Label();
         nameLabel.Text = ability.AbilityName;
         nameLabel.AddThemeFontSizeOverride("font_size", 16);
-        nameLabel.AddThemeColorOverride("font_color", new Color(1f, 0.95f, 0.85f));
+        nameLabel.AddThemeColorOverride("font_color", isLocked ? new Color(0.5f, 0.5f, 0.5f) : new Color(1f, 0.95f, 0.85f));
         nameLabel.SizeFlagsHorizontal = SizeFlags.ExpandFill;
         nameLabel.MouseFilter = MouseFilterEnum.Ignore;
         nameRow.AddChild(nameLabel);
 
+        // Lock indicator for locked abilities
+        if (isLocked)
+        {
+            var lockLabel = new Label();
+            lockLabel.Text = $"[Lvl {ability.RequiredLevel}]";
+            lockLabel.AddThemeFontSizeOverride("font_size", 11);
+            lockLabel.AddThemeColorOverride("font_color", new Color(0.8f, 0.4f, 0.4f));
+            lockLabel.MouseFilter = MouseFilterEnum.Ignore;
+            nameRow.AddChild(lockLabel);
+        }
+
         var typeLabel = new Label();
         typeLabel.Text = $"[{ability.Type}]";
         typeLabel.AddThemeFontSizeOverride("font_size", 11);
-        typeLabel.AddThemeColorOverride("font_color", GetAbilityTypeColor(ability.Type));
+        typeLabel.AddThemeColorOverride("font_color", isLocked ? new Color(0.4f, 0.4f, 0.4f) : GetAbilityTypeColor(ability.Type));
         typeLabel.MouseFilter = MouseFilterEnum.Ignore;
         nameRow.AddChild(typeLabel);
 
@@ -247,7 +274,7 @@ public partial class SpellBook3D : Control
         var descLabel = new Label();
         descLabel.Text = ability.Description;
         descLabel.AddThemeFontSizeOverride("font_size", 11);
-        descLabel.AddThemeColorOverride("font_color", new Color(0.75f, 0.7f, 0.85f));
+        descLabel.AddThemeColorOverride("font_color", isLocked ? new Color(0.4f, 0.4f, 0.45f) : new Color(0.75f, 0.7f, 0.85f));
         descLabel.AutowrapMode = TextServer.AutowrapMode.WordSmart;
         descLabel.CustomMinimumSize = new Vector2(280, 0);
         descLabel.MouseFilter = MouseFilterEnum.Ignore;
@@ -262,7 +289,7 @@ public partial class SpellBook3D : Control
         var manaLabel = new Label();
         manaLabel.Text = ability.ManaCost > 0 ? $"Mana: {ability.ManaCost}" : "Mana: Free";
         manaLabel.AddThemeFontSizeOverride("font_size", 11);
-        manaLabel.AddThemeColorOverride("font_color", new Color(0.4f, 0.6f, 1f));
+        manaLabel.AddThemeColorOverride("font_color", isLocked ? new Color(0.3f, 0.35f, 0.5f) : new Color(0.4f, 0.6f, 1f));
         manaLabel.MouseFilter = MouseFilterEnum.Ignore;
         statsRow.AddChild(manaLabel);
 
@@ -270,7 +297,7 @@ public partial class SpellBook3D : Control
         var cdLabel = new Label();
         cdLabel.Text = ability.Cooldown > 0 ? $"CD: {ability.Cooldown}s" : "CD: None";
         cdLabel.AddThemeFontSizeOverride("font_size", 11);
-        cdLabel.AddThemeColorOverride("font_color", new Color(1f, 0.8f, 0.4f));
+        cdLabel.AddThemeColorOverride("font_color", isLocked ? new Color(0.5f, 0.4f, 0.3f) : new Color(1f, 0.8f, 0.4f));
         cdLabel.MouseFilter = MouseFilterEnum.Ignore;
         statsRow.AddChild(cdLabel);
 
@@ -325,6 +352,13 @@ public partial class SpellBook3D : Control
     {
         if (e is InputEventMouseButton mb && mb.ButtonIndex == MouseButton.Left && mb.Pressed)
         {
+            // Only allow dragging unlocked abilities
+            if (entry.Ability?.IsUnlocked != true)
+            {
+                GD.Print($"[SpellBook3D] Cannot drag locked ability: {entry.AbilityId} (requires level {entry.Ability?.RequiredLevel ?? 0})");
+                return;
+            }
+
             // Start drag
             StartDrag(entry);
         }
@@ -479,6 +513,25 @@ public partial class SpellBook3D : Control
             Hide();
         else
             Show();
+    }
+
+    /// <summary>
+    /// Refresh the spell list to reflect unlock status changes.
+    /// Called when abilities are unlocked (e.g., on level up).
+    /// </summary>
+    public void RefreshSpellList()
+    {
+        if (_spellListContainer == null) return;
+
+        // Clear and repopulate
+        foreach (var child in _spellListContainer.GetChildren())
+        {
+            child.QueueFree();
+        }
+        _entries.Clear();
+
+        CallDeferred(nameof(PopulateSpellListDeferred));
+        GD.Print("[SpellBook3D] Refreshed spell list (unlock status may have changed)");
     }
 
     /// <summary>

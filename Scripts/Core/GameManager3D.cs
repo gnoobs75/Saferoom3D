@@ -280,10 +280,15 @@ public partial class GameManager3D : Node
         hud.Name = "HUD";
         hudLayer.AddChild(hud);
 
-        // Create Spell Book
+        // Create Spell Book (B key)
         var spellBook = new SpellBook3D();
         spellBook.Name = "SpellBook";
         hudLayer.AddChild(spellBook);
+
+        // Create Abilities Menu (K key)
+        var abilitiesUI = new AbilitiesUI3D();
+        abilitiesUI.Name = "AbilitiesUI";
+        hudLayer.AddChild(abilitiesUI);
 
         // Create Inventory UI
         var inventoryUI = new InventoryUI3D();
@@ -368,8 +373,16 @@ public partial class GameManager3D : Node
         env.VolumetricFogAnisotropy = 0.6f; // Forward scattering for light shafts
         env.VolumetricFogLength = 50f;
 
-        // PERFORMANCE: SSAO disabled - very expensive effect
-        env.SsaoEnabled = false;
+        // SSAO for depth and ambient occlusion in corners
+        // Use moderate quality settings for performance balance
+        env.SsaoEnabled = true;
+        env.SsaoRadius = 0.5f;           // Smaller radius = better performance
+        env.SsaoIntensity = 1.5f;        // Visible but not overwhelming
+        env.SsaoPower = 1.2f;            // Slightly soft falloff
+        env.SsaoDetail = 0.3f;           // Moderate detail
+        env.SsaoHorizon = 0.04f;         // Small horizon angle
+        env.SsaoSharpness = 0.9f;        // Sharp edges
+        env.SsaoLightAffect = 0.1f;      // Minimal light bleeding
 
         // Enable subtle glow for torch flames and magic effects
         env.GlowEnabled = true;
@@ -523,11 +536,17 @@ public partial class GameManager3D : Node
             GD.Print("[GameManager3D] ESC pressed");
             HandleEscapeKey();
         }
-        // Toggle spell book on Tab - works even when paused
+        // Toggle spell book on B - works even when paused
         else if (@event.IsActionPressed("toggle_spellbook"))
         {
             GD.Print("[GameManager3D] Spellbook toggle pressed");
             HandleSpellbookToggle();
+        }
+        // Toggle abilities menu on K - works even when paused
+        else if (@event.IsActionPressed("toggle_abilities"))
+        {
+            GD.Print("[GameManager3D] Abilities menu toggle pressed");
+            HandleAbilitiesToggle();
         }
         // Toggle inventory on I - works even when paused
         else if (@event.IsActionPressed("toggle_inventory"))
@@ -608,6 +627,23 @@ public partial class GameManager3D : Node
             (LootUI3D.Instance == null || !LootUI3D.Instance.Visible))
         {
             SpellBook3D.Instance.Toggle();
+        }
+    }
+
+    private void HandleAbilitiesToggle()
+    {
+        // Block during inspect mode
+        if (InspectMode3D.Instance?.IsActive == true) return;
+
+        if (AbilitiesUI3D.Instance != null &&
+            (EscapeMenu3D.Instance == null || !EscapeMenu3D.Instance.Visible) &&
+            (EditorScreen3D.Instance == null || !EditorScreen3D.Instance.Visible) &&
+            (InventoryUI3D.Instance == null || !InventoryUI3D.Instance.Visible) &&
+            (SpellBook3D.Instance == null || !SpellBook3D.Instance.Visible) &&
+            (HUD3D.Instance == null || !HUD3D.Instance.IsOverviewMapVisible) &&
+            (LootUI3D.Instance == null || !LootUI3D.Instance.Visible))
+        {
+            AbilitiesUI3D.Instance.Toggle();
         }
     }
 

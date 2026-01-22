@@ -12,7 +12,7 @@ public partial class CrawlerDialogueUI3D : Control
 {
     public static CrawlerDialogueUI3D? Instance { get; private set; }
 
-    private BaseNPC3D? _currentNpc;
+    private Node3D? _currentNpc;
     private string? _crawlerType;
     private CrawlerDialogueDatabase.DialogueNode? _currentNode;
 
@@ -386,7 +386,7 @@ public partial class CrawlerDialogueUI3D : Control
     /// <summary>
     /// Open the dialogue UI for a specific crawler NPC.
     /// </summary>
-    public void Open(BaseNPC3D npc, string crawlerType)
+    public void Open(Node3D npc, string crawlerType)
     {
         _currentNpc = npc;
         _crawlerType = crawlerType;

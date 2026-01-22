@@ -511,6 +511,73 @@ public partial class Cosmetic3D : StaticBody3D
                 LightRadius = 4f;
                 break;
 
+            case "floor_grate":
+                mesh = CreateFloorGrateMesh(rng);
+                collision = new BoxShape3D
+                {
+                    Size = new Vector3(1.5f * s, 0.1f, 1.5f * s)
+                };
+                HasCollision = false; // Walk-through grate
+                meshOffset = new Vector3(0, 0.02f * s, 0);
+                break;
+
+            case "drain_cover":
+                mesh = CreateDrainCoverMesh(rng);
+                collision = new CylinderShape3D
+                {
+                    Radius = 0.4f * s,
+                    Height = 0.08f * s
+                };
+                HasCollision = false;
+                meshOffset = new Vector3(0, 0.02f * s, 0);
+                break;
+
+            case "ceiling_beam":
+                mesh = CreateCeilingBeamMesh(rng);
+                collision = new BoxShape3D
+                {
+                    Size = new Vector3(0.4f * s, 0.5f * s, 6f * s)
+                };
+                HasCollision = false; // Ceiling beams don't block
+                meshOffset = new Vector3(0, 0, 0);
+                break;
+
+            case "ceiling_arch":
+                mesh = CreateCeilingArchMesh(rng);
+                collision = null;
+                HasCollision = false;
+                meshOffset = new Vector3(0, 0, 0);
+                break;
+
+            case "wall_buttress":
+                mesh = CreateWallButtressMesh(rng);
+                collision = new BoxShape3D
+                {
+                    Size = new Vector3(0.8f * s, 3f * s, 0.5f * s)
+                };
+                meshOffset = new Vector3(0, 1.5f * s, 0);
+                break;
+
+            case "wall_column":
+                mesh = CreateWallColumnMesh(rng);
+                collision = new CylinderShape3D
+                {
+                    Radius = 0.35f * s,
+                    Height = Constants.WallHeight * s
+                };
+                meshOffset = new Vector3(0, Constants.WallHeight * s / 2f, 0);
+                break;
+
+            case "wall_sconce":
+                mesh = CreateWallSconceMesh(rng);
+                collision = null;
+                HasCollision = false;
+                meshOffset = new Vector3(0, 2.5f * s, 0);
+                HasLighting = true;
+                LightColor = new Color(1f, 0.7f, 0.4f);
+                LightRadius = 6f;
+                break;
+
             default:
                 // Fallback to barrel
                 mesh = CreateBarrelMesh(rng);
@@ -565,6 +632,16 @@ public partial class Cosmetic3D : StaticBody3D
         int segments = 16;
         float angleStep = Mathf.Tau / segments;
 
+        // Wood plank color variations for natural wood look
+        Color[] woodColors = {
+            new Color(0.5f, 0.32f, 0.18f),   // Medium oak
+            new Color(0.42f, 0.27f, 0.14f),  // Dark oak
+            new Color(0.55f, 0.38f, 0.22f),  // Light oak
+        };
+        Color ironBandColor = new Color(0.25f, 0.25f, 0.28f);  // Dark iron
+        Color rivetColor = new Color(0.4f, 0.35f, 0.3f);       // Weathered bronze rivets
+        Color spigotColor = new Color(0.6f, 0.45f, 0.25f);     // Brass spigot
+
         // Create barrel body with bulge, wood plank gaps, and wear marks
         int heightSegments = 10;
         int numPlanks = 8;
@@ -593,6 +670,18 @@ public partial class Cosmetic3D : StaticBody3D
                 float x = Mathf.Cos(angle) * r;
                 float z = Mathf.Sin(angle) * r;
 
+                // Set vertex color based on which plank this vertex belongs to
+                int plankIndex = (int)(angle / plankAngle) % numPlanks;
+                Color woodColor = woodColors[plankIndex % woodColors.Length];
+                // Add slight variation within each plank
+                float colorVariation = rng.RandfRange(-0.03f, 0.03f);
+                woodColor = new Color(
+                    Mathf.Clamp(woodColor.R + colorVariation, 0, 1),
+                    Mathf.Clamp(woodColor.G + colorVariation * 0.7f, 0, 1),
+                    Mathf.Clamp(woodColor.B + colorVariation * 0.5f, 0, 1)
+                );
+
+                surfaceTool.SetColor(woodColor);
                 surfaceTool.SetUV(new Vector2((float)i / segments, t));
                 surfaceTool.AddVertex(new Vector3(x, y, z));
             }
@@ -635,7 +724,10 @@ public partial class Cosmetic3D : StaticBody3D
                 float x = Mathf.Cos(angle) * bandRadius;
                 float z = Mathf.Sin(angle) * bandRadius;
 
+                // Iron band color
+                surfaceTool.SetColor(ironBandColor);
                 surfaceTool.AddVertex(new Vector3(x, bandY - bandHeight / 2, z));
+                surfaceTool.SetColor(ironBandColor);
                 surfaceTool.AddVertex(new Vector3(x, bandY + bandHeight / 2, z));
 
                 if (i < segments)
@@ -660,8 +752,8 @@ public partial class Cosmetic3D : StaticBody3D
                 float rivetAngle = rv * Mathf.Tau / rivetsPerBand;
                 float rivetX = Mathf.Cos(rivetAngle) * (bandRadius + rivetRadius * 0.5f);
                 float rivetZ = Mathf.Sin(rivetAngle) * (bandRadius + rivetRadius * 0.5f);
-                AddBoxToSurfaceTool(surfaceTool, new Vector3(rivetX, bandY, rivetZ),
-                    new Vector3(rivetRadius * 2, rivetRadius * 2, rivetRadius * 2));
+                AddColoredBoxToSurfaceTool(surfaceTool, new Vector3(rivetX, bandY, rivetZ),
+                    new Vector3(rivetRadius * 2, rivetRadius * 2, rivetRadius * 2), rivetColor);
             }
         }
 
@@ -672,27 +764,34 @@ public partial class Cosmetic3D : StaticBody3D
         float bulgeAtSpigot = 1f + 0.15f * Mathf.Sin(0.4f * Mathf.Pi);
         float spigotZ = radius * bulgeAtSpigot + spigotLength / 2;
 
-        // Spigot body
-        AddBoxToSurfaceTool(surfaceTool, new Vector3(0, spigotY, spigotZ),
-            new Vector3(spigotRadius * 2, spigotRadius * 2, spigotLength));
-        // Spigot handle
-        AddBoxToSurfaceTool(surfaceTool, new Vector3(0, spigotY + spigotRadius * 2, spigotZ + spigotLength * 0.3f),
-            new Vector3(spigotRadius * 3, spigotRadius * 4, spigotRadius * 1.5f));
-        // Spigot base plate
-        AddBoxToSurfaceTool(surfaceTool, new Vector3(0, spigotY, radius * bulgeAtSpigot + 0.005f * PropScale),
-            new Vector3(0.05f * PropScale, 0.05f * PropScale, 0.01f * PropScale));
+        // Spigot body (brass)
+        AddColoredBoxToSurfaceTool(surfaceTool, new Vector3(0, spigotY, spigotZ),
+            new Vector3(spigotRadius * 2, spigotRadius * 2, spigotLength), spigotColor);
+        // Spigot handle (brass)
+        AddColoredBoxToSurfaceTool(surfaceTool, new Vector3(0, spigotY + spigotRadius * 2, spigotZ + spigotLength * 0.3f),
+            new Vector3(spigotRadius * 3, spigotRadius * 4, spigotRadius * 1.5f), spigotColor);
+        // Spigot base plate (iron)
+        AddColoredBoxToSurfaceTool(surfaceTool, new Vector3(0, spigotY, radius * bulgeAtSpigot + 0.005f * PropScale),
+            new Vector3(0.05f * PropScale, 0.05f * PropScale, 0.01f * PropScale), ironBandColor);
 
         // Barrel top cap
         float topY = height / 2f;
         float topBulge = 1f + 0.15f * Mathf.Sin(Mathf.Pi);
         float topRadius = radius * topBulge * 0.98f;
 
+        // Top cap center vertex with wood color
+        Color topWoodColor = woodColors[0].Darkened(0.1f);
+        surfaceTool.SetColor(topWoodColor);
         surfaceTool.AddVertex(new Vector3(0, topY, 0));
         int topCenterIdx = currentVertexOffset;
 
         for (int i = 0; i <= segments; i++)
         {
             float angle = i * angleStep;
+            // Vary top cap color slightly by angle
+            int plankIndex = (int)(angle / plankAngle) % numPlanks;
+            Color capColor = woodColors[plankIndex % woodColors.Length].Darkened(0.05f);
+            surfaceTool.SetColor(capColor);
             surfaceTool.AddVertex(new Vector3(Mathf.Cos(angle) * topRadius, topY, Mathf.Sin(angle) * topRadius));
         }
 
@@ -705,8 +804,10 @@ public partial class Cosmetic3D : StaticBody3D
 
         surfaceTool.GenerateNormals();
         var mesh = surfaceTool.Commit();
-        var material = ProceduralMesh3D.CreateWoodMaterial(PrimaryColor.Darkened(0.1f));
-        material.Roughness = 0.8f;
+        // Use vertex colors for albedo
+        var material = new StandardMaterial3D();
+        material.VertexColorUseAsAlbedo = true;
+        material.Roughness = 0.85f;
         mesh.SurfaceSetMaterial(0, material);
 
         return mesh;
@@ -1018,6 +1119,18 @@ public partial class Cosmetic3D : StaticBody3D
         int segments = 12;
         float angleStep = Mathf.Tau / segments;
 
+        // Weathered stone colors
+        Color mainShaftColor = new Color(0.6f, 0.58f, 0.55f);       // Stone gray
+        Color capitalBaseColor = new Color(0.65f, 0.62f, 0.58f);    // Slightly lighter
+        Color crackColor = new Color(0.4f, 0.38f, 0.35f);           // Darker weathering
+        Color mossColor = new Color(0.35f, 0.42f, 0.32f);           // Green tint for moss
+        // Stone color variations for natural look
+        Color[] stoneVariations = {
+            new Color(0.58f, 0.55f, 0.52f), // Warm gray
+            new Color(0.52f, 0.52f, 0.54f), // Cool gray
+            new Color(0.55f, 0.5f, 0.45f),  // Brown-gray
+        };
+
         // Base pedestal with stone block texture
         float baseHeight = height * 0.12f;
         float baseRadius = radius * 1.4f;
@@ -1039,6 +1152,8 @@ public partial class Cosmetic3D : StaticBody3D
                 float x = Mathf.Cos(angle) * (r - wearOffset);
                 float z = Mathf.Sin(angle) * (r - wearOffset);
 
+                // Base uses capital color (lighter)
+                surfaceTool.SetColor(capitalBaseColor);
                 surfaceTool.SetUV(new Vector2((float)i / segments, t));
                 surfaceTool.AddVertex(new Vector3(x, y, z));
             }
@@ -1066,9 +1181,11 @@ public partial class Cosmetic3D : StaticBody3D
         float mainHeight = mainEnd - mainStart;
         int mainSegments = 14;
 
-        // Precompute crack positions
+        // Precompute crack positions (multiple cracks)
         int crackSegment = rng.RandiRange(3, mainSegments - 3);
         int crackAngle = rng.RandiRange(2, segments - 2);
+        int crackSegment2 = rng.RandiRange(3, mainSegments - 3);
+        int crackAngle2 = rng.RandiRange(2, segments - 2);
 
         for (int hs = 0; hs <= mainSegments; hs++)
         {
@@ -1083,14 +1200,37 @@ public partial class Cosmetic3D : StaticBody3D
 
                 // Add crack effect
                 float crackDepth = 0f;
+                bool isCrack = false;
                 if (Mathf.Abs(hs - crackSegment) <= 2 && Mathf.Abs(i - crackAngle) <= 1)
+                {
                     crackDepth = 0.02f * PropScale;
+                    isCrack = true;
+                }
+                if (Mathf.Abs(hs - crackSegment2) <= 1 && Mathf.Abs(i - crackAngle2) <= 1)
+                {
+                    crackDepth = 0.015f * PropScale;
+                    isCrack = true;
+                }
 
                 float r = radius - flutingDepth - crackDepth;
 
                 float x = Mathf.Cos(angle) * r;
                 float z = Mathf.Sin(angle) * r;
 
+                // Color based on position and crack status
+                Color vertColor;
+                if (isCrack)
+                {
+                    vertColor = crackColor;
+                }
+                else
+                {
+                    // Add subtle variation to main shaft
+                    int varIdx = (hs + i) % stoneVariations.Length;
+                    vertColor = mainShaftColor.Lerp(stoneVariations[varIdx], 0.15f);
+                }
+
+                surfaceTool.SetColor(vertColor);
                 surfaceTool.SetUV(new Vector2((float)i / segments, t + 0.3f));
                 surfaceTool.AddVertex(new Vector3(x, y, z));
             }
@@ -1133,6 +1273,8 @@ public partial class Cosmetic3D : StaticBody3D
                 float x = Mathf.Cos(angle) * (r - carveDepth);
                 float z = Mathf.Sin(angle) * (r - carveDepth);
 
+                // Capital uses lighter color
+                surfaceTool.SetColor(capitalBaseColor);
                 surfaceTool.SetUV(new Vector2((float)i / segments, t + 0.8f));
                 surfaceTool.AddVertex(new Vector3(x, y, z));
             }
@@ -1169,10 +1311,10 @@ public partial class Cosmetic3D : StaticBody3D
                 mossHeight,
                 Mathf.Sin(mossAngle) * mossR
             );
-            AddBoxToSurfaceTool(surfaceTool, mossPos, new Vector3(mossSize, mossSize * 0.5f, mossSize));
+            AddColoredBoxToSurfaceTool(surfaceTool, mossPos, new Vector3(mossSize, mossSize * 0.5f, mossSize), mossColor);
         }
 
-        // Stone block lines (horizontal seams)
+        // Stone block lines (horizontal seams) - darker weathering lines
         float[] blockSeams = { 0.25f, 0.5f, 0.75f };
         foreach (float seamT in blockSeams)
         {
@@ -1187,14 +1329,19 @@ public partial class Cosmetic3D : StaticBody3D
                     seamY,
                     Mathf.Sin(seamAngle) * seamRadius
                 );
-                AddBoxToSurfaceTool(surfaceTool, seamPos, new Vector3(0.12f * PropScale, 0.015f * PropScale, 0.02f * PropScale));
+                AddColoredBoxToSurfaceTool(surfaceTool, seamPos, new Vector3(0.12f * PropScale, 0.015f * PropScale, 0.02f * PropScale), crackColor);
             }
         }
 
         surfaceTool.GenerateNormals();
         var mesh = surfaceTool.Commit();
-        var material = ProceduralMesh3D.CreateMaterial(PrimaryColor, 0.85f);
-        mesh.SurfaceSetMaterial(0, material);
+
+        // Weathered stone material with vertex colors
+        var mat = new StandardMaterial3D();
+        mat.VertexColorUseAsAlbedo = true;
+        mat.Roughness = 0.9f; // Very matte stone
+        mat.Metallic = 0.0f;
+        mesh.SurfaceSetMaterial(0, mat);
         return mesh;
     }
 
@@ -1632,14 +1779,33 @@ public partial class Cosmetic3D : StaticBody3D
 
         float s = PropScale;
 
+        // Color palette for books
+        Color[] bookColors = {
+            new Color(0.5f, 0.15f, 0.15f),   // Burgundy red
+            new Color(0.15f, 0.35f, 0.2f),   // Forest green
+            new Color(0.15f, 0.2f, 0.45f),   // Royal blue
+            new Color(0.6f, 0.45f, 0.3f),    // Tan leather
+            new Color(0.1f, 0.15f, 0.3f),    // Navy
+            new Color(0.4f, 0.1f, 0.15f),    // Maroon
+            new Color(0.35f, 0.2f, 0.1f),    // Dark brown
+            new Color(0.15f, 0.12f, 0.1f),   // Black
+        };
+
+        // Material colors
+        Color woodColor = new Color(0.4f, 0.25f, 0.15f);    // Dark wood for frame/shelves
+        Color goldColor = new Color(0.75f, 0.6f, 0.2f);     // Gold accent for spine bands
+        Color creamColor = new Color(0.9f, 0.85f, 0.7f);    // Cream for scroll paper
+        Color brassColor = new Color(0.65f, 0.5f, 0.25f);   // Brass for scroll caps
+        Color dustColor = new Color(0.6f, 0.55f, 0.5f);     // Dust color
+
         // Shelf frame
-        AddBoxToSurfaceTool(surfaceTool, Vector3.Zero, new Vector3(1.2f * s, 2f * s, 0.35f * s));
+        AddColoredBoxToSurfaceTool(surfaceTool, Vector3.Zero, new Vector3(1.2f * s, 2f * s, 0.35f * s), woodColor);
 
         // Shelves (4 horizontal)
         for (int i = 0; i < 4; i++)
         {
             float y = -0.9f * s + i * 0.6f * s;
-            AddBoxToSurfaceTool(surfaceTool, new Vector3(0, y, 0), new Vector3(1.15f * s, 0.03f * s, 0.32f * s));
+            AddColoredBoxToSurfaceTool(surfaceTool, new Vector3(0, y, 0), new Vector3(1.15f * s, 0.03f * s, 0.32f * s), woodColor);
         }
 
         // Individual books on shelves
@@ -1655,24 +1821,27 @@ public partial class Cosmetic3D : StaticBody3D
                 float bookHeight = 0.28f * s + rng.Randf() * 0.18f * s;
                 float bookDepth = 0.05f * s + rng.Randf() * 0.02f * s;
 
+                // Pick a random color for this book
+                Color bookColor = bookColors[(int)(rng.Randf() * bookColors.Length)];
+
                 // Main book body
                 var bookPos = new Vector3(bookX, shelfY + bookHeight / 2f, 0.03f * s);
-                AddBoxToSurfaceTool(surfaceTool, bookPos, new Vector3(bookWidth, bookHeight, bookDepth));
+                AddColoredBoxToSurfaceTool(surfaceTool, bookPos, new Vector3(bookWidth, bookHeight, bookDepth), bookColor);
 
-                // Book spine (slightly protruding)
-                AddBoxToSurfaceTool(surfaceTool,
+                // Book spine (slightly protruding) - same color as book
+                AddColoredBoxToSurfaceTool(surfaceTool,
                     new Vector3(bookX, shelfY + bookHeight / 2f, 0.03f * s + bookDepth / 2f + 0.005f * s),
-                    new Vector3(bookWidth * 0.9f, bookHeight * 0.95f, 0.008f * s));
+                    new Vector3(bookWidth * 0.9f, bookHeight * 0.95f, 0.008f * s), bookColor);
 
-                // Spine decoration band (top)
-                AddBoxToSurfaceTool(surfaceTool,
+                // Spine decoration band (top) - gold accent
+                AddColoredBoxToSurfaceTool(surfaceTool,
                     new Vector3(bookX, shelfY + bookHeight * 0.85f, 0.03f * s + bookDepth / 2f + 0.006f * s),
-                    new Vector3(bookWidth * 0.85f, 0.015f * s, 0.003f * s));
+                    new Vector3(bookWidth * 0.85f, 0.015f * s, 0.003f * s), goldColor);
 
-                // Spine decoration band (bottom)
-                AddBoxToSurfaceTool(surfaceTool,
+                // Spine decoration band (bottom) - gold accent
+                AddColoredBoxToSurfaceTool(surfaceTool,
                     new Vector3(bookX, shelfY + bookHeight * 0.15f, 0.03f * s + bookDepth / 2f + 0.006f * s),
-                    new Vector3(bookWidth * 0.85f, 0.015f * s, 0.003f * s));
+                    new Vector3(bookWidth * 0.85f, 0.015f * s, 0.003f * s), goldColor);
             }
 
             // Scroll tube on some shelves
@@ -1680,12 +1849,14 @@ public partial class Cosmetic3D : StaticBody3D
             {
                 float scrollX = 0.4f * s + rng.Randf() * 0.1f * s;
                 float scrollY = shelfY + 0.04f * s;
-                AddBoxToSurfaceTool(surfaceTool, new Vector3(scrollX, scrollY, 0.05f * s),
-                    new Vector3(0.04f * s, 0.04f * s, 0.18f * s));
-                AddBoxToSurfaceTool(surfaceTool, new Vector3(scrollX, scrollY, -0.05f * s),
-                    new Vector3(0.05f * s, 0.05f * s, 0.02f * s));
-                AddBoxToSurfaceTool(surfaceTool, new Vector3(scrollX, scrollY, 0.15f * s),
-                    new Vector3(0.05f * s, 0.05f * s, 0.02f * s));
+                // Scroll paper (cream)
+                AddColoredBoxToSurfaceTool(surfaceTool, new Vector3(scrollX, scrollY, 0.05f * s),
+                    new Vector3(0.04f * s, 0.04f * s, 0.18f * s), creamColor);
+                // Scroll caps (brass)
+                AddColoredBoxToSurfaceTool(surfaceTool, new Vector3(scrollX, scrollY, -0.05f * s),
+                    new Vector3(0.05f * s, 0.05f * s, 0.02f * s), brassColor);
+                AddColoredBoxToSurfaceTool(surfaceTool, new Vector3(scrollX, scrollY, 0.15f * s),
+                    new Vector3(0.05f * s, 0.05f * s, 0.02f * s), brassColor);
             }
         }
 
@@ -1693,24 +1864,29 @@ public partial class Cosmetic3D : StaticBody3D
         for (int i = 0; i < 4; i++)
         {
             float shelfY = -0.9f * s + i * 0.6f * s;
-            AddBoxToSurfaceTool(surfaceTool, new Vector3(0, shelfY + 0.018f * s, 0.15f * s),
-                new Vector3(1.1f * s, 0.003f * s, 0.02f * s));
+            AddColoredBoxToSurfaceTool(surfaceTool, new Vector3(0, shelfY + 0.018f * s, 0.15f * s),
+                new Vector3(1.1f * s, 0.003f * s, 0.02f * s), dustColor);
         }
 
         // Top molding
-        AddBoxToSurfaceTool(surfaceTool, new Vector3(0, 1.0f * s, 0),
-            new Vector3(1.25f * s, 0.04f * s, 0.38f * s));
-        AddBoxToSurfaceTool(surfaceTool, new Vector3(0, 1.03f * s, 0.05f * s),
-            new Vector3(1.2f * s, 0.02f * s, 0.25f * s));
+        AddColoredBoxToSurfaceTool(surfaceTool, new Vector3(0, 1.0f * s, 0),
+            new Vector3(1.25f * s, 0.04f * s, 0.38f * s), woodColor);
+        AddColoredBoxToSurfaceTool(surfaceTool, new Vector3(0, 1.03f * s, 0.05f * s),
+            new Vector3(1.2f * s, 0.02f * s, 0.25f * s), woodColor);
 
         // Base molding
-        AddBoxToSurfaceTool(surfaceTool, new Vector3(0, -1.0f * s, 0),
-            new Vector3(1.25f * s, 0.04f * s, 0.38f * s));
+        AddColoredBoxToSurfaceTool(surfaceTool, new Vector3(0, -1.0f * s, 0),
+            new Vector3(1.25f * s, 0.04f * s, 0.38f * s), woodColor);
 
-        // Skip GenerateTangents() - not needed without normal maps, saves ~2-5ms per prop
+        // Generate normals for proper lighting
+        surfaceTool.GenerateNormals();
+
         var mesh = surfaceTool.Commit();
-        var material = ProceduralMesh3D.CreateWoodMaterial(PrimaryColor.Darkened(0.2f));
-        mesh.SurfaceSetMaterial(0, material);
+        // Use vertex color material instead of wood material
+        var mat = new StandardMaterial3D();
+        mat.VertexColorUseAsAlbedo = true;
+        mat.Roughness = 0.85f;
+        mesh.SurfaceSetMaterial(0, mat);
         return mesh;
     }
 
@@ -2565,6 +2741,44 @@ public partial class Cosmetic3D : StaticBody3D
         {
             foreach (var idx in face)
             {
+                st.AddVertex(verts[idx]);
+            }
+        }
+    }
+
+    private void AddColoredBoxToSurfaceTool(SurfaceTool st, Vector3 center, Vector3 size, Color color)
+    {
+        // Helper to add a colored box to the surface tool (for vertex color materials)
+        // NOTE: Do NOT set normals here - let GenerateNormals() handle it at the end
+        Vector3 half = size / 2f;
+
+        // Define the 8 vertices
+        Vector3[] verts = {
+            center + new Vector3(-half.X, -half.Y, -half.Z),
+            center + new Vector3(half.X, -half.Y, -half.Z),
+            center + new Vector3(half.X, half.Y, -half.Z),
+            center + new Vector3(-half.X, half.Y, -half.Z),
+            center + new Vector3(-half.X, -half.Y, half.Z),
+            center + new Vector3(half.X, -half.Y, half.Z),
+            center + new Vector3(half.X, half.Y, half.Z),
+            center + new Vector3(-half.X, half.Y, half.Z),
+        };
+
+        // Define the 6 faces (2 triangles each) - normals calculated by GenerateNormals()
+        int[][] faces = {
+            new[] {0, 1, 2, 0, 2, 3}, // front
+            new[] {5, 4, 7, 5, 7, 6}, // back
+            new[] {4, 0, 3, 4, 3, 7}, // left
+            new[] {1, 5, 6, 1, 6, 2}, // right
+            new[] {3, 2, 6, 3, 6, 7}, // top
+            new[] {4, 5, 1, 4, 1, 0}, // bottom
+        };
+
+        foreach (var face in faces)
+        {
+            foreach (var idx in face)
+            {
+                st.SetColor(color);
                 st.AddVertex(verts[idx]);
             }
         }
@@ -6542,6 +6756,490 @@ public partial class Cosmetic3D : StaticBody3D
         };
         mesh.SurfaceSetMaterial(0, material);
         return mesh;
+    }
+
+    /// <summary>
+    /// Creates a floor grate mesh with metal bars.
+    /// </summary>
+    private ArrayMesh CreateFloorGrateMesh(RandomNumberGenerator rng)
+    {
+        float size = 1.5f * PropScale;
+        float barWidth = 0.08f * PropScale;
+        float barHeight = 0.1f * PropScale;
+
+        var surfaceTool = new SurfaceTool();
+        surfaceTool.Begin(Mesh.PrimitiveType.Triangles);
+
+        Color metalColor = new Color(0.25f, 0.25f, 0.28f);
+        Color rustColor = new Color(0.35f, 0.22f, 0.15f);
+
+        // Create grid of bars
+        int numBars = 8;
+        float spacing = size / numBars;
+
+        // Horizontal bars
+        for (int i = 0; i <= numBars; i++)
+        {
+            float z = -size / 2f + i * spacing;
+            Color barColor = rng.Randf() > 0.7f ? rustColor : metalColor;
+            AddBox(surfaceTool, new Vector3(0, barHeight / 2f, z),
+                new Vector3(size, barHeight, barWidth), barColor);
+        }
+
+        // Vertical bars
+        for (int i = 0; i <= numBars; i++)
+        {
+            float x = -size / 2f + i * spacing;
+            Color barColor = rng.Randf() > 0.7f ? rustColor : metalColor;
+            AddBox(surfaceTool, new Vector3(x, barHeight / 2f, 0),
+                new Vector3(barWidth, barHeight, size), barColor);
+        }
+
+        // Frame border
+        Color frameColor = new Color(0.2f, 0.2f, 0.22f);
+        float frameWidth = 0.12f * PropScale;
+        AddBox(surfaceTool, new Vector3(0, barHeight / 2f, -size / 2f - frameWidth / 2f),
+            new Vector3(size + frameWidth * 2, barHeight * 1.2f, frameWidth), frameColor);
+        AddBox(surfaceTool, new Vector3(0, barHeight / 2f, size / 2f + frameWidth / 2f),
+            new Vector3(size + frameWidth * 2, barHeight * 1.2f, frameWidth), frameColor);
+        AddBox(surfaceTool, new Vector3(-size / 2f - frameWidth / 2f, barHeight / 2f, 0),
+            new Vector3(frameWidth, barHeight * 1.2f, size), frameColor);
+        AddBox(surfaceTool, new Vector3(size / 2f + frameWidth / 2f, barHeight / 2f, 0),
+            new Vector3(frameWidth, barHeight * 1.2f, size), frameColor);
+
+        surfaceTool.GenerateNormals();
+        var mesh = surfaceTool.Commit();
+
+        var material = new StandardMaterial3D
+        {
+            VertexColorUseAsAlbedo = true,
+            Roughness = 0.7f,
+            Metallic = 0.6f,
+            CullMode = BaseMaterial3D.CullModeEnum.Disabled
+        };
+        mesh.SurfaceSetMaterial(0, material);
+        return mesh;
+    }
+
+    /// <summary>
+    /// Creates a circular drain cover mesh.
+    /// </summary>
+    private ArrayMesh CreateDrainCoverMesh(RandomNumberGenerator rng)
+    {
+        float radius = 0.4f * PropScale;
+        float thickness = 0.08f * PropScale;
+
+        var surfaceTool = new SurfaceTool();
+        surfaceTool.Begin(Mesh.PrimitiveType.Triangles);
+
+        Color metalColor = new Color(0.22f, 0.22f, 0.25f);
+        int segments = 16;
+
+        // Outer ring
+        for (int i = 0; i < segments; i++)
+        {
+            float angle1 = i * Mathf.Tau / segments;
+            float angle2 = (i + 1) * Mathf.Tau / segments;
+
+            Vector3 outer1 = new Vector3(Mathf.Cos(angle1) * radius, thickness, Mathf.Sin(angle1) * radius);
+            Vector3 outer2 = new Vector3(Mathf.Cos(angle2) * radius, thickness, Mathf.Sin(angle2) * radius);
+            Vector3 inner1 = new Vector3(Mathf.Cos(angle1) * radius * 0.9f, thickness, Mathf.Sin(angle1) * radius * 0.9f);
+            Vector3 inner2 = new Vector3(Mathf.Cos(angle2) * radius * 0.9f, thickness, Mathf.Sin(angle2) * radius * 0.9f);
+
+            surfaceTool.SetColor(metalColor);
+            surfaceTool.AddVertex(outer1);
+            surfaceTool.AddVertex(outer2);
+            surfaceTool.AddVertex(inner1);
+            surfaceTool.AddVertex(inner1);
+            surfaceTool.AddVertex(outer2);
+            surfaceTool.AddVertex(inner2);
+        }
+
+        // Radial bars
+        int numBars = 6;
+        for (int i = 0; i < numBars; i++)
+        {
+            float angle = i * Mathf.Tau / numBars;
+            float barWidth = 0.04f * PropScale;
+
+            Vector3 dir = new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle));
+            Vector3 perp = new Vector3(-dir.Z, 0, dir.X);
+
+            Vector3[] corners = {
+                dir * radius * 0.1f + perp * barWidth / 2f + Vector3.Up * thickness,
+                dir * radius * 0.85f + perp * barWidth / 2f + Vector3.Up * thickness,
+                dir * radius * 0.85f - perp * barWidth / 2f + Vector3.Up * thickness,
+                dir * radius * 0.1f - perp * barWidth / 2f + Vector3.Up * thickness
+            };
+
+            surfaceTool.SetColor(metalColor);
+            surfaceTool.AddVertex(corners[0]);
+            surfaceTool.AddVertex(corners[1]);
+            surfaceTool.AddVertex(corners[2]);
+            surfaceTool.AddVertex(corners[0]);
+            surfaceTool.AddVertex(corners[2]);
+            surfaceTool.AddVertex(corners[3]);
+        }
+
+        surfaceTool.GenerateNormals();
+        var mesh = surfaceTool.Commit();
+
+        var material = new StandardMaterial3D
+        {
+            VertexColorUseAsAlbedo = true,
+            Roughness = 0.65f,
+            Metallic = 0.7f,
+            CullMode = BaseMaterial3D.CullModeEnum.Disabled
+        };
+        mesh.SurfaceSetMaterial(0, material);
+        return mesh;
+    }
+
+    /// <summary>
+    /// Creates a ceiling support beam mesh.
+    /// </summary>
+    private ArrayMesh CreateCeilingBeamMesh(RandomNumberGenerator rng)
+    {
+        float beamWidth = 0.4f * PropScale;
+        float beamHeight = 0.5f * PropScale;
+        float beamLength = 6f * PropScale;
+
+        var surfaceTool = new SurfaceTool();
+        surfaceTool.Begin(Mesh.PrimitiveType.Triangles);
+
+        // Wood colors
+        Color woodDark = new Color(0.28f, 0.18f, 0.1f);
+        Color woodLight = new Color(0.35f, 0.24f, 0.14f);
+        Color woodMid = new Color(0.32f, 0.21f, 0.12f);
+
+        // Main beam
+        Color beamColor = rng.Randf() > 0.5f ? woodDark : woodMid;
+        AddBox(surfaceTool, Vector3.Zero, new Vector3(beamWidth, beamHeight, beamLength), beamColor);
+
+        // Add wood grain stripes
+        int numStripes = rng.RandiRange(3, 6);
+        for (int i = 0; i < numStripes; i++)
+        {
+            float xOffset = rng.RandfRange(-beamWidth * 0.4f, beamWidth * 0.4f);
+            float stripeWidth = rng.RandfRange(0.02f, 0.05f) * PropScale;
+            Color stripeColor = rng.Randf() > 0.5f ? woodLight : woodDark;
+            AddBox(surfaceTool, new Vector3(xOffset, beamHeight / 2f + 0.01f, 0),
+                new Vector3(stripeWidth, 0.01f, beamLength), stripeColor);
+        }
+
+        // Add decorative brackets at ends
+        Color bracketColor = new Color(0.25f, 0.25f, 0.28f);
+        float bracketSize = 0.15f * PropScale;
+        AddBox(surfaceTool, new Vector3(0, -beamHeight * 0.3f, beamLength / 2f - bracketSize),
+            new Vector3(beamWidth * 1.2f, bracketSize, bracketSize), bracketColor);
+        AddBox(surfaceTool, new Vector3(0, -beamHeight * 0.3f, -beamLength / 2f + bracketSize),
+            new Vector3(beamWidth * 1.2f, bracketSize, bracketSize), bracketColor);
+
+        surfaceTool.GenerateNormals();
+        var mesh = surfaceTool.Commit();
+
+        var material = new StandardMaterial3D
+        {
+            VertexColorUseAsAlbedo = true,
+            Roughness = 0.85f,
+            Metallic = 0f,
+            CullMode = BaseMaterial3D.CullModeEnum.Disabled
+        };
+        mesh.SurfaceSetMaterial(0, material);
+        return mesh;
+    }
+
+    /// <summary>
+    /// Creates a ceiling arch/rib mesh.
+    /// </summary>
+    private ArrayMesh CreateCeilingArchMesh(RandomNumberGenerator rng)
+    {
+        float archWidth = 0.3f * PropScale;
+        float archHeight = 0.4f * PropScale;
+        float archSpan = 4f * PropScale;
+
+        var surfaceTool = new SurfaceTool();
+        surfaceTool.Begin(Mesh.PrimitiveType.Triangles);
+
+        Color stoneColor = new Color(0.32f, 0.28f, 0.24f);
+
+        // Create arch segments
+        int segments = 12;
+        for (int i = 0; i < segments; i++)
+        {
+            float t1 = i / (float)segments;
+            float t2 = (i + 1) / (float)segments;
+            float angle1 = t1 * Mathf.Pi;
+            float angle2 = t2 * Mathf.Pi;
+
+            float y1 = Mathf.Sin(angle1) * archHeight;
+            float y2 = Mathf.Sin(angle2) * archHeight;
+            float z1 = (t1 - 0.5f) * archSpan;
+            float z2 = (t2 - 0.5f) * archSpan;
+
+            // Slight color variation per segment
+            Color segColor = stoneColor * (0.9f + rng.Randf() * 0.2f);
+
+            // Draw box segment
+            Vector3 center = new Vector3(0, (y1 + y2) / 2f, (z1 + z2) / 2f);
+            float segLength = new Vector2(z2 - z1, y2 - y1).Length();
+            AddBox(surfaceTool, center, new Vector3(archWidth, archHeight * 0.5f, segLength * 1.1f), segColor);
+        }
+
+        surfaceTool.GenerateNormals();
+        var mesh = surfaceTool.Commit();
+
+        var material = new StandardMaterial3D
+        {
+            VertexColorUseAsAlbedo = true,
+            Roughness = 0.9f,
+            Metallic = 0f,
+            CullMode = BaseMaterial3D.CullModeEnum.Disabled
+        };
+        mesh.SurfaceSetMaterial(0, material);
+        return mesh;
+    }
+
+    /// <summary>
+    /// Creates a wall buttress/support structure mesh.
+    /// </summary>
+    private ArrayMesh CreateWallButtressMesh(RandomNumberGenerator rng)
+    {
+        float width = 0.8f * PropScale;
+        float height = 3f * PropScale;
+        float depth = 0.5f * PropScale;
+
+        var surfaceTool = new SurfaceTool();
+        surfaceTool.Begin(Mesh.PrimitiveType.Triangles);
+
+        Color stoneBase = new Color(0.35f, 0.30f, 0.25f);
+        Color stoneDark = new Color(0.28f, 0.24f, 0.20f);
+
+        // Main buttress body (tapered)
+        // Bottom section (wider)
+        AddBox(surfaceTool, new Vector3(0, height * 0.15f, depth * 0.1f),
+            new Vector3(width, height * 0.3f, depth * 0.8f), stoneBase);
+
+        // Middle section
+        AddBox(surfaceTool, new Vector3(0, height * 0.5f, 0),
+            new Vector3(width * 0.85f, height * 0.4f, depth * 0.6f), stoneBase * 0.95f);
+
+        // Top section (narrower)
+        AddBox(surfaceTool, new Vector3(0, height * 0.85f, -depth * 0.1f),
+            new Vector3(width * 0.7f, height * 0.3f, depth * 0.4f), stoneBase * 0.9f);
+
+        // Decorative cap
+        AddBox(surfaceTool, new Vector3(0, height, -depth * 0.15f),
+            new Vector3(width * 0.9f, height * 0.08f, depth * 0.5f), stoneDark);
+
+        // Base molding
+        AddBox(surfaceTool, new Vector3(0, height * 0.03f, depth * 0.2f),
+            new Vector3(width * 1.1f, height * 0.06f, depth), stoneDark);
+
+        surfaceTool.GenerateNormals();
+        var mesh = surfaceTool.Commit();
+
+        var material = new StandardMaterial3D
+        {
+            VertexColorUseAsAlbedo = true,
+            Roughness = 0.88f,
+            Metallic = 0f,
+            CullMode = BaseMaterial3D.CullModeEnum.Disabled
+        };
+        mesh.SurfaceSetMaterial(0, material);
+        return mesh;
+    }
+
+    /// <summary>
+    /// Creates a decorative wall column mesh.
+    /// </summary>
+    private ArrayMesh CreateWallColumnMesh(RandomNumberGenerator rng)
+    {
+        float radius = 0.35f * PropScale;
+        float height = Constants.WallHeight * PropScale;
+
+        var surfaceTool = new SurfaceTool();
+        surfaceTool.Begin(Mesh.PrimitiveType.Triangles);
+
+        Color stoneLight = new Color(0.38f, 0.33f, 0.28f);
+        Color stoneDark = new Color(0.28f, 0.24f, 0.20f);
+
+        int segments = 12;
+
+        // Column shaft with fluting
+        for (int i = 0; i < segments; i++)
+        {
+            float angle1 = i * Mathf.Tau / segments;
+            float angle2 = (i + 1) * Mathf.Tau / segments;
+
+            // Fluted radius (alternating)
+            float r1 = radius * (i % 2 == 0 ? 1f : 0.9f);
+            float r2 = radius * ((i + 1) % 2 == 0 ? 1f : 0.9f);
+
+            Vector3 bottom1 = new Vector3(Mathf.Cos(angle1) * r1, 0.3f * PropScale, Mathf.Sin(angle1) * r1);
+            Vector3 bottom2 = new Vector3(Mathf.Cos(angle2) * r2, 0.3f * PropScale, Mathf.Sin(angle2) * r2);
+            Vector3 top1 = new Vector3(Mathf.Cos(angle1) * r1 * 0.9f, height - 0.3f * PropScale, Mathf.Sin(angle1) * r1 * 0.9f);
+            Vector3 top2 = new Vector3(Mathf.Cos(angle2) * r2 * 0.9f, height - 0.3f * PropScale, Mathf.Sin(angle2) * r2 * 0.9f);
+
+            Color segColor = i % 2 == 0 ? stoneLight : stoneLight * 0.9f;
+            surfaceTool.SetColor(segColor);
+            surfaceTool.AddVertex(bottom1);
+            surfaceTool.AddVertex(top1);
+            surfaceTool.AddVertex(bottom2);
+            surfaceTool.AddVertex(bottom2);
+            surfaceTool.AddVertex(top1);
+            surfaceTool.AddVertex(top2);
+        }
+
+        // Base
+        AddCylinder(surfaceTool, new Vector3(0, 0.15f * PropScale, 0), radius * 1.3f, 0.3f * PropScale, segments, stoneDark);
+
+        // Capital (top)
+        AddCylinder(surfaceTool, new Vector3(0, height - 0.15f * PropScale, 0), radius * 1.2f, 0.3f * PropScale, segments, stoneDark);
+
+        surfaceTool.GenerateNormals();
+        var mesh = surfaceTool.Commit();
+
+        var material = new StandardMaterial3D
+        {
+            VertexColorUseAsAlbedo = true,
+            Roughness = 0.85f,
+            Metallic = 0f,
+            CullMode = BaseMaterial3D.CullModeEnum.Disabled
+        };
+        mesh.SurfaceSetMaterial(0, material);
+        return mesh;
+    }
+
+    /// <summary>
+    /// Creates a wall-mounted torch sconce mesh.
+    /// </summary>
+    private ArrayMesh CreateWallSconceMesh(RandomNumberGenerator rng)
+    {
+        float scale = PropScale;
+
+        var surfaceTool = new SurfaceTool();
+        surfaceTool.Begin(Mesh.PrimitiveType.Triangles);
+
+        Color ironColor = new Color(0.2f, 0.2f, 0.22f);
+        Color brassColor = new Color(0.5f, 0.4f, 0.25f);
+
+        // Wall plate
+        AddBox(surfaceTool, new Vector3(0, 0, -0.05f * scale),
+            new Vector3(0.2f * scale, 0.3f * scale, 0.03f * scale), ironColor);
+
+        // Arm
+        AddBox(surfaceTool, new Vector3(0, -0.05f * scale, 0.1f * scale),
+            new Vector3(0.06f * scale, 0.06f * scale, 0.25f * scale), ironColor);
+
+        // Torch holder ring
+        int segments = 8;
+        float ringRadius = 0.08f * scale;
+        for (int i = 0; i < segments; i++)
+        {
+            float angle1 = i * Mathf.Tau / segments;
+            float angle2 = (i + 1) * Mathf.Tau / segments;
+
+            Vector3 inner1 = new Vector3(Mathf.Cos(angle1) * ringRadius * 0.7f, -0.05f * scale, 0.22f * scale + Mathf.Sin(angle1) * ringRadius * 0.7f);
+            Vector3 inner2 = new Vector3(Mathf.Cos(angle2) * ringRadius * 0.7f, -0.05f * scale, 0.22f * scale + Mathf.Sin(angle2) * ringRadius * 0.7f);
+            Vector3 outer1 = new Vector3(Mathf.Cos(angle1) * ringRadius, -0.05f * scale, 0.22f * scale + Mathf.Sin(angle1) * ringRadius);
+            Vector3 outer2 = new Vector3(Mathf.Cos(angle2) * ringRadius, -0.05f * scale, 0.22f * scale + Mathf.Sin(angle2) * ringRadius);
+
+            surfaceTool.SetColor(brassColor);
+            surfaceTool.AddVertex(inner1);
+            surfaceTool.AddVertex(outer1);
+            surfaceTool.AddVertex(inner2);
+            surfaceTool.AddVertex(inner2);
+            surfaceTool.AddVertex(outer1);
+            surfaceTool.AddVertex(outer2);
+        }
+
+        // Torch (simple cylinder)
+        AddCylinder(surfaceTool, new Vector3(0, 0.1f * scale, 0.22f * scale), 0.04f * scale, 0.25f * scale, 6, new Color(0.4f, 0.28f, 0.15f));
+
+        surfaceTool.GenerateNormals();
+        var mesh = surfaceTool.Commit();
+
+        var material = new StandardMaterial3D
+        {
+            VertexColorUseAsAlbedo = true,
+            Roughness = 0.7f,
+            Metallic = 0.4f,
+            CullMode = BaseMaterial3D.CullModeEnum.Disabled
+        };
+        mesh.SurfaceSetMaterial(0, material);
+        return mesh;
+    }
+
+    // Helper methods for mesh generation
+
+    private void AddBox(SurfaceTool st, Vector3 center, Vector3 size, Color color)
+    {
+        Vector3 half = size / 2f;
+        Vector3[] corners = {
+            center + new Vector3(-half.X, -half.Y, -half.Z),
+            center + new Vector3(half.X, -half.Y, -half.Z),
+            center + new Vector3(half.X, half.Y, -half.Z),
+            center + new Vector3(-half.X, half.Y, -half.Z),
+            center + new Vector3(-half.X, -half.Y, half.Z),
+            center + new Vector3(half.X, -half.Y, half.Z),
+            center + new Vector3(half.X, half.Y, half.Z),
+            center + new Vector3(-half.X, half.Y, half.Z)
+        };
+
+        int[,] faces = {
+            {0, 1, 2, 3}, // Front
+            {5, 4, 7, 6}, // Back
+            {4, 0, 3, 7}, // Left
+            {1, 5, 6, 2}, // Right
+            {3, 2, 6, 7}, // Top
+            {4, 5, 1, 0}  // Bottom
+        };
+
+        st.SetColor(color);
+        for (int f = 0; f < 6; f++)
+        {
+            st.AddVertex(corners[faces[f, 0]]);
+            st.AddVertex(corners[faces[f, 1]]);
+            st.AddVertex(corners[faces[f, 2]]);
+            st.AddVertex(corners[faces[f, 0]]);
+            st.AddVertex(corners[faces[f, 2]]);
+            st.AddVertex(corners[faces[f, 3]]);
+        }
+    }
+
+    private void AddCylinder(SurfaceTool st, Vector3 center, float radius, float height, int segments, Color color)
+    {
+        st.SetColor(color);
+
+        for (int i = 0; i < segments; i++)
+        {
+            float angle1 = i * Mathf.Tau / segments;
+            float angle2 = (i + 1) * Mathf.Tau / segments;
+
+            Vector3 bottom1 = center + new Vector3(Mathf.Cos(angle1) * radius, -height / 2f, Mathf.Sin(angle1) * radius);
+            Vector3 bottom2 = center + new Vector3(Mathf.Cos(angle2) * radius, -height / 2f, Mathf.Sin(angle2) * radius);
+            Vector3 top1 = center + new Vector3(Mathf.Cos(angle1) * radius, height / 2f, Mathf.Sin(angle1) * radius);
+            Vector3 top2 = center + new Vector3(Mathf.Cos(angle2) * radius, height / 2f, Mathf.Sin(angle2) * radius);
+
+            // Side
+            st.AddVertex(bottom1);
+            st.AddVertex(top1);
+            st.AddVertex(bottom2);
+            st.AddVertex(bottom2);
+            st.AddVertex(top1);
+            st.AddVertex(top2);
+
+            // Top cap
+            st.AddVertex(center + Vector3.Up * height / 2f);
+            st.AddVertex(top1);
+            st.AddVertex(top2);
+
+            // Bottom cap
+            st.AddVertex(center + Vector3.Down * height / 2f);
+            st.AddVertex(bottom2);
+            st.AddVertex(bottom1);
+        }
     }
 
     // Static counter for shadow-enabled lights (for performance)

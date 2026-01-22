@@ -86,6 +86,9 @@ public static class AbilityIcons
 
         switch (abilityId)
         {
+            case "heal":
+                DrawHealHeart(image, cx, cy, symbolColor);
+                break;
             case "fireball":
                 DrawFlame(image, cx, cy, symbolColor);
                 break;
@@ -429,6 +432,50 @@ public static class AbilityIcons
                     if (px >= 0 && px < IconSize && py >= 0 && py < IconSize)
                         image.SetPixel(px, py, color);
                 }
+            }
+        }
+    }
+
+    private static void DrawHealHeart(Image image, int cx, int cy, Color color)
+    {
+        // Draw a heart shape with a plus sign for healing
+        // Heart outline
+        for (float t = 0; t < Mathf.Tau; t += 0.05f)
+        {
+            // Heart parametric equation
+            float x = 16 * Mathf.Pow(Mathf.Sin(t), 3);
+            float y = -(13 * Mathf.Cos(t) - 5 * Mathf.Cos(2*t) - 2 * Mathf.Cos(3*t) - Mathf.Cos(4*t));
+            int px = cx + (int)(x * 0.6f);
+            int py = cy + (int)(y * 0.5f) - 1;
+            if (px >= 0 && px < IconSize && py >= 0 && py < IconSize)
+            {
+                image.SetPixel(px, py, color);
+                // Thicken the line
+                if (px + 1 < IconSize) image.SetPixel(px + 1, py, color);
+            }
+        }
+
+        // Plus sign in center (medical cross)
+        Color brightColor = color * 1.2f;
+        brightColor.A = 1f;
+        // Vertical bar
+        for (int y = -4; y <= 4; y++)
+        {
+            int py = cy + y;
+            if (py >= 0 && py < IconSize)
+            {
+                image.SetPixel(cx, py, brightColor);
+                if (cx + 1 < IconSize) image.SetPixel(cx + 1, py, brightColor);
+            }
+        }
+        // Horizontal bar
+        for (int x = -4; x <= 4; x++)
+        {
+            int px = cx + x;
+            if (px >= 0 && px < IconSize)
+            {
+                image.SetPixel(px, cy, brightColor);
+                if (cy + 1 < IconSize) image.SetPixel(px, cy + 1, brightColor);
             }
         }
     }

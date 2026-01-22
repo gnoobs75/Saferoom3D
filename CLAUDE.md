@@ -16,7 +16,7 @@
 
 ## Project Overview
 
-First-person dungeon crawler built with **Godot 4.5 (.NET)** and **C# (.NET 8.0)**. Set in the "Dungeon Crawler Carl" universe with procedurally generated dungeons, 28 monster types, 8 bosses, 14 abilities, and combat systems.
+First-person dungeon crawler built with **Godot 4.5 (.NET)** and **C# (.NET 8.0)**. Set in the "Dungeon Crawler Carl" universe with procedurally generated dungeons, 29 monster types, 8 bosses, 14 abilities, and combat systems.
 
 ---
 
@@ -78,6 +78,29 @@ Monsters occasionally stop to chat with each other (30-60 second cooldown):
 - Dialogue also logged to combat log in purple color
 - Both monsters enter `IdleInteracting` state during chat
 - Files: `MonsterChatDatabase.cs`, `MonsterChatBubble.cs`
+
+### Adding New Monsters (Checklist)
+
+When adding a new monster type, you must update **ALL** of these locations:
+
+| Step | File | What to Add |
+|------|------|-------------|
+| 1. Procedural Mesh | `Scripts/Enemies/MonsterMeshFactory.cs` | Add `case "monster_name":` in switch + `CreateMonsterNameMesh()` method |
+| 2. Monster Stats | `Scripts/Enemies/BasicEnemy3D.cs` | Add `case "monster_name":` in `LoadMonsterConfig()` with HP, speed, damage, color |
+| 3. Map Editor List | `Scripts/UI/InMapEditor.cs` | Add `"monster_name"` to `MonsterTypes` array |
+| 4. Editor Preview | `Scripts/UI/EditorScreen3D.cs` | Add `"monster_name"` to `monsterTypes` array (~line 357) |
+| 5. Editor Stats Display | `Scripts/UI/EditorScreen3D.cs` | Add `case "monster_name":` in `UpdateMonsterStatsDisplay()` |
+| 6. Documentation | `.claude/reference/monsters.md` | Add monster to the table with stats |
+
+**Optional additions:**
+- `Scripts/Enemies/MonsterChatDatabase.cs` - Add chat lines for monster pairs
+- `Scripts/Core/MonsterPartDatabase.cs` - Add quest item drop (e.g., "Monster Fang")
+- `Scripts/Core/MonsterSounds.cs` - Add sound effects for the monster
+
+**GLB Model Support:**
+- GLB models use automatic path convention: `Assets/Models/<monster_name>.glb`
+- Toggle "Model Type" in Editor Screen → Monsters tab to enable
+- Settings stored in `user://glb_config.json` via `GlbModelConfig.cs`
 
 ### Procedural Mesh (MonsterMeshFactory)
 - Use `BodyGeometry` for attachment points

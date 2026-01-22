@@ -16,6 +16,7 @@ public partial class MirrorImage3D : Ability3D
 
     public override float DefaultCooldown => 60f;
     public override int DefaultManaCost => 0;
+    public override int RequiredLevel => 3;
 
     // Mirror Image stats
     public float Duration { get; private set; } = 12f;

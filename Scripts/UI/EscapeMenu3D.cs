@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using SafeRoom3D.Core;
+using SafeRoom3D.NPC.AI;
 
 namespace SafeRoom3D.UI;
 
@@ -37,6 +38,8 @@ public partial class EscapeMenu3D : CanvasLayer
     private OptionButton? _lodDropdown;
     private HSlider? _gameSpeedSlider;
     private Label? _gameSpeedValueLabel;
+    private CheckBox? _crawlerAIToggle;
+    private CheckBox? _crawlerAILoggingToggle;
     private Button? _optionsBackButton;
 
     // Keybindings panel
@@ -212,7 +215,7 @@ public partial class EscapeMenu3D : CanvasLayer
     private void CreateOptionsPanel(CenterContainer parent)
     {
         _optionsPanel = new PanelContainer();
-        _optionsPanel.CustomMinimumSize = new Vector2(450, 450);
+        _optionsPanel.CustomMinimumSize = new Vector2(450, 550);  // Taller for AI options
         _optionsPanel.Visible = false;
 
         var panelStyle = new StyleBoxFlat();
@@ -334,6 +337,35 @@ public partial class EscapeMenu3D : CanvasLayer
         speedRow.AddChild(_gameSpeedValueLabel);
         vbox.AddChild(speedRow);
 
+        // Crawler AI section header
+        var aiHeader = new Label { Text = "Crawler AI" };
+        aiHeader.AddThemeFontSizeOverride("font_size", 16);
+        aiHeader.AddThemeColorOverride("font_color", new Color(0.4f, 0.8f, 1.0f));
+        vbox.AddChild(aiHeader);
+
+        // Load Crawler AI config
+        CrawlerAIConfig.Load();
+
+        // Crawler AI toggle
+        var aiRow = new HBoxContainer();
+        var aiLabel = new Label { Text = "Enable AI", CustomMinimumSize = new Vector2(120, 0) };
+        aiLabel.AddThemeFontSizeOverride("font_size", 18);
+        aiRow.AddChild(aiLabel);
+        _crawlerAIToggle = new CheckBox { ButtonPressed = CrawlerAIConfig.AIEnabled };
+        _crawlerAIToggle.Toggled += (pressed) => CrawlerAIConfig.AIEnabled = pressed;
+        aiRow.AddChild(_crawlerAIToggle);
+        vbox.AddChild(aiRow);
+
+        // Crawler AI logging toggle
+        var aiLogRow = new HBoxContainer();
+        var aiLogLabel = new Label { Text = "AI Logging", CustomMinimumSize = new Vector2(120, 0) };
+        aiLogLabel.AddThemeFontSizeOverride("font_size", 18);
+        aiLogRow.AddChild(aiLogLabel);
+        _crawlerAILoggingToggle = new CheckBox { ButtonPressed = CrawlerAIConfig.DebugLoggingEnabled };
+        _crawlerAILoggingToggle.Toggled += (pressed) => CrawlerAIConfig.DebugLoggingEnabled = pressed;
+        aiLogRow.AddChild(_crawlerAILoggingToggle);
+        vbox.AddChild(aiLogRow);
+
         // Back button
         _optionsBackButton = CreateMenuButton("Back", new Color(0.4f, 0.3f, 0.3f));
         _optionsBackButton.Pressed += OnOptionsBackPressed;
@@ -388,7 +420,8 @@ public partial class EscapeMenu3D : CanvasLayer
         AddKeybindingRow("attack_alt", "Alt Attack", "RMB");
         AddKeybindingRow("interact", "Interact", "E");
         AddKeybindingRow("loot", "Loot Corpse", "T");
-        AddKeybindingRow("toggle_spellbook", "Spellbook", "Tab");
+        AddKeybindingRow("toggle_spellbook", "Spellbook", "B");
+        AddKeybindingRow("toggle_abilities", "Abilities", "K");
         AddKeybindingRow("toggle_inventory", "Inventory", "I");
         AddKeybindingRow("toggle_map", "Toggle Map", "M");
         AddKeybindingRow("escape", "Menu", "Escape");

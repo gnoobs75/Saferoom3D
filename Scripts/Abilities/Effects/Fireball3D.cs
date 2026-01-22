@@ -6,10 +6,10 @@ using SafeRoom3D.Enemies;
 namespace SafeRoom3D.Abilities.Effects;
 
 /// <summary>
-/// Fireball ability - Launch a fireball that explodes on impact.
-/// Targeted AOE damage spell.
+/// Fireball spell - Launch a fireball that explodes on impact.
+/// Targeted AOE damage spell. Starter spell for all players.
 /// </summary>
-public partial class Fireball3D : Ability3D, ITargetedAbility
+public partial class Fireball3D : Spell3D, ITargetedAbility
 {
     public override string AbilityId => "fireball";
     public override string AbilityName => "Fireball";
@@ -18,6 +18,7 @@ public partial class Fireball3D : Ability3D, ITargetedAbility
 
     public override float DefaultCooldown => 0f; // No cooldown, mana-limited
     public override int DefaultManaCost => 25;
+    public override int RequiredLevel => 1; // Starter spell
 
     // Fireball stats
     public float Damage { get; private set; } = 100f;

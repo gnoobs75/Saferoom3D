@@ -15,7 +15,7 @@ public static class KeybindingsManager
     {
         "move_forward", "move_back", "move_left", "move_right",
         "jump", "sprint", "attack", "attack_alt",
-        "interact", "loot", "toggle_spellbook", "toggle_inventory",
+        "interact", "loot", "toggle_spellbook", "toggle_abilities", "toggle_inventory",
         "toggle_map", "escape", "ability_q", "ability_r", "ability_f", "ability_v"
     };
 

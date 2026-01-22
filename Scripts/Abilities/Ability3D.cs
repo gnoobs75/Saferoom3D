@@ -6,15 +6,23 @@ namespace SafeRoom3D.Abilities;
 
 /// <summary>
 /// Base class for all player abilities in the 3D game.
-/// Provides common functionality: cooldowns, mana costs, activation.
+/// Abilities are cooldown-based skills that do NOT cost mana.
+/// For mana-based spells, see Spell3D.
 /// Ported from 2D ability system architecture.
 /// </summary>
-public abstract partial class Ability3D : Node
+public abstract partial class Ability3D : Node, IUnlockable
 {
     // Ability identity
     public abstract string AbilityId { get; }
     public abstract string AbilityName { get; }
     public abstract string Description { get; }
+
+    // IUnlockable implementation
+    public string Id => AbilityId;
+    public string DisplayName => AbilityName;
+    public virtual int RequiredLevel => 1;
+    public bool IsUnlocked { get; set; } = false;
+    public virtual string Category => "Ability";
 
     // Ability type
     public abstract AbilityType Type { get; }
@@ -22,6 +30,12 @@ public abstract partial class Ability3D : Node
     // Default stats (can be overridden by config)
     public abstract float DefaultCooldown { get; }
     public abstract int DefaultManaCost { get; }
+
+    /// <summary>
+    /// Whether this ability costs mana. Override in Spell3D to return true.
+    /// Abilities (base class) do NOT cost mana.
+    /// </summary>
+    public virtual bool UsesMana => false;
 
     // Current stats (loaded from config or defaults)
     public float Cooldown { get; protected set; }
@@ -104,6 +118,13 @@ public abstract partial class Ability3D : Node
     /// </summary>
     public virtual bool TryActivate()
     {
+        // Check if unlocked
+        if (!IsUnlocked)
+        {
+            GD.Print($"[{AbilityName}] Not unlocked (requires level {RequiredLevel})");
+            return false;
+        }
+
         // Check if on cooldown
         if (IsOnCooldown)
         {
@@ -118,12 +139,15 @@ public abstract partial class Ability3D : Node
             return false;
         }
 
-        // NOTE: Mana cost check disabled for testing
-        // if (Player.CurrentMana < ManaCost)
-        // {
-        //     GD.Print($"[{AbilityName}] Not enough mana: {Player.CurrentMana}/{ManaCost}");
-        //     return false;
-        // }
+        // Mana cost check (only for spells that use mana)
+        if (UsesMana && ManaCost > 0)
+        {
+            if (Player.CurrentMana < ManaCost)
+            {
+                GD.Print($"[{AbilityName}] Not enough mana: {Player.CurrentMana}/{ManaCost}");
+                return false;
+            }
+        }
 
         // Toggle abilities can be deactivated
         if (Type == AbilityType.Toggle && IsActive)
@@ -138,11 +162,11 @@ public abstract partial class Ability3D : Node
             return false;
         }
 
-        // NOTE: Mana consumption disabled for testing
-        // if (ManaCost > 0)
-        // {
-        //     Player.UseMana(ManaCost);
-        // }
+        // Consume mana (only for spells that use mana)
+        if (UsesMana && ManaCost > 0)
+        {
+            Player.UseMana(ManaCost);
+        }
 
         // Start cooldown
         StartCooldown();

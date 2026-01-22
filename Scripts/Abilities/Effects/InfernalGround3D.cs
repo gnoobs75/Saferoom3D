@@ -5,10 +5,10 @@ using System.Linq;
 namespace SafeRoom3D.Abilities.Effects;
 
 /// <summary>
-/// Infernal Ground ability - Create a fire zone that damages enemies over time.
+/// Infernal Ground spell - Create a fire zone that damages enemies over time.
 /// Targeted DOT (damage over time) zone spell.
 /// </summary>
-public partial class InfernalGround3D : Ability3D, ITargetedAbility
+public partial class InfernalGround3D : Spell3D, ITargetedAbility
 {
     public override string AbilityId => "infernal_ground";
     public override string AbilityName => "Infernal Ground";
@@ -17,6 +17,7 @@ public partial class InfernalGround3D : Ability3D, ITargetedAbility
 
     public override float DefaultCooldown => 15f;
     public override int DefaultManaCost => 35;
+    public override int RequiredLevel => 4;
 
     // Infernal Ground stats
     public float DamagePerTick { get; private set; } = 15f;

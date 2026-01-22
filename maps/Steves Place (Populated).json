@@ -1,0 +1,7408 @@
+{
+  "version": "1.1",
+  "name": "Steves Place (Populated)",
+  "mode": "tiles",
+  "width": 420,
+  "depth": 420,
+  "spawnRoom": 0,
+  "spawnPosition": {
+    "x": 22,
+    "z": 351
+  },
+  "tileData": "H4sIAAAAAAAAClvCyMCwhJGBoeH/fxAy1Alt8GIM5xqKZON8Rqrj0AZvxtBBS+5nAQClsO3ovwEAAA==",
+  "rooms": [],
+  "corridors": [],
+  "enemies": [
+    {
+      "type": "goblin",
+      "roomId": -1,
+      "position": {
+        "x": 62,
+        "z": 374
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0
+    },
+    {
+      "type": "goblin",
+      "roomId": -1,
+      "position": {
+        "x": 62,
+        "z": 386
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0
+    },
+    {
+      "type": "goblin_shaman",
+      "roomId": -1,
+      "position": {
+        "x": 70,
+        "z": 380
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0
+    },
+    {
+      "type": "goblin_thrower",
+      "roomId": -1,
+      "position": {
+        "x": 78,
+        "z": 380
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0
+    },
+    {
+      "type": "slime",
+      "roomId": -1,
+      "position": {
+        "x": 100,
+        "z": 372
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0
+    },
+    {
+      "type": "slime",
+      "roomId": -1,
+      "position": {
+        "x": 100,
+        "z": 378
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0
+    },
+    {
+      "type": "slime",
+      "roomId": -1,
+      "position": {
+        "x": 100,
+        "z": 387
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0
+    },
+    {
+      "type": "slime",
+      "roomId": -1,
+      "position": {
+        "x": 100,
+        "z": 382
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0
+    },
+    {
+      "type": "wolf",
+      "roomId": -1,
+      "position": {
+        "x": 128,
+        "z": 372
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0
+    },
+    {
+      "type": "wolf",
+      "roomId": -1,
+      "position": {
+        "x": 128,
+        "z": 387
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0
+    },
+    {
+      "type": "wolf",
+      "roomId": -1,
+      "position": {
+        "x": 128,
+        "z": 379
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0
+    },
+    {
+      "type": "dragon",
+      "roomId": -1,
+      "position": {
+        "x": 352,
+        "z": 374
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0
+    },
+    {
+      "type": "dragon",
+      "roomId": -1,
+      "position": {
+        "x": 352,
+        "z": 386
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0
+    },
+    {
+      "type": "living_armor",
+      "roomId": -1,
+      "position": {
+        "x": 152,
+        "z": 379
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0
+    },
+    {
+      "type": "shock_drone",
+      "roomId": -1,
+      "position": {
+        "x": 38,
+        "z": 412
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0
+    },
+    {
+      "type": "shock_drone",
+      "roomId": -1,
+      "position": {
+        "x": 32,
+        "z": 412
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0
+    },
+    {
+      "type": "shock_drone",
+      "roomId": -1,
+      "position": {
+        "x": 25,
+        "z": 412
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0
+    },
+    {
+      "type": "shock_drone",
+      "roomId": -1,
+      "position": {
+        "x": 18,
+        "z": 412
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0
+    },
+    {
+      "type": "shock_drone",
+      "roomId": -1,
+      "position": {
+        "x": 10,
+        "z": 412
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0
+    },
+    {
+      "type": "skeleton",
+      "roomId": -1,
+      "position": {
+        "x": 260,
+        "z": 373
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0
+    },
+    {
+      "type": "skeleton",
+      "roomId": -1,
+      "position": {
+        "x": 260,
+        "z": 385
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0
+    },
+    {
+      "type": "skeleton",
+      "roomId": -1,
+      "position": {
+        "x": 264,
+        "z": 376
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0
+    },
+    {
+      "type": "skeleton",
+      "roomId": -1,
+      "position": {
+        "x": 264,
+        "z": 382
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0
+    },
+    {
+      "type": "skeleton",
+      "roomId": -1,
+      "position": {
+        "x": 269,
+        "z": 379
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0
+    },
+    {
+      "type": "spider_queen",
+      "roomId": -1,
+      "position": {
+        "x": 395,
+        "z": 354
+      },
+      "level": 1,
+      "isBoss": true,
+      "rotationY": 0
+    },
+    {
+      "type": "dragon_king",
+      "roomId": -1,
+      "position": {
+        "x": 395,
+        "z": 403
+      },
+      "level": 1,
+      "isBoss": true,
+      "rotationY": 0
+    },
+    {
+      "type": "void_spawn",
+      "roomId": -1,
+      "position": {
+        "x": 377,
+        "z": 406
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 5.643335559127142
+    },
+    {
+      "type": "lava_elemental",
+      "roomId": -1,
+      "position": {
+        "x": 201,
+        "z": 390
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 1.3861770955558719
+    },
+    {
+      "type": "dungeon_rat",
+      "roomId": -1,
+      "position": {
+        "x": 16,
+        "z": 380
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0.49564639980224756
+    },
+    {
+      "type": "lava_elemental",
+      "roomId": -1,
+      "position": {
+        "x": 373,
+        "z": 378
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 0.294877590632673
+    },
+    {
+      "type": "living_armor",
+      "roomId": -1,
+      "position": {
+        "x": 300,
+        "z": 377
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 2.5742869101249406
+    },
+    {
+      "type": "plague_bearer",
+      "roomId": -1,
+      "position": {
+        "x": 390,
+        "z": 361
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 5.997154685883681
+    },
+    {
+      "type": "lava_elemental",
+      "roomId": -1,
+      "position": {
+        "x": 237,
+        "z": 373
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 1.560163464987733
+    },
+    {
+      "type": "living_armor",
+      "roomId": -1,
+      "position": {
+        "x": 171,
+        "z": 383
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 5.996410318820535
+    },
+    {
+      "type": "void_spawn",
+      "roomId": -1,
+      "position": {
+        "x": 179,
+        "z": 375
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 0.771697788115878
+    },
+    {
+      "type": "living_armor",
+      "roomId": -1,
+      "position": {
+        "x": 258,
+        "z": 379
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 0.073462535122612
+    },
+    {
+      "type": "wolf",
+      "roomId": -1,
+      "position": {
+        "x": 117,
+        "z": 370
+      },
+      "level": 3,
+      "isBoss": false,
+      "rotationY": 2.8960643858840998
+    },
+    {
+      "type": "void_spawn",
+      "roomId": -1,
+      "position": {
+        "x": 254,
+        "z": 388
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 3.953737456427427
+    },
+    {
+      "type": "living_armor",
+      "roomId": -1,
+      "position": {
+        "x": 410,
+        "z": 348
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 5.28913852609702
+    },
+    {
+      "type": "living_armor",
+      "roomId": -1,
+      "position": {
+        "x": 186,
+        "z": 387
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 5.359831219696247
+    },
+    {
+      "type": "plague_bearer",
+      "roomId": -1,
+      "position": {
+        "x": 383,
+        "z": 366
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 6.084603632897813
+    },
+    {
+      "type": "plague_bearer",
+      "roomId": -1,
+      "position": {
+        "x": 247,
+        "z": 372
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 2.2852105353876837
+    },
+    {
+      "type": "goblin_thrower",
+      "roomId": -1,
+      "position": {
+        "x": 43,
+        "z": 382
+      },
+      "level": 2,
+      "isBoss": false,
+      "rotationY": 4.122660103609885
+    },
+    {
+      "type": "goblin_shaman",
+      "roomId": -1,
+      "position": {
+        "x": 52,
+        "z": 375
+      },
+      "level": 2,
+      "isBoss": false,
+      "rotationY": 4.493057017078039
+    },
+    {
+      "type": "spider",
+      "roomId": -1,
+      "position": {
+        "x": 36,
+        "z": 390
+      },
+      "level": 2,
+      "isBoss": false,
+      "rotationY": 1.3559131103489495
+    },
+    {
+      "type": "goblin",
+      "roomId": -1,
+      "position": {
+        "x": 5,
+        "z": 357
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 1.7212740832641897
+    },
+    {
+      "type": "lava_elemental",
+      "roomId": -1,
+      "position": {
+        "x": 388,
+        "z": 404
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 0.5598698069544152
+    },
+    {
+      "type": "shadow_stalker",
+      "roomId": -1,
+      "position": {
+        "x": 164,
+        "z": 390
+      },
+      "level": 4,
+      "isBoss": false,
+      "rotationY": 0.22145826112810527
+    },
+    {
+      "type": "goblin",
+      "roomId": -1,
+      "position": {
+        "x": 5,
+        "z": 366
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 3.624922785188872
+    },
+    {
+      "type": "crawler_killer",
+      "roomId": -1,
+      "position": {
+        "x": 163,
+        "z": 378
+      },
+      "level": 4,
+      "isBoss": false,
+      "rotationY": 1.1972452335442694
+    },
+    {
+      "type": "void_spawn",
+      "roomId": -1,
+      "position": {
+        "x": 404,
+        "z": 381
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 2.555894369663585
+    },
+    {
+      "type": "badlama",
+      "roomId": -1,
+      "position": {
+        "x": 38,
+        "z": 417
+      },
+      "level": 3,
+      "isBoss": false,
+      "rotationY": 2.675744870809373
+    },
+    {
+      "type": "void_spawn",
+      "roomId": -1,
+      "position": {
+        "x": 417,
+        "z": 380
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 0.6079216386259483
+    },
+    {
+      "type": "bat",
+      "roomId": -1,
+      "position": {
+        "x": 75,
+        "z": 373
+      },
+      "level": 2,
+      "isBoss": false,
+      "rotationY": 6.111282569437938
+    },
+    {
+      "type": "eye",
+      "roomId": -1,
+      "position": {
+        "x": 92,
+        "z": 385
+      },
+      "level": 3,
+      "isBoss": false,
+      "rotationY": 1.7435689952141462
+    },
+    {
+      "type": "mimic",
+      "roomId": -1,
+      "position": {
+        "x": 136,
+        "z": 390
+      },
+      "level": 4,
+      "isBoss": false,
+      "rotationY": 1.2867147404686354
+    },
+    {
+      "type": "lava_elemental",
+      "roomId": -1,
+      "position": {
+        "x": 285,
+        "z": 374
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 6.113623249679503
+    },
+    {
+      "type": "lava_elemental",
+      "roomId": -1,
+      "position": {
+        "x": 218,
+        "z": 370
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 4.158627914703865
+    },
+    {
+      "type": "spider",
+      "roomId": -1,
+      "position": {
+        "x": 54,
+        "z": 370
+      },
+      "level": 2,
+      "isBoss": false,
+      "rotationY": 1.0171769350064084
+    },
+    {
+      "type": "lava_elemental",
+      "roomId": -1,
+      "position": {
+        "x": 404,
+        "z": 348
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 2.084514998051131
+    },
+    {
+      "type": "mimic",
+      "roomId": -1,
+      "position": {
+        "x": 117,
+        "z": 388
+      },
+      "level": 4,
+      "isBoss": false,
+      "rotationY": 2.438408777772778
+    },
+    {
+      "type": "lava_elemental",
+      "roomId": -1,
+      "position": {
+        "x": 328,
+        "z": 382
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 1.7831309687770072
+    },
+    {
+      "type": "living_armor",
+      "roomId": -1,
+      "position": {
+        "x": 407,
+        "z": 389
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 4.312066589137209
+    },
+    {
+      "type": "shadow_stalker",
+      "roomId": -1,
+      "position": {
+        "x": 147,
+        "z": 387
+      },
+      "level": 4,
+      "isBoss": false,
+      "rotationY": 4.373389969112999
+    },
+    {
+      "type": "void_spawn",
+      "roomId": -1,
+      "position": {
+        "x": 396,
+        "z": 384
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 0.9668876713321162
+    },
+    {
+      "type": "slime",
+      "roomId": -1,
+      "position": {
+        "x": 33,
+        "z": 362
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 2.6213021413377002
+    },
+    {
+      "type": "lava_elemental",
+      "roomId": -1,
+      "position": {
+        "x": 290,
+        "z": 389
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 1.7962129465429562
+    },
+    {
+      "type": "void_spawn",
+      "roomId": -1,
+      "position": {
+        "x": 265,
+        "z": 371
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 1.9220537680772734
+    },
+    {
+      "type": "plague_bearer",
+      "roomId": -1,
+      "position": {
+        "x": 388,
+        "z": 353
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 2.2153411921924273
+    },
+    {
+      "type": "shadow_stalker",
+      "roomId": -1,
+      "position": {
+        "x": 157,
+        "z": 378
+      },
+      "level": 4,
+      "isBoss": false,
+      "rotationY": 5.119493217189772
+    },
+    {
+      "type": "void_spawn",
+      "roomId": -1,
+      "position": {
+        "x": 407,
+        "z": 344
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 0.6418944946681472
+    },
+    {
+      "type": "lava_elemental",
+      "roomId": -1,
+      "position": {
+        "x": 180,
+        "z": 384
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 2.81103392000024
+    },
+    {
+      "type": "mushroom",
+      "roomId": -1,
+      "position": {
+        "x": 18,
+        "z": 395
+      },
+      "level": 2,
+      "isBoss": false,
+      "rotationY": 3.731466981907349
+    },
+    {
+      "type": "plague_bearer",
+      "roomId": -1,
+      "position": {
+        "x": 187,
+        "z": 370
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 2.8005926328552753
+    },
+    {
+      "type": "void_spawn",
+      "roomId": -1,
+      "position": {
+        "x": 184,
+        "z": 381
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 2.3126790261870487
+    },
+    {
+      "type": "void_spawn",
+      "roomId": -1,
+      "position": {
+        "x": 321,
+        "z": 375
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 2.8098241046813315
+    },
+    {
+      "type": "void_spawn",
+      "roomId": -1,
+      "position": {
+        "x": 409,
+        "z": 339
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 1.4100311653280844
+    },
+    {
+      "type": "void_spawn",
+      "roomId": -1,
+      "position": {
+        "x": 309,
+        "z": 378
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 4.938353119256362
+    },
+    {
+      "type": "plague_bearer",
+      "roomId": -1,
+      "position": {
+        "x": 339,
+        "z": 370
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 1.7996771593389211
+    },
+    {
+      "type": "shadow_stalker",
+      "roomId": -1,
+      "position": {
+        "x": 152,
+        "z": 390
+      },
+      "level": 4,
+      "isBoss": false,
+      "rotationY": 5.649595441931886
+    },
+    {
+      "type": "slime",
+      "roomId": -1,
+      "position": {
+        "x": 44,
+        "z": 339
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 1.631045984200013
+    },
+    {
+      "type": "lava_elemental",
+      "roomId": -1,
+      "position": {
+        "x": 337,
+        "z": 386
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 0.8580950744020651
+    },
+    {
+      "type": "void_spawn",
+      "roomId": -1,
+      "position": {
+        "x": 321,
+        "z": 390
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 1.5121063596910094
+    },
+    {
+      "type": "lava_elemental",
+      "roomId": -1,
+      "position": {
+        "x": 328,
+        "z": 375
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 6.253707830518008
+    },
+    {
+      "type": "goblin",
+      "roomId": -1,
+      "position": {
+        "x": 11,
+        "z": 340
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0.012571291218235907
+    },
+    {
+      "type": "void_spawn",
+      "roomId": -1,
+      "position": {
+        "x": 334,
+        "z": 375
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 1.3161128271272307
+    },
+    {
+      "type": "goblin_thrower",
+      "roomId": -1,
+      "position": {
+        "x": 37,
+        "z": 378
+      },
+      "level": 2,
+      "isBoss": false,
+      "rotationY": 1.1353379276612354
+    },
+    {
+      "type": "plague_bearer",
+      "roomId": -1,
+      "position": {
+        "x": 329,
+        "z": 389
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 1.9311546619328057
+    },
+    {
+      "type": "lava_elemental",
+      "roomId": -1,
+      "position": {
+        "x": 378,
+        "z": 387
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 2.4542861287196343
+    },
+    {
+      "type": "slime",
+      "roomId": -1,
+      "position": {
+        "x": 36,
+        "z": 372
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 1.9103444229994098
+    },
+    {
+      "type": "lava_elemental",
+      "roomId": -1,
+      "position": {
+        "x": 306,
+        "z": 371
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 1.476919773530911
+    },
+    {
+      "type": "goblin",
+      "roomId": -1,
+      "position": {
+        "x": 19,
+        "z": 370
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 3.6444899054885598
+    },
+    {
+      "type": "dungeon_rat",
+      "roomId": -1,
+      "position": {
+        "x": 27,
+        "z": 376
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 5.683161910420081
+    },
+    {
+      "type": "mimic",
+      "roomId": -1,
+      "position": {
+        "x": 144,
+        "z": 382
+      },
+      "level": 4,
+      "isBoss": false,
+      "rotationY": 3.855647108848106
+    },
+    {
+      "type": "mushroom",
+      "roomId": -1,
+      "position": {
+        "x": 5,
+        "z": 396
+      },
+      "level": 2,
+      "isBoss": false,
+      "rotationY": 1.7837977353972283
+    },
+    {
+      "type": "lava_elemental",
+      "roomId": -1,
+      "position": {
+        "x": 211,
+        "z": 371
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 5.32187682937559
+    },
+    {
+      "type": "dragon_king",
+      "roomId": -1,
+      "position": {
+        "x": 269,
+        "z": 390
+      },
+      "level": 5,
+      "isBoss": true,
+      "rotationY": 1.9954843804680684
+    },
+    {
+      "type": "lava_elemental",
+      "roomId": -1,
+      "position": {
+        "x": 314,
+        "z": 387
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 3.942750691844035
+    },
+    {
+      "type": "spider",
+      "roomId": -1,
+      "position": {
+        "x": 24,
+        "z": 386
+      },
+      "level": 2,
+      "isBoss": false,
+      "rotationY": 4.379559234738625
+    },
+    {
+      "type": "wolf",
+      "roomId": -1,
+      "position": {
+        "x": 87,
+        "z": 378
+      },
+      "level": 3,
+      "isBoss": false,
+      "rotationY": 3.3636548616681106
+    },
+    {
+      "type": "lizard",
+      "roomId": -1,
+      "position": {
+        "x": 30,
+        "z": 417
+      },
+      "level": 3,
+      "isBoss": false,
+      "rotationY": 5.681901857250039
+    },
+    {
+      "type": "living_armor",
+      "roomId": -1,
+      "position": {
+        "x": 334,
+        "z": 380
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 2.019024705768207
+    },
+    {
+      "type": "mushroom",
+      "roomId": -1,
+      "position": {
+        "x": 8,
+        "z": 386
+      },
+      "level": 2,
+      "isBoss": false,
+      "rotationY": 2.37509678209505
+    },
+    {
+      "type": "spider",
+      "roomId": -1,
+      "position": {
+        "x": 57,
+        "z": 387
+      },
+      "level": 2,
+      "isBoss": false,
+      "rotationY": 6.002880932054733
+    },
+    {
+      "type": "spider",
+      "roomId": -1,
+      "position": {
+        "x": 53,
+        "z": 381
+      },
+      "level": 2,
+      "isBoss": false,
+      "rotationY": 0.03415009936141336
+    },
+    {
+      "type": "living_armor",
+      "roomId": -1,
+      "position": {
+        "x": 380,
+        "z": 346
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 2.0958213158649555
+    },
+    {
+      "type": "skeleton",
+      "roomId": -1,
+      "position": {
+        "x": 110,
+        "z": 383
+      },
+      "level": 3,
+      "isBoss": false,
+      "rotationY": 4.331014948116485
+    },
+    {
+      "type": "wolf",
+      "roomId": -1,
+      "position": {
+        "x": 89,
+        "z": 372
+      },
+      "level": 3,
+      "isBoss": false,
+      "rotationY": 3.7273594084375623
+    },
+    {
+      "type": "goblin",
+      "roomId": -1,
+      "position": {
+        "x": 40,
+        "z": 363
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 5.7400982101710865
+    },
+    {
+      "type": "plague_bearer",
+      "roomId": -1,
+      "position": {
+        "x": 382,
+        "z": 416
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 3.311785277937098
+    },
+    {
+      "type": "plague_bearer",
+      "roomId": -1,
+      "position": {
+        "x": 372,
+        "z": 388
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 3.598857663415774
+    },
+    {
+      "type": "plague_bearer",
+      "roomId": -1,
+      "position": {
+        "x": 383,
+        "z": 393
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 5.454001784834835
+    },
+    {
+      "type": "lizard",
+      "roomId": -1,
+      "position": {
+        "x": 109,
+        "z": 374
+      },
+      "level": 3,
+      "isBoss": false,
+      "rotationY": 4.518239512841412
+    },
+    {
+      "type": "bat",
+      "roomId": -1,
+      "position": {
+        "x": 34,
+        "z": 398
+      },
+      "level": 2,
+      "isBoss": false,
+      "rotationY": 4.814619923021495
+    },
+    {
+      "type": "lava_elemental",
+      "roomId": -1,
+      "position": {
+        "x": 390,
+        "z": 413
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 3.3569934424566745
+    },
+    {
+      "type": "lava_elemental",
+      "roomId": -1,
+      "position": {
+        "x": 188,
+        "z": 376
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 4.215637132527347
+    },
+    {
+      "type": "void_spawn",
+      "roomId": -1,
+      "position": {
+        "x": 401,
+        "z": 391
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 2.0670225635276087
+    },
+    {
+      "type": "lava_elemental",
+      "roomId": -1,
+      "position": {
+        "x": 206,
+        "z": 376
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 2.87044361005299
+    },
+    {
+      "type": "shadow_stalker",
+      "roomId": -1,
+      "position": {
+        "x": 163,
+        "z": 370
+      },
+      "level": 4,
+      "isBoss": false,
+      "rotationY": 4.476566810048672
+    },
+    {
+      "type": "wolf",
+      "roomId": -1,
+      "position": {
+        "x": 73,
+        "z": 386
+      },
+      "level": 3,
+      "isBoss": false,
+      "rotationY": 2.0014339286802763
+    },
+    {
+      "type": "shadow_stalker",
+      "roomId": -1,
+      "position": {
+        "x": 144,
+        "z": 374
+      },
+      "level": 4,
+      "isBoss": false,
+      "rotationY": 3.3057232382645894
+    },
+    {
+      "type": "void_spawn",
+      "roomId": -1,
+      "position": {
+        "x": 250,
+        "z": 383
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 0.8692306223592141
+    },
+    {
+      "type": "lava_elemental",
+      "roomId": -1,
+      "position": {
+        "x": 240,
+        "z": 386
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 4.0649392484155324
+    },
+    {
+      "type": "goblin",
+      "roomId": -1,
+      "position": {
+        "x": 3,
+        "z": 345
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 5.803903714738373
+    },
+    {
+      "type": "mimic",
+      "roomId": -1,
+      "position": {
+        "x": 119,
+        "z": 381
+      },
+      "level": 4,
+      "isBoss": false,
+      "rotationY": 0.32538454370728775
+    },
+    {
+      "type": "living_armor",
+      "roomId": -1,
+      "position": {
+        "x": 387,
+        "z": 386
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 0.888117252191461
+    },
+    {
+      "type": "void_spawn",
+      "roomId": -1,
+      "position": {
+        "x": 394,
+        "z": 389
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 4.8001228924567245
+    },
+    {
+      "type": "void_spawn",
+      "roomId": -1,
+      "position": {
+        "x": 379,
+        "z": 361
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 1.4894972520008447
+    },
+    {
+      "type": "slime",
+      "roomId": -1,
+      "position": {
+        "x": 32,
+        "z": 367
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 5.53026987232027
+    },
+    {
+      "type": "bat",
+      "roomId": -1,
+      "position": {
+        "x": 52,
+        "z": 389
+      },
+      "level": 2,
+      "isBoss": false,
+      "rotationY": 3.7026836967678354
+    },
+    {
+      "type": "crawler_killer",
+      "roomId": -1,
+      "position": {
+        "x": 168,
+        "z": 378
+      },
+      "level": 4,
+      "isBoss": false,
+      "rotationY": 2.594120715442588
+    },
+    {
+      "type": "lava_elemental",
+      "roomId": -1,
+      "position": {
+        "x": 357,
+        "z": 380
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 0.5632825693770459
+    },
+    {
+      "type": "flesh_golem",
+      "roomId": -1,
+      "position": {
+        "x": 142,
+        "z": 390
+      },
+      "level": 4,
+      "isBoss": false,
+      "rotationY": 5.162373102734976
+    },
+    {
+      "type": "living_armor",
+      "roomId": -1,
+      "position": {
+        "x": 403,
+        "z": 358
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 2.192851637329325
+    },
+    {
+      "type": "void_spawn",
+      "roomId": -1,
+      "position": {
+        "x": 294,
+        "z": 371
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 4.6374295671643075
+    },
+    {
+      "type": "plague_bearer",
+      "roomId": -1,
+      "position": {
+        "x": 413,
+        "z": 360
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 2.229716300114052
+    },
+    {
+      "type": "lava_elemental",
+      "roomId": -1,
+      "position": {
+        "x": 381,
+        "z": 339
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 3.8326175117847097
+    },
+    {
+      "type": "void_spawn",
+      "roomId": -1,
+      "position": {
+        "x": 218,
+        "z": 375
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 4.908691277017792
+    },
+    {
+      "type": "living_armor",
+      "roomId": -1,
+      "position": {
+        "x": 226,
+        "z": 372
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 5.957525868019895
+    },
+    {
+      "type": "lava_elemental",
+      "roomId": -1,
+      "position": {
+        "x": 331,
+        "z": 371
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 4.091739283424652
+    },
+    {
+      "type": "void_spawn",
+      "roomId": -1,
+      "position": {
+        "x": 405,
+        "z": 405
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 2.9498040324786934
+    },
+    {
+      "type": "spider",
+      "roomId": -1,
+      "position": {
+        "x": 30,
+        "z": 392
+      },
+      "level": 2,
+      "isBoss": false,
+      "rotationY": 6.043985503911961
+    },
+    {
+      "type": "dungeon_rat",
+      "roomId": -1,
+      "position": {
+        "x": 32,
+        "z": 378
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 6.241985914367611
+    },
+    {
+      "type": "lava_elemental",
+      "roomId": -1,
+      "position": {
+        "x": 303,
+        "z": 385
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 2.2128425889823364
+    },
+    {
+      "type": "lava_elemental",
+      "roomId": -1,
+      "position": {
+        "x": 386,
+        "z": 398
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 0.3440949914770523
+    },
+    {
+      "type": "void_spawn",
+      "roomId": -1,
+      "position": {
+        "x": 397,
+        "z": 414
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 1.8013844259060487
+    },
+    {
+      "type": "lava_elemental",
+      "roomId": -1,
+      "position": {
+        "x": 407,
+        "z": 372
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 4.5021290607614
+    },
+    {
+      "type": "spider",
+      "roomId": -1,
+      "position": {
+        "x": 39,
+        "z": 405
+      },
+      "level": 2,
+      "isBoss": false,
+      "rotationY": 4.86268617389537
+    },
+    {
+      "type": "void_spawn",
+      "roomId": -1,
+      "position": {
+        "x": 309,
+        "z": 389
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 1.373990078638979
+    },
+    {
+      "type": "living_armor",
+      "roomId": -1,
+      "position": {
+        "x": 414,
+        "z": 386
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 0.8320219329492249
+    },
+    {
+      "type": "flesh_golem",
+      "roomId": -1,
+      "position": {
+        "x": 152,
+        "z": 370
+      },
+      "level": 4,
+      "isBoss": false,
+      "rotationY": 0.7749584525051754
+    },
+    {
+      "type": "plague_bearer",
+      "roomId": -1,
+      "position": {
+        "x": 237,
+        "z": 390
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 4.679306536285445
+    },
+    {
+      "type": "living_armor",
+      "roomId": -1,
+      "position": {
+        "x": 194,
+        "z": 372
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 1.8668590636380697
+    },
+    {
+      "type": "living_armor",
+      "roomId": -1,
+      "position": {
+        "x": 360,
+        "z": 385
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 5.4273748174819065
+    },
+    {
+      "type": "mimic",
+      "roomId": -1,
+      "position": {
+        "x": 122,
+        "z": 373
+      },
+      "level": 4,
+      "isBoss": false,
+      "rotationY": 5.602878745667569
+    },
+    {
+      "type": "void_spawn",
+      "roomId": -1,
+      "position": {
+        "x": 412,
+        "z": 366
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 4.396565501572172
+    },
+    {
+      "type": "spider",
+      "roomId": -1,
+      "position": {
+        "x": 10,
+        "z": 400
+      },
+      "level": 2,
+      "isBoss": false,
+      "rotationY": 3.6767997454974064
+    },
+    {
+      "type": "plague_bearer",
+      "roomId": -1,
+      "position": {
+        "x": 362,
+        "z": 370
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 4.559199198944596
+    },
+    {
+      "type": "void_spawn",
+      "roomId": -1,
+      "position": {
+        "x": 387,
+        "z": 348
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 6.16152848851214
+    },
+    {
+      "type": "living_armor",
+      "roomId": -1,
+      "position": {
+        "x": 245,
+        "z": 389
+      },
+      "level": 5,
+      "isBoss": false,
+      "rotationY": 5.49513657294647
+    },
+    {
+      "type": "bat",
+      "roomId": -1,
+      "position": {
+        "x": 30,
+        "z": 401
+      },
+      "level": 2,
+      "isBoss": false,
+      "rotationY": 4.680953528621735
+    }
+  ],
+  "monsterGroups": [
+    {
+      "id": "23bfd8ef-fadc-491e-9443-ac98d4894647",
+      "name": "Mushroom Circle",
+      "roomId": -1,
+      "center": {
+        "x": 170,
+        "z": 379
+      },
+      "monsters": [
+        {
+          "type": "mushroom",
+          "offsetX": 0,
+          "offsetZ": -1.5,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "mushroom",
+          "offsetX": 1.3,
+          "offsetZ": 0.75,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "mushroom",
+          "offsetX": -1.3,
+          "offsetZ": 0.75,
+          "level": 1,
+          "isBoss": false
+        }
+      ]
+    },
+    {
+      "id": "4a86d997-8ad2-48d8-bcd6-3cfcb861311b",
+      "name": "Slime Colony",
+      "roomId": -1,
+      "center": {
+        "x": 188,
+        "z": 379
+      },
+      "monsters": [
+        {
+          "type": "slime",
+          "offsetX": 0,
+          "offsetZ": 0,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "slime",
+          "offsetX": -1.5,
+          "offsetZ": 1,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "slime",
+          "offsetX": 1.5,
+          "offsetZ": 1,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "slime",
+          "offsetX": 0,
+          "offsetZ": 2,
+          "level": 2,
+          "isBoss": false
+        }
+      ]
+    },
+    {
+      "id": "23318165-241a-414b-9ac0-0b8eeabd28d7",
+      "name": "Spider Nest",
+      "roomId": -1,
+      "center": {
+        "x": 211,
+        "z": 379
+      },
+      "monsters": [
+        {
+          "type": "spider",
+          "offsetX": -1,
+          "offsetZ": -1,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "spider",
+          "offsetX": 1,
+          "offsetZ": -1,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "spider",
+          "offsetX": -1,
+          "offsetZ": 1,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "spider",
+          "offsetX": 1,
+          "offsetZ": 1,
+          "level": 1,
+          "isBoss": false
+        },
+        {
+          "type": "spider_queen",
+          "offsetX": 0,
+          "offsetZ": 0,
+          "level": 3,
+          "isBoss": true
+        }
+      ]
+    },
+    {
+      "id": "197daad2-5ad0-4ffb-a4d6-15074b78bf08",
+      "name": "Goblin Thrower Squad",
+      "roomId": -1,
+      "center": {
+        "x": 236,
+        "z": 379
+      },
+      "monsters": [
+        {
+          "type": "goblin_thrower",
+          "offsetX": -2,
+          "offsetZ": 0,
+          "level": 2,
+          "isBoss": false
+        },
+        {
+          "type": "goblin_thrower",
+          "offsetX": 2,
+          "offsetZ": 0,
+          "level": 2,
+          "isBoss": false
+        },
+        {
+          "type": "goblin",
+          "offsetX": 0,
+          "offsetZ": -2,
+          "level": 1,
+          "isBoss": false
+        }
+      ]
+    }
+  ],
+  "groupTemplates": [],
+  "customTiles": [],
+  "placedProps": [
+    {
+      "type": "bone_pile",
+      "x": 61.122215,
+      "y": 0,
+      "z": 386.5078,
+      "rotationY": -5.960465e-8,
+      "scale": 1
+    },
+    {
+      "type": "bone_pile",
+      "x": 62.244087,
+      "y": 0,
+      "z": 387.50992,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "bone_pile",
+      "x": 62.2493,
+      "y": 0,
+      "z": 385.44797,
+      "rotationY": -0.78539824,
+      "scale": 1
+    },
+    {
+      "type": "bone_pile",
+      "x": 62.08414,
+      "y": 0,
+      "z": 375.66797,
+      "rotationY": 0.78539807,
+      "scale": 1
+    },
+    {
+      "type": "bone_pile",
+      "x": 61.324974,
+      "y": 0,
+      "z": 374.58765,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "bone_pile",
+      "x": 62.29364,
+      "y": 0,
+      "z": 373.47308,
+      "rotationY": -0.785398,
+      "scale": 1
+    },
+    {
+      "type": "bone_pile",
+      "x": 78.21321,
+      "y": 0,
+      "z": 372.52927,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "bone_pile",
+      "x": 78.15666,
+      "y": 0,
+      "z": 388.39395,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "bone_pile",
+      "x": 101.29242,
+      "y": 0,
+      "z": 372.65192,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "bone_pile",
+      "x": 101.47559,
+      "y": 0,
+      "z": 378.385,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "bone_pile",
+      "x": 101.40966,
+      "y": 0,
+      "z": 382.44202,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "bone_pile",
+      "x": 101.39769,
+      "y": 0,
+      "z": 387.38,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "bone_pile",
+      "x": 128.36145,
+      "y": 0,
+      "z": 388.4699,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "bone_pile",
+      "x": 128.43558,
+      "y": 0,
+      "z": 380.70895,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "bone_pile",
+      "x": 128.51694,
+      "y": 0,
+      "z": 373.75833,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 63.545937,
+      "y": 0,
+      "z": 388.44574,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 76.50472,
+      "y": 0,
+      "z": 388.45596,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 95.58907,
+      "y": 0,
+      "z": 388.46777,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 111.53887,
+      "y": 0,
+      "z": 388.51825,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 131.63681,
+      "y": 0,
+      "z": 388.54016,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 146.49808,
+      "y": 0,
+      "z": 388.53738,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 162.58522,
+      "y": 0,
+      "z": 388.60446,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 181.5154,
+      "y": 0,
+      "z": 388.5369,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 202.58424,
+      "y": 0,
+      "z": 388.51215,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 218.5225,
+      "y": 0,
+      "z": 388.47675,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 239.50667,
+      "y": 0,
+      "z": 388.45538,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 259.60928,
+      "y": 0,
+      "z": 388.52823,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 283.59592,
+      "y": 0,
+      "z": 388.64368,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 308.45914,
+      "y": 0,
+      "z": 388.4637,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 331.39227,
+      "y": 0,
+      "z": 388.4478,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 354.52167,
+      "y": 0,
+      "z": 388.47598,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 375.54337,
+      "y": 0,
+      "z": 388.628,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 374.61734,
+      "y": 0,
+      "z": 372.5632,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 355.45013,
+      "y": 0,
+      "z": 372.50607,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 331.4592,
+      "y": 0,
+      "z": 372.47604,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 308.42816,
+      "y": 0,
+      "z": 372.54633,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 283.40952,
+      "y": 0,
+      "z": 372.46823,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 259.43677,
+      "y": 0,
+      "z": 372.5236,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 239.50487,
+      "y": 0,
+      "z": 372.55048,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 218.45201,
+      "y": 0,
+      "z": 372.46222,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 202.36044,
+      "y": 0,
+      "z": 372.49634,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 180.55296,
+      "y": 0,
+      "z": 372.49637,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 162.43794,
+      "y": 0,
+      "z": 372.49512,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 146.4182,
+      "y": 0,
+      "z": 372.58167,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 131.49033,
+      "y": 0,
+      "z": 372.52133,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 111.46159,
+      "y": 0,
+      "z": 372.50595,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 95.38715,
+      "y": 0,
+      "z": 372.47296,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 76.495026,
+      "y": 0,
+      "z": 372.42435,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 63.393658,
+      "y": 0,
+      "z": 372.55362,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 45.367825,
+      "y": 0,
+      "z": 372.4236,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 45.464943,
+      "y": 0,
+      "z": 388.58212,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 44.51546,
+      "y": 0,
+      "z": 415.49014,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 3.5382464,
+      "y": 0,
+      "z": 415.47995,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "crate",
+      "x": 5.5047765,
+      "y": 0,
+      "z": 415.50052,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "crate",
+      "x": 7.534828,
+      "y": 0,
+      "z": 415.55685,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "crate",
+      "x": 6.525955,
+      "y": 0,
+      "z": 415.5751,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "crate",
+      "x": 41.516205,
+      "y": 0,
+      "z": 415.5282,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "crate",
+      "x": 40.519646,
+      "y": 0,
+      "z": 415.57278,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "crate",
+      "x": 42.509125,
+      "y": 0,
+      "z": 415.62042,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "crystal",
+      "x": 37.51387,
+      "y": 0,
+      "z": 415.26492,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "crystal",
+      "x": 10.473204,
+      "y": 0,
+      "z": 415.1586,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "crystal",
+      "x": 26.443275,
+      "y": 0,
+      "z": 415.33542,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "crystal",
+      "x": 17.467121,
+      "y": 0,
+      "z": 415.12183,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 45.538048,
+      "y": 0,
+      "z": 378.54663,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 45.44417,
+      "y": 0,
+      "z": 382.5502,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 47.595245,
+      "y": 0,
+      "z": 382.53152,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 49.53255,
+      "y": 0,
+      "z": 382.51486,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 51.572876,
+      "y": 0,
+      "z": 382.53705,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 53.45787,
+      "y": 0,
+      "z": 382.53952,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 55.456356,
+      "y": 0,
+      "z": 382.5635,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 57.486057,
+      "y": 0,
+      "z": 382.56906,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 59.517803,
+      "y": 0,
+      "z": 382.5265,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 61.49917,
+      "y": 0,
+      "z": 382.55746,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 63.488106,
+      "y": 0,
+      "z": 382.57968,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 65.508255,
+      "y": 0,
+      "z": 382.58853,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 67.443054,
+      "y": 0,
+      "z": 382.5592,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 69.46695,
+      "y": 0,
+      "z": 382.5573,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 71.65698,
+      "y": 0,
+      "z": 382.54037,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 73.50309,
+      "y": 0,
+      "z": 382.53424,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 75.48363,
+      "y": 0,
+      "z": 382.54385,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 77.45214,
+      "y": 0,
+      "z": 382.53418,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 79.475845,
+      "y": 0,
+      "z": 382.56723,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 81.52835,
+      "y": 0,
+      "z": 382.54068,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 83.50486,
+      "y": 0,
+      "z": 382.55627,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 85.53898,
+      "y": 0,
+      "z": 382.53503,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 87.50782,
+      "y": 0,
+      "z": 382.55093,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 89.52716,
+      "y": 0,
+      "z": 382.53464,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 91.4661,
+      "y": 0,
+      "z": 382.51447,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 93.53705,
+      "y": 0,
+      "z": 382.5297,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 95.43172,
+      "y": 0,
+      "z": 382.55276,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 97.504105,
+      "y": 0,
+      "z": 382.5476,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 99.492905,
+      "y": 0,
+      "z": 382.55783,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 101.53259,
+      "y": 0,
+      "z": 382.5006,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 103.45339,
+      "y": 0,
+      "z": 382.57043,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 105.48664,
+      "y": 0,
+      "z": 382.51068,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 107.48665,
+      "y": 0,
+      "z": 382.50534,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 109.5165,
+      "y": 0,
+      "z": 382.5176,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 111.46303,
+      "y": 0,
+      "z": 382.54175,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 113.46493,
+      "y": 0,
+      "z": 382.5667,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 115.549385,
+      "y": 0,
+      "z": 382.5682,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 117.44716,
+      "y": 0,
+      "z": 382.5552,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 119.500145,
+      "y": 0,
+      "z": 382.54126,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 121.50172,
+      "y": 0,
+      "z": 382.53333,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 123.56402,
+      "y": 0,
+      "z": 382.53513,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 125.43378,
+      "y": 0,
+      "z": 382.57074,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 127.44703,
+      "y": 0,
+      "z": 382.5449,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 129.50513,
+      "y": 0,
+      "z": 382.57623,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 131.54042,
+      "y": 0,
+      "z": 382.51904,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 133.4669,
+      "y": 0,
+      "z": 382.5534,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 135.58493,
+      "y": 0,
+      "z": 382.52673,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 137.51303,
+      "y": 0,
+      "z": 382.55734,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 139.54121,
+      "y": 0,
+      "z": 382.55252,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 141.35625,
+      "y": 0,
+      "z": 382.57544,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 143.38686,
+      "y": 0,
+      "z": 382.56735,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 145.54546,
+      "y": 0,
+      "z": 382.5594,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 147.55095,
+      "y": 0,
+      "z": 382.55103,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 149.40578,
+      "y": 0,
+      "z": 382.5423,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 151.50908,
+      "y": 0,
+      "z": 382.55795,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 153.62822,
+      "y": 0,
+      "z": 382.56815,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 155.45312,
+      "y": 0,
+      "z": 382.53708,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 157.42297,
+      "y": 0,
+      "z": 382.54242,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 159.56053,
+      "y": 0,
+      "z": 382.52835,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 161.43803,
+      "y": 0,
+      "z": 382.55414,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 163.56168,
+      "y": 0,
+      "z": 382.5685,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 165.46152,
+      "y": 0,
+      "z": 382.56598,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 167.59009,
+      "y": 0,
+      "z": 382.51437,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 169.55675,
+      "y": 0,
+      "z": 382.53207,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 171.51227,
+      "y": 0,
+      "z": 382.5455,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 173.53825,
+      "y": 0,
+      "z": 382.53455,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 175.54488,
+      "y": 0,
+      "z": 382.569,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 177.6506,
+      "y": 0,
+      "z": 382.57327,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 179.44022,
+      "y": 0,
+      "z": 382.53583,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 181.55869,
+      "y": 0,
+      "z": 382.52115,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 183.51933,
+      "y": 0,
+      "z": 382.55038,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 185.49376,
+      "y": 0,
+      "z": 382.58975,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 187.57635,
+      "y": 0,
+      "z": 382.5745,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 189.62225,
+      "y": 0,
+      "z": 382.59872,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 191.3768,
+      "y": 0,
+      "z": 382.56592,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 193.57658,
+      "y": 0,
+      "z": 382.5529,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 195.60243,
+      "y": 0,
+      "z": 382.54932,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 198.48837,
+      "y": 0,
+      "z": 382.52292,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 200.55826,
+      "y": 0,
+      "z": 382.56516,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 197.50368,
+      "y": 0,
+      "z": 382.51828,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 199.5199,
+      "y": 0,
+      "z": 382.55603,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 201.52408,
+      "y": 0,
+      "z": 382.58594,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 203.49918,
+      "y": 0,
+      "z": 382.57693,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 205.49855,
+      "y": 0,
+      "z": 382.55994,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 207.56555,
+      "y": 0,
+      "z": 382.54398,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 209.4697,
+      "y": 0,
+      "z": 382.5406,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 211.51237,
+      "y": 0,
+      "z": 382.57965,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 213.5763,
+      "y": 0,
+      "z": 382.6079,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 215.4848,
+      "y": 0,
+      "z": 382.53195,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 217.5447,
+      "y": 0,
+      "z": 382.49918,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 219.55089,
+      "y": 0,
+      "z": 382.54938,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 221.40768,
+      "y": 0,
+      "z": 382.515,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 223.51883,
+      "y": 0,
+      "z": 382.55838,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 225.484,
+      "y": 0,
+      "z": 382.53406,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 227.52429,
+      "y": 0,
+      "z": 382.50458,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 229.5486,
+      "y": 0,
+      "z": 382.52225,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 231.45035,
+      "y": 0,
+      "z": 382.4989,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 233.55943,
+      "y": 0,
+      "z": 382.49762,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 235.57417,
+      "y": 0,
+      "z": 382.50992,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 237.48763,
+      "y": 0,
+      "z": 382.52658,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 239.41882,
+      "y": 0,
+      "z": 382.52856,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 241.57207,
+      "y": 0,
+      "z": 382.5197,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 243.51787,
+      "y": 0,
+      "z": 382.51895,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 245.54448,
+      "y": 0,
+      "z": 382.50946,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 247.46086,
+      "y": 0,
+      "z": 382.49716,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 249.53665,
+      "y": 0,
+      "z": 382.5239,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 251.52151,
+      "y": 0,
+      "z": 382.50623,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 253.44002,
+      "y": 0,
+      "z": 382.52753,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 255.41614,
+      "y": 0,
+      "z": 382.52875,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 257.53723,
+      "y": 0,
+      "z": 382.52744,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 259.41412,
+      "y": 0,
+      "z": 382.55505,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 261.40994,
+      "y": 0,
+      "z": 382.53064,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 263.51602,
+      "y": 0,
+      "z": 382.552,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 265.5611,
+      "y": 0,
+      "z": 382.55368,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 267.42496,
+      "y": 0,
+      "z": 382.5294,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 269.519,
+      "y": 0,
+      "z": 382.54013,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 271.40417,
+      "y": 0,
+      "z": 382.5368,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 273.4252,
+      "y": 0,
+      "z": 382.5305,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 275.5455,
+      "y": 0,
+      "z": 382.519,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 277.36154,
+      "y": 0,
+      "z": 382.5455,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 279.48334,
+      "y": 0,
+      "z": 382.56265,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 281.51447,
+      "y": 0,
+      "z": 382.56064,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 283.49402,
+      "y": 0,
+      "z": 382.51218,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 285.64276,
+      "y": 0,
+      "z": 382.54373,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 287.3904,
+      "y": 0,
+      "z": 382.52652,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 289.37164,
+      "y": 0,
+      "z": 382.5309,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 291.51175,
+      "y": 0,
+      "z": 382.53552,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 293.69263,
+      "y": 0,
+      "z": 382.55865,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 295.45215,
+      "y": 0,
+      "z": 382.53397,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 297.60593,
+      "y": 0,
+      "z": 382.54688,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 299.49362,
+      "y": 0,
+      "z": 382.58582,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 301.46466,
+      "y": 0,
+      "z": 382.5734,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 303.52646,
+      "y": 0,
+      "z": 382.5487,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 305.50757,
+      "y": 0,
+      "z": 382.57077,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 307.4974,
+      "y": 0,
+      "z": 382.5668,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 309.53238,
+      "y": 0,
+      "z": 382.5294,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 311.5365,
+      "y": 0,
+      "z": 382.5207,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 313.5387,
+      "y": 0,
+      "z": 382.53912,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 315.47366,
+      "y": 0,
+      "z": 382.5431,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 317.44498,
+      "y": 0,
+      "z": 382.549,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 319.5095,
+      "y": 0,
+      "z": 382.5182,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 321.53964,
+      "y": 0,
+      "z": 382.54248,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 323.6869,
+      "y": 0,
+      "z": 382.53323,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 325.4255,
+      "y": 0,
+      "z": 382.53745,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 327.42377,
+      "y": 0,
+      "z": 382.56772,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 329.59747,
+      "y": 0,
+      "z": 382.56305,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 331.40305,
+      "y": 0,
+      "z": 382.51694,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 333.39093,
+      "y": 0,
+      "z": 382.59363,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 335.56818,
+      "y": 0,
+      "z": 382.60367,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 337.53336,
+      "y": 0,
+      "z": 382.589,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 339.49896,
+      "y": 0,
+      "z": 382.5595,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 341.4581,
+      "y": 0,
+      "z": 382.59204,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 343.6191,
+      "y": 0,
+      "z": 382.54623,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 345.51376,
+      "y": 0,
+      "z": 382.5488,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 347.48383,
+      "y": 0,
+      "z": 382.5362,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 349.5429,
+      "y": 0,
+      "z": 382.54926,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 351.48315,
+      "y": 0,
+      "z": 382.5329,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 353.48132,
+      "y": 0,
+      "z": 382.54352,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 355.60507,
+      "y": 0,
+      "z": 382.5468,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 357.43948,
+      "y": 0,
+      "z": 382.52896,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 359.42093,
+      "y": 0,
+      "z": 382.57544,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 361.5923,
+      "y": 0,
+      "z": 382.58478,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 363.57297,
+      "y": 0,
+      "z": 382.5851,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 365.51645,
+      "y": 0,
+      "z": 382.5762,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 367.4537,
+      "y": 0,
+      "z": 382.56235,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 369.49292,
+      "y": 0,
+      "z": 382.56625,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 371.53027,
+      "y": 0,
+      "z": 382.56787,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 373.50122,
+      "y": 0,
+      "z": 382.55978,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 375.46262,
+      "y": 0,
+      "z": 382.5335,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 47.48131,
+      "y": 0,
+      "z": 378.5206,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 49.489574,
+      "y": 0,
+      "z": 378.542,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 51.518234,
+      "y": 0,
+      "z": 378.552,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 53.529938,
+      "y": 0,
+      "z": 378.5351,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 55.477875,
+      "y": 0,
+      "z": 378.53256,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 57.49116,
+      "y": 0,
+      "z": 378.49878,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 59.53629,
+      "y": 0,
+      "z": 378.49402,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 61.477825,
+      "y": 0,
+      "z": 378.47485,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 63.49614,
+      "y": 0,
+      "z": 378.4911,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 65.49859,
+      "y": 0,
+      "z": 378.536,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 67.50841,
+      "y": 0,
+      "z": 378.5034,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 69.474686,
+      "y": 0,
+      "z": 378.49426,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 71.45336,
+      "y": 0,
+      "z": 378.5134,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 73.60244,
+      "y": 0,
+      "z": 378.5832,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 75.352486,
+      "y": 0,
+      "z": 378.49222,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 77.39294,
+      "y": 0,
+      "z": 378.5356,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 79.48779,
+      "y": 0,
+      "z": 378.49918,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 81.44565,
+      "y": 0,
+      "z": 378.54733,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 83.52483,
+      "y": 0,
+      "z": 378.51984,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 85.47588,
+      "y": 0,
+      "z": 378.40002,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 87.47187,
+      "y": 0,
+      "z": 378.49893,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 89.58276,
+      "y": 0,
+      "z": 378.58536,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 91.46628,
+      "y": 0,
+      "z": 378.56137,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 93.49432,
+      "y": 0,
+      "z": 378.52878,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 95.44646,
+      "y": 0,
+      "z": 378.5335,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 97.5146,
+      "y": 0,
+      "z": 378.518,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 99.68446,
+      "y": 0,
+      "z": 378.5432,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 101.516975,
+      "y": 0,
+      "z": 378.5201,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 103.51694,
+      "y": 0,
+      "z": 378.5635,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 105.50188,
+      "y": 0,
+      "z": 378.57263,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 107.49639,
+      "y": 0,
+      "z": 378.5381,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 109.58225,
+      "y": 0,
+      "z": 378.5437,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 111.38349,
+      "y": 0,
+      "z": 378.55627,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 113.50548,
+      "y": 0,
+      "z": 378.54602,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 115.61095,
+      "y": 0,
+      "z": 378.5564,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 117.62464,
+      "y": 0,
+      "z": 378.55353,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 119.54142,
+      "y": 0,
+      "z": 378.57755,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 121.56058,
+      "y": 0,
+      "z": 378.58112,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 123.39754,
+      "y": 0,
+      "z": 378.50632,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 125.44352,
+      "y": 0,
+      "z": 378.5523,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 127.44086,
+      "y": 0,
+      "z": 378.56595,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 129.49162,
+      "y": 0,
+      "z": 378.56882,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 131.4475,
+      "y": 0,
+      "z": 378.54483,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 133.49641,
+      "y": 0,
+      "z": 378.55737,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 135.49916,
+      "y": 0,
+      "z": 378.5554,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 137.32697,
+      "y": 0,
+      "z": 378.54523,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 139.49762,
+      "y": 0,
+      "z": 378.60175,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 141.47696,
+      "y": 0,
+      "z": 378.5421,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 143.5191,
+      "y": 0,
+      "z": 378.51758,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 145.61496,
+      "y": 0,
+      "z": 378.53177,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 147.50337,
+      "y": 0,
+      "z": 378.5215,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 149.52629,
+      "y": 0,
+      "z": 378.53992,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 151.51308,
+      "y": 0,
+      "z": 378.5406,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 153.60406,
+      "y": 0,
+      "z": 378.5137,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 155.53908,
+      "y": 0,
+      "z": 378.56906,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 157.57729,
+      "y": 0,
+      "z": 378.55988,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 159.51111,
+      "y": 0,
+      "z": 378.55832,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 161.4257,
+      "y": 0,
+      "z": 378.55624,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 163.38391,
+      "y": 0,
+      "z": 378.59433,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 165.54768,
+      "y": 0,
+      "z": 378.57663,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 167.41928,
+      "y": 0,
+      "z": 378.49353,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 169.56314,
+      "y": 0,
+      "z": 378.58243,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 171.51765,
+      "y": 0,
+      "z": 378.57758,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 173.51848,
+      "y": 0,
+      "z": 378.5696,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 175.46938,
+      "y": 0,
+      "z": 378.57858,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 177.69318,
+      "y": 0,
+      "z": 378.58643,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 179.36661,
+      "y": 0,
+      "z": 378.57224,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 181.41782,
+      "y": 0,
+      "z": 378.56415,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 183.42815,
+      "y": 0,
+      "z": 378.55612,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 185.62292,
+      "y": 0,
+      "z": 378.55316,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 187.54308,
+      "y": 0,
+      "z": 378.5264,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 189.55093,
+      "y": 0,
+      "z": 378.5103,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 191.39322,
+      "y": 0,
+      "z": 378.49582,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 193.36748,
+      "y": 0,
+      "z": 378.48624,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 195.42905,
+      "y": 0,
+      "z": 378.50388,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 197.47844,
+      "y": 0,
+      "z": 378.48047,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 198.59747,
+      "y": 0,
+      "z": 378.53006,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 199.61755,
+      "y": 0,
+      "z": 378.51068,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 200.64911,
+      "y": 0,
+      "z": 378.5453,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 201.67108,
+      "y": 0,
+      "z": 378.5493,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 203.51114,
+      "y": 0,
+      "z": 378.52515,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 205.57617,
+      "y": 0,
+      "z": 378.5569,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 207.41003,
+      "y": 0,
+      "z": 378.51456,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 209.46864,
+      "y": 0,
+      "z": 378.51926,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 211.48769,
+      "y": 0,
+      "z": 378.53998,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 213.51616,
+      "y": 0,
+      "z": 378.5215,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 215.50966,
+      "y": 0,
+      "z": 378.53784,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 217.45538,
+      "y": 0,
+      "z": 378.5427,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 219.48843,
+      "y": 0,
+      "z": 378.5344,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 221.44489,
+      "y": 0,
+      "z": 378.59424,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 223.52238,
+      "y": 0,
+      "z": 378.60312,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 225.45114,
+      "y": 0,
+      "z": 378.55667,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 227.44035,
+      "y": 0,
+      "z": 378.56186,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 229.47368,
+      "y": 0,
+      "z": 378.53653,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 231.59532,
+      "y": 0,
+      "z": 378.54718,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 233.47095,
+      "y": 0,
+      "z": 378.5492,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 235.46736,
+      "y": 0,
+      "z": 378.52484,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 237.50304,
+      "y": 0,
+      "z": 378.5394,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 239.54044,
+      "y": 0,
+      "z": 378.56223,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 241.4744,
+      "y": 0,
+      "z": 378.54813,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 243.44064,
+      "y": 0,
+      "z": 378.5351,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 245.51633,
+      "y": 0,
+      "z": 378.55475,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 247.53082,
+      "y": 0,
+      "z": 378.5386,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 249.4106,
+      "y": 0,
+      "z": 378.53815,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 251.43672,
+      "y": 0,
+      "z": 378.51047,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 253.46349,
+      "y": 0,
+      "z": 378.51694,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 255.5096,
+      "y": 0,
+      "z": 378.53613,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 257.47446,
+      "y": 0,
+      "z": 378.524,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 259.60022,
+      "y": 0,
+      "z": 378.55505,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 261.42258,
+      "y": 0,
+      "z": 378.5543,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 263.60226,
+      "y": 0,
+      "z": 378.5416,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 265.48294,
+      "y": 0,
+      "z": 378.52502,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 267.39212,
+      "y": 0,
+      "z": 378.5393,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 269.40515,
+      "y": 0,
+      "z": 378.54184,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 271.47168,
+      "y": 0,
+      "z": 378.54114,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 273.48093,
+      "y": 0,
+      "z": 378.53168,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 275.4915,
+      "y": 0,
+      "z": 378.54593,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 277.51773,
+      "y": 0,
+      "z": 378.55472,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 279.54132,
+      "y": 0,
+      "z": 378.5481,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 281.54294,
+      "y": 0,
+      "z": 378.55264,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 283.6552,
+      "y": 0,
+      "z": 378.55203,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 285.44778,
+      "y": 0,
+      "z": 378.56635,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 287.47906,
+      "y": 0,
+      "z": 378.5237,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 289.56152,
+      "y": 0,
+      "z": 378.55157,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 291.51276,
+      "y": 0,
+      "z": 378.58737,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 293.58566,
+      "y": 0,
+      "z": 378.56125,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 295.38144,
+      "y": 0,
+      "z": 378.54764,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 297.40195,
+      "y": 0,
+      "z": 378.5461,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 299.48557,
+      "y": 0,
+      "z": 378.5266,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 301.5141,
+      "y": 0,
+      "z": 378.52448,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 303.56247,
+      "y": 0,
+      "z": 378.57742,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 305.49255,
+      "y": 0,
+      "z": 378.54395,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 307.38574,
+      "y": 0,
+      "z": 378.59543,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 309.57233,
+      "y": 0,
+      "z": 378.60693,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 311.60718,
+      "y": 0,
+      "z": 378.56604,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 313.44183,
+      "y": 0,
+      "z": 378.53043,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 315.4837,
+      "y": 0,
+      "z": 378.49976,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 317.45956,
+      "y": 0,
+      "z": 378.48474,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 319.48297,
+      "y": 0,
+      "z": 378.4638,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 321.52005,
+      "y": 0,
+      "z": 378.44168,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 323.66354,
+      "y": 0,
+      "z": 378.52817,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 325.32333,
+      "y": 0,
+      "z": 378.54126,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 327.40698,
+      "y": 0,
+      "z": 378.5767,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 329.43307,
+      "y": 0,
+      "z": 378.58075,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 331.53137,
+      "y": 0,
+      "z": 378.6008,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 333.57074,
+      "y": 0,
+      "z": 378.5581,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 335.5065,
+      "y": 0,
+      "z": 378.54425,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 337.51837,
+      "y": 0,
+      "z": 378.52463,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 339.4179,
+      "y": 0,
+      "z": 378.51538,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 341.40323,
+      "y": 0,
+      "z": 378.50964,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 343.58444,
+      "y": 0,
+      "z": 378.53033,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 345.36346,
+      "y": 0,
+      "z": 378.5331,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 347.5616,
+      "y": 0,
+      "z": 378.50443,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 349.60934,
+      "y": 0,
+      "z": 378.4881,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 351.54117,
+      "y": 0,
+      "z": 378.52808,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 353.76773,
+      "y": 0,
+      "z": 378.54272,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 355.5122,
+      "y": 0,
+      "z": 378.58344,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 357.51248,
+      "y": 0,
+      "z": 378.56573,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 359.465,
+      "y": 0,
+      "z": 378.5675,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 361.6084,
+      "y": 0,
+      "z": 378.55112,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 363.50656,
+      "y": 0,
+      "z": 378.53812,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 365.72147,
+      "y": 0,
+      "z": 378.52664,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 367.37686,
+      "y": 0,
+      "z": 378.52863,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 369.50754,
+      "y": 0,
+      "z": 378.52353,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 371.57916,
+      "y": 0,
+      "z": 378.5148,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 373.49628,
+      "y": 0,
+      "z": 378.51086,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 375.51462,
+      "y": 0,
+      "z": 378.52414,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "forgotten_shield",
+      "x": 356.5232,
+      "y": 0,
+      "z": 372.5888,
+      "rotationY": -0.785398,
+      "scale": 1
+    },
+    {
+      "type": "forgotten_shield",
+      "x": 356.49136,
+      "y": 0,
+      "z": 388.43988,
+      "rotationY": -3.1415925,
+      "scale": 1
+    },
+    {
+      "type": "rat_nest",
+      "x": 351.27884,
+      "y": 0,
+      "z": 388.26154,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "rat_nest",
+      "x": 352.26413,
+      "y": 0,
+      "z": 388.32303,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "rat_nest",
+      "x": 350.3897,
+      "y": 0,
+      "z": 388.307,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "rat_nest",
+      "x": 349.5007,
+      "y": 0,
+      "z": 372.73425,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "rat_nest",
+      "x": 350.30548,
+      "y": 0,
+      "z": 372.71887,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "rat_nest",
+      "x": 351.27356,
+      "y": 0,
+      "z": 372.73462,
+      "rotationY": -1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "spike_trap",
+      "x": 308.5601,
+      "y": 0,
+      "z": 386.71957,
+      "rotationY": 1.5707964,
+      "scale": 1
+    },
+    {
+      "type": "spike_trap",
+      "x": 308.5747,
+      "y": 0,
+      "z": 374.31955,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "table",
+      "x": 281.108,
+      "y": 0,
+      "z": 373.32526,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "table",
+      "x": 278.9725,
+      "y": 0,
+      "z": 373.3567,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "table",
+      "x": 275.91425,
+      "y": 0,
+      "z": 373.30734,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "treasure_chest",
+      "x": 102.04945328134876,
+      "y": 0,
+      "z": 381.88567624470693,
+      "rotationY": 1.292288800708573,
+      "scale": 0.9209858996759079
+    },
+    {
+      "type": "skull_pile",
+      "x": 16.25903371742294,
+      "y": 0,
+      "z": 353.92407794863294,
+      "rotationY": 4.892041266676757,
+      "scale": 1.1510796294084678
+    },
+    {
+      "type": "crate",
+      "x": 25.818937071927344,
+      "y": 0,
+      "z": 408.7213228554919,
+      "rotationY": 4.780377597787551,
+      "scale": 0.8544933807994058
+    },
+    {
+      "type": "torch",
+      "x": 24.809751218666218,
+      "y": 0,
+      "z": 355.1908843543229,
+      "rotationY": 3.6161781726888185,
+      "scale": 1.1561568561767042
+    },
+    {
+      "type": "crate",
+      "x": 28.79309002358108,
+      "y": 0,
+      "z": 415.13702944681773,
+      "rotationY": 3.0853376216316466,
+      "scale": 0.8223629374037745
+    },
+    {
+      "type": "rubble_heap",
+      "x": 11.788459303066766,
+      "y": 0,
+      "z": 351.27538535254445,
+      "rotationY": 5.134945068200985,
+      "scale": 1.0804542346511643
+    },
+    {
+      "type": "torch",
+      "x": 21.157909524230977,
+      "y": 0,
+      "z": 344.7922372156198,
+      "rotationY": 0.5281809478469114,
+      "scale": 0.9684651063845288
+    },
+    {
+      "type": "campfire",
+      "x": 12.908514751116233,
+      "y": 0,
+      "z": 344.8876225747598,
+      "rotationY": 5.149165259127331,
+      "scale": 0.9591854043386542
+    },
+    {
+      "type": "pot",
+      "x": 10.207232544743132,
+      "y": 0,
+      "z": 409.0848240535606,
+      "rotationY": 0.9677740998620376,
+      "scale": 1.0775524711004467
+    },
+    {
+      "type": "forgotten_shield",
+      "x": 287.839601397564,
+      "y": 0,
+      "z": 372.2761317205721,
+      "rotationY": 2.9539169870357087,
+      "scale": 0.8948736520503766
+    },
+    {
+      "type": "moss_patch",
+      "x": 80.26211944101425,
+      "y": 0,
+      "z": 379.90787012643113,
+      "rotationY": 4.160155119777758,
+      "scale": 0.8606699392102405
+    },
+    {
+      "type": "bone_pile",
+      "x": 16.10760185174663,
+      "y": 0,
+      "z": 359.92167088374026,
+      "rotationY": 0.41856062353847556,
+      "scale": 0.904694035016744
+    },
+    {
+      "type": "forgotten_shield",
+      "x": 246.90163814641647,
+      "y": 0,
+      "z": 375.8642555184729,
+      "rotationY": 0.9044178121508089,
+      "scale": 1.1861718933894483
+    },
+    {
+      "type": "crate",
+      "x": 73.0733864033847,
+      "y": 0,
+      "z": 381.28907956612017,
+      "rotationY": 5.090598713124002,
+      "scale": 0.9772756229389048
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 95.9918188198371,
+      "y": 0,
+      "z": 380.06250828332145,
+      "rotationY": 0.028177774930890544,
+      "scale": 1.136451258668964
+    },
+    {
+      "type": "chest",
+      "x": 387.07197460489544,
+      "y": 0,
+      "z": 350.01349335193026,
+      "rotationY": 2.9369979246764304,
+      "scale": 0.9656614369964297
+    },
+    {
+      "type": "blood_pool",
+      "x": 283.064358704335,
+      "y": 0,
+      "z": 371.86550901863814,
+      "rotationY": 1.9153364694399309,
+      "scale": 0.9420635853701932
+    },
+    {
+      "type": "blood_pool",
+      "x": 285.0249983136832,
+      "y": 0,
+      "z": 377.7531269468877,
+      "rotationY": 4.505804122864445,
+      "scale": 1.0732283144913708
+    },
+    {
+      "type": "coiled_chains",
+      "x": 409.19217486259623,
+      "y": 0,
+      "z": 388.1900469673433,
+      "rotationY": 3.083338479381823,
+      "scale": 0.8339846479523589
+    },
+    {
+      "type": "manacles",
+      "x": 303.04815192883007,
+      "y": 0,
+      "z": 374.9880022771909,
+      "rotationY": 3.4051755605946172,
+      "scale": 0.917446934248593
+    },
+    {
+      "type": "bone_pile",
+      "x": 59.980796695554034,
+      "y": 0,
+      "z": 369.7239614318511,
+      "rotationY": 0.601245003804986,
+      "scale": 1.0496275211638442
+    },
+    {
+      "type": "chest",
+      "x": 99.12660740915598,
+      "y": 0,
+      "z": 384.1498710215292,
+      "rotationY": 1.8531479252951948,
+      "scale": 1.1794196618134127
+    },
+    {
+      "type": "skull_pile",
+      "x": 16.187714623158907,
+      "y": 0,
+      "z": 348.13901595613703,
+      "rotationY": 3.308680738202013,
+      "scale": 0.9968970901710819
+    },
+    {
+      "type": "chest",
+      "x": 388.0352958257108,
+      "y": 0,
+      "z": 360.235005994886,
+      "rotationY": 3.0469635363085863,
+      "scale": 0.9277150053162998
+    },
+    {
+      "type": "rubble_heap",
+      "x": 132.00150723692693,
+      "y": 0,
+      "z": 373.71584183399,
+      "rotationY": 0.8102219803413452,
+      "scale": 1.0310642101139367
+    },
+    {
+      "type": "treasure_chest",
+      "x": 378.7167813400142,
+      "y": 0,
+      "z": 366.27889053404897,
+      "rotationY": 1.5189774239356053,
+      "scale": 1.0453714531119154
+    },
+    {
+      "type": "blood_pool",
+      "x": 416.9645102924909,
+      "y": 0,
+      "z": 381.8625855833074,
+      "rotationY": 0.5407274570931802,
+      "scale": 1.0308078171480248
+    },
+    {
+      "type": "abandoned_campfire",
+      "x": 14.833688551951019,
+      "y": 0,
+      "z": 342.2467374152297,
+      "rotationY": 0.3970372866989012,
+      "scale": 0.8926517371360336
+    },
+    {
+      "type": "forgotten_shield",
+      "x": 311.10461710388876,
+      "y": 0,
+      "z": 373.8955309432274,
+      "rotationY": 4.21399497149336,
+      "scale": 1.1171571825293498
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 20.15592580872797,
+      "y": 0,
+      "z": 415.08081936735795,
+      "rotationY": 1.6657204891570148,
+      "scale": 1.0701856757441457
+    },
+    {
+      "type": "manacles",
+      "x": 167.76761731314969,
+      "y": 0,
+      "z": 383.72020062215915,
+      "rotationY": 5.03071633475172,
+      "scale": 1.0897962326102228
+    },
+    {
+      "type": "coiled_chains",
+      "x": 209.03192294158197,
+      "y": 0,
+      "z": 370.1958535054403,
+      "rotationY": 3.2698797153290675,
+      "scale": 1.157119307356548
+    },
+    {
+      "type": "coiled_chains",
+      "x": 325.939230843755,
+      "y": 0,
+      "z": 387.93724110921426,
+      "rotationY": 2.0539459200390215,
+      "scale": 0.8939780731962169
+    },
+    {
+      "type": "skull_pile",
+      "x": 127.88599139231299,
+      "y": 0,
+      "z": 389.0532702111704,
+      "rotationY": 1.4094223343529642,
+      "scale": 0.8425064424015156
+    },
+    {
+      "type": "coiled_chains",
+      "x": 397.1635774779435,
+      "y": 0,
+      "z": 386.7874510891858,
+      "rotationY": 0.4153220722339208,
+      "scale": 1.1702817844890694
+    },
+    {
+      "type": "chest",
+      "x": 272.8281712882922,
+      "y": 0,
+      "z": 377.2984006474474,
+      "rotationY": 3.8894573432550628,
+      "scale": 0.8107017708978914
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 18.73468080606064,
+      "y": 0,
+      "z": 393.05691363698554,
+      "rotationY": 3.1014931766597833,
+      "scale": 0.8392346380701255
+    },
+    {
+      "type": "forgotten_shield",
+      "x": 402.8155168510531,
+      "y": 0,
+      "z": 387.049213899499,
+      "rotationY": 4.443189016425385,
+      "scale": 0.8612755788196713
+    },
+    {
+      "type": "scattered_coins",
+      "x": 171.83639689426306,
+      "y": 0,
+      "z": 385.7380086169885,
+      "rotationY": 6.13602025819139,
+      "scale": 0.9675500633529008
+    },
+    {
+      "type": "blood_pool",
+      "x": 410.982943654632,
+      "y": 0,
+      "z": 341.74032536522026,
+      "rotationY": 0.1472574492063769,
+      "scale": 0.8954984266619189
+    },
+    {
+      "type": "coiled_chains",
+      "x": 392.92050127847074,
+      "y": 0,
+      "z": 355.03294910585646,
+      "rotationY": 5.396754504651194,
+      "scale": 1.0109033024012057
+    },
+    {
+      "type": "pot",
+      "x": 32.70101336475425,
+      "y": 0,
+      "z": 415.73897206879104,
+      "rotationY": 3.292479289004775,
+      "scale": 1.010052588763018
+    },
+    {
+      "type": "forgotten_shield",
+      "x": 116.92770283435758,
+      "y": 0,
+      "z": 385.79533843609113,
+      "rotationY": 0.16741882640389075,
+      "scale": 1.0839165024071278
+    },
+    {
+      "type": "skull_pile",
+      "x": 18.721676739442568,
+      "y": 0,
+      "z": 368.25308892155317,
+      "rotationY": 1.2686161492164008,
+      "scale": 0.8496657743144316
+    },
+    {
+      "type": "ancient_scroll",
+      "x": 264.18507844051874,
+      "y": 0,
+      "z": 378.0666218269515,
+      "rotationY": 5.690457726788084,
+      "scale": 0.8698270006418725
+    },
+    {
+      "type": "barrel",
+      "x": 101.78970745026041,
+      "y": 0,
+      "z": 378.7505452073468,
+      "rotationY": 3.4834979458961666,
+      "scale": 0.8312046781943477
+    },
+    {
+      "type": "barrel",
+      "x": 19.83775863049179,
+      "y": 0,
+      "z": 384.91779032526483,
+      "rotationY": 4.402632326249207,
+      "scale": 0.9098802882758434
+    },
+    {
+      "type": "barrel",
+      "x": 15.194829696548588,
+      "y": 0,
+      "z": 383.781932826735,
+      "rotationY": 2.5398285256154076,
+      "scale": 0.9014325152321544
+    },
+    {
+      "type": "manacles",
+      "x": 412.9756490782939,
+      "y": 0,
+      "z": 381.0302004386689,
+      "rotationY": 0.11784102721050731,
+      "scale": 0.9576548540567311
+    },
+    {
+      "type": "scattered_coins",
+      "x": 380.14576039605794,
+      "y": 0,
+      "z": 363.01790298777576,
+      "rotationY": 3.0077442079059975,
+      "scale": 1.1456825792821905
+    },
+    {
+      "type": "manacles",
+      "x": 297.8459571394529,
+      "y": 0,
+      "z": 377.27221743745105,
+      "rotationY": 4.209566679425867,
+      "scale": 1.1507735609559446
+    },
+    {
+      "type": "coiled_chains",
+      "x": 280.7406629227486,
+      "y": 0,
+      "z": 374.9003151947009,
+      "rotationY": 1.6854199522546471,
+      "scale": 1.1012319954188101
+    },
+    {
+      "type": "barrel",
+      "x": 46.06922826980636,
+      "y": 0,
+      "z": 379.2886587907864,
+      "rotationY": 6.176265943190126,
+      "scale": 1.0384841248956678
+    },
+    {
+      "type": "scattered_coins",
+      "x": 102.0654653468272,
+      "y": 0,
+      "z": 374.2244803411239,
+      "rotationY": 3.7370020924922955,
+      "scale": 0.9786446194660171
+    },
+    {
+      "type": "scattered_coins",
+      "x": 106.86263598767819,
+      "y": 0,
+      "z": 380.8301921793536,
+      "rotationY": 1.277126967835502,
+      "scale": 1.1129248521801967
+    },
+    {
+      "type": "barrel",
+      "x": 4.127018005024549,
+      "y": 0,
+      "z": 353.8108256256967,
+      "rotationY": 0.24666197031148285,
+      "scale": 0.8525879392277391
+    },
+    {
+      "type": "chest",
+      "x": 396.7052430921672,
+      "y": 0,
+      "z": 356.24192284213206,
+      "rotationY": 5.8619918171149745,
+      "scale": 1.0166229492854861
+    },
+    {
+      "type": "scattered_coins",
+      "x": 106.15443098581085,
+      "y": 0,
+      "z": 373.9691217178993,
+      "rotationY": 1.6498657629947946,
+      "scale": 1.1968784242072616
+    },
+    {
+      "type": "scattered_coins",
+      "x": 102.05303839566565,
+      "y": 0,
+      "z": 389.09841839027973,
+      "rotationY": 2.926563812234554,
+      "scale": 1.032553543596222
+    },
+    {
+      "type": "pot",
+      "x": 28.20652461851993,
+      "y": 0,
+      "z": 358.9767860585528,
+      "rotationY": 5.333788682129631,
+      "scale": 0.8253274796998006
+    },
+    {
+      "type": "chest",
+      "x": 269.2593075517699,
+      "y": 0,
+      "z": 386.2040581394668,
+      "rotationY": 1.2925389336609518,
+      "scale": 1.0259641385153886
+    },
+    {
+      "type": "scattered_coins",
+      "x": 322.7588884534401,
+      "y": 0,
+      "z": 390.02652499847835,
+      "rotationY": 1.1582539133013272,
+      "scale": 1.1734919211700896
+    },
+    {
+      "type": "coiled_chains",
+      "x": 203.8385221334229,
+      "y": 0,
+      "z": 376.8953153465956,
+      "rotationY": 5.082531417124591,
+      "scale": 0.8658178192373293
+    },
+    {
+      "type": "abandoned_campfire",
+      "x": 39.7365489680042,
+      "y": 0,
+      "z": 369.8527227597723,
+      "rotationY": 1.561683751865779,
+      "scale": 0.9226780980854306
+    },
+    {
+      "type": "barrel",
+      "x": 72.87729852290434,
+      "y": 0,
+      "z": 377.01130245581334,
+      "rotationY": 5.0803733647543785,
+      "scale": 1.085863780457526
+    },
+    {
+      "type": "chest",
+      "x": 94.05113019119617,
+      "y": 0,
+      "z": 386.87477811246015,
+      "rotationY": 2.1606474351268776,
+      "scale": 1.0719950550366808
+    },
+    {
+      "type": "manacles",
+      "x": 266.71039659334184,
+      "y": 0,
+      "z": 385.1838936472147,
+      "rotationY": 0.4817805220051158,
+      "scale": 0.9839776674494719
+    },
+    {
+      "type": "forgotten_shield",
+      "x": 271.12828707530514,
+      "y": 0,
+      "z": 376.9973549317784,
+      "rotationY": 2.8992696986573954,
+      "scale": 0.839002040033562
+    },
+    {
+      "type": "manacles",
+      "x": 400.07623631948127,
+      "y": 0,
+      "z": 345.7538265665397,
+      "rotationY": 1.9502553190346743,
+      "scale": 1.1638653132430643
+    },
+    {
+      "type": "blood_pool",
+      "x": 161.1191850128183,
+      "y": 0,
+      "z": 371.20577925437567,
+      "rotationY": 0.06143697991991114,
+      "scale": 1.1982312283623537
+    },
+    {
+      "type": "chest",
+      "x": 293.13786918208274,
+      "y": 0,
+      "z": 387.8727146916342,
+      "rotationY": 4.380672952843222,
+      "scale": 0.9054993973398855
+    },
+    {
+      "type": "torch",
+      "x": 90.87762391647406,
+      "y": 0,
+      "z": 378.0240726878731,
+      "rotationY": 4.501180777280336,
+      "scale": 0.9702479514852026
+    },
+    {
+      "type": "scattered_coins",
+      "x": 376.1993730637082,
+      "y": 0,
+      "z": 374.8622188119746,
+      "rotationY": 0.7558111650710326,
+      "scale": 0.8925996483727903
+    },
+    {
+      "type": "discarded_sword",
+      "x": 101.11764269806767,
+      "y": 0,
+      "z": 370.1133528469902,
+      "rotationY": 2.564197194919634,
+      "scale": 1.1475014699135158
+    },
+    {
+      "type": "manacles",
+      "x": 403.87966564368236,
+      "y": 0,
+      "z": 379.0454209251809,
+      "rotationY": 5.119792749880558,
+      "scale": 1.039037840661011
+    },
+    {
+      "type": "ancient_scroll",
+      "x": 313.80352334737256,
+      "y": 0,
+      "z": 382.737802607959,
+      "rotationY": 1.666863925368824,
+      "scale": 0.9611489871410097
+    },
+    {
+      "type": "bone_pile",
+      "x": 140.03559953890766,
+      "y": 0,
+      "z": 372.2643259917829,
+      "rotationY": 1.5594182419588207,
+      "scale": 0.8508817165674901
+    },
+    {
+      "type": "chest",
+      "x": 154.86598973979187,
+      "y": 0,
+      "z": 378.97517537496515,
+      "rotationY": 5.361112670945924,
+      "scale": 1.1391205055489133
+    },
+    {
+      "type": "treasure_chest",
+      "x": 146.2200967658337,
+      "y": 0,
+      "z": 379.21291531245896,
+      "rotationY": 0.41614643374178856,
+      "scale": 1.1552451210954895
+    },
+    {
+      "type": "torch",
+      "x": 117.08130229265609,
+      "y": 0,
+      "z": 378.86498101946165,
+      "rotationY": 5.021818452934739,
+      "scale": 1.0240502961216431
+    },
+    {
+      "type": "ancient_scroll",
+      "x": 304.80200943451445,
+      "y": 0,
+      "z": 373.2587888337433,
+      "rotationY": 1.5480949445405268,
+      "scale": 1.1331928261206345
+    },
+    {
+      "type": "treasure_chest",
+      "x": 249.85880567220755,
+      "y": 0,
+      "z": 381.28891018053383,
+      "rotationY": 1.1145462796211176,
+      "scale": 1.129544592790825
+    },
+    {
+      "type": "scattered_coins",
+      "x": 399.1578029961177,
+      "y": 0,
+      "z": 382.14186072180314,
+      "rotationY": 6.207383600453365,
+      "scale": 1.1112027895925103
+    },
+    {
+      "type": "pot",
+      "x": 19.776714743301582,
+      "y": 0,
+      "z": 378.1973491280252,
+      "rotationY": 0.13485969731338043,
+      "scale": 0.9930226644065827
+    },
+    {
+      "type": "treasure_chest",
+      "x": 198.1246304868316,
+      "y": 0,
+      "z": 373.1546794013901,
+      "rotationY": 2.050548496643716,
+      "scale": 0.8439887788718465
+    },
+    {
+      "type": "blood_pool",
+      "x": 178.09270949621202,
+      "y": 0,
+      "z": 371.75800629019955,
+      "rotationY": 0.6453449940506605,
+      "scale": 1.032717446611157
+    },
+    {
+      "type": "blood_pool",
+      "x": 183.82160811676474,
+      "y": 0,
+      "z": 372.7716215056768,
+      "rotationY": 3.9239007784360456,
+      "scale": 0.8480735122680036
+    },
+    {
+      "type": "abandoned_campfire",
+      "x": 33.24583177239441,
+      "y": 0,
+      "z": 358.2904508834332,
+      "rotationY": 1.654619123273107,
+      "scale": 0.8682967936926347
+    },
+    {
+      "type": "moss_patch",
+      "x": 9.028886462098944,
+      "y": 0,
+      "z": 393.9294971194194,
+      "rotationY": 4.420394062575491,
+      "scale": 0.8384688759718514
+    },
+    {
+      "type": "blood_pool",
+      "x": 397.24492308651406,
+      "y": 0,
+      "z": 391.9304881245532,
+      "rotationY": 5.996063579195761,
+      "scale": 0.9224292204490538
+    },
+    {
+      "type": "scattered_coins",
+      "x": 237.85365044576653,
+      "y": 0,
+      "z": 382.1469733324114,
+      "rotationY": 0.15587987394173558,
+      "scale": 0.9863004594728129
+    },
+    {
+      "type": "rubble_heap",
+      "x": 34.137076718389,
+      "y": 0,
+      "z": 345.8763254393182,
+      "rotationY": 3.0500302863929507,
+      "scale": 0.8295391152683815
+    },
+    {
+      "type": "pot",
+      "x": 50.73894547436531,
+      "y": 0,
+      "z": 385.27959395832977,
+      "rotationY": 4.6861194324918,
+      "scale": 1.1441701211101838
+    },
+    {
+      "type": "forgotten_shield",
+      "x": 117.25866884146913,
+      "y": 0,
+      "z": 383.7511965249041,
+      "rotationY": 3.0409335936431283,
+      "scale": 0.8134524059846353
+    },
+    {
+      "type": "pot",
+      "x": 29.16140747065224,
+      "y": 0,
+      "z": 375.77965086737123,
+      "rotationY": 6.002003673375399,
+      "scale": 0.877742380753781
+    },
+    {
+      "type": "ancient_scroll",
+      "x": 145.99237234861735,
+      "y": 0,
+      "z": 383.7595008811699,
+      "rotationY": 2.4006412527903276,
+      "scale": 1.1510931298227556
+    },
+    {
+      "type": "manacles",
+      "x": 301.25294885449324,
+      "y": 0,
+      "z": 388.24803289988955,
+      "rotationY": 3.405499825361104,
+      "scale": 0.8055413425977832
+    },
+    {
+      "type": "forgotten_shield",
+      "x": 251.29442733469153,
+      "y": 0,
+      "z": 372.2853561065381,
+      "rotationY": 4.856971710933415,
+      "scale": 1.0550521193118687
+    },
+    {
+      "type": "discarded_sword",
+      "x": 189.83201053008855,
+      "y": 0,
+      "z": 370.04419327681234,
+      "rotationY": 3.861069036946796,
+      "scale": 1.0821699967909792
+    },
+    {
+      "type": "treasure_chest",
+      "x": 411.8621723807332,
+      "y": 0,
+      "z": 377.2629452073065,
+      "rotationY": 4.304663993077835,
+      "scale": 1.1255365161439053
+    },
+    {
+      "type": "bone_pile",
+      "x": 16.196707088885184,
+      "y": 0,
+      "z": 408.1311972166716,
+      "rotationY": 3.1414380449637607,
+      "scale": 0.9981567042216528
+    },
+    {
+      "type": "forgotten_shield",
+      "x": 366.9716082475575,
+      "y": 0,
+      "z": 377.8232937672003,
+      "rotationY": 5.047311082238363,
+      "scale": 1.01134550535954
+    },
+    {
+      "type": "treasure_chest",
+      "x": 107.96670156578628,
+      "y": 0,
+      "z": 390.0482171925878,
+      "rotationY": 1.4280610801079021,
+      "scale": 1.125524019998427
+    },
+    {
+      "type": "barrel",
+      "x": 42.79188081876806,
+      "y": 0,
+      "z": 342.119195835649,
+      "rotationY": 4.76448361804254,
+      "scale": 0.8029193135427567
+    },
+    {
+      "type": "treasure_chest",
+      "x": 411.7137614329149,
+      "y": 0,
+      "z": 350.9901205114009,
+      "rotationY": 1.0780846055900928,
+      "scale": 1.0344315421207464
+    },
+    {
+      "type": "blood_pool",
+      "x": 178.16249133115704,
+      "y": 0,
+      "z": 383.88647903596376,
+      "rotationY": 1.2652569564190361,
+      "scale": 1.03604182807221
+    },
+    {
+      "type": "rubble_heap",
+      "x": 38.93009951840752,
+      "y": 0,
+      "z": 392.9156887751835,
+      "rotationY": 3.258251832337084,
+      "scale": 1.0715923527293019
+    },
+    {
+      "type": "moss_patch",
+      "x": 23.275478311070717,
+      "y": 0,
+      "z": 403.8797620107747,
+      "rotationY": 0.22081470527490268,
+      "scale": 0.8857034421373655
+    },
+    {
+      "type": "pot",
+      "x": 17.9855412819985,
+      "y": 0,
+      "z": 403.10553533230063,
+      "rotationY": 5.063369709858831,
+      "scale": 1.0351354578715632
+    },
+    {
+      "type": "torch",
+      "x": 87.16857583788993,
+      "y": 0,
+      "z": 372.0774380382929,
+      "rotationY": 1.4335639084956031,
+      "scale": 1.1830223289029722
+    },
+    {
+      "type": "blood_pool",
+      "x": 169.9673113530203,
+      "y": 0,
+      "z": 386.10504215772966,
+      "rotationY": 5.735962346859978,
+      "scale": 1.0123412018453701
+    },
+    {
+      "type": "coiled_chains",
+      "x": 413.25667147436036,
+      "y": 0,
+      "z": 389.26679305213383,
+      "rotationY": 4.846813562162604,
+      "scale": 1.147471376164299
+    },
+    {
+      "type": "coiled_chains",
+      "x": 375.7899562766667,
+      "y": 0,
+      "z": 347.06805856045474,
+      "rotationY": 1.5345413261287022,
+      "scale": 1.1281075690824236
+    },
+    {
+      "type": "torch",
+      "x": 16.273712951694264,
+      "y": 0,
+      "z": 367.9978380511657,
+      "rotationY": 2.9834350661303204,
+      "scale": 0.9271752998069973
+    },
+    {
+      "type": "ancient_scroll",
+      "x": 214.201786052812,
+      "y": 0,
+      "z": 377.14275986490884,
+      "rotationY": 2.060072674675482,
+      "scale": 1.1071837029504383
+    },
+    {
+      "type": "skull_pile",
+      "x": 24.93980914596633,
+      "y": 0,
+      "z": 407.0940859340338,
+      "rotationY": 1.1652005959254015,
+      "scale": 0.9262757702805706
+    },
+    {
+      "type": "bone_pile",
+      "x": 13.837979556761562,
+      "y": 0,
+      "z": 371.18607060454525,
+      "rotationY": 2.906692985555192,
+      "scale": 1.169311014799405
+    },
+    {
+      "type": "treasure_chest",
+      "x": 417.1983948136423,
+      "y": 0,
+      "z": 393.88851739453014,
+      "rotationY": 1.8702276622859828,
+      "scale": 0.9508483642426746
+    },
+    {
+      "type": "coiled_chains",
+      "x": 149.09540670835605,
+      "y": 0,
+      "z": 383.75740610520495,
+      "rotationY": 4.503547632796693,
+      "scale": 0.9363588319499263
+    },
+    {
+      "type": "pot",
+      "x": 98.1538049332914,
+      "y": 0,
+      "z": 373.10193747390696,
+      "rotationY": 4.058293453653155,
+      "scale": 1.0931145052474152
+    },
+    {
+      "type": "manacles",
+      "x": 291.21422261189366,
+      "y": 0,
+      "z": 372.16711101318316,
+      "rotationY": 3.945089406487513,
+      "scale": 1.182899645450502
+    },
+    {
+      "type": "ancient_scroll",
+      "x": 148.2616082164055,
+      "y": 0,
+      "z": 389.289723990291,
+      "rotationY": 5.416464353337751,
+      "scale": 0.9473965870250114
+    },
+    {
+      "type": "rubble_heap",
+      "x": 29.735179480734534,
+      "y": 0,
+      "z": 354.96552774154236,
+      "rotationY": 3.3156617876995487,
+      "scale": 0.9208471170077143
+    },
+    {
+      "type": "coiled_chains",
+      "x": 333.89056880552846,
+      "y": 0,
+      "z": 377.09410833631534,
+      "rotationY": 4.108879092705014,
+      "scale": 1.1931063631195034
+    },
+    {
+      "type": "ancient_scroll",
+      "x": 348.1699508997724,
+      "y": 0,
+      "z": 370.71916529314393,
+      "rotationY": 3.9215857579016884,
+      "scale": 0.8028714936512138
+    },
+    {
+      "type": "abandoned_campfire",
+      "x": 11.232110294939016,
+      "y": 0,
+      "z": 366.1844776108082,
+      "rotationY": 5.307693904834333,
+      "scale": 1.0744178640249573
+    },
+    {
+      "type": "scattered_coins",
+      "x": 237.04188236258443,
+      "y": 0,
+      "z": 383.89009524289037,
+      "rotationY": 6.005606951434314,
+      "scale": 0.972925176360614
+    },
+    {
+      "type": "coiled_chains",
+      "x": 192.9700048354731,
+      "y": 0,
+      "z": 384.18731500501616,
+      "rotationY": 0.7460093535236303,
+      "scale": 1.0249907669587746
+    },
+    {
+      "type": "abandoned_campfire",
+      "x": 35.29200764108216,
+      "y": 0,
+      "z": 377.0741780754398,
+      "rotationY": 5.7304009868580765,
+      "scale": 0.8521787329303316
+    },
+    {
+      "type": "torch",
+      "x": 78.88187124038285,
+      "y": 0,
+      "z": 390.06940480481484,
+      "rotationY": 4.294294204267043,
+      "scale": 0.8053340528109203
+    },
+    {
+      "type": "torch",
+      "x": 85.22169906336816,
+      "y": 0,
+      "z": 375.21412341660016,
+      "rotationY": 2.5915530466259953,
+      "scale": 1.0946830652427324
+    },
+    {
+      "type": "ancient_scroll",
+      "x": 170.15991069587187,
+      "y": 0,
+      "z": 380.97973311076913,
+      "rotationY": 2.1789203956119345,
+      "scale": 0.857935812065303
+    },
+    {
+      "type": "blood_pool",
+      "x": 392.05411329687337,
+      "y": 0,
+      "z": 371.1520046015227,
+      "rotationY": 2.5070754798043744,
+      "scale": 0.8112567249437489
+    },
+    {
+      "type": "discarded_sword",
+      "x": 393.1328570971239,
+      "y": 0,
+      "z": 352.94424200421116,
+      "rotationY": 3.4727674868653002,
+      "scale": 0.8221901855597337
+    },
+    {
+      "type": "bone_pile",
+      "x": 83.00075344526707,
+      "y": 0,
+      "z": 371.09648494424755,
+      "rotationY": 1.7729438239813096,
+      "scale": 0.9383363593181215
+    },
+    {
+      "type": "ancient_scroll",
+      "x": 121.12957595135205,
+      "y": 0,
+      "z": 386.0617143281816,
+      "rotationY": 0.05627947345723262,
+      "scale": 0.9185141957878622
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 52.28084248195889,
+      "y": 0,
+      "z": 383.0733304256268,
+      "rotationY": 4.409330374700429,
+      "scale": 0.8244374341012615
+    },
+    {
+      "type": "ancient_scroll",
+      "x": 134.81216768157785,
+      "y": 0,
+      "z": 374.11978548058136,
+      "rotationY": 4.679651960658304,
+      "scale": 1.0312139328820917
+    },
+    {
+      "type": "treasure_chest",
+      "x": 223.73207958650823,
+      "y": 0,
+      "z": 369.76671059277544,
+      "rotationY": 6.1509525983857865,
+      "scale": 0.9828155316032819
+    },
+    {
+      "type": "treasure_chest",
+      "x": 107.84998738049659,
+      "y": 0,
+      "z": 388.21115595645773,
+      "rotationY": 2.467011796976081,
+      "scale": 0.8605581090368989
+    },
+    {
+      "type": "barrel",
+      "x": 8.808670672052854,
+      "y": 0,
+      "z": 391.25762416149985,
+      "rotationY": 3.210407004893144,
+      "scale": 0.9099812107791615
+    },
+    {
+      "type": "manacles",
+      "x": 393.10950892443503,
+      "y": 0,
+      "z": 402.7898050683746,
+      "rotationY": 0.2424515969166897,
+      "scale": 0.9474888536786112
+    },
+    {
+      "type": "scattered_coins",
+      "x": 397.07844768714637,
+      "y": 0,
+      "z": 347.8649176018663,
+      "rotationY": 4.4383874720648455,
+      "scale": 0.9191086647175973
+    },
+    {
+      "type": "treasure_chest",
+      "x": 214.7907303947822,
+      "y": 0,
+      "z": 387.25289085996843,
+      "rotationY": 4.251362974489784,
+      "scale": 1.0552136516555501
+    },
+    {
+      "type": "coiled_chains",
+      "x": 256.74143845536827,
+      "y": 0,
+      "z": 384.763981208428,
+      "rotationY": 0.7489488244485327,
+      "scale": 1.1232690235948073
+    },
+    {
+      "type": "torch",
+      "x": 26.71656572472702,
+      "y": 0,
+      "z": 394.93686846802996,
+      "rotationY": 4.314746376346127,
+      "scale": 0.8255420138446001
+    },
+    {
+      "type": "barrel",
+      "x": 91.05309111471732,
+      "y": 0,
+      "z": 372.8944487696988,
+      "rotationY": 5.370970095567485,
+      "scale": 1.1832672829372808
+    },
+    {
+      "type": "rubble_heap",
+      "x": 24.137400757407775,
+      "y": 0,
+      "z": 396.29100779457,
+      "rotationY": 3.4107007893550985,
+      "scale": 0.9347444595984082
+    },
+    {
+      "type": "treasure_chest",
+      "x": 268.95986875592354,
+      "y": 0,
+      "z": 370.1009037352217,
+      "rotationY": 5.879765982236309,
+      "scale": 1.0523697803075582
+    },
+    {
+      "type": "discarded_sword",
+      "x": 316.0969910005523,
+      "y": 0,
+      "z": 374.17227013581345,
+      "rotationY": 2.8933804460402084,
+      "scale": 1.1421686363512575
+    },
+    {
+      "type": "forgotten_shield",
+      "x": 344.0719087539306,
+      "y": 0,
+      "z": 386.72238034647927,
+      "rotationY": 5.001574630177449,
+      "scale": 0.861391920809057
+    },
+    {
+      "type": "blood_pool",
+      "x": 407.25290147081574,
+      "y": 0,
+      "z": 393.17401808889355,
+      "rotationY": 2.70011317697583,
+      "scale": 0.896186904912633
+    },
+    {
+      "type": "rat_nest",
+      "x": 16.039715453758035,
+      "y": 0,
+      "z": 362.2445574242731,
+      "rotationY": 2.8708397931646275,
+      "scale": 1.1181337518183376
+    },
+    {
+      "type": "scattered_coins",
+      "x": 365.03775861719134,
+      "y": 0,
+      "z": 374.87274743714227,
+      "rotationY": 6.061237953499903,
+      "scale": 0.9499906959707588
+    },
+    {
+      "type": "ancient_scroll",
+      "x": 182.27708838101003,
+      "y": 0,
+      "z": 382.74031382270437,
+      "rotationY": 5.962723585754117,
+      "scale": 0.8873400132694841
+    },
+    {
+      "type": "ancient_scroll",
+      "x": 260.0181119417074,
+      "y": 0,
+      "z": 374.9832311162746,
+      "rotationY": 4.838873079554845,
+      "scale": 0.8526737504047893
+    },
+    {
+      "type": "ancient_scroll",
+      "x": 323.0008173469843,
+      "y": 0,
+      "z": 376.708212430973,
+      "rotationY": 4.211102083273494,
+      "scale": 1.0914299999677455
+    },
+    {
+      "type": "chest",
+      "x": 409.15371689294085,
+      "y": 0,
+      "z": 401.859000069458,
+      "rotationY": 3.4137434137988714,
+      "scale": 1.1491075559650719
+    },
+    {
+      "type": "chest",
+      "x": 406.27483499405486,
+      "y": 0,
+      "z": 383.7529461260686,
+      "rotationY": 4.474470904137575,
+      "scale": 0.8793244157378785
+    },
+    {
+      "type": "moldy_bread",
+      "x": 42.845785923630146,
+      "y": 0,
+      "z": 352.22243882035866,
+      "rotationY": 5.023243708895051,
+      "scale": 0.9412385121512836
+    },
+    {
+      "type": "treasure_chest",
+      "x": 125.8934476962845,
+      "y": 0,
+      "z": 377.99936427844665,
+      "rotationY": 3.7615766460142543,
+      "scale": 0.9266240462475046
+    },
+    {
+      "type": "moss_patch",
+      "x": 40.23981145297016,
+      "y": 0,
+      "z": 406.9577013592835,
+      "rotationY": 4.161934632670265,
+      "scale": 0.9378522687377746
+    },
+    {
+      "type": "forgotten_shield",
+      "x": 314.07678273928576,
+      "y": 0,
+      "z": 370.9855562423224,
+      "rotationY": 5.5750740994413786,
+      "scale": 1.180434771242905
+    },
+    {
+      "type": "torch",
+      "x": 24.750078821416295,
+      "y": 0,
+      "z": 403.7886126391246,
+      "rotationY": 1.1732673128469095,
+      "scale": 1.1077406791804332
+    },
+    {
+      "type": "chest",
+      "x": 354.0496818736854,
+      "y": 0,
+      "z": 375.7294855752111,
+      "rotationY": 2.540593184967606,
+      "scale": 1.154783083507053
+    },
+    {
+      "type": "scattered_coins",
+      "x": 413.7486713712389,
+      "y": 0,
+      "z": 362.2809247027488,
+      "rotationY": 4.736063055555796,
+      "scale": 1.0513436596955053
+    },
+    {
+      "type": "coiled_chains",
+      "x": 387.1528555370659,
+      "y": 0,
+      "z": 389.7228401821466,
+      "rotationY": 4.957855618384369,
+      "scale": 1.13838096171711
+    },
+    {
+      "type": "manacles",
+      "x": 300.0229905383146,
+      "y": 0,
+      "z": 370.840816894545,
+      "rotationY": 4.40610164094004,
+      "scale": 1.1358285593611372
+    },
+    {
+      "type": "chest",
+      "x": 379.70784244292,
+      "y": 0,
+      "z": 414.2501938419964,
+      "rotationY": 4.572486597147375,
+      "scale": 1.1996295778257415
+    },
+    {
+      "type": "manacles",
+      "x": 410.9961588833106,
+      "y": 0,
+      "z": 393.27223536209164,
+      "rotationY": 0.1492541414510862,
+      "scale": 1.107374153759594
+    },
+    {
+      "type": "coiled_chains",
+      "x": 290.8213013588564,
+      "y": 0,
+      "z": 382.29293540626054,
+      "rotationY": 3.2057699993861917,
+      "scale": 1.1583781531186645
+    },
+    {
+      "type": "blood_pool",
+      "x": 385.1524619914836,
+      "y": 0,
+      "z": 365.05864241382034,
+      "rotationY": 4.33073803232552,
+      "scale": 0.8565919424810307
+    },
+    {
+      "type": "pot",
+      "x": 63.77098877535833,
+      "y": 0,
+      "z": 377.89065152145866,
+      "rotationY": 2.9333980496203145,
+      "scale": 0.9951965499951749
+    },
+    {
+      "type": "coiled_chains",
+      "x": 356.70088836663103,
+      "y": 0,
+      "z": 375.8481979153568,
+      "rotationY": 5.383629331317182,
+      "scale": 1.0531599175731725
+    },
+    {
+      "type": "bone_pile",
+      "x": 136.7864212605399,
+      "y": 0,
+      "z": 375.8353847013255,
+      "rotationY": 3.1381474193490395,
+      "scale": 1.0192876716078927
+    },
+    {
+      "type": "blood_pool",
+      "x": 382.1443144426621,
+      "y": 0,
+      "z": 351.1960083588104,
+      "rotationY": 1.698768975261033,
+      "scale": 0.9742839800342837
+    },
+    {
+      "type": "ancient_scroll",
+      "x": 174.18809854850332,
+      "y": 0,
+      "z": 376.9325940389868,
+      "rotationY": 1.7424411484583002,
+      "scale": 1.0687422066492964
+    },
+    {
+      "type": "blood_pool",
+      "x": 401.14002225951907,
+      "y": 0,
+      "z": 385.1008399778583,
+      "rotationY": 5.887860750314188,
+      "scale": 0.9485600955912171
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 21.172963225705026,
+      "y": 0,
+      "z": 397.9724873308505,
+      "rotationY": 6.11698282819556,
+      "scale": 0.8810873864198165
+    },
+    {
+      "type": "discarded_sword",
+      "x": 375.8519702499647,
+      "y": 0,
+      "z": 355.71482218289106,
+      "rotationY": 0.870176918733742,
+      "scale": 0.8286285980550318
+    },
+    {
+      "type": "discarded_sword",
+      "x": 189.9721916573656,
+      "y": 0,
+      "z": 373.9709436166312,
+      "rotationY": 2.00784203995198,
+      "scale": 0.9711871295790548
+    },
+    {
+      "type": "manacles",
+      "x": 136.94236888464343,
+      "y": 0,
+      "z": 370.2955923818118,
+      "rotationY": 5.554948751682655,
+      "scale": 1.1916961146056426
+    },
+    {
+      "type": "ancient_scroll",
+      "x": 228.04472177838167,
+      "y": 0,
+      "z": 373.79133710686733,
+      "rotationY": 4.6702595285679065,
+      "scale": 0.9631665201772337
+    },
+    {
+      "type": "moss_patch",
+      "x": 67.23180896271944,
+      "y": 0,
+      "z": 388.80178149542786,
+      "rotationY": 6.110970486632138,
+      "scale": 0.8352868446879145
+    },
+    {
+      "type": "forgotten_shield",
+      "x": 232.06083457644493,
+      "y": 0,
+      "z": 389.7343174064686,
+      "rotationY": 1.1318398367572327,
+      "scale": 0.9349012119359257
+    },
+    {
+      "type": "torch",
+      "x": 17.908639473402722,
+      "y": 0,
+      "z": 399.8489111783993,
+      "rotationY": 2.0498178697150613,
+      "scale": 0.8238815015754055
+    },
+    {
+      "type": "scattered_coins",
+      "x": 288.8753671568677,
+      "y": 0,
+      "z": 370.0313302791389,
+      "rotationY": 1.0570484214185158,
+      "scale": 1.1767606898044969
+    },
+    {
+      "type": "chest",
+      "x": 95.95454674001502,
+      "y": 0,
+      "z": 384.7353576401855,
+      "rotationY": 0.6315587660590851,
+      "scale": 0.835032606265278
+    },
+    {
+      "type": "coiled_chains",
+      "x": 365.1624656179231,
+      "y": 0,
+      "z": 370.14953510662605,
+      "rotationY": 1.3049784367937984,
+      "scale": 1.0074330356430305
+    },
+    {
+      "type": "bone_pile",
+      "x": 2.7279393785300825,
+      "y": 0,
+      "z": 400.80099571865514,
+      "rotationY": 4.141024825703888,
+      "scale": 0.8057989836549814
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 54.28398179178804,
+      "y": 0,
+      "z": 387.1880523842203,
+      "rotationY": 1.4970875659319973,
+      "scale": 1.1820761251702756
+    },
+    {
+      "type": "ancient_scroll",
+      "x": 323.77331807836447,
+      "y": 0,
+      "z": 385.8994642722603,
+      "rotationY": 5.278532841640252,
+      "scale": 1.0027866370968848
+    },
+    {
+      "type": "rubble_heap",
+      "x": 37.25907942984599,
+      "y": 0,
+      "z": 343.92605422190996,
+      "rotationY": 3.33769189009252,
+      "scale": 0.9842165286844392
+    },
+    {
+      "type": "moss_patch",
+      "x": 11.022514053848443,
+      "y": 0,
+      "z": 395.15230848688134,
+      "rotationY": 4.128945870976701,
+      "scale": 1.092633954416294
+    },
+    {
+      "type": "campfire",
+      "x": 23.781635941215043,
+      "y": 0,
+      "z": 352.01363020394524,
+      "rotationY": 4.3252641549579876,
+      "scale": 0.9457892039261618
+    },
+    {
+      "type": "forgotten_shield",
+      "x": 150.9345090201877,
+      "y": 0,
+      "z": 386.26645744295877,
+      "rotationY": 2.227484222540056,
+      "scale": 0.8911897929631528
+    },
+    {
+      "type": "discarded_sword",
+      "x": 403.22448807232877,
+      "y": 0,
+      "z": 384.2566409414542,
+      "rotationY": 2.8542592047361937,
+      "scale": 0.9690085869166163
+    },
+    {
+      "type": "pot",
+      "x": 42.864636236502626,
+      "y": 0,
+      "z": 389.27180289921785,
+      "rotationY": 1.470654393265365,
+      "scale": 0.8651441994545201
+    },
+    {
+      "type": "blood_pool",
+      "x": 379.9955647202722,
+      "y": 0,
+      "z": 349.01205491323105,
+      "rotationY": 5.797572614485279,
+      "scale": 0.8786812475258041
+    },
+    {
+      "type": "water_puddle",
+      "x": 20.21709557997564,
+      "y": 0,
+      "z": 410.8514660061051,
+      "rotationY": 6.1841039654322225,
+      "scale": 0.9216230365226118
+    },
+    {
+      "type": "thorny_vines",
+      "x": 32.19355474044655,
+      "y": 0,
+      "z": 400.8104864866054,
+      "rotationY": 1.1381726117698796,
+      "scale": 0.9098404539849286
+    },
+    {
+      "type": "discarded_sword",
+      "x": 171.88997938285902,
+      "y": 0,
+      "z": 378.8206969910821,
+      "rotationY": 4.24986748285138,
+      "scale": 1.0735708328582136
+    },
+    {
+      "type": "treasure_chest",
+      "x": 342.2085862185864,
+      "y": 0,
+      "z": 375.7596574074756,
+      "rotationY": 5.331833721266582,
+      "scale": 0.8402259755090701
+    },
+    {
+      "type": "manacles",
+      "x": 239.2054986205476,
+      "y": 0,
+      "z": 384.06888552482724,
+      "rotationY": 1.248664783034623,
+      "scale": 1.199523320831365
+    },
+    {
+      "type": "treasure_chest",
+      "x": 326.7410978974436,
+      "y": 0,
+      "z": 385.87751209415353,
+      "rotationY": 3.4014566609390497,
+      "scale": 1.1287260568638395
+    },
+    {
+      "type": "discarded_sword",
+      "x": 215.29867859749217,
+      "y": 0,
+      "z": 389.8738594954285,
+      "rotationY": 6.20916068735064,
+      "scale": 0.9959287543475668
+    },
+    {
+      "type": "treasure_chest",
+      "x": 405.9631672426865,
+      "y": 0,
+      "z": 416.28650142487777,
+      "rotationY": 6.09667625664821,
+      "scale": 0.8927665341453677
+    },
+    {
+      "type": "treasure_chest",
+      "x": 413.73547149913026,
+      "y": 0,
+      "z": 413.10851939325835,
+      "rotationY": 5.937462763895258,
+      "scale": 1.0631048201078837
+    },
+    {
+      "type": "bone_pile",
+      "x": 26.844338098654376,
+      "y": 0,
+      "z": 339.2268977637592,
+      "rotationY": 5.859594805715189,
+      "scale": 0.961749144194979
+    },
+    {
+      "type": "manacles",
+      "x": 306.9712106939822,
+      "y": 0,
+      "z": 379.98326410971777,
+      "rotationY": 5.3165853353328485,
+      "scale": 0.8445485466883051
+    },
+    {
+      "type": "discarded_sword",
+      "x": 378.8637887862044,
+      "y": 0,
+      "z": 390.91282573558374,
+      "rotationY": 2.432346268049545,
+      "scale": 1.1678517256905971
+    },
+    {
+      "type": "blood_pool",
+      "x": 233.29210730245637,
+      "y": 0,
+      "z": 388.25872560055086,
+      "rotationY": 1.6108075531003399,
+      "scale": 0.8922841349193856
+    },
+    {
+      "type": "treasure_chest",
+      "x": 261.7532173805102,
+      "y": 0,
+      "z": 379.0602781981362,
+      "rotationY": 4.949971201021807,
+      "scale": 0.8796121780849684
+    },
+    {
+      "type": "thorny_vines",
+      "x": 7.8318302114871665,
+      "y": 0,
+      "z": 405.87558094537775,
+      "rotationY": 0.032404975183174325,
+      "scale": 1.1653091256420778
+    },
+    {
+      "type": "coiled_chains",
+      "x": 352.0333360865485,
+      "y": 0,
+      "z": 379.1041135552071,
+      "rotationY": 1.0676304532823442,
+      "scale": 1.1961396445355068
+    },
+    {
+      "type": "crate",
+      "x": 85.74347817458397,
+      "y": 0,
+      "z": 390.28409650017227,
+      "rotationY": 3.492861606881305,
+      "scale": 1.1771163713290367
+    },
+    {
+      "type": "blood_pool",
+      "x": 319.83234554068065,
+      "y": 0,
+      "z": 370.03741536581964,
+      "rotationY": 3.7726582879574724,
+      "scale": 1.0985784368909073
+    },
+    {
+      "type": "forgotten_shield",
+      "x": 274.73553456437617,
+      "y": 0,
+      "z": 387.9374689050859,
+      "rotationY": 4.48276916213967,
+      "scale": 1.1903114874160279
+    },
+    {
+      "type": "manacles",
+      "x": 399.83643235261593,
+      "y": 0,
+      "z": 362.96739850082196,
+      "rotationY": 4.179516872204117,
+      "scale": 0.8919944708404333
+    },
+    {
+      "type": "scattered_coins",
+      "x": 391.1306065033213,
+      "y": 0,
+      "z": 340.20054631294676,
+      "rotationY": 5.6905556586521655,
+      "scale": 0.954032960718257
+    },
+    {
+      "type": "campfire",
+      "x": 23.211664632175697,
+      "y": 0,
+      "z": 368.0610814008082,
+      "rotationY": 0.8504611111665437,
+      "scale": 1.156967514160545
+    },
+    {
+      "type": "treasure_chest",
+      "x": 144.08091127229554,
+      "y": 0,
+      "z": 387.8680312530289,
+      "rotationY": 4.652663852429432,
+      "scale": 0.897067869459859
+    },
+    {
+      "type": "discarded_sword",
+      "x": 334.8327750933851,
+      "y": 0,
+      "z": 385.22642382588083,
+      "rotationY": 5.2729925302511464,
+      "scale": 0.8263528419113196
+    },
+    {
+      "type": "chest",
+      "x": 413.90717674356813,
+      "y": 0,
+      "z": 377.26045895951995,
+      "rotationY": 3.1314818773319697,
+      "scale": 1.1390576497604088
+    },
+    {
+      "type": "treasure_chest",
+      "x": 257.8246992102535,
+      "y": 0,
+      "z": 372.7255082011656,
+      "rotationY": 5.250424839961785,
+      "scale": 1.0678034051329477
+    },
+    {
+      "type": "coiled_chains",
+      "x": 223.17898611786114,
+      "y": 0,
+      "z": 389.0442038387097,
+      "rotationY": 0.4622819272295621,
+      "scale": 1.1772692414870523
+    },
+    {
+      "type": "discarded_sword",
+      "x": 250.20451581513763,
+      "y": 0,
+      "z": 387.7037324655331,
+      "rotationY": 1.7806422093384695,
+      "scale": 0.8553343017412834
+    },
+    {
+      "type": "scattered_coins",
+      "x": 216.1106897804798,
+      "y": 0,
+      "z": 380.0890925269426,
+      "rotationY": 5.713336122148945,
+      "scale": 1.041654912438863
+    },
+    {
+      "type": "coiled_chains",
+      "x": 282.80514699798584,
+      "y": 0,
+      "z": 383.7064662015364,
+      "rotationY": 0.408615286164363,
+      "scale": 1.0713648676450425
+    },
+    {
+      "type": "rubble_heap",
+      "x": 27.08618614001265,
+      "y": 0,
+      "z": 352.860726939416,
+      "rotationY": 1.0078667852017076,
+      "scale": 0.8961757809005094
+    },
+    {
+      "type": "coiled_chains",
+      "x": 311.13624489430606,
+      "y": 0,
+      "z": 382.99443387517096,
+      "rotationY": 4.1937256103967435,
+      "scale": 0.9257645381916392
+    },
+    {
+      "type": "blood_pool",
+      "x": 240.72139539707558,
+      "y": 0,
+      "z": 382.2236440081077,
+      "rotationY": 2.5858224927055597,
+      "scale": 0.9602327258442257
+    },
+    {
+      "type": "ancient_scroll",
+      "x": 384.76143371101256,
+      "y": 0,
+      "z": 370.2016037861602,
+      "rotationY": 1.0195979682532497,
+      "scale": 1.1468469207056509
+    },
+    {
+      "type": "chest",
+      "x": 415.96900171913455,
+      "y": 0,
+      "z": 373.23674091255174,
+      "rotationY": 4.292003178961569,
+      "scale": 0.896771071497173
+    },
+    {
+      "type": "ancient_scroll",
+      "x": 244.26594131976321,
+      "y": 0,
+      "z": 370.82567895667506,
+      "rotationY": 2.0305999617728445,
+      "scale": 1.0390609740558638
+    },
+    {
+      "type": "scattered_coins",
+      "x": 383.289353251923,
+      "y": 0,
+      "z": 344.11982089496456,
+      "rotationY": 0.2554080271036482,
+      "scale": 1.0533910325475149
+    },
+    {
+      "type": "coiled_chains",
+      "x": 392.1731621592612,
+      "y": 0,
+      "z": 387.20412311557453,
+      "rotationY": 4.248829046484958,
+      "scale": 0.8126962874120941
+    },
+    {
+      "type": "rubble_heap",
+      "x": 36.220144791880685,
+      "y": 0,
+      "z": 395.24749562581536,
+      "rotationY": 5.623851062300151,
+      "scale": 0.9694414795674404
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 72.91212153059539,
+      "y": 0,
+      "z": 390.1581695341378,
+      "rotationY": 3.25184006719239,
+      "scale": 0.9097397807582279
+    },
+    {
+      "type": "blood_pool",
+      "x": 154.18693456274517,
+      "y": 0,
+      "z": 390.19361865788915,
+      "rotationY": 5.183815767153556,
+      "scale": 1.113813342360603
+    },
+    {
+      "type": "moss_patch",
+      "x": 72.94768312540815,
+      "y": 0,
+      "z": 372.002369453944,
+      "rotationY": 1.167888866276364,
+      "scale": 1.0310476417245413
+    },
+    {
+      "type": "coiled_chains",
+      "x": 196.90044118596566,
+      "y": 0,
+      "z": 378.15472274126205,
+      "rotationY": 4.6860775081568296,
+      "scale": 0.9330248430658451
+    },
+    {
+      "type": "discarded_sword",
+      "x": 410.2867930034862,
+      "y": 0,
+      "z": 356.8071063790514,
+      "rotationY": 1.574084244147545,
+      "scale": 0.8849852733281585
+    },
+    {
+      "type": "scattered_coins",
+      "x": 389.88459425164524,
+      "y": 0,
+      "z": 364.1337899622501,
+      "rotationY": 1.9040456783709063,
+      "scale": 0.9366370983381503
+    },
+    {
+      "type": "treasure_chest",
+      "x": 157.29132137953482,
+      "y": 0,
+      "z": 385.0637606041164,
+      "rotationY": 1.1250486506354391,
+      "scale": 0.8244734632324968
+    },
+    {
+      "type": "moldy_bread",
+      "x": 13.925995322398892,
+      "y": 0,
+      "z": 347.27321827894264,
+      "rotationY": 2.7661903237104077,
+      "scale": 0.818367746391363
+    },
+    {
+      "type": "water_puddle",
+      "x": 30.173963358708416,
+      "y": 0,
+      "z": 380.03537952616216,
+      "rotationY": 5.007163315599691,
+      "scale": 1.1316038890251572
+    },
+    {
+      "type": "water_puddle",
+      "x": 66.14739487691922,
+      "y": 0,
+      "z": 387.012689704108,
+      "rotationY": 2.6640065641316295,
+      "scale": 1.0033126078403862
+    },
+    {
+      "type": "treasure_chest",
+      "x": 402.7020648140916,
+      "y": 0,
+      "z": 369.783742182196,
+      "rotationY": 5.190372408304845,
+      "scale": 0.9387376146197246
+    },
+    {
+      "type": "coiled_chains",
+      "x": 364.8061307374106,
+      "y": 0,
+      "z": 381.1764408461911,
+      "rotationY": 6.056442114623828,
+      "scale": 0.8857280275717059
+    },
+    {
+      "type": "crate",
+      "x": 71.20066190608355,
+      "y": 0,
+      "z": 389.9338396751654,
+      "rotationY": 3.4371249043233916,
+      "scale": 0.920993692188386
+    },
+    {
+      "type": "abandoned_campfire",
+      "x": 8.840282230083762,
+      "y": 0,
+      "z": 348.2479964101847,
+      "rotationY": 6.063663500945831,
+      "scale": 1.0234651360465936
+    },
+    {
+      "type": "manacles",
+      "x": 331.0548471897065,
+      "y": 0,
+      "z": 378.9252649054353,
+      "rotationY": 2.579131103090373,
+      "scale": 0.9727974131072138
+    },
+    {
+      "type": "moldy_bread",
+      "x": 20.1885676099131,
+      "y": 0,
+      "z": 339.7020236135435,
+      "rotationY": 5.75389888599897,
+      "scale": 1.1537891880117261
+    },
+    {
+      "type": "skull_pile",
+      "x": 129.85629882483,
+      "y": 0,
+      "z": 388.7083600581958,
+      "rotationY": 0.3436945132911634,
+      "scale": 1.1697227420378673
+    },
+    {
+      "type": "barrel",
+      "x": 7.127589133275084,
+      "y": 0,
+      "z": 344.0692427049971,
+      "rotationY": 4.124908961629202,
+      "scale": 1.019961439337501
+    },
+    {
+      "type": "pot",
+      "x": 40.039995466674256,
+      "y": 0,
+      "z": 376.2804271240492,
+      "rotationY": 5.0588229197156265,
+      "scale": 1.114254424069989
+    },
+    {
+      "type": "treasure_chest",
+      "x": 196.1878676183508,
+      "y": 0,
+      "z": 386.7982780196652,
+      "rotationY": 4.895013929398374,
+      "scale": 1.0141839220128337
+    },
+    {
+      "type": "pot",
+      "x": 35.029752655907,
+      "y": 0,
+      "z": 393.07715831507835,
+      "rotationY": 1.8912639839589012,
+      "scale": 0.8102180853624965
+    },
+    {
+      "type": "chest",
+      "x": 156.0066321445777,
+      "y": 0,
+      "z": 371.97424066630794,
+      "rotationY": 4.187582270005576,
+      "scale": 0.9184850015463971
+    },
+    {
+      "type": "forgotten_shield",
+      "x": 133.72902886499392,
+      "y": 0,
+      "z": 369.8303563993222,
+      "rotationY": 2.690039572453001,
+      "scale": 0.9197800678425228
+    },
+    {
+      "type": "chest",
+      "x": 335.94418763278804,
+      "y": 0,
+      "z": 375.83447007943226,
+      "rotationY": 2.4774954502300623,
+      "scale": 0.8853353223273118
+    },
+    {
+      "type": "barrel",
+      "x": 90.15502853217083,
+      "y": 0,
+      "z": 385.9785230679132,
+      "rotationY": 5.612405563366578,
+      "scale": 1.1614911297844972
+    },
+    {
+      "type": "scattered_coins",
+      "x": 124.08521704705117,
+      "y": 0,
+      "z": 382.93154095514154,
+      "rotationY": 1.197728071344814,
+      "scale": 1.1582195623515812
+    },
+    {
+      "type": "forgotten_shield",
+      "x": 108.96610840543269,
+      "y": 0,
+      "z": 371.9765875142121,
+      "rotationY": 0.08470424678521274,
+      "scale": 1.0183925626247294
+    },
+    {
+      "type": "forgotten_shield",
+      "x": 297.81567436291385,
+      "y": 0,
+      "z": 389.8694234884065,
+      "rotationY": 1.4687616251310807,
+      "scale": 0.8475842203727368
+    },
+    {
+      "type": "treasure_chest",
+      "x": 414.98042664462366,
+      "y": 0,
+      "z": 410.17312890290344,
+      "rotationY": 0.5251135871295215,
+      "scale": 1.1758890234227855
+    },
+    {
+      "type": "skull_pile",
+      "x": 36.06600744212482,
+      "y": 0,
+      "z": 363.00226146814845,
+      "rotationY": 0.5497843626624259,
+      "scale": 1.1461457869202176
+    },
+    {
+      "type": "treasure_chest",
+      "x": 248.91405853564274,
+      "y": 0,
+      "z": 373.96821722304446,
+      "rotationY": 0.1138449569013842,
+      "scale": 0.884172642797485
+    },
+    {
+      "type": "discarded_sword",
+      "x": 104.95330409854851,
+      "y": 0,
+      "z": 379.2044467040208,
+      "rotationY": 4.486882302614177,
+      "scale": 0.9856496377007283
+    },
+    {
+      "type": "chest",
+      "x": 282.8838017467299,
+      "y": 0,
+      "z": 373.93079491239973,
+      "rotationY": 3.4785269320305896,
+      "scale": 0.8653341662867043
+    }
+  ],
+  "useProceduralProps": false
+}

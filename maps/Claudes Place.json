@@ -1,0 +1,2365 @@
+{
+  "version": "1.1",
+  "name": "Claudes Place",
+  "mode": "tiles",
+  "width": 400,
+  "depth": 400,
+  "spawnRoom": 0,
+  "spawnPosition": {
+    "x": 30,
+    "z": 30
+  },
+  "tileData": "H4sIAAAAAAAC/5vAyMAwAYgbVvEHN6QzUgM3FjI0yOMkKTE5uyEainMZ3aGY24i74RlDfkMAAyqrgCG9wXlw8fjsQ4YYj6VxHgO57KHp44FLJSH2fulejaEMMF5DPQNOXg13hXsAd0PoIOA1JjFQxCtmQJg4CNkN7VCMje3NwJ03yhuavGyG6jgi2A2PCdDnGaIbwoF0CDAve1CXLQMsEfCxQ+xlBoTN1fiQgYUk1kC5lJhQpHrsxRCZch7DUlvDehwsaIodZQPxfyrR3YzAsr1BB0xOZrBvqGLAw3IwbnAcCLZENPls2rjNodGdwQwvuyGSAT+bmxEL3eBJPhnC3SBFIr2GIb0MzOKrbsjAzWbJZwHyWEA9Fkp43BlgM7nqR3nIPFBI51RTj9Wwg4H+dKApABWRCm07DwAA",
+  "rooms": [],
+  "corridors": [],
+  "enemies": [
+    {
+      "type": "goblin",
+      "roomId": -1,
+      "position": {
+        "x": 83,
+        "z": 323
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": -1.7327237127077515,
+      "isRoamer": false
+    },
+    {
+      "type": "goblin",
+      "roomId": -1,
+      "position": {
+        "x": 78,
+        "z": 331
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": -1.545055203513498,
+      "isRoamer": false
+    },
+    {
+      "type": "goblin",
+      "roomId": -1,
+      "position": {
+        "x": 76,
+        "z": 343
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0.18043932398643658,
+      "isRoamer": false
+    },
+    {
+      "type": "goblin",
+      "roomId": -1,
+      "position": {
+        "x": 90,
+        "z": 340
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": -2.1463153013806724,
+      "isRoamer": false
+    },
+    {
+      "type": "goblin",
+      "roomId": -1,
+      "position": {
+        "x": 73,
+        "z": 356
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": -2.956806650669811,
+      "isRoamer": false
+    },
+    {
+      "type": "goblin",
+      "roomId": -1,
+      "position": {
+        "x": 67,
+        "z": 349
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": -0.8847971409614646,
+      "isRoamer": false
+    },
+    {
+      "type": "goblin_shaman",
+      "roomId": -1,
+      "position": {
+        "x": 80,
+        "z": 340
+      },
+      "level": 2,
+      "isBoss": false,
+      "rotationY": -2.5586767404125843,
+      "isRoamer": false
+    },
+    {
+      "type": "goblin_thrower",
+      "roomId": -1,
+      "position": {
+        "x": 75,
+        "z": 335
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0.7327988074799658,
+      "isRoamer": false
+    },
+    {
+      "type": "goblin_thrower",
+      "roomId": -1,
+      "position": {
+        "x": 85,
+        "z": 345
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 2.5478754806418236,
+      "isRoamer": false
+    },
+    {
+      "type": "skeleton",
+      "roomId": -1,
+      "position": {
+        "x": 323,
+        "z": 325
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": -0.22548709789514154,
+      "isRoamer": false
+    },
+    {
+      "type": "skeleton",
+      "roomId": -1,
+      "position": {
+        "x": 307,
+        "z": 341
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": -1.0519199095930718,
+      "isRoamer": false
+    },
+    {
+      "type": "skeleton",
+      "roomId": -1,
+      "position": {
+        "x": 332,
+        "z": 334
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 2.6585194981637628,
+      "isRoamer": false
+    },
+    {
+      "type": "skeleton",
+      "roomId": -1,
+      "position": {
+        "x": 309,
+        "z": 336
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0.1160744473332338,
+      "isRoamer": false
+    },
+    {
+      "type": "skeleton",
+      "roomId": -1,
+      "position": {
+        "x": 326,
+        "z": 332
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": -3.092539869263174,
+      "isRoamer": false
+    },
+    {
+      "type": "shadow_stalker",
+      "roomId": -1,
+      "position": {
+        "x": 320,
+        "z": 340
+      },
+      "level": 2,
+      "isBoss": false,
+      "rotationY": -1.546110991407117,
+      "isRoamer": true
+    },
+    {
+      "type": "flesh_golem",
+      "roomId": -1,
+      "position": {
+        "x": 310,
+        "z": 330
+      },
+      "level": 3,
+      "isBoss": false,
+      "rotationY": 0.6777535569759996,
+      "isRoamer": false
+    },
+    {
+      "type": "spider",
+      "roomId": -1,
+      "position": {
+        "x": 328,
+        "z": 88
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 1.0299126409478037,
+      "isRoamer": false
+    },
+    {
+      "type": "spider",
+      "roomId": -1,
+      "position": {
+        "x": 330,
+        "z": 81
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 1.082436373206356,
+      "isRoamer": false
+    },
+    {
+      "type": "spider",
+      "roomId": -1,
+      "position": {
+        "x": 317,
+        "z": 79
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": -1.9674675651894564,
+      "isRoamer": false
+    },
+    {
+      "type": "spider",
+      "roomId": -1,
+      "position": {
+        "x": 337,
+        "z": 70
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0.3342803265858123,
+      "isRoamer": false
+    },
+    {
+      "type": "spider",
+      "roomId": -1,
+      "position": {
+        "x": 300,
+        "z": 85
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": -1.6797542785181216,
+      "isRoamer": false
+    },
+    {
+      "type": "spider",
+      "roomId": -1,
+      "position": {
+        "x": 327,
+        "z": 91
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": -1.4120055789944594,
+      "isRoamer": false
+    },
+    {
+      "type": "spider",
+      "roomId": -1,
+      "position": {
+        "x": 334,
+        "z": 62
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 2.4573538218285833,
+      "isRoamer": false
+    },
+    {
+      "type": "clockwork_spider",
+      "roomId": -1,
+      "position": {
+        "x": 330,
+        "z": 90
+      },
+      "level": 2,
+      "isBoss": false,
+      "rotationY": 1.71722683307914,
+      "isRoamer": false
+    },
+    {
+      "type": "spider",
+      "roomId": -1,
+      "position": {
+        "x": 370,
+        "z": 80
+      },
+      "level": 5,
+      "isBoss": true,
+      "rotationY": -1.9340348024516751,
+      "isRoamer": false
+    },
+    {
+      "type": "wolf",
+      "roomId": -1,
+      "position": {
+        "x": 345,
+        "z": 200
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0.8229279833805059,
+      "isRoamer": false
+    },
+    {
+      "type": "wolf",
+      "roomId": -1,
+      "position": {
+        "x": 340,
+        "z": 187
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": -0.09559763906673524,
+      "isRoamer": false
+    },
+    {
+      "type": "wolf",
+      "roomId": -1,
+      "position": {
+        "x": 341,
+        "z": 201
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": -2.7849433894030575,
+      "isRoamer": false
+    },
+    {
+      "type": "wolf",
+      "roomId": -1,
+      "position": {
+        "x": 332,
+        "z": 200
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": -1.9645001487999263,
+      "isRoamer": false
+    },
+    {
+      "type": "badlama",
+      "roomId": -1,
+      "position": {
+        "x": 350,
+        "z": 200
+      },
+      "level": 2,
+      "isBoss": false,
+      "rotationY": 2.1542188033443646,
+      "isRoamer": false
+    },
+    {
+      "type": "badlama",
+      "roomId": -1,
+      "position": {
+        "x": 330,
+        "z": 210
+      },
+      "level": 2,
+      "isBoss": false,
+      "rotationY": -2.5007059420692297,
+      "isRoamer": false
+    },
+    {
+      "type": "slime",
+      "roomId": -1,
+      "position": {
+        "x": 216,
+        "z": 74
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": -0.6909777412022287,
+      "isRoamer": false
+    },
+    {
+      "type": "slime",
+      "roomId": -1,
+      "position": {
+        "x": 205,
+        "z": 98
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 1.5550480980007872,
+      "isRoamer": false
+    },
+    {
+      "type": "slime",
+      "roomId": -1,
+      "position": {
+        "x": 205,
+        "z": 73
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": -1.3254273190577517,
+      "isRoamer": false
+    },
+    {
+      "type": "slime",
+      "roomId": -1,
+      "position": {
+        "x": 205,
+        "z": 79
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0.9875526398893868,
+      "isRoamer": false
+    },
+    {
+      "type": "slime",
+      "roomId": -1,
+      "position": {
+        "x": 186,
+        "z": 66
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": -0.4243447691287172,
+      "isRoamer": false
+    },
+    {
+      "type": "slime",
+      "roomId": -1,
+      "position": {
+        "x": 184,
+        "z": 76
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": -2.8177671691943416,
+      "isRoamer": false
+    },
+    {
+      "type": "gelatinous_cube",
+      "roomId": -1,
+      "position": {
+        "x": 200,
+        "z": 80
+      },
+      "level": 3,
+      "isBoss": false,
+      "rotationY": -2.7041777800367504,
+      "isRoamer": false
+    },
+    {
+      "type": "camera_drone",
+      "roomId": -1,
+      "position": {
+        "x": 55,
+        "z": 195
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": -0.3220057543441488,
+      "isRoamer": false
+    },
+    {
+      "type": "camera_drone",
+      "roomId": -1,
+      "position": {
+        "x": 65,
+        "z": 205
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": -2.1832174984745296,
+      "isRoamer": false
+    },
+    {
+      "type": "shock_drone",
+      "roomId": -1,
+      "position": {
+        "x": 60,
+        "z": 200
+      },
+      "level": 2,
+      "isBoss": false,
+      "rotationY": 2.850487592248058,
+      "isRoamer": false
+    },
+    {
+      "type": "advertiser_bot",
+      "roomId": -1,
+      "position": {
+        "x": 70,
+        "z": 190
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": -1.7717808462103068,
+      "isRoamer": true
+    },
+    {
+      "type": "dragon",
+      "roomId": -1,
+      "position": {
+        "x": 200,
+        "z": 320
+      },
+      "level": 4,
+      "isBoss": false,
+      "rotationY": -1.181558621443333,
+      "isRoamer": false
+    },
+    {
+      "type": "dragon",
+      "roomId": -1,
+      "position": {
+        "x": 190,
+        "z": 310
+      },
+      "level": 3,
+      "isBoss": false,
+      "rotationY": 3.1025714923060725,
+      "isRoamer": false
+    },
+    {
+      "type": "lava_elemental",
+      "roomId": -1,
+      "position": {
+        "x": 210,
+        "z": 330
+      },
+      "level": 3,
+      "isBoss": false,
+      "rotationY": 0.43201788969647303,
+      "isRoamer": false
+    },
+    {
+      "type": "living_armor",
+      "roomId": -1,
+      "position": {
+        "x": 200,
+        "z": 200
+      },
+      "level": 3,
+      "isBoss": false,
+      "rotationY": -2.4343018519925304,
+      "isRoamer": true
+    },
+    {
+      "type": "void_spawn",
+      "roomId": -1,
+      "position": {
+        "x": 190,
+        "z": 190
+      },
+      "level": 3,
+      "isBoss": false,
+      "rotationY": 2.408587899740202,
+      "isRoamer": false
+    },
+    {
+      "type": "ice_wraith",
+      "roomId": -1,
+      "position": {
+        "x": 210,
+        "z": 210
+      },
+      "level": 3,
+      "isBoss": false,
+      "rotationY": 1.2582842675826384,
+      "isRoamer": false
+    },
+    {
+      "type": "mimic",
+      "roomId": -1,
+      "position": {
+        "x": 120,
+        "z": 280
+      },
+      "level": 3,
+      "isBoss": false,
+      "rotationY": -0.7962551801361664,
+      "isRoamer": false
+    },
+    {
+      "type": "dungeon_rat",
+      "roomId": -1,
+      "position": {
+        "x": 117,
+        "z": 129
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 1.661069984939675,
+      "isRoamer": false
+    },
+    {
+      "type": "dungeon_rat",
+      "roomId": -1,
+      "position": {
+        "x": 128,
+        "z": 124
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": -0.696199508166853,
+      "isRoamer": false
+    },
+    {
+      "type": "dungeon_rat",
+      "roomId": -1,
+      "position": {
+        "x": 113,
+        "z": 130
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 1.9798881831934523,
+      "isRoamer": false
+    },
+    {
+      "type": "dungeon_rat",
+      "roomId": -1,
+      "position": {
+        "x": 119,
+        "z": 110
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 3.099709005513552,
+      "isRoamer": false
+    },
+    {
+      "type": "dungeon_rat",
+      "roomId": -1,
+      "position": {
+        "x": 114,
+        "z": 128
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": -1.239808667503235,
+      "isRoamer": false
+    },
+    {
+      "type": "dungeon_rat",
+      "roomId": -1,
+      "position": {
+        "x": 127,
+        "z": 117
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": -0.9119961213979404,
+      "isRoamer": false
+    },
+    {
+      "type": "dungeon_rat",
+      "roomId": -1,
+      "position": {
+        "x": 117,
+        "z": 127
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": -1.296719100445716,
+      "isRoamer": false
+    },
+    {
+      "type": "dungeon_rat",
+      "roomId": -1,
+      "position": {
+        "x": 130,
+        "z": 121
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0.46010816192277737,
+      "isRoamer": false
+    },
+    {
+      "type": "bat",
+      "roomId": -1,
+      "position": {
+        "x": 288,
+        "z": 127
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": -1.0490856585042545,
+      "isRoamer": false
+    },
+    {
+      "type": "bat",
+      "roomId": -1,
+      "position": {
+        "x": 268,
+        "z": 112
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": -0.3748087340613524,
+      "isRoamer": false
+    },
+    {
+      "type": "bat",
+      "roomId": -1,
+      "position": {
+        "x": 268,
+        "z": 118
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": -0.2843437089781853,
+      "isRoamer": false
+    },
+    {
+      "type": "bat",
+      "roomId": -1,
+      "position": {
+        "x": 284,
+        "z": 121
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 2.0747221881607665,
+      "isRoamer": false
+    },
+    {
+      "type": "bat",
+      "roomId": -1,
+      "position": {
+        "x": 270,
+        "z": 115
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": -1.6017667205055872,
+      "isRoamer": false
+    },
+    {
+      "type": "bat",
+      "roomId": -1,
+      "position": {
+        "x": 288,
+        "z": 112
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": -1.0974247354761029,
+      "isRoamer": false
+    },
+    {
+      "type": "eye",
+      "roomId": -1,
+      "position": {
+        "x": 59,
+        "z": 289
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0.3295075645137797,
+      "isRoamer": false
+    },
+    {
+      "type": "eye",
+      "roomId": -1,
+      "position": {
+        "x": 59,
+        "z": 275
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 1.8102976532437367,
+      "isRoamer": false
+    },
+    {
+      "type": "eye",
+      "roomId": -1,
+      "position": {
+        "x": 51,
+        "z": 272
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": -0.41241645967367235,
+      "isRoamer": false
+    },
+    {
+      "type": "eye",
+      "roomId": -1,
+      "position": {
+        "x": 52,
+        "z": 282
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 0.3650081147622357,
+      "isRoamer": false
+    },
+    {
+      "type": "mushroom",
+      "roomId": -1,
+      "position": {
+        "x": 279,
+        "z": 280
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": -0.6564422987262892,
+      "isRoamer": false
+    },
+    {
+      "type": "mushroom",
+      "roomId": -1,
+      "position": {
+        "x": 278,
+        "z": 271
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": -2.936485049189585,
+      "isRoamer": false
+    },
+    {
+      "type": "mushroom",
+      "roomId": -1,
+      "position": {
+        "x": 282,
+        "z": 278
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": -0.16891502737955433,
+      "isRoamer": false
+    },
+    {
+      "type": "mushroom",
+      "roomId": -1,
+      "position": {
+        "x": 275,
+        "z": 269
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": -1.2411319086462658,
+      "isRoamer": false
+    },
+    {
+      "type": "mushroom",
+      "roomId": -1,
+      "position": {
+        "x": 281,
+        "z": 284
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": -0.4269326964249758,
+      "isRoamer": false
+    },
+    {
+      "type": "lizard",
+      "roomId": -1,
+      "position": {
+        "x": 137,
+        "z": 192
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 1.5109516762072444,
+      "isRoamer": false
+    },
+    {
+      "type": "lizard",
+      "roomId": -1,
+      "position": {
+        "x": 142,
+        "z": 203
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": 1.5818075578027173,
+      "isRoamer": false
+    },
+    {
+      "type": "lizard",
+      "roomId": -1,
+      "position": {
+        "x": 148,
+        "z": 203
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": -1.006468845228206,
+      "isRoamer": false
+    },
+    {
+      "type": "lizard",
+      "roomId": -1,
+      "position": {
+        "x": 143,
+        "z": 206
+      },
+      "level": 1,
+      "isBoss": false,
+      "rotationY": -2.943988310886773,
+      "isRoamer": false
+    },
+    {
+      "type": "plague_bearer",
+      "roomId": -1,
+      "position": {
+        "x": 260,
+        "z": 200
+      },
+      "level": 3,
+      "isBoss": false,
+      "rotationY": 3.0926182085462672,
+      "isRoamer": false
+    },
+    {
+      "type": "plague_bearer",
+      "roomId": -1,
+      "position": {
+        "x": 255,
+        "z": 195
+      },
+      "level": 2,
+      "isBoss": false,
+      "rotationY": 2.613176240988497,
+      "isRoamer": false
+    },
+    {
+      "type": "crawler_killer",
+      "roomId": -1,
+      "position": {
+        "x": 200,
+        "z": 150
+      },
+      "level": 4,
+      "isBoss": false,
+      "rotationY": -1.8547873401316746,
+      "isRoamer": true
+    }
+  ],
+  "encounters": [],
+  "groupTemplates": [],
+  "customTiles": [],
+  "placedProps": [
+    {
+      "type": "brazier_fire",
+      "x": 13.0,
+      "y": 0,
+      "z": 13.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 47.0,
+      "y": 0,
+      "z": 13.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 13.0,
+      "y": 0,
+      "z": 47.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 47.0,
+      "y": 0,
+      "z": 47.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "chest",
+      "x": 25.0,
+      "y": 0,
+      "z": 25.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "bookshelf",
+      "x": 38.0,
+      "y": 0,
+      "z": 30.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "table",
+      "x": 27.0,
+      "y": 0,
+      "z": 33.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "chair",
+      "x": 25.0,
+      "y": 0,
+      "z": 33.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "chair",
+      "x": 29.0,
+      "y": 0,
+      "z": 33.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "cauldron",
+      "x": 35.0,
+      "y": 0,
+      "z": 25.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "pot",
+      "x": 34.0,
+      "y": 0,
+      "z": 32.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "pot",
+      "x": 31.0,
+      "y": 0,
+      "z": 30.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 58.0,
+      "y": 0,
+      "z": 318.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 102.0,
+      "y": 0,
+      "z": 318.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 58.0,
+      "y": 0,
+      "z": 362.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 102.0,
+      "y": 0,
+      "z": 362.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "campfire",
+      "x": 80.0,
+      "y": 0,
+      "z": 340.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "barrel",
+      "x": 73.0,
+      "y": 0,
+      "z": 345.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "barrel",
+      "x": 77.0,
+      "y": 0,
+      "z": 341.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "barrel",
+      "x": 73.0,
+      "y": 0,
+      "z": 347.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "barrel",
+      "x": 85.0,
+      "y": 0,
+      "z": 340.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "crate",
+      "x": 82.0,
+      "y": 0,
+      "z": 332.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "crate",
+      "x": 81.0,
+      "y": 0,
+      "z": 339.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "crate",
+      "x": 81.0,
+      "y": 0,
+      "z": 350.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "crate",
+      "x": 77.0,
+      "y": 0,
+      "z": 347.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "moldy_bread",
+      "x": 82.0,
+      "y": 0,
+      "z": 342.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 293.0,
+      "y": 0,
+      "z": 318.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 347.0,
+      "y": 0,
+      "z": 318.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 293.0,
+      "y": 0,
+      "z": 362.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 347.0,
+      "y": 0,
+      "z": 362.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "bone_pile",
+      "x": 325.0,
+      "y": 0,
+      "z": 344.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "bone_pile",
+      "x": 326.0,
+      "y": 0,
+      "z": 350.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "bone_pile",
+      "x": 323.0,
+      "y": 0,
+      "z": 329.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "bone_pile",
+      "x": 315.0,
+      "y": 0,
+      "z": 338.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "bone_pile",
+      "x": 327.0,
+      "y": 0,
+      "z": 328.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "skull_pile",
+      "x": 328.0,
+      "y": 0,
+      "z": 340.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "skull_pile",
+      "x": 322.0,
+      "y": 0,
+      "z": 331.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "skull_pile",
+      "x": 319.0,
+      "y": 0,
+      "z": 336.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "skull_pile",
+      "x": 322.0,
+      "y": 0,
+      "z": 350.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "altar_stone",
+      "x": 320.0,
+      "y": 0,
+      "z": 340.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "ancient_scroll",
+      "x": 317.0,
+      "y": 0,
+      "z": 340.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 296.0,
+      "y": 0,
+      "z": 56.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 344.0,
+      "y": 0,
+      "z": 56.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 296.0,
+      "y": 0,
+      "z": 104.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 344.0,
+      "y": 0,
+      "z": 104.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "thorny_vines",
+      "x": 325.0,
+      "y": 0,
+      "z": 68.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "thorny_vines",
+      "x": 312.0,
+      "y": 0,
+      "z": 85.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "thorny_vines",
+      "x": 324.0,
+      "y": 0,
+      "z": 77.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "thorny_vines",
+      "x": 333.0,
+      "y": 0,
+      "z": 74.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "thorny_vines",
+      "x": 324.0,
+      "y": 0,
+      "z": 91.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 326.0,
+      "y": 0,
+      "z": 85.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 319.0,
+      "y": 0,
+      "z": 83.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "rat_nest",
+      "x": 325.0,
+      "y": 0,
+      "z": 80.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "skull_pile",
+      "x": 370.0,
+      "y": 0,
+      "z": 70.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "skull_pile",
+      "x": 370.0,
+      "y": 0,
+      "z": 90.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 318.0,
+      "y": 0,
+      "z": 181.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 362.0,
+      "y": 0,
+      "z": 181.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 318.0,
+      "y": 0,
+      "z": 219.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 362.0,
+      "y": 0,
+      "z": 219.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 344.0,
+      "y": 0,
+      "z": 194.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 337.0,
+      "y": 0,
+      "z": 192.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 330.0,
+      "y": 0,
+      "z": 191.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "bone_pile",
+      "x": 348.0,
+      "y": 0,
+      "z": 199.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "bone_pile",
+      "x": 343.0,
+      "y": 0,
+      "z": 200.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "bone_pile",
+      "x": 350.0,
+      "y": 0,
+      "z": 197.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "bone_pile",
+      "x": 336.0,
+      "y": 0,
+      "z": 193.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "bone_pile",
+      "x": 350.0,
+      "y": 0,
+      "z": 194.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "bone_pile",
+      "x": 336.0,
+      "y": 0,
+      "z": 206.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "discarded_sword",
+      "x": 335.0,
+      "y": 0,
+      "z": 203.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "forgotten_shield",
+      "x": 345.0,
+      "y": 0,
+      "z": 197.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 178.0,
+      "y": 0,
+      "z": 58.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 222.0,
+      "y": 0,
+      "z": 58.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 178.0,
+      "y": 0,
+      "z": 102.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 222.0,
+      "y": 0,
+      "z": 102.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 207.0,
+      "y": 0,
+      "z": 78.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 201.0,
+      "y": 0,
+      "z": 79.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 206.0,
+      "y": 0,
+      "z": 73.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 201.0,
+      "y": 0,
+      "z": 76.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 204.0,
+      "y": 0,
+      "z": 81.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 207.0,
+      "y": 0,
+      "z": 76.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 207.0,
+      "y": 0,
+      "z": 86.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 196.0,
+      "y": 0,
+      "z": 73.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 197.0,
+      "y": 0,
+      "z": 84.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 198.0,
+      "y": 0,
+      "z": 80.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 206.0,
+      "y": 0,
+      "z": 74.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "moss_patch",
+      "x": 206.0,
+      "y": 0,
+      "z": 84.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "moss_patch",
+      "x": 207.0,
+      "y": 0,
+      "z": 72.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "shattered_potion",
+      "x": 200.0,
+      "y": 0,
+      "z": 75.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "crystal",
+      "x": 60.0,
+      "y": 0,
+      "z": 200.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 50.0,
+      "y": 0,
+      "z": 190.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 70.0,
+      "y": 0,
+      "z": 210.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 168.0,
+      "y": 0,
+      "z": 293.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 232.0,
+      "y": 0,
+      "z": 293.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 168.0,
+      "y": 0,
+      "z": 347.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 232.0,
+      "y": 0,
+      "z": 347.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "treasure_chest",
+      "x": 200.0,
+      "y": 0,
+      "z": 312.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 208.0,
+      "y": 0,
+      "z": 316.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 203.0,
+      "y": 0,
+      "z": 316.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 205.0,
+      "y": 0,
+      "z": 316.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 195.0,
+      "y": 0,
+      "z": 315.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "crystal",
+      "x": 194.0,
+      "y": 0,
+      "z": 320.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "crystal",
+      "x": 206.0,
+      "y": 0,
+      "z": 320.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 200.0,
+      "y": 0,
+      "z": 325.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "pillar",
+      "x": 211.0,
+      "y": 0,
+      "z": 329.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "pillar",
+      "x": 211.0,
+      "y": 0,
+      "z": 326.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 173.0,
+      "y": 0,
+      "z": 173.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 227.0,
+      "y": 0,
+      "z": 173.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 173.0,
+      "y": 0,
+      "z": 227.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "brazier_fire",
+      "x": 227.0,
+      "y": 0,
+      "z": 227.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "statue",
+      "x": 190.0,
+      "y": 0,
+      "z": 190.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "statue",
+      "x": 210.0,
+      "y": 0,
+      "z": 190.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "statue",
+      "x": 190.0,
+      "y": 0,
+      "z": 210.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "statue",
+      "x": 210.0,
+      "y": 0,
+      "z": 210.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "pillar",
+      "x": 215.0,
+      "y": 0,
+      "z": 200.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "pillar",
+      "x": 200.0,
+      "y": 0,
+      "z": 215.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "pillar",
+      "x": 185.0,
+      "y": 0,
+      "z": 200.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "pillar",
+      "x": 200.0,
+      "y": 0,
+      "z": 185.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "crystal",
+      "x": 200.0,
+      "y": 0,
+      "z": 200.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "chest",
+      "x": 115.0,
+      "y": 0,
+      "z": 280.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "chest",
+      "x": 125.0,
+      "y": 0,
+      "z": 280.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 120.0,
+      "y": 0,
+      "z": 275.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "scattered_coins",
+      "x": 120.0,
+      "y": 0,
+      "z": 285.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "rat_nest",
+      "x": 120.0,
+      "y": 0,
+      "z": 120.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "moldy_bread",
+      "x": 125.0,
+      "y": 0,
+      "z": 115.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 280.0,
+      "y": 0,
+      "z": 120.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 275.0,
+      "y": 0,
+      "z": 125.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "crystal",
+      "x": 60.0,
+      "y": 0,
+      "z": 280.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "engraved_rune",
+      "x": 55.0,
+      "y": 0,
+      "z": 275.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 269.0,
+      "y": 0,
+      "z": 273.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 284.0,
+      "y": 0,
+      "z": 284.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 293.0,
+      "y": 0,
+      "z": 289.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 281.0,
+      "y": 0,
+      "z": 272.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 294.0,
+      "y": 0,
+      "z": 276.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "glowing_mushrooms",
+      "x": 270.0,
+      "y": 0,
+      "z": 266.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "moss_patch",
+      "x": 280.0,
+      "y": 0,
+      "z": 280.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "water_puddle",
+      "x": 140.0,
+      "y": 0,
+      "z": 200.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "rubble_heap",
+      "x": 145.0,
+      "y": 0,
+      "z": 205.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "cauldron",
+      "x": 260.0,
+      "y": 0,
+      "z": 200.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "shattered_potion",
+      "x": 265.0,
+      "y": 0,
+      "z": 205.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "blood_pool",
+      "x": 255.0,
+      "y": 0,
+      "z": 200.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 30.0,
+      "y": 0,
+      "z": 60.0,
+      "rotationY": -0.2211193176175975,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 30.0,
+      "y": 0,
+      "z": 90.0,
+      "rotationY": -0.2573878730141391,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 30.0,
+      "y": 0,
+      "z": 120.0,
+      "rotationY": -0.12710141024550117,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 60.0,
+      "y": 0,
+      "z": 30.0,
+      "rotationY": -0.2599211239834835,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 90.0,
+      "y": 0,
+      "z": 30.0,
+      "rotationY": 0.24067946411937396,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 120.0,
+      "y": 0,
+      "z": 30.0,
+      "rotationY": 0.002094572932163641,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 150.0,
+      "y": 0,
+      "z": 200.0,
+      "rotationY": 0.1547935338919641,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 180.0,
+      "y": 0,
+      "z": 200.0,
+      "rotationY": -0.038821433527205795,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 220.0,
+      "y": 0,
+      "z": 200.0,
+      "rotationY": 0.01500431290316373,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 250.0,
+      "y": 0,
+      "z": 200.0,
+      "rotationY": -0.16028876410741252,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 280.0,
+      "y": 0,
+      "z": 200.0,
+      "rotationY": -0.03186494609282198,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 200.0,
+      "y": 0,
+      "z": 140.0,
+      "rotationY": 0.053137005666229364,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 200.0,
+      "y": 0,
+      "z": 170.0,
+      "rotationY": -0.10723189371018985,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 200.0,
+      "y": 0,
+      "z": 230.0,
+      "rotationY": -0.14492022490623332,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 200.0,
+      "y": 0,
+      "z": 260.0,
+      "rotationY": -0.12343506951655966,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 200.0,
+      "y": 0,
+      "z": 290.0,
+      "rotationY": -0.254458079764094,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 130.0,
+      "y": 0,
+      "z": 340.0,
+      "rotationY": -0.028480391121753323,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 160.0,
+      "y": 0,
+      "z": 340.0,
+      "rotationY": 0.17878037046710965,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 260.0,
+      "y": 0,
+      "z": 340.0,
+      "rotationY": -0.2864289611243939,
+      "scale": 1
+    },
+    {
+      "type": "torch",
+      "x": 290.0,
+      "y": 0,
+      "z": 340.0,
+      "rotationY": 0.04020242309293387,
+      "scale": 1
+    },
+    {
+      "type": "rubble_heap",
+      "x": 52.0,
+      "y": 0,
+      "z": 102.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "broken_pottery",
+      "x": 98.0,
+      "y": 0,
+      "z": 51.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "broken_pottery",
+      "x": 181.0,
+      "y": 0,
+      "z": 203.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "broken_pottery",
+      "x": 218.0,
+      "y": 0,
+      "z": 202.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "rubble_heap",
+      "x": 199.0,
+      "y": 0,
+      "z": 151.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "cracked_tiles",
+      "x": 197.0,
+      "y": 0,
+      "z": 252.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "bone_pile",
+      "x": 303.0,
+      "y": 0,
+      "z": 197.0,
+      "rotationY": 0,
+      "scale": 1
+    },
+    {
+      "type": "cracked_tiles",
+      "x": 99.0,
+      "y": 0,
+      "z": 198.0,
+      "rotationY": 0,
+      "scale": 1
+    }
+  ],
+  "npcs": [
+    {
+      "type": "bopca",
+      "x": 22.0,
+      "z": 22.0,
+      "rotationY": 0.7
+    },
+    {
+      "type": "mordecai",
+      "x": 40.0,
+      "z": 25.0,
+      "rotationY": -0.5
+    },
+    {
+      "type": "steve",
+      "x": 35.0,
+      "z": 35.0,
+      "rotationY": 0
+    },
+    {
+      "type": "crawler_rex",
+      "x": 25.0,
+      "z": 38.0,
+      "rotationY": 0
+    },
+    {
+      "type": "crawler_lily",
+      "x": 38.0,
+      "z": 40.0,
+      "rotationY": -1.57
+    },
+    {
+      "type": "crawler_chad",
+      "x": 20.0,
+      "z": 30.0,
+      "rotationY": 1.57
+    },
+    {
+      "type": "crawler_shade",
+      "x": 30.0,
+      "z": 18.0,
+      "rotationY": 3.14
+    },
+    {
+      "type": "crawler_hank",
+      "x": 42.0,
+      "z": 20.0,
+      "rotationY": -0.8
+    }
+  ],
+  "useProceduralProps": false
+}

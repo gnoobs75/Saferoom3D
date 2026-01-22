@@ -3,10 +3,10 @@ using Godot;
 namespace SafeRoom3D.Abilities.Effects;
 
 /// <summary>
-/// Soul Leech ability - AOE life drain that heals player.
+/// Soul Leech spell - AOE life drain that heals player.
 /// Targeted spell that damages enemies and heals for a percentage.
 /// </summary>
-public partial class SoulLeech3D : Ability3D, ITargetedAbility
+public partial class SoulLeech3D : Spell3D, ITargetedAbility
 {
     public override string AbilityId => "soul_leech";
     public override string AbilityName => "Soul Leech";
@@ -15,6 +15,7 @@ public partial class SoulLeech3D : Ability3D, ITargetedAbility
 
     public override float DefaultCooldown => 12f;
     public override int DefaultManaCost => 40;
+    public override int RequiredLevel => 3;
 
     // Soul Leech stats
     public float Damage { get; private set; } = 40f;

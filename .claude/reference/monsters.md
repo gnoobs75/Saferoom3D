@@ -1,6 +1,6 @@
 # Monster Reference
 
-## Original Monsters (13 types)
+## Original Monsters (14 types)
 
 | Type | HP | Speed | Damage | Color | Notes |
 |------|---:|------:|-------:|-------|-------|
@@ -17,6 +17,7 @@
 | Badlama | 90 | 2.5 | 20 | Brown/cream | Sturdy quadruped |
 | Bat | 40 | 4.0 | 8 | Dark purple | Flying |
 | Dragon | 200 | 2.5 | 35 | Red | Large winged creature |
+| Rabbidd | 75 | 4.5 | 16 | Dark purple-crimson | Demonic rabbit with horns, glowing eyes |
 
 ## DCC Monsters (15 types)
 

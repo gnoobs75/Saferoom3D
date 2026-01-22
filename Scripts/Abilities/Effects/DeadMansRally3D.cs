@@ -15,6 +15,7 @@ public partial class DeadMansRally3D : Ability3D
 
     public override float DefaultCooldown => 0f; // No cooldown, toggle
     public override int DefaultManaCost => 0;
+    public override int RequiredLevel => 4;
 
     // Dead Man's Rally stats
     public float LowHealthThreshold { get; private set; } = 0.3f; // 30% HP

@@ -1,5 +1,6 @@
 using Godot;
 using System.Collections.Generic;
+using System.Linq;
 using SafeRoom3D.Core;
 using SafeRoom3D.Player;
 using SafeRoom3D.UI;
@@ -8,16 +9,20 @@ using SafeRoom3D.Abilities.Effects;
 namespace SafeRoom3D.Abilities;
 
 /// <summary>
-/// Manages all player abilities: registration, input handling, cooldowns.
-/// Central hub for the ability system.
+/// Manages all player spells and abilities: registration, input handling, cooldowns, unlocks.
+/// Central hub for the spell/ability system.
+/// Spells = mana cost + cooldown, Abilities = cooldown only.
 /// </summary>
 public partial class AbilityManager3D : Node
 {
     // Singleton
     public static AbilityManager3D? Instance { get; private set; }
 
-    // All registered abilities
+    // All registered spells and abilities
     private readonly Dictionary<string, Ability3D> _abilities = new();
+
+    // Unlock tracking
+    private readonly HashSet<string> _unlockedIds = new();
 
     // Three hotbars: Bar 0 = 1-0 keys, Bar 1 = Shift+1-0, Bar 2 = Alt+1-0
     private readonly Ability3D?[,] _hotbars = new Ability3D?[3, 10];
@@ -38,6 +43,7 @@ public partial class AbilityManager3D : Node
     [Signal] public delegate void HotbarSlotChangedEventHandler(int row, int slot, string? abilityId);
     [Signal] public delegate void TargetingStartedEventHandler(string abilityId, float radius, Color color);
     [Signal] public delegate void TargetingEndedEventHandler();
+    [Signal] public delegate void AbilityUnlockedEventHandler(string abilityId, string category);
 
     public override void _Ready()
     {
@@ -54,8 +60,11 @@ public partial class AbilityManager3D : Node
     {
         _player = FPSController.Instance;
 
-        // Create all abilities
+        // Create all spells and abilities
         CreateAbilities();
+
+        // Set up starter unlocks
+        SetupStarterUnlocks();
 
         // Set up default hotbar
         SetupDefaultHotbar();
@@ -69,28 +78,61 @@ public partial class AbilityManager3D : Node
             GameManager3D.Instance.EnemyKilled += OnEnemyKilled;
         }
 
-        GD.Print("[AbilityManager3D] Initialized with all abilities");
+        GD.Print($"[AbilityManager3D] Initialized with {_abilities.Count} spells/abilities ({_unlockedIds.Count} unlocked)");
+    }
+
+    private void SetupStarterUnlocks()
+    {
+        // Player starts at level 0 with only Heal spell unlocked
+        UnlockAbility("heal");
     }
 
     private void CreateAbilities()
     {
-        // Create and register all 15 abilities
-        RegisterAbility(new Fireball3D());
-        RegisterAbility(new ChainLightning3D());
-        RegisterAbility(new SoulLeech3D());
-        RegisterAbility(new ProtectiveShell3D());
-        RegisterAbility(new GravityWell3D());
-        RegisterAbility(new TimestopBubble3D());
-        RegisterAbility(new InfernalGround3D());
-        RegisterAbility(new BansheesWail3D());
-        RegisterAbility(new Berserk3D());
-        RegisterAbility(new EngineOfTomorrow3D());
-        RegisterAbility(new DeadMansRally3D());
-        RegisterAbility(new MirrorImage3D());
-        RegisterAbility(new AudienceFavorite3D());
-        RegisterAbility(new SponsorBlessing3D());
+        // ========== SPELLS (mana cost + cooldown) ==========
+        // Starter spell - available from level 0
+        RegisterAbility(new Heal3D());               // Level 0 - Starter (20 HP, 3 mana)
 
-        GD.Print($"[AbilityManager3D] Registered {_abilities.Count} abilities");
+        // Existing spells
+        RegisterAbility(new Fireball3D());           // Level 1
+        RegisterAbility(new ChainLightning3D());     // Level 2
+        RegisterAbility(new SoulLeech3D());          // Level 3
+        RegisterAbility(new InfernalGround3D());     // Level 4
+        RegisterAbility(new GravityWell3D());        // Level 5
+        RegisterAbility(new BansheesWail3D());       // Level 6
+        RegisterAbility(new TimestopBubble3D());     // Level 7
+        RegisterAbility(new Berserk3D());            // Level 8
+
+        // New spells
+        RegisterAbility(new FrostNova3D());          // Level 9
+        RegisterAbility(new ArcaneMissiles3D());     // Level 10
+        RegisterAbility(new PoisonCloud3D());        // Level 11
+        RegisterAbility(new MeteorStrike3D());       // Level 12
+        RegisterAbility(new LightningStorm3D());     // Level 13
+        RegisterAbility(new DeathCoil3D());          // Level 14
+        RegisterAbility(new ManaBurn3D());           // Level 15
+
+        // ========== ABILITIES (cooldown only, no mana) ==========
+        // Existing abilities
+        RegisterAbility(new ProtectiveShell3D());    // Level 1 - Starter
+        RegisterAbility(new SponsorBlessing3D());    // Level 2
+        RegisterAbility(new MirrorImage3D());        // Level 3
+        RegisterAbility(new DeadMansRally3D());      // Level 4
+        RegisterAbility(new AudienceFavorite3D());   // Level 5
+        RegisterAbility(new EngineOfTomorrow3D());   // Level 6
+
+        // New abilities (Phase 4)
+        RegisterAbility(new DodgeRoll3D());         // Level 7
+        RegisterAbility(new WarCry3D());            // Level 8
+        RegisterAbility(new FeignDeath3D());        // Level 9
+        RegisterAbility(new SecondWind3D());        // Level 10
+        RegisterAbility(new Bloodlust3D());         // Level 11
+        RegisterAbility(new Taunt3D());             // Level 12
+        RegisterAbility(new SmokeBomb3D());         // Level 13
+        RegisterAbility(new AdrenalineRush3D());    // Level 14
+        RegisterAbility(new MarkedForDeath3D());    // Level 15
+
+        GD.Print($"[AbilityManager3D] Registered {_abilities.Count} spells/abilities");
     }
 
     private void RegisterAbility(Ability3D ability)
@@ -115,28 +157,11 @@ public partial class AbilityManager3D : Node
 
     private void SetupDefaultHotbar()
     {
-        // Default hotbar layout matching 2D game
-        // Bar 0 (1-0 keys): Slot 0 = key 1, Slot 9 = key 0
-        AssignToHotbar(0, 0, "fireball");
-        AssignToHotbar(0, 1, "chain_lightning");
-        AssignToHotbar(0, 2, "soul_leech");
-        AssignToHotbar(0, 3, "protective_shell");
-        AssignToHotbar(0, 4, "gravity_well");
-        AssignToHotbar(0, 5, "timestop_bubble");
-        AssignToHotbar(0, 6, "infernal_ground");
-        AssignToHotbar(0, 7, "banshees_wail");
-        AssignToHotbar(0, 8, "berserk");
-        AssignToHotbar(0, 9, "mirror_image");
+        // Player starts with empty hotbars - they must drag spells/abilities from the Spell Book
+        // All 3 bars (30 slots total) start empty
+        // Bar 0 (1-0 keys), Bar 1 (Shift+1-0), Bar 2 (Alt+1-0)
 
-        // Bar 1 (Shift+1-0): Additional abilities - moved from QVRF
-        AssignToHotbar(1, 0, "dead_mans_rally");
-        AssignToHotbar(1, 1, "engine_of_tomorrow");
-        AssignToHotbar(1, 2, "audience_favorite");
-        AssignToHotbar(1, 3, "sponsor_blessing");
-
-        // Bar 2 (Alt+1-0): Reserved for future abilities or duplicates
-
-        GD.Print("[AbilityManager3D] Default hotbars configured (3 rows)");
+        GD.Print("[AbilityManager3D] Hotbars initialized empty (player must assign from Spell Book)");
     }
 
     private void CreateTargetingIndicator()
@@ -769,6 +794,139 @@ public partial class AbilityManager3D : Node
 
         int index = GD.RandRange(0, onCooldown.Count - 1);
         return onCooldown[index];
+    }
+
+    // ============================================
+    // UNLOCK SYSTEM
+    // ============================================
+
+    /// <summary>
+    /// Unlock a spell or ability by ID.
+    /// </summary>
+    public bool UnlockAbility(string abilityId)
+    {
+        if (!_abilities.TryGetValue(abilityId, out var ability))
+        {
+            GD.PrintErr($"[AbilityManager3D] Unknown ability: {abilityId}");
+            return false;
+        }
+
+        if (_unlockedIds.Contains(abilityId))
+        {
+            GD.Print($"[AbilityManager3D] {abilityId} already unlocked");
+            return false;
+        }
+
+        _unlockedIds.Add(abilityId);
+        ability.IsUnlocked = true;
+
+        string category = ability.UsesMana ? "Spell" : "Ability";
+        EmitSignal(SignalName.AbilityUnlocked, abilityId, category);
+        GD.Print($"[AbilityManager3D] Unlocked {category}: {ability.AbilityName}");
+
+        return true;
+    }
+
+    /// <summary>
+    /// Check if a spell/ability is unlocked.
+    /// </summary>
+    public bool IsUnlocked(string abilityId)
+    {
+        return _unlockedIds.Contains(abilityId);
+    }
+
+    /// <summary>
+    /// Get all spells (UsesMana = true).
+    /// </summary>
+    public IEnumerable<Ability3D> GetAllSpells()
+    {
+        return _abilities.Values.Where(a => a.UsesMana);
+    }
+
+    /// <summary>
+    /// Get all abilities (UsesMana = false).
+    /// </summary>
+    public IEnumerable<Ability3D> GetOnlyAbilities()
+    {
+        return _abilities.Values.Where(a => !a.UsesMana);
+    }
+
+    /// <summary>
+    /// Get unlocked spells.
+    /// </summary>
+    public IEnumerable<Ability3D> GetUnlockedSpells()
+    {
+        return _abilities.Values.Where(a => a.UsesMana && a.IsUnlocked);
+    }
+
+    /// <summary>
+    /// Get unlocked abilities.
+    /// </summary>
+    public IEnumerable<Ability3D> GetUnlockedAbilities()
+    {
+        return _abilities.Values.Where(a => !a.UsesMana && a.IsUnlocked);
+    }
+
+    /// <summary>
+    /// Get spells available to unlock at a given player level.
+    /// </summary>
+    public IEnumerable<Ability3D> GetSpellsAvailableAtLevel(int level)
+    {
+        return _abilities.Values
+            .Where(a => a.UsesMana && !a.IsUnlocked && a.RequiredLevel <= level)
+            .OrderBy(a => a.RequiredLevel);
+    }
+
+    /// <summary>
+    /// Get abilities available to unlock at a given player level.
+    /// </summary>
+    public IEnumerable<Ability3D> GetAbilitiesAvailableAtLevel(int level)
+    {
+        return _abilities.Values
+            .Where(a => !a.UsesMana && !a.IsUnlocked && a.RequiredLevel <= level)
+            .OrderBy(a => a.RequiredLevel);
+    }
+
+    /// <summary>
+    /// Get total unlocked count.
+    /// </summary>
+    public int UnlockedCount => _unlockedIds.Count;
+
+    /// <summary>
+    /// Get unlocked spell count.
+    /// </summary>
+    public int UnlockedSpellCount => _abilities.Values.Count(a => a.UsesMana && a.IsUnlocked);
+
+    /// <summary>
+    /// Get unlocked ability count.
+    /// </summary>
+    public int UnlockedAbilityCount => _abilities.Values.Count(a => !a.UsesMana && a.IsUnlocked);
+
+    /// <summary>
+    /// Save unlocked IDs for persistence.
+    /// </summary>
+    public List<string> GetUnlockedIds()
+    {
+        return _unlockedIds.ToList();
+    }
+
+    /// <summary>
+    /// Load unlocked IDs from save data.
+    /// </summary>
+    public void LoadUnlockedIds(IEnumerable<string> ids)
+    {
+        _unlockedIds.Clear();
+
+        foreach (var id in ids)
+        {
+            if (_abilities.TryGetValue(id, out var ability))
+            {
+                _unlockedIds.Add(id);
+                ability.IsUnlocked = true;
+            }
+        }
+
+        GD.Print($"[AbilityManager3D] Loaded {_unlockedIds.Count} unlocked spells/abilities");
     }
 
     public override void _ExitTree()

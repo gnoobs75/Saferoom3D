@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(powershell -Command \"Write-Host '''' ; Write-Host ''    +-----------------------------------------------------------+'' -ForegroundColor Green ; Write-Host ''    |                                                           |'' -ForegroundColor Green ; Write-Host ''    |    ####   ###   ####  ####     ####   ###   ###  #   #    |'' -ForegroundColor Cyan\")",
+      "Bash(powershell -NoProfile -Command \"Write-Host ''''; Write-Host ''    +-----------------------------------------------------------+'' -ForegroundColor Green; Write-Host ''    |    ####   ###   ####  ####     ####   ###   ###  #   #    |'' -ForegroundColor Cyan; Write-Host ''    |                       ,      ,                           |'' -ForegroundColor Yellow; Write-Host ''    +-----------------------------------------------------------+'' -ForegroundColor Green\")",
+      "Bash(powershell -NoProfile -Command \"[Console]::Error.WriteLine\\(''''\\); [Console]::Error.WriteLine\\(''    +-----------------------------------------------------------+''\\); [Console]::Error.WriteLine\\(''    |    ####   ###   ####  ####     ####   ###   ###  #   #    |''\\); [Console]::Error.WriteLine\\(''    +-----------------------------------------------------------+''\\); exit 2\")",
+      "Bash(python -c:*)",
+      "Bash(dir \"C:\\\\Claude\\\\SafeRoom3D\\\\.claude\" /b)",
+      "Bash(node -e:*)",
+      "Bash(where:*)",
+      "Bash(dir \"%APPDATA%\\\\claude-code\")",
+      "Bash(dir \"%USERPROFILE%\\\\.claude\")"
+    ]
+  }
+}

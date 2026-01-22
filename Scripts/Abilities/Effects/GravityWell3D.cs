@@ -4,10 +4,10 @@ using System.Collections.Generic;
 namespace SafeRoom3D.Abilities.Effects;
 
 /// <summary>
-/// Gravity Well ability - Create a singularity that pulls enemies toward center.
+/// Gravity Well spell - Create a singularity that pulls enemies toward center.
 /// Targeted control spell for grouping enemies.
 /// </summary>
-public partial class GravityWell3D : Ability3D, ITargetedAbility
+public partial class GravityWell3D : Spell3D, ITargetedAbility
 {
     public override string AbilityId => "gravity_well";
     public override string AbilityName => "Gravity Well";
@@ -16,6 +16,7 @@ public partial class GravityWell3D : Ability3D, ITargetedAbility
 
     public override float DefaultCooldown => 45f;
     public override int DefaultManaCost => 20;
+    public override int RequiredLevel => 5;
 
     // Gravity Well stats
     public float Duration { get; private set; } = 5f;

@@ -4,10 +4,10 @@ using System.Collections.Generic;
 namespace SafeRoom3D.Abilities.Effects;
 
 /// <summary>
-/// Banshee's Wail ability - Scream that causes enemies to flee.
+/// Banshee's Wail spell - Scream that causes enemies to flee.
 /// Instant fear AOE around the player.
 /// </summary>
-public partial class BansheesWail3D : Ability3D
+public partial class BansheesWail3D : Spell3D
 {
     // Singleton for checking fear state
     public static BansheesWail3D? Instance { get; private set; }
@@ -19,6 +19,7 @@ public partial class BansheesWail3D : Ability3D
 
     public override float DefaultCooldown => 25f;
     public override int DefaultManaCost => 30;
+    public override int RequiredLevel => 6;
 
     // Banshee's Wail stats
     public float Duration { get; private set; } = 4f;

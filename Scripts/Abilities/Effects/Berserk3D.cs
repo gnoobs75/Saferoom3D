@@ -3,10 +3,10 @@ using Godot;
 namespace SafeRoom3D.Abilities.Effects;
 
 /// <summary>
-/// Berserk ability - Double movement and attack speed for a duration.
+/// Berserk spell - Double movement and attack speed for a duration.
 /// Self-buff that makes the player faster and deadlier.
 /// </summary>
-public partial class Berserk3D : Ability3D
+public partial class Berserk3D : Spell3D
 {
     public override string AbilityId => "berserk";
     public override string AbilityName => "Berserk";
@@ -15,6 +15,7 @@ public partial class Berserk3D : Ability3D
 
     public override float DefaultCooldown => 120f; // 2 minutes
     public override int DefaultManaCost => 25;
+    public override int RequiredLevel => 8;
 
     // Berserk stats
     public float Duration { get; private set; } = 15f;

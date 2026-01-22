@@ -16,6 +16,7 @@ public partial class ProtectiveShell3D : Ability3D
 
     public override float DefaultCooldown => 120f; // 2 minutes
     public override int DefaultManaCost => 0;
+    public override int RequiredLevel => 1; // Starter ability
 
     // Protective Shell stats - tighter to character
     public float Duration { get; private set; } = 15f;

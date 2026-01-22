@@ -205,6 +205,10 @@ public partial class Corpse3D : StaticBody3D
                 Loot.TakeItem(slot); // Remove from loot bag
                 anyLooted = true;
                 GD.Print($"[Corpse3D] Auto-looted {quantity}x {itemName}");
+
+                // Update quest progress for collected items
+                int totalCount = inventory.CountItemById(item.Id);
+                Core.QuestManager.Instance?.OnItemPickedUp(item.Id, totalCount);
             }
             else
             {

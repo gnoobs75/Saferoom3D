@@ -15,6 +15,7 @@ public partial class AudienceFavorite3D : Ability3D
 
     public override float DefaultCooldown => 90f;
     public override int DefaultManaCost => 0;
+    public override int RequiredLevel => 5;
 
     // Audience Favorite stats
     public float Duration { get; private set; } = 20f;

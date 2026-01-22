@@ -5,10 +5,10 @@ using System.Linq;
 namespace SafeRoom3D.Abilities.Effects;
 
 /// <summary>
-/// Timestop Bubble ability - Create a zone that freezes enemies.
+/// Timestop Bubble spell - Create a zone that freezes enemies.
 /// Targeted control spell that completely stops enemies inside.
 /// </summary>
-public partial class TimestopBubble3D : Ability3D, ITargetedAbility
+public partial class TimestopBubble3D : Spell3D, ITargetedAbility
 {
     public override string AbilityId => "timestop_bubble";
     public override string AbilityName => "Timestop Bubble";
@@ -17,6 +17,7 @@ public partial class TimestopBubble3D : Ability3D, ITargetedAbility
 
     public override float DefaultCooldown => 30f;
     public override int DefaultManaCost => 50;
+    public override int RequiredLevel => 7;
 
     // Timestop stats
     public float Duration { get; private set; } = 6f;

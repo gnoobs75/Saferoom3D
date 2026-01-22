@@ -15,6 +15,7 @@ public partial class SponsorBlessing3D : Ability3D, ITargetedAbility
 
     public override float DefaultCooldown => 120f; // 2 minutes
     public override int DefaultManaCost => 0;
+    public override int RequiredLevel => 2;
 
     // Sponsor's Blessing stats
     public int HealAmount { get; private set; } = 50;

@@ -18,6 +18,7 @@ public partial class EngineOfTomorrow3D : Ability3D
 
     public override float DefaultCooldown => 120f; // 2 minutes
     public override int DefaultManaCost => 0;
+    public override int RequiredLevel => 6;
 
     // Engine of Tomorrow stats
     public float Duration { get; private set; } = 15f;
