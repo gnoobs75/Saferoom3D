@@ -1061,10 +1061,15 @@ public partial class GoblinShaman : CharacterBody3D
 
     public void TakeDamage(float damage, Vector3 fromPosition, string source)
     {
-        TakeDamage(damage, fromPosition, source, false);
+        TakeDamage(damage, fromPosition, source, false, 1f);
     }
 
     public void TakeDamage(float damage, Vector3 fromPosition, string source, bool isCrit)
+    {
+        TakeDamage(damage, fromPosition, source, isCrit, 1f);
+    }
+
+    public void TakeDamage(float damage, Vector3 fromPosition, string source, bool isCrit, float pushbackMultiplier)
     {
         if (CurrentState == State.Dead) return;
 
