@@ -32,6 +32,11 @@ public partial class QuestUI3D : Control
 	private Button? _acceptButton;
 	private Button? _turnInButton;
 
+	// Mordecai dialogue
+	private Label? _dialogueLabel;
+	private float _dialogueTimer;
+	private const float DialogueFadeTime = 8f;
+
 	private Quest? _selectedQuest;
 
 	// Window dragging
@@ -77,12 +82,25 @@ public partial class QuestUI3D : Control
 		_titleLabel = new Label();
 		_titleLabel.Text = "Mordecai the Game Guide";
 		_titleLabel.HorizontalAlignment = HorizontalAlignment.Center;
-		_titleLabel.Position = new Vector2(0, 10);
-		_titleLabel.Size = new Vector2(900, 35);
-		_titleLabel.AddThemeFontSizeOverride("font_size", 28);
+		_titleLabel.Position = new Vector2(0, 8);
+		_titleLabel.Size = new Vector2(900, 28);
+		_titleLabel.AddThemeFontSizeOverride("font_size", 24);
 		_titleLabel.AddThemeColorOverride("font_color", new Color(0.8f, 0.7f, 0.9f));
 		_titleLabel.MouseFilter = MouseFilterEnum.Ignore;
 		_panel.AddChild(_titleLabel);
+
+		// Mordecai dialogue label (below title, italicized)
+		_dialogueLabel = new Label();
+		_dialogueLabel.Text = "";
+		_dialogueLabel.HorizontalAlignment = HorizontalAlignment.Center;
+		_dialogueLabel.Position = new Vector2(20, 32);
+		_dialogueLabel.Size = new Vector2(860, 22);
+		_dialogueLabel.AddThemeFontSizeOverride("font_size", 14);
+		_dialogueLabel.AddThemeColorOverride("font_color", new Color(0.7f, 0.8f, 0.65f)); // Greenish for Mordecai
+		_dialogueLabel.MouseFilter = MouseFilterEnum.Ignore;
+		_dialogueLabel.AutowrapMode = TextServer.AutowrapMode.WordSmart;
+		_dialogueLabel.ClipText = true;
+		_panel.AddChild(_dialogueLabel);
 
 		// Close button (X)
 		var closeBtn = new Button();
@@ -95,8 +113,8 @@ public partial class QuestUI3D : Control
 
 		// Left side: Tab container for quest lists
 		_tabContainer = new TabContainer();
-		_tabContainer.Position = new Vector2(15, 55);
-		_tabContainer.Size = new Vector2(400, 530);
+		_tabContainer.Position = new Vector2(15, 60);
+		_tabContainer.Size = new Vector2(400, 525);
 		_tabContainer.TabChanged += OnTabChanged;
 		_panel.AddChild(_tabContainer);
 
@@ -114,8 +132,8 @@ public partial class QuestUI3D : Control
 
 		// Right side: Quest detail panel
 		_detailPanel = new Panel();
-		_detailPanel.Position = new Vector2(430, 55);
-		_detailPanel.Size = new Vector2(455, 530);
+		_detailPanel.Position = new Vector2(430, 60);
+		_detailPanel.Size = new Vector2(455, 525);
 
 		var detailStyle = new StyleBoxFlat();
 		detailStyle.BgColor = new Color(0.12f, 0.1f, 0.14f);
@@ -293,7 +311,24 @@ public partial class QuestUI3D : Control
 	private void SelectQuest(Quest quest)
 	{
 		_selectedQuest = quest;
+
+		// Show difficulty comment when selecting a quest
+		if (quest.Status == QuestStatus.Available)
+		{
+			SetMordecaiDialogue(MordecaiQuestDatabase.GetDifficultyComment(quest.Difficulty));
+		}
+
 		UpdateDetailPanel();
+	}
+
+	/// <summary>
+	/// Set Mordecai's dialogue text with a quote prefix.
+	/// </summary>
+	private void SetMordecaiDialogue(string text)
+	{
+		if (_dialogueLabel == null) return;
+		_dialogueLabel.Text = $"\"{text}\"";
+		_dialogueTimer = DialogueFadeTime;
 	}
 
 	private void OnTabChanged(long tabIndex)
@@ -361,6 +396,10 @@ public partial class QuestUI3D : Control
 		if (_selectedQuest.Status != QuestStatus.Available) return;
 
 		_currentNpc.AcceptQuest(_selectedQuest);
+
+		// Show Mordecai's accept dialogue
+		SetMordecaiDialogue(MordecaiQuestDatabase.GetQuestAcceptLine());
+
 		RefreshQuestLists();
 
 		// Switch to active tab
@@ -372,6 +411,9 @@ public partial class QuestUI3D : Control
 	{
 		if (_selectedQuest == null || _currentNpc == null) return;
 		if (_selectedQuest.Status != QuestStatus.ReadyToTurnIn) return;
+
+		// Show Mordecai's completion dialogue before clearing quest
+		SetMordecaiDialogue(MordecaiQuestDatabase.GetQuestCompleteLine());
 
 		_currentNpc.TurnInQuest(_selectedQuest);
 		_selectedQuest = null;
@@ -510,6 +552,9 @@ public partial class QuestUI3D : Control
 
 		// Update title
 		_titleLabel!.Text = $"{npc.NPCName} the Game Guide";
+
+		// Show Mordecai's greeting
+		SetMordecaiDialogue(MordecaiQuestDatabase.GetGreeting());
 
 		// Refresh quest lists
 		RefreshQuestLists();

@@ -63,6 +63,7 @@ public class Quest
     public string Description { get; set; } = "";
     public string GiverNpcId { get; set; } = "";      // "mordecai", "bopca", etc.
     public int RequiredLevel { get; set; } = 1;
+    public string Difficulty { get; set; } = "easy"; // "easy", "medium", "hard", "boss"
 
     public QuestStatus Status { get; set; } = QuestStatus.Available;
     public List<QuestObjective> Objectives { get; set; } = new();

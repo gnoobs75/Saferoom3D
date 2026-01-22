@@ -8,8 +8,8 @@ using SafeRoom3D.NPC;
 namespace SafeRoom3D.Core;
 
 /// <summary>
-/// Manages all quests in the game. Generates collection quests based on
-/// monsters present on the current floor.
+/// Manages all quests in the game. Generates collection and kill quests based on
+/// monsters present on the current floor. Uses MordecaiQuestDatabase for funny stories.
 /// </summary>
 public partial class QuestManager : Node
 {
@@ -24,9 +24,14 @@ public partial class QuestManager : Node
     // Completed quest IDs (persist across session)
     private HashSet<string> _completedQuestIds = new();
 
+    // Current floor's monster types for contextual quest stories
+    private List<string> _currentFloorMonsters = new();
+
     // Quest generation settings
     private const int MinCollectionAmount = 3;
     private const int MaxCollectionAmount = 10;
+    private const int MinKillAmount = 5;
+    private const int MaxKillAmount = 15;
     private const int BaseGoldReward = 50;
     private const int BaseXpReward = 100;
 
@@ -60,46 +65,57 @@ public partial class QuestManager : Node
     {
         _allQuests.Clear();
 
-        // Get unique monster types (exclude bosses for collection quests)
+        // Get unique monster types (exclude bosses for collection/kill quests)
         var normalMonsters = monsterTypes
             .Where(m => !m.Contains("boss") && !m.Contains("king") && !m.Contains("queen") && !m.Contains("lord") && !m.Contains("elder"))
             .Distinct()
             .ToList();
 
+        // Store for contextual quest stories
+        _currentFloorMonsters = new List<string>(normalMonsters);
+
         GD.Print($"[QuestManager] Generating quests for {normalMonsters.Count} monster types on floor {floorLevel}");
 
-        // Generate 1-3 collection quests per monster type
+        // Generate both collection AND kill quests per monster type
         foreach (var monsterType in normalMonsters)
         {
             var partId = MonsterPartDatabase.GetMonsterPartId(monsterType);
             var partName = MonsterPartDatabase.GetMonsterPartName(partId);
             var monsterName = MonsterPartDatabase.GetMonsterDisplayName(monsterType);
 
-            // Easy quest (3-5 items)
-            GenerateCollectionQuest(
-                monsterType, partId, partName, monsterName,
-                GD.RandRange(MinCollectionAmount, 5),
-                floorLevel, "easy"
-            );
+            // Get other monsters for contextual stories
+            var otherMonsters = normalMonsters.Where(m => m != monsterType).ToList();
 
-            // Medium quest (6-8 items) - only if floor level > 1
+            // === KILL QUESTS ===
+            // Easy kill quest (5-8 kills)
+            GenerateKillQuest(monsterType, monsterName, GD.RandRange(MinKillAmount, 8), floorLevel, "easy", otherMonsters);
+
+            // Medium kill quest (8-12 kills) - floor 2+
             if (floorLevel > 1)
             {
-                GenerateCollectionQuest(
-                    monsterType, partId, partName, monsterName,
-                    GD.RandRange(6, 8),
-                    floorLevel, "medium"
-                );
+                GenerateKillQuest(monsterType, monsterName, GD.RandRange(8, 12), floorLevel, "medium", otherMonsters);
             }
 
-            // Hard quest (8-10 items) - only if floor level > 2
+            // Hard kill quest (12-15 kills) - floor 3+
             if (floorLevel > 2)
             {
-                GenerateCollectionQuest(
-                    monsterType, partId, partName, monsterName,
-                    GD.RandRange(8, MaxCollectionAmount),
-                    floorLevel, "hard"
-                );
+                GenerateKillQuest(monsterType, monsterName, GD.RandRange(12, MaxKillAmount), floorLevel, "hard", otherMonsters);
+            }
+
+            // === COLLECTION QUESTS ===
+            // Easy collection quest (3-5 items)
+            GenerateCollectionQuest(monsterType, partId, partName, monsterName, GD.RandRange(MinCollectionAmount, 5), floorLevel, "easy", otherMonsters);
+
+            // Medium collection quest (6-8 items) - floor 2+
+            if (floorLevel > 1)
+            {
+                GenerateCollectionQuest(monsterType, partId, partName, monsterName, GD.RandRange(6, 8), floorLevel, "medium", otherMonsters);
+            }
+
+            // Hard collection quest (8-10 items) - floor 3+
+            if (floorLevel > 2)
+            {
+                GenerateCollectionQuest(monsterType, partId, partName, monsterName, GD.RandRange(8, MaxCollectionAmount), floorLevel, "hard", otherMonsters);
             }
         }
 
@@ -114,11 +130,62 @@ public partial class QuestManager : Node
             GenerateBossQuest(bossType, floorLevel);
         }
 
-        GD.Print($"[QuestManager] Generated {_allQuests.Count} quests total");
+        GD.Print($"[QuestManager] Generated {_allQuests.Count} quests total ({normalMonsters.Count} monster types, {bossTypes.Count} bosses)");
+    }
+
+    private void GenerateKillQuest(string monsterType, string monsterName, int amount,
+        int floorLevel, string difficulty, List<string> otherMonsters)
+    {
+        string questId = $"kill_{monsterType}_{amount}_{difficulty}";
+
+        // Skip if already completed
+        if (_completedQuestIds.Contains(questId)) return;
+
+        // Calculate rewards based on difficulty and floor
+        float difficultyMultiplier = difficulty switch
+        {
+            "easy" => 1f,
+            "medium" => 1.5f,
+            "hard" => 2f,
+            _ => 1f
+        };
+
+        int goldReward = (int)(BaseGoldReward * amount * 0.8f * difficultyMultiplier * (1 + floorLevel * 0.2f));
+        int xpReward = (int)(BaseXpReward * amount * difficultyMultiplier * (1 + floorLevel * 0.15f));
+
+        // Use MordecaiQuestDatabase for funny titles and descriptions
+        var quest = new Quest
+        {
+            Id = questId,
+            Title = MordecaiQuestDatabase.GenerateKillQuestTitle(monsterType, amount),
+            Description = MordecaiQuestDatabase.GenerateKillQuestDescription(monsterType, amount, otherMonsters),
+            GiverNpcId = "mordecai",
+            RequiredLevel = floorLevel,
+            Difficulty = difficulty,
+            Status = QuestStatus.Available,
+            Objectives = new List<QuestObjective>
+            {
+                new QuestObjective
+                {
+                    Type = QuestObjectiveType.KillMonster,
+                    TargetId = monsterType,
+                    TargetName = monsterName,
+                    RequiredCount = amount,
+                    CurrentCount = 0
+                }
+            },
+            Reward = new QuestReward
+            {
+                Gold = goldReward,
+                Experience = xpReward
+            }
+        };
+
+        _allQuests[questId] = quest;
     }
 
     private void GenerateCollectionQuest(string monsterType, string partId, string partName,
-        string monsterName, int amount, int floorLevel, string difficulty)
+        string monsterName, int amount, int floorLevel, string difficulty, List<string> otherMonsters)
     {
         string questId = $"collect_{partId}_{amount}_{difficulty}";
 
@@ -137,13 +204,15 @@ public partial class QuestManager : Node
         int goldReward = (int)(BaseGoldReward * amount * difficultyMultiplier * (1 + floorLevel * 0.2f));
         int xpReward = (int)(BaseXpReward * amount * difficultyMultiplier * (1 + floorLevel * 0.15f));
 
+        // Use MordecaiQuestDatabase for funny titles and descriptions
         var quest = new Quest
         {
             Id = questId,
-            Title = GetQuestTitle(partName, amount, difficulty),
-            Description = GetQuestDescription(monsterName, partName, amount),
+            Title = MordecaiQuestDatabase.GenerateCollectionQuestTitle(monsterType, partName, amount),
+            Description = MordecaiQuestDatabase.GenerateCollectionQuestDescription(monsterType, partName, amount, otherMonsters),
             GiverNpcId = "mordecai",
             RequiredLevel = floorLevel,
+            Difficulty = difficulty,
             Status = QuestStatus.Available,
             Objectives = new List<QuestObjective>
             {
@@ -177,14 +246,15 @@ public partial class QuestManager : Node
         int goldReward = BaseGoldReward * 10 * floorLevel;
         int xpReward = BaseXpReward * 10 * floorLevel;
 
+        // Use MordecaiQuestDatabase for funny boss quest stories
         var quest = new Quest
         {
             Id = questId,
-            Title = $"Slay the {bossName}",
-            Description = $"The {bossName} is a terrible threat to all crawlers. " +
-                          $"Defeat this powerful foe and bring proof of your victory.",
+            Title = MordecaiQuestDatabase.GenerateBossQuestTitle(bossType),
+            Description = MordecaiQuestDatabase.GenerateBossQuestDescription(bossType),
             GiverNpcId = "mordecai",
             RequiredLevel = floorLevel,
+            Difficulty = "boss",
             Status = QuestStatus.Available,
             Objectives = new List<QuestObjective>
             {
@@ -205,38 +275,6 @@ public partial class QuestManager : Node
         };
 
         _allQuests[questId] = quest;
-    }
-
-    private string GetQuestTitle(string partName, int amount, string difficulty)
-    {
-        string[] easyTitles = { "Gather", "Collect", "Retrieve", "Obtain" };
-        string[] mediumTitles = { "Hunt for", "Acquire", "Procure", "Secure" };
-        string[] hardTitles = { "Harvest", "Stockpile", "Amass", "Accumulate" };
-
-        string[] titles = difficulty switch
-        {
-            "easy" => easyTitles,
-            "medium" => mediumTitles,
-            "hard" => hardTitles,
-            _ => easyTitles
-        };
-
-        string verb = titles[GD.RandRange(0, titles.Length - 1)];
-        return $"{verb} {amount} {partName}s";
-    }
-
-    private string GetQuestDescription(string monsterName, string partName, int amount)
-    {
-        string[] templates =
-        {
-            $"I require {amount} {partName}s for my research. You can obtain them from {monsterName}s.",
-            $"The alchemists guild needs {amount} {partName}s. Slay some {monsterName}s and collect them.",
-            $"For a special brew, I need exactly {amount} {partName}s. {monsterName}s carry these.",
-            $"A fellow crawler has requested {amount} {partName}s. Help me gather them from {monsterName}s.",
-            $"My studies require {amount} {partName}s. You'll find them on {monsterName}s."
-        };
-
-        return templates[GD.RandRange(0, templates.Length - 1)];
     }
 
     /// <summary>

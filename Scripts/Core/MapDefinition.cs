@@ -24,6 +24,13 @@ public class MapDefinition
     public string Name { get; set; } = "Custom Dungeon";
 
     /// <summary>
+    /// Floor level of this dungeon (1-based). Affects quest difficulty and rewards.
+    /// If not specified, attempts to infer from map name (e.g., "Floor 2", "level_3").
+    /// </summary>
+    [JsonPropertyName("floorLevel")]
+    public int FloorLevel { get; set; } = 1;
+
+    /// <summary>
     /// Map mode: "rooms" for traditional room-based maps, "tiles" for WYSIWYG tile-painted maps.
     /// </summary>
     [JsonPropertyName("mode")]
@@ -99,6 +106,53 @@ public class MapDefinition
     /// </summary>
     [JsonIgnore]
     public bool IsTileMode => Mode == "tiles";
+
+    /// <summary>
+    /// Gets the effective floor level, inferring from map name if FloorLevel is default (1).
+    /// </summary>
+    [JsonIgnore]
+    public int EffectiveFloorLevel
+    {
+        get
+        {
+            // If explicitly set to something other than 1, use that
+            if (FloorLevel > 1) return FloorLevel;
+
+            // Try to infer from map name
+            return InferFloorLevelFromName(Name);
+        }
+    }
+
+    /// <summary>
+    /// Infers floor level from map name patterns like "Floor 2", "level_3", "dungeon-4", etc.
+    /// </summary>
+    private static int InferFloorLevelFromName(string name)
+    {
+        if (string.IsNullOrEmpty(name)) return 1;
+
+        var lowerName = name.ToLower();
+
+        // Try patterns like "floor 2", "floor_3", "floor-4"
+        var patterns = new[]
+        {
+            @"floor[\s_-]?(\d+)",
+            @"level[\s_-]?(\d+)",
+            @"dungeon[\s_-]?(\d+)",
+            @"f(\d+)",
+            @"l(\d+)"
+        };
+
+        foreach (var pattern in patterns)
+        {
+            var match = System.Text.RegularExpressions.Regex.Match(lowerName, pattern);
+            if (match.Success && int.TryParse(match.Groups[1].Value, out int level))
+            {
+                return Math.Max(1, Math.Min(level, 10)); // Clamp to 1-10
+            }
+        }
+
+        return 1;
+    }
 
     /// <summary>
     /// Loads a map definition from a JSON file.

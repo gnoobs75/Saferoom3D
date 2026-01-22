@@ -670,9 +670,9 @@ public partial class DungeonGenerator3D
         // Generate quests if we have monsters
         if (monsterTypes.Count > 0)
         {
-            int floorLevel = 1; // TODO: Get from map definition or floor counter
+            int floorLevel = map.EffectiveFloorLevel;
             QuestManager.Instance?.GenerateQuestsForFloor(monsterTypes, floorLevel);
-            GD.Print($"[DungeonGenerator3D] Generated quests for {monsterTypes.Count} monster types");
+            GD.Print($"[DungeonGenerator3D] Generated quests for {monsterTypes.Count} monster types on floor {floorLevel}");
         }
     }
 
