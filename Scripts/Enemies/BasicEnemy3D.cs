@@ -201,6 +201,16 @@ public partial class BasicEnemy3D : CharacterBody3D
     private const float EyeGlowMinEnergy = 1.8f;
     private const float EyeGlowMaxEnergy = 2.5f;
 
+    // Aggro eye effect (for GLB models without named eyes)
+    private Color _normalEyeColor;  // Stored eye color before aggro
+    private MeshInstance3D? _aggroEyeLeft;
+    private MeshInstance3D? _aggroEyeRight;
+    private OmniLight3D? _aggroEyeLight;
+    private float _aggroEyePulseTimer;
+    private const float AggroEyePulseSpeed = 4f;  // Faster pulse when angry
+    private const float AggroEyeMinEnergy = 2.5f;
+    private const float AggroEyeMaxEnergy = 4.0f;
+
     // Footstep Dust
     private Vector3 _lastFootstepPos;
     private const float FootstepDustDistance = 0.5f;  // Distance between dust puffs
@@ -1540,6 +1550,9 @@ public partial class BasicEnemy3D : CharacterBody3D
 
         // Update glowing eyes pulse (always runs for ambient effect)
         UpdateEyeGlowPulse(delta);
+
+        // Update aggro eye pulse (when aggroed, eyes pulse faster/brighter)
+        UpdateAggroEyePulse(delta);
 
         // Update head tracking toward player
         UpdateHeadTracking(dt);
@@ -4619,27 +4632,214 @@ public partial class BasicEnemy3D : CharacterBody3D
     // ===================
 
     /// <summary>
-    /// Enable red-orange glow when enemy enters aggro state.
+    /// Enable aggro effect - red glowing eyes instead of full model emission.
     /// </summary>
     private void EnableAggroGlow()
     {
         if (_isAggroGlowActive) return;
         _isAggroGlowActive = true;
 
-        // Red-orange aggressive glow
-        SetModelEmission(new Color(1f, 0.3f, 0.2f), 1.5f);
+        Color aggroEyeColor = new Color(1f, 0.15f, 0.1f);  // Deep red
+
+        // If we have eye meshes (procedural model), turn them red
+        if (_eyeMeshes.Count > 0)
+        {
+            // Store normal eye color before changing
+            if (_eyeMeshes[0].MaterialOverride is StandardMaterial3D mat)
+            {
+                _normalEyeColor = mat.Emission;
+            }
+
+            // Set eyes to angry red
+            foreach (var eyeMesh in _eyeMeshes)
+            {
+                SetEyeEmission(eyeMesh, aggroEyeColor, AggroEyeMinEnergy);
+            }
+        }
+        else if (_isGlbModel)
+        {
+            // For GLB models without named eyes, create glowing eye orbs
+            CreateAggroEyeOrbs();
+        }
     }
 
     /// <summary>
-    /// Disable aggro glow when enemy leaves aggro state.
+    /// Create glowing red eye orbs for GLB models when aggroed.
+    /// </summary>
+    private void CreateAggroEyeOrbs()
+    {
+        if (_aggroEyeLeft != null) return;  // Already created
+
+        // Estimate head position based on model - most humanoids have head around 70-90% of height
+        float modelHeight = 1.2f;  // Default estimate
+        float headY = modelHeight * 0.85f;
+        float eyeSpacing = 0.08f;
+        float eyeForward = 0.12f;
+        float eyeSize = 0.04f;
+
+        // Adjust based on monster type
+        switch (MonsterType.ToLower())
+        {
+            case "slime":
+            case "green_slime":
+            case "fire_slime":
+            case "void_slime":
+                headY = 0.3f;
+                eyeSpacing = 0.1f;
+                eyeForward = 0.15f;
+                break;
+            case "spider":
+            case "clockwork_spider":
+                headY = 0.25f;
+                eyeSpacing = 0.06f;
+                eyeForward = 0.18f;
+                eyeSize = 0.03f;
+                break;
+            case "rat":
+            case "badlama":
+                headY = 0.4f;
+                eyeSpacing = 0.05f;
+                eyeForward = 0.15f;
+                break;
+            case "dragon":
+            case "dragon_king":
+                headY = 2.0f;
+                eyeSpacing = 0.15f;
+                eyeForward = 0.3f;
+                eyeSize = 0.08f;
+                break;
+            case "mimic":
+                headY = 0.5f;
+                eyeSpacing = 0.12f;
+                eyeForward = 0.2f;
+                break;
+        }
+
+        Color aggroColor = new Color(1f, 0.15f, 0.1f);
+
+        // Create left eye orb
+        _aggroEyeLeft = new MeshInstance3D();
+        var sphereL = new SphereMesh();
+        sphereL.Radius = eyeSize;
+        sphereL.Height = eyeSize * 2f;
+        _aggroEyeLeft.Mesh = sphereL;
+        var matL = new StandardMaterial3D();
+        matL.AlbedoColor = aggroColor;
+        matL.EmissionEnabled = true;
+        matL.Emission = aggroColor;
+        matL.EmissionEnergyMultiplier = AggroEyeMinEnergy;
+        matL.ShadingMode = BaseMaterial3D.ShadingModeEnum.Unshaded;
+        _aggroEyeLeft.MaterialOverride = matL;
+        _aggroEyeLeft.Position = new Vector3(-eyeSpacing, headY, eyeForward);
+        _meshInstance?.AddChild(_aggroEyeLeft);
+
+        // Create right eye orb
+        _aggroEyeRight = new MeshInstance3D();
+        var sphereR = new SphereMesh();
+        sphereR.Radius = eyeSize;
+        sphereR.Height = eyeSize * 2f;
+        _aggroEyeRight.Mesh = sphereR;
+        var matR = new StandardMaterial3D();
+        matR.AlbedoColor = aggroColor;
+        matR.EmissionEnabled = true;
+        matR.Emission = aggroColor;
+        matR.EmissionEnergyMultiplier = AggroEyeMinEnergy;
+        matR.ShadingMode = BaseMaterial3D.ShadingModeEnum.Unshaded;
+        _aggroEyeRight.MaterialOverride = matR;
+        _aggroEyeRight.Position = new Vector3(eyeSpacing, headY, eyeForward);
+        _meshInstance?.AddChild(_aggroEyeRight);
+
+        // Add small omni light between eyes for dramatic effect
+        _aggroEyeLight = new OmniLight3D();
+        _aggroEyeLight.LightColor = aggroColor;
+        _aggroEyeLight.LightEnergy = 0.3f;
+        _aggroEyeLight.OmniRange = 0.5f;
+        _aggroEyeLight.Position = new Vector3(0, headY, eyeForward * 0.8f);
+        _meshInstance?.AddChild(_aggroEyeLight);
+    }
+
+    /// <summary>
+    /// Disable aggro effect - restore normal eye color.
     /// </summary>
     private void DisableAggroGlow()
     {
         if (!_isAggroGlowActive) return;
         _isAggroGlowActive = false;
 
-        // Disable emission
-        SetModelEmission(Colors.Black, 0f);
+        // Restore normal eye color for procedural models
+        if (_eyeMeshes.Count > 0)
+        {
+            Color normalColor = GetEyeGlowColor();
+            foreach (var eyeMesh in _eyeMeshes)
+            {
+                SetEyeEmission(eyeMesh, normalColor, EyeGlowMinEnergy);
+            }
+        }
+
+        // Remove aggro eye orbs for GLB models
+        RemoveAggroEyeOrbs();
+    }
+
+    /// <summary>
+    /// Remove the aggro eye orbs when leaving aggro state.
+    /// </summary>
+    private void RemoveAggroEyeOrbs()
+    {
+        if (_aggroEyeLeft != null && IsInstanceValid(_aggroEyeLeft))
+        {
+            _aggroEyeLeft.QueueFree();
+            _aggroEyeLeft = null;
+        }
+        if (_aggroEyeRight != null && IsInstanceValid(_aggroEyeRight))
+        {
+            _aggroEyeRight.QueueFree();
+            _aggroEyeRight = null;
+        }
+        if (_aggroEyeLight != null && IsInstanceValid(_aggroEyeLight))
+        {
+            _aggroEyeLight.QueueFree();
+            _aggroEyeLight = null;
+        }
+    }
+
+    /// <summary>
+    /// Update aggro eye pulse effect (called from _Process when aggroed).
+    /// </summary>
+    private void UpdateAggroEyePulse(double delta)
+    {
+        if (!_isAggroGlowActive) return;
+
+        _aggroEyePulseTimer += (float)delta * AggroEyePulseSpeed * Mathf.Pi * 2f;
+        float pulse = (Mathf.Sin(_aggroEyePulseTimer) + 1f) * 0.5f;
+        float energy = Mathf.Lerp(AggroEyeMinEnergy, AggroEyeMaxEnergy, pulse);
+
+        Color aggroColor = new Color(1f, 0.15f, 0.1f);
+
+        // Update procedural model eyes
+        if (_eyeMeshes.Count > 0)
+        {
+            foreach (var eyeMesh in _eyeMeshes)
+            {
+                if (IsInstanceValid(eyeMesh) && eyeMesh.MaterialOverride is StandardMaterial3D mat)
+                {
+                    mat.EmissionEnergyMultiplier = energy;
+                }
+            }
+        }
+
+        // Update GLB aggro eye orbs
+        if (_aggroEyeLeft != null && IsInstanceValid(_aggroEyeLeft) && _aggroEyeLeft.MaterialOverride is StandardMaterial3D matL)
+        {
+            matL.EmissionEnergyMultiplier = energy;
+        }
+        if (_aggroEyeRight != null && IsInstanceValid(_aggroEyeRight) && _aggroEyeRight.MaterialOverride is StandardMaterial3D matR)
+        {
+            matR.EmissionEnergyMultiplier = energy;
+        }
+        if (_aggroEyeLight != null && IsInstanceValid(_aggroEyeLight))
+        {
+            _aggroEyeLight.LightEnergy = 0.2f + pulse * 0.3f;
+        }
     }
 
     /// <summary>
